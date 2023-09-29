@@ -30,7 +30,7 @@ const items = [
     ]),
     getItem('Group', 'grp', null, [getItem('Option 13', '13'), getItem('Option 14', '14')], 'group'),
 ];
-const App = () => {
+const Sidebar = () => {
     const onClick = (e) => {
         console.log('click ', e);
     };
@@ -47,4 +47,4 @@ const App = () => {
         />
     );
 };
-export default App;
+export default Sidebar;

@@ -1,5 +1,5 @@
-function UserLayout() {
-    return <h1>Layout User</h1>;
+function DefaultLayout({ children }) {
+    return <h1>{children}</h1>;
 }
 
-export default UserLayout;
+export default DefaultLayout;
