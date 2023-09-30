@@ -9,7 +9,7 @@ const headerStyle = {
 function Header() {
     return (
         <div>
-            <div style={headerStyle}>Header</div>
+            <div style={headerStyle}>Headerrrrrrrrrrrrr</div>
         </div>
     );
 }
