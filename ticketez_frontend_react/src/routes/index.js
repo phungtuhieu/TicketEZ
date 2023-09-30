@@ -18,7 +18,7 @@ const publicRoutes = [
 
     // User
     { path: '/', component: UserHome, layout: DefaultLayout },
-    { path: '/contact', component: UserContact },
+    { path: '/contact', component: UserContact, layout: DefaultLayout },
 ];
 
 const privateRoutes = [];
