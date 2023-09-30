@@ -1,10 +1,1 @@
-function Header() {
-    return (
-        <div style={{ flex: 1 }}>
-            {/* Đặt nội dung header phụ ở đây */}
-            <span>Ticket EZ</span>
-        </div>
-    );
-}
-
-export default Header;
+export { default as HeaderAdminLeft } from './HeaderAdminLeft';
