@@ -1,5 +1,10 @@
 function Header() {
-    return <h2>Header</h2>;
+    return (
+        <div style={{ flex: 1 }}>
+            {/* Đặt nội dung header phụ ở đây */}
+            <span>Ticket EZ</span>
+        </div>
+    );
 }
 
 export default Header;

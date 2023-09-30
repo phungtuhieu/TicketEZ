@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
-import { DefaultLayout } from '~/layouts/Admin';
+import { AdminLayout, DefaultLayout } from '~/layouts';
 import { Fragment } from 'react';
 function App() {
     return (
@@ -16,7 +16,17 @@ function App() {
                         } else if (route.layout === null) {
                             Layout = Fragment;
                         }
-                        return <Route key={index} path={route.path} element={<Page />} />;
+                        return (
+                            <Route
+                                key={index}
+                                path={route.path}
+                                element={
+                                    <Layout>
+                                        <Page />
+                                    </Layout>
+                                }
+                            />
+                        );
                     })}
                 </Routes>
             </div>
