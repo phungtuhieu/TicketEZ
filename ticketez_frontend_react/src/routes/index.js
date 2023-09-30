@@ -9,6 +9,12 @@ const publicRoutes = [
     { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout },
     { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout },
     { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout },
+    { path: '/admin/showtime', component: PageAdmin.AdminShowtime, layout: AdminLayout },
+    { path: '/admin/seat', component: PageAdmin.AdminSeat, layout: AdminLayout },
+    { path: '/admin/seat-type', component: PageAdmin.AdminSeatType, layout: AdminLayout },
+    { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
+    { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
+    { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
 
     // User
     { path: '/', component: UserHome, layout: DefaultLayout },

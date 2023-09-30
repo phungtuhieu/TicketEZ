@@ -32,34 +32,25 @@ const items = [
     // Quản lý ghế
     getItem('Ghế', 'grSeat', <FontAwesomeIcon icon={solidIcons.faCouch} />, [
         getItem(<Link to="/admin/seat">Ghế</Link>, 'seat', null),
-        getItem(<Link to="/admin/seat">Loại ghế</Link>, 'seatType', null),
+        getItem(<Link to="/admin/seat-type">Loại ghế</Link>, 'seatType', null),
     ]),
 
     // Quản lý dịch vụ, sự kiện
     getItem('Dịch vụ & sự kiện', 'grServiceEvent', <FontAwesomeIcon icon={solidIcons.faCalendarCheck} />, [
-        getItem(<Link to="/admin/seat">Combo</Link>, 'combo'),
+        getItem(<Link to="/admin/combo">Combo</Link>, 'combo'),
         getItem(
             'Sự kiện',
             'grEvent',
             null,
             [
-                getItem(<Link to="/admin/seat">Giảm giá</Link>, 'discount'),
-                getItem(<Link to="/admin/seat">Sự kiện</Link>, 'discount'),
+                getItem(<Link to="/admin/discount">Giảm giá</Link>, 'discount'),
+                getItem(<Link to="/admin/event">Sự kiện</Link>, 'event'),
             ],
             'group',
         ),
     ]),
     { type: 'divider' },
-    getItem(
-        'Quản lý người dùng',
-        'grSeat',
-        <FontAwesomeIcon icon={solidIcons.faCouch} />,
-        [
-            getItem(<Link to="/admin/seat">Danh sách</Link>, 'seat', null),
-            getItem(<Link to="/admin/seat">Loại ghế</Link>, 'seatType', null),
-        ],
-        'group',
-    ),
+    getItem('Quản lý người dùng', 'grSeat', <FontAwesomeIcon icon={solidIcons.faUsers} />),
 ];
 function Sidebar() {
     return <Menu mode="inline" items={items} />;
