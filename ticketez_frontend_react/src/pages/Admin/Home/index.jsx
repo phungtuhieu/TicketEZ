@@ -1,5 +1,7 @@
+import Hi from "./Hi";
+
 function AdminIndex() {
-    return <h1>Index admin</h1>;
+    return <Hi/>;
 }
 
 export default AdminIndex;

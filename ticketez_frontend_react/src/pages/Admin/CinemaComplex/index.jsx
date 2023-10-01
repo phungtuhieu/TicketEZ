@@ -1,14 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table } from 'antd';
-import { SearchOutlined, PlusOutlined,  } from '@ant-design/icons';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, Card, Breadcrumb } from 'antd';
+import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined,  } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import BaseTable from '~/components/common/BaseTable/BaseTable';
-import BaseModal from '~/components/common/BaseModal/BaseModal';
+import BaseTable from '~/components/Admin/BaseTable/BaseTable';
+import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import style from './CinemaComplex.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 
 
 const cx = classNames.bind(style);
@@ -283,90 +284,116 @@ const AdminCinemaComplex = () => {
 
 
     return (
-        <div>
-            <Row>
-                <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                </Col>
-                <Col span={2}>
-                    <Button
-                        type="primary"
-                        className={cx('button-title')}
-                        icon={<PlusOutlined />}
-                        size={size}
-                        onClick={showModal}
-                    >
-                        Thêm
-                    </Button>
-                </Col>
-                <BaseModal
-                    open={open}
-                    width={'60%'}
-                    title={editData ? 'Cập nhật' : 'Thêm mới'}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    footer={[
-                        <Button key="back" onClick={handleCancel}>
-                            Thoát
-                        </Button>,
-                        resetForm && ( // Conditionally render the "Làm mới" button only when editing
-                            <Button key="reset" onClick={handleResetForm}>
-                                Làm mới
-                            </Button>
-                        ),
-                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                            {editData ? 'Cập nhật' : 'Thêm mới'}
-                        </Button>,
+        <>
+            {' '}
+            <Card bordered={false} className={cx('card-Breadcrumb')}>
+                <Breadcrumb
+                    items={[
+                        {
+                            href: '',
+                            title: <HomeOutlined />,
+                        },
+                        {
+                            href: '',
+                            title: (
+                                <>
+                                    <VideoCameraOutlined />
+                                    <span> Rạp</span>
+                                </>
+                            ),
+                        },
+                        {
+                            title: 'Cụm rạp',
+                        },
                     ]}
-                >
-                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="id"
-                            label="Id"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                />
+            </Card>
+            <Card bordered={false} className={cx('card-chart-donut')}>
+                <Row>
+                    <Col span={22}>
+                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    </Col>
+                    <Col span={2}>
+                        <Button
+                            type="primary"
+                            className={cx('button-title')}
+                            icon={<PlusOutlined />}
+                            size={size}
+                            onClick={showModal}
                         >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="title"
-                            label="title"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                        >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="body"
-                            label="body"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                        >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                    </Form>
-                </BaseModal>
-            </Row>
-            <BaseTable
-                columns={columns}
-                onClick={() => {
-                    handleDelete();
-                }}
-                // dataSource={posts}
-                dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <p
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {record.body}
-                        </p>
-                    ),
-                }}
-            />
-        </div>
+                            Thêm
+                        </Button>
+                    </Col>
+                    <BaseModal
+                        open={open}
+                        width={'60%'}
+                        title={editData ? 'Cập nhật' : 'Thêm mới'}
+                        onOk={handleOk}
+                        onCancel={handleCancel}
+                        footer={[
+                            <Button key="back" onClick={handleCancel}>
+                                Thoát
+                            </Button>,
+                            resetForm && ( // Conditionally render the "Làm mới" button only when editing
+                                <Button key="reset" onClick={handleResetForm}>
+                                    Làm mới
+                                </Button>
+                            ),
+                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                                {editData ? 'Cập nhật' : 'Thêm mới'}
+                            </Button>,
+                        ]}
+                    >
+                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="id"
+                                label="Id"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="title"
+                                label="title"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="body"
+                                label="body"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                        </Form>
+                    </BaseModal>
+                </Row>
+
+                <BaseTable
+                    columns={columns}
+                    onClick={() => {
+                        handleDelete();
+                    }}
+                    // dataSource={posts}
+                    dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+                    expandable={{
+                        expandedRowRender: (record) => (
+                            <p
+                                style={{
+                                    margin: 0,
+                                }}
+                            >
+                                {record.body}
+                            </p>
+                        ),
+                    }}
+                />
+            </Card>
+        </>
     );
 };
 
