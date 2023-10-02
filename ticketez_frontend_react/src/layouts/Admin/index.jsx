@@ -11,9 +11,9 @@ import classNames from 'classnames/bind';
 // Ant Design
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilm, faHouse, faSitemap, faVideo } from '@fortawesome/free-solid-svg-icons';
-import HeaderAdmin from './Header';
+import { HeaderAdminLeft } from './Header';
+import { Footer } from 'antd/es/layout/layout';
+import Sidebar from './Sidebar';
 
 const { Header, Sider, Content } = Layout;
 const cx = classNames.bind(styles);
@@ -24,7 +24,7 @@ const AdminLayout = ({ children }) => {
     } = theme.useToken();
     return (
         <Layout>
-            <Sider trigger={null} collapsible collapsed={collapsed}>
+            <Sider trigger={null} theme="light" collapsible collapsed={collapsed} width={250}>
                 <Header
                     style={{
                         display: 'flex',
@@ -34,22 +34,9 @@ const AdminLayout = ({ children }) => {
                         paddingLeft: '16px',
                     }}
                 >
-                    <HeaderAdmin />
+                    <HeaderAdminLeft />
                 </Header>
-                <Menu mode="inline" defaultSelectedKeys={['1']}>
-                    <Menu.Item className={cx('active-menu-item')} key="1" icon={<FontAwesomeIcon icon={faHouse} />}>
-                        <Link to="/admin/index">Trang chủ</Link>
-                    </Menu.Item>
-                    <Menu.Item key="2" icon={<FontAwesomeIcon icon={faVideo} />}>
-                        <Link to="/admin/movie">Phim</Link>
-                    </Menu.Item>
-                    <Menu.Item key="3" icon={<FontAwesomeIcon icon={faSitemap} />}>
-                        <Link to="/admin/cinema-complex">Cụm rạp</Link>
-                    </Menu.Item>
-                    <Menu.Item key="3" icon={<FontAwesomeIcon icon={faFilm} />}>
-                        <Link to="/admin/cinema">Cụm rạp</Link>
-                    </Menu.Item>
-                </Menu>
+                <Sidebar />
             </Sider>
             <Layout>
                 <Header
@@ -79,6 +66,13 @@ const AdminLayout = ({ children }) => {
                 >
                     {children}
                 </Content>
+                <Footer
+                    style={{
+                        textAlign: 'center',
+                    }}
+                >
+                    Ant Design ©2023 Created by Ant UED
+                </Footer>
             </Layout>
         </Layout>
     );

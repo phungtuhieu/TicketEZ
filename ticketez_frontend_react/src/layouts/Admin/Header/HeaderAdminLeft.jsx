@@ -1,4 +1,4 @@
-function Header() {
+function HeaderAdminLeft() {
     return (
         <div style={{ flex: 1 }}>
             {/* Đặt nội dung header phụ ở đây */}
@@ -7,4 +7,4 @@ function Header() {
     );
 }
 
-export default Header;
+export default HeaderAdminLeft;
