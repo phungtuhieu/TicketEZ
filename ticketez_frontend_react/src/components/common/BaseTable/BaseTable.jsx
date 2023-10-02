@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import BaseTables from './BaseTable.module.scss';
 import { Table } from 'antd';
