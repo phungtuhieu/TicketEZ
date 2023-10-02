@@ -1,6 +1,9 @@
 import UserHome from '~/pages/User/Home';
+import { Route } from 'react-router-dom';
 import UserContact from '~/pages/User/Contact';
 import { AdminIndex, AdminMovie, AdminCinemaComplex } from '~/pages/Admin';
+import {  MovieDef} from '~/pages/User';
+
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
@@ -10,6 +13,7 @@ const publicRoutes = [
     { path: '/admin/cinema-complex', component: AdminCinemaComplex, layout: AdminLayout },
 
     // User
+    { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },
     { path: '/', component: UserHome, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
 ];
