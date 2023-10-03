@@ -1,26 +1,23 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table } from 'antd';
-import { SearchOutlined, PlusOutlined,  } from '@ant-design/icons';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, Card, Breadcrumb } from 'antd';
+import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import BaseTable from '~/components/common/BaseTable/BaseTable';
-import BaseModal from '~/components/common/BaseModal/BaseModal';
+import BaseTable from '~/components/Admin/BaseTable/BaseTable';
+import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import style from './CinemaComplex.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
-
-
-
 
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
-
 
 const AdminCinemaComplex = () => {
     const [searchText, setSearchText] = useState('');
@@ -120,7 +117,7 @@ const AdminCinemaComplex = () => {
         render: (text, record) =>
             searchedColumn === dataIndex ? (
                 <Highlighter
-                    highlightStyle={{   
+                    highlightStyle={{
                         backgroundColor: '#ffc069',
                         padding: 0,
                     }}
@@ -179,7 +176,7 @@ const AdminCinemaComplex = () => {
         },
     ];
 
-    // modal 
+    // modal
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -194,25 +191,25 @@ const AdminCinemaComplex = () => {
         setResetForm(true);
     };
 
-     const handleDelete = () => {
-        message.success("xoá nè")
-     };
+    const handleDelete = () => {
+        message.success('xoá nè');
+    };
 
-     const handleEditData = (record) => {
+    const handleEditData = (record) => {
         setOpen(true);
         setResetForm(false);
         setEditData(record);
         //  message.success(record.id);
         form.setFieldsValue(record);
-     };
-     
+    };
+
     const handleOk = async () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            
+
             let resp;
-            if(editData){
+            if (editData) {
                 //xử lý khi thêm  call api rồi put lên
                 //code mẫu
                 //  axios
@@ -225,11 +222,10 @@ const AdminCinemaComplex = () => {
                 //      .catch((error) => {
                 //          console.error('Error fetching data:', error);
                 //      });
-                message.success("cập nhật thành công");
-
-            }else{
+                message.success('cập nhật thành công');
+            } else {
                 //xử lý thêm  call api rồi push lun tương tự như edit
-                message.success("Thêm thành công");
+                message.success('Thêm thành công');
             }
 
             setOpen(false);
@@ -240,8 +236,6 @@ const AdminCinemaComplex = () => {
             console.log('Failed:', errorInfo);
             setLoading(false);
         }
-
-
     };
     const handleCancel = () => {
         setOpen(false);
@@ -253,120 +247,146 @@ const AdminCinemaComplex = () => {
 
     useEffect(() => {
         getList();
-    },[]);
+    }, []);
 
-    //form 
+    //form
     const handleResetForm = () => {
-        form.resetFields(
-        );
+        form.resetFields();
         console.log(form);
-    }
-    //call api 
+    };
+    //call api
     const [posts, setPosts] = useState([]);
-    const getList = () => {
-        setLoading(true)
+    const getList = async () => {
+        setLoading(true);
         try {
-            axios
-                .get('https://jsonplaceholder.typicode.com/posts')
-                .then((response) => {
-                    setPosts(response.data);
-                    console.log(response);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
-        } catch (error) {
-
-        }
-    }
-
+            const res = await axiosClient.get('posts');
+            setPosts(res.data);
+            setLoading(false);
+            console.log(res.data);
+            // axios
+            //     .get('https://jsonplaceholder.typicode.com/posts')
+            //     .then((response) => {
+            //         setPosts(response.data);
+            //         console.log(response);
+            //         setLoading(false);
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error fetching data:', error);
+            //     });
+        } catch (error) {}
+    };
 
     return (
-        <div>
-            <Row>
-                <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                </Col>
-                <Col span={2}>
-                    <Button
-                        type="primary"
-                        className={cx('button-title')}
-                        icon={<PlusOutlined />}
-                        size={size}
-                        onClick={showModal}
-                    >
-                        Thêm
-                    </Button>
-                </Col>
-                <BaseModal
-                    open={open}
-                    width={'60%'}
-                    title={editData ? 'Cập nhật' : 'Thêm mới'}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    footer={[
-                        <Button key="back" onClick={handleCancel}>
-                            Thoát
-                        </Button>,
-                        resetForm && ( // Conditionally render the "Làm mới" button only when editing
-                            <Button key="reset" onClick={handleResetForm}>
-                                Làm mới
-                            </Button>
-                        ),
-                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                            {editData ? 'Cập nhật' : 'Thêm mới'}
-                        </Button>,
+        <>
+            {' '}
+            <Card bordered={false} className={cx('card-Breadcrumb')}>
+                <Breadcrumb
+                    items={[
+                        {
+                            href: '',
+                            title: <HomeOutlined />,
+                        },
+                        {
+                            href: '',
+                            title: (
+                                <>
+                                    <VideoCameraOutlined />
+                                    <span> Rạp</span>
+                                </>
+                            ),
+                        },
+                        {
+                            title: 'Cụm rạp',
+                        },
                     ]}
-                >
-                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="id"
-                            label="Id"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                />
+            </Card>
+            <Card bordered={false} className={cx('card-chart-donut')}>
+                <Row>
+                    <Col span={22}>
+                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    </Col>
+                    <Col span={2}>
+                        <Button
+                            type="primary"
+                            className={cx('button-title')}
+                            icon={<PlusOutlined />}
+                            size={size}
+                            onClick={showModal}
                         >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="title"
-                            label="title"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                        >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="body"
-                            label="body"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                        >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-                    </Form>
-                </BaseModal>
-            </Row>
-            <BaseTable
-                columns={columns}
-                onClick={() => {
-                    handleDelete();
-                }}
-                // dataSource={posts}
-                dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <p
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {record.body}
-                        </p>
-                    ),
-                }}
-            />
-        </div>
+                            Thêm
+                        </Button>
+                    </Col>
+                    <BaseModal
+                        open={open}
+                        width={'60%'}
+                        title={editData ? 'Cập nhật' : 'Thêm mới'}
+                        onOk={handleOk}
+                        onCancel={handleCancel}
+                        footer={[
+                            <Button key="back" onClick={handleCancel}>
+                                Thoát
+                            </Button>,
+                            resetForm && ( // Conditionally render the "Làm mới" button only when editing
+                                <Button key="reset" onClick={handleResetForm}>
+                                    Làm mới
+                                </Button>
+                            ),
+                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                                {editData ? 'Cập nhật' : 'Thêm mới'}
+                            </Button>,
+                        ]}
+                    >
+                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="id"
+                                label="Id"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="title"
+                                label="title"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="body"
+                                label="body"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
+                            </Form.Item>
+                        </Form>
+                    </BaseModal>
+                </Row>
+
+                <BaseTable
+                    columns={columns}
+                    onClick={() => {
+                        handleDelete();
+                    }}
+                    // dataSource={posts}
+                    dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+                    expandable={{
+                        expandedRowRender: (record) => (
+                            <p
+                                style={{
+                                    margin: 0,
+                                }}
+                            >
+                                {record.body}
+                            </p>
+                        ),
+                    }}
+                />
+            </Card>
+        </>
     );
 };
 

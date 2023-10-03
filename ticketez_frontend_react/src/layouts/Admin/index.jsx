@@ -11,7 +11,7 @@ import classNames from 'classnames/bind';
 // Ant Design
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
-import { HeaderAdminLeft } from './Header';
+import { HeaderAdminLeft, HeaderAdminRight } from './Header';
 import { Footer } from 'antd/es/layout/layout';
 import Sidebar from './Sidebar';
 
@@ -43,6 +43,8 @@ const AdminLayout = ({ children }) => {
                     style={{
                         padding: 0,
                         background: colorBgContainer,
+                        display: 'flex',
+                        width: '100%',
                     }}
                 >
                     <Button
@@ -55,13 +57,14 @@ const AdminLayout = ({ children }) => {
                             height: 64,
                         }}
                     />
+                    <HeaderAdminRight />
                 </Header>
                 <Content
                     style={{
                         margin: '24px 16px',
                         padding: 24,
                         minHeight: 280,
-                        background: colorBgContainer,
+                        // background: colorBgContainer,
                     }}
                 >
                     {children}
@@ -71,7 +74,7 @@ const AdminLayout = ({ children }) => {
                         textAlign: 'center',
                     }}
                 >
-                    Ant Design ©2023 Created by Ant UED
+                    {/* Ant Design ©2023 Created by Ant UED */}
                 </Footer>
             </Layout>
         </Layout>

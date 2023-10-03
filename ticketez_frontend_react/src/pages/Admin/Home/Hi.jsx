@@ -5,6 +5,8 @@ import style from './Home.module.scss';
 import classNames from 'classnames/bind';
 import ReactApexChart from 'react-apexcharts';
 
+
+
 const cx = classNames.bind(style);
 
 // Các options và series cho biểu đồ ApexCharts
@@ -103,28 +105,28 @@ const options = {
     },
 };
 
-const dataBieuDoTron = [44, 55, 41, 17, 15];
+  const dataBieuDoTron = [44, 55, 41, 17, 15];
 
-const optionsBieuDoTron = {
-    chart: {
-        type: 'donut',
-    },
-    responsive: [
-        {
-            breakpoint: 480,
-            options: {
-                chart: {
-                    width: 200,
-                },
-                legend: {
-                    position: 'bottom',
-                },
-            },
-        },
-    ],
-};
+  const optionsBieuDoTron = {
+      chart: {
+          type: 'donut',
+      },
+      responsive: [
+          {
+              breakpoint: 480,
+              options: {
+                  chart: {
+                      width: 200,
+                  },
+                  legend: {
+                      position: 'bottom',
+                  },
+              },
+          },
+      ],
+  };
 
-const AdminIndex = () => {
+const Hi = () => {
     const [size, setSize] = useState('large');
     return (
         <>
@@ -285,4 +287,4 @@ const AdminIndex = () => {
         </>
     );
 };
-export default AdminIndex;
+export default Hi;

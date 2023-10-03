@@ -21,7 +21,7 @@ const contentStyle = {
     minHeight: 120,
     lineHeight: '120px',
     color: '#fff',
-    backgroundColor: '#108ee9',
+    backgroundColor: '#040714',
 };
 const siderStyle = {
     textAlign: 'center',

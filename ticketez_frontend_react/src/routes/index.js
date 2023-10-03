@@ -1,6 +1,7 @@
 import UserHome from '~/pages/User/Home';
 import UserContact from '~/pages/User/Contact';
 import * as PageAdmin from '~/pages/Admin';
+import{MovieDef} from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
@@ -17,6 +18,7 @@ const publicRoutes = [
     { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
 
     // User
+    { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },
     { path: '/', component: UserHome, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
 ];
