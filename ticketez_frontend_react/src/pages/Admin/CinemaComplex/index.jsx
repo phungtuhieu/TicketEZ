@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, Card, Breadcrumb } from 'antd';
-import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined,  } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
@@ -10,18 +10,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-
+import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
-
-
-
 
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
-
 
 const AdminCinemaComplex = () => {
     const [searchText, setSearchText] = useState('');
@@ -121,7 +117,7 @@ const AdminCinemaComplex = () => {
         render: (text, record) =>
             searchedColumn === dataIndex ? (
                 <Highlighter
-                    highlightStyle={{   
+                    highlightStyle={{
                         backgroundColor: '#ffc069',
                         padding: 0,
                     }}
@@ -180,7 +176,7 @@ const AdminCinemaComplex = () => {
         },
     ];
 
-    // modal 
+    // modal
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -195,25 +191,25 @@ const AdminCinemaComplex = () => {
         setResetForm(true);
     };
 
-     const handleDelete = () => {
-        message.success("xoá nè")
-     };
+    const handleDelete = () => {
+        message.success('xoá nè');
+    };
 
-     const handleEditData = (record) => {
+    const handleEditData = (record) => {
         setOpen(true);
         setResetForm(false);
         setEditData(record);
         //  message.success(record.id);
         form.setFieldsValue(record);
-     };
-     
+    };
+
     const handleOk = async () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            
+
             let resp;
-            if(editData){
+            if (editData) {
                 //xử lý khi thêm  call api rồi put lên
                 //code mẫu
                 //  axios
@@ -226,11 +222,10 @@ const AdminCinemaComplex = () => {
                 //      .catch((error) => {
                 //          console.error('Error fetching data:', error);
                 //      });
-                message.success("cập nhật thành công");
-
-            }else{
+                message.success('cập nhật thành công');
+            } else {
                 //xử lý thêm  call api rồi push lun tương tự như edit
-                message.success("Thêm thành công");
+                message.success('Thêm thành công');
             }
 
             setOpen(false);
@@ -241,8 +236,6 @@ const AdminCinemaComplex = () => {
             console.log('Failed:', errorInfo);
             setLoading(false);
         }
-
-
     };
     const handleCancel = () => {
         setOpen(false);
@@ -254,34 +247,34 @@ const AdminCinemaComplex = () => {
 
     useEffect(() => {
         getList();
-    },[]);
+    }, []);
 
-    //form 
+    //form
     const handleResetForm = () => {
-        form.resetFields(
-        );
+        form.resetFields();
         console.log(form);
-    }
-    //call api 
+    };
+    //call api
     const [posts, setPosts] = useState([]);
-    const getList = () => {
-        setLoading(true)
+    const getList = async () => {
+        setLoading(true);
         try {
-            axios
-                .get('https://jsonplaceholder.typicode.com/posts')
-                .then((response) => {
-                    setPosts(response.data);
-                    console.log(response);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
-        } catch (error) {
-
-        }
-    }
-
+            const res = await axiosClient.get('posts');
+            setPosts(res.data);
+            setLoading(false);
+            console.log(res.data);
+            // axios
+            //     .get('https://jsonplaceholder.typicode.com/posts')
+            //     .then((response) => {
+            //         setPosts(response.data);
+            //         console.log(response);
+            //         setLoading(false);
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error fetching data:', error);
+            //     });
+        } catch (error) {}
+    };
 
     return (
         <>
