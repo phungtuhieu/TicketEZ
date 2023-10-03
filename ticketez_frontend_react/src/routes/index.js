@@ -1,9 +1,7 @@
 import UserHome from '~/pages/User/Home';
-import { Route } from 'react-router-dom';
 import UserContact from '~/pages/User/Contact';
 import { AdminIndex, AdminMovie, AdminCinemaComplex } from '~/pages/Admin';
-import {  MovieDef} from '~/pages/User';
-
+import{MovieDef} from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
