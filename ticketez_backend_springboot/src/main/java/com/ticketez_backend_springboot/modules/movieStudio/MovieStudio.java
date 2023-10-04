@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.movieStudio;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 import jakarta.persistence.Entity;
@@ -25,6 +26,7 @@ public class MovieStudio {
 	private String email;
 	private String description;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "movieStudio")
 	private List<Movie> movies;
 
