@@ -1,7 +1,7 @@
 import UserHome from '~/pages/User/Home';
 import UserContact from '~/pages/User/Contact';
 import * as PageAdmin from '~/pages/Admin';
-import{MovieDef} from '~/pages/User';
+import { MovieDef } from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
@@ -16,6 +16,7 @@ const publicRoutes = [
     { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
     { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
     { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
+    { path: '/admin/movie-studio', component: PageAdmin.AdminMovieStudio, layout: AdminLayout },
 
     // User
     { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },

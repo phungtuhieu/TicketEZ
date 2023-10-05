@@ -26,6 +26,7 @@ const items = [
     // Quản lý rạp phim
     getItem('Phim', 'grMovie', <FontAwesomeIcon icon={solidIcons.faVideo} />, [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
+        getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
     ]),
 

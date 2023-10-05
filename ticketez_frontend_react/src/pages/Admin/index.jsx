@@ -9,3 +9,4 @@ export { default as AdminSeatType } from './SeatType';
 export { default as AdminCombo } from './Combo';
 export { default as AdminDiscount } from './Discount';
 export { default as AdminEvent } from './Event';
+export { default as AdminMovieStudio } from './MovieStudio';
