@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player';
 import 'font-awesome/css/font-awesome.min.css';
 import { Link } from 'react-router-dom';
 import TimeMovie from '../../Booking/screening_details';
-import SeatChart from '../../Booking/seat_chart';
+import SeatChart from '../../Booking/SeatChart';
 import ReactDOM from 'react-dom';
 
 
@@ -51,7 +51,6 @@ const MovieDetails = (props) => {
                  
 
                         <SeatChart />
-                        <p>Đây là nội dung của modal.</p>
                         <button onClick={closeModal}>Đóng</button>
                     </ModalContent>
                 </Modal>
