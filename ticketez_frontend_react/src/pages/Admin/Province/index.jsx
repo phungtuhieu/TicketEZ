@@ -4,7 +4,7 @@ import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOu
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
-import style from './CinemaComplex.module.scss';
+import style from './Province.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -19,7 +19,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminCinemaComplex = () => {
+const AdminProvince = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -143,29 +143,8 @@ const AdminCinemaComplex = () => {
         {
             title: 'name',
             dataIndex: 'name',
-            width: '10%',
+            width: '50%',
             ...getColumnSearchProps('name'),
-        },
-        {
-            title: 'address',
-            dataIndex: 'address',
-            width: '20%',
-            ...getColumnSearchProps('address'),
-        },
-        {
-            title: 'phone',
-            dataIndex: 'phone',
-            ...getColumnSearchProps('phone'),
-        },
-        {
-            title: 'opening_time',
-            dataIndex: 'opening_time',
-            
-        },
-        {
-            title: 'closing_time',
-            dataIndex: 'closing_time',
-           
         },
         {
             title: 'Action',
@@ -226,18 +205,18 @@ const AdminCinemaComplex = () => {
 
             let resp;
             if (editData) {
-                // xử lý khi thêm  call api rồi put lên
-                // code mẫu
-                 axios
-                     .put('http://localhost:8081/api/cinemaComplex', values)
-                     .then((response) => {
-                         setPosts(response.data);
-                         console.log(response);
-                         setLoading(false);
-                     })
-                     .catch((error) => {
-                         console.error('Error fetching data:', error);
-                     });
+                //xử lý khi thêm  call api rồi put lên
+                //code mẫu
+                //  axios
+                //      .put('https://jsonplaceholder.typicode.com/posts', values)
+                //      .then((response) => {
+                //          setPosts(response.data);
+                //          console.log(response);
+                //          setLoading(false);
+                //      })
+                //      .catch((error) => {
+                //          console.error('Error fetching data:', error);
+                //      });
                 message.success('cập nhật thành công');
             } else {
                 //xử lý thêm  call api rồi push lun tương tự như edit
@@ -279,16 +258,16 @@ const AdminCinemaComplex = () => {
             setPosts(res.data);
             setLoading(false);
             console.log(res.data);
-            axios
-                .get('http://localhost:8081/api/cinemaComplex')
-                .then((response) => {
-                    setPosts(response.data);
-                    console.log(response);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
+            // axios
+            //     .get('https://jsonplaceholder.typicode.com/posts')
+            //     .then((response) => {
+            //         setPosts(response.data);
+            //         console.log(response);
+            //         setLoading(false);
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error fetching data:', error);
+            //     });
         } catch (error) {}
     };
 
@@ -320,7 +299,7 @@ const AdminCinemaComplex = () => {
             <Card bordered={false} className={cx('card-chart-donut')}>
                 <Row>
                     <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                        <h1 className={cx('title')}>Tỉnh</h1>
                     </Col>
                     <Col span={2}>
                         <Button
@@ -406,4 +385,5 @@ const AdminCinemaComplex = () => {
     );
 };
 
-export default AdminCinemaComplex;
+
+export default AdminProvince;

@@ -1,8 +1,11 @@
 //
+import AdminProvince from './Province/index';
 export { default as AdminIndex } from './Home';
 export { default as AdminMovie } from './Movie';
 export { default as AdminCinemaComplex } from './CinemaComplex';
 export { default as AdminCinema } from './Cinema';
+export { default as AdminCinemaType } from './CinemaType';
+export { default as AdminProvince } from './Province';
 export { default as AdminShowtime } from './Showtime';
 export { default as AdminSeat } from './Seat';
 export { default as AdminSeatType } from './SeatType';
