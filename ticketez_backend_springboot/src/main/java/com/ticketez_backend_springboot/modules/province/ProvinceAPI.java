@@ -1,4 +1,4 @@
-package com.ticketez_backend_springboot.modules.cinemaType;
+package com.ticketez_backend_springboot.modules.province;
 
 import java.util.List;
 
@@ -16,43 +16,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/cinemaType")
-
-public class CinemaTypeAPI {
+@RequestMapping("/api/province")
+public class ProvinceAPI {
     @Autowired
-    CinemaTypeDAO cinemaTypeDAO;
+    ProvinceDao provinceDao;
 
     @GetMapping
-    public ResponseEntity<List<CinemaType>> findAll() {
-        return ResponseEntity.ok(cinemaTypeDAO.findAll());
+    public ResponseEntity<List<Province>> findAll() {
+        return ResponseEntity.ok(provinceDao.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CinemaType> findById(@PathVariable("id") Long id) {
-        if (!cinemaTypeDAO.existsById(id)) {
+    public ResponseEntity<Province> findById(@PathVariable("id") Long id) {
+        if (!provinceDao.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(cinemaTypeDAO.findById(id).get());
+        return ResponseEntity.ok(provinceDao.findById(id).get());
     }
 
     @PostMapping
-    public ResponseEntity<CinemaType> post(@RequestBody CinemaType cinemaType) {
-        cinemaTypeDAO.save(cinemaType);
-        return ResponseEntity.ok(cinemaType);
+    public ResponseEntity<Province> post(@RequestBody Province province) {
+        provinceDao.save(province);
+        return ResponseEntity.ok(province);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CinemaType> put(@PathVariable("id") Long id, @RequestBody CinemaType cinemaType) {
-        if (!cinemaTypeDAO.existsById(id)) {
+    public ResponseEntity<Province> put(@PathVariable("id") Long id, @RequestBody Province province) {
+        if (!provinceDao.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        cinemaTypeDAO.save(cinemaType);
-        return ResponseEntity.ok(cinemaType);
+        provinceDao.save(province);
+        return ResponseEntity.ok(province);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-        cinemaTypeDAO.deleteById(id);
+        provinceDao.deleteById(id);
         return ResponseEntity.ok(true);
     }
 }
