@@ -1,5 +1,5 @@
 import React from 'react';
-import './seat_chart.css';
+import './SeatChart.scss';
 
 class SeatChart extends React.Component {
     constructor() {

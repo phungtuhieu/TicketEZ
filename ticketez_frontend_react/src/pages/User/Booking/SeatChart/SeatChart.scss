@@ -43,7 +43,7 @@
 
 .unavailable {
   display: inline-block;
-  background-color: #cd5c5c;
+  background-color: #404040;
   pointer-events: none;
 }
 
@@ -60,4 +60,16 @@
 
 li {
   list-style: none;
+}
+
+/* Trạng thái ghế thường */
+.normal-seat {
+  background-color: #5b2b9f; /* Màu nền cho ghế thường */
+  color: white; /* Màu chữ cho ghế thường */
+}
+
+/* Trạng thái ghế VIP */
+.vip-seat {
+  background-color: #b7232b; /* Màu nền cho ghế VIP */
+  color: white; /* Màu chữ cho ghế VIP */
 }
