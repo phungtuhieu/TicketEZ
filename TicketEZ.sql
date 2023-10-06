@@ -26,7 +26,7 @@ GO
         active BIT NOT NULL
     )
 GO
-    CREATE TABLE Reviews(
+    CREATE TABLE Reviews (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         comment NVARCHAR(MAX),
         rating FLOAT NOT NULL,
@@ -62,7 +62,7 @@ GO
         [description] NVARCHAR(MAX)
     )
 GO
-    CREATE TABLE Movies(
+    CREATE TABLE Movies (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         title NVARCHAR (500) NOT NULL,
         [description] NVARCHAR(MAX) NOT NULL,
@@ -75,13 +75,13 @@ GO
         MPAA_rating_id BIGINT NOT NULL
     )
 GO
-    CREATE TABLE Formats(
+    CREATE TABLE Formats (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(20) NOT NULL,
         [description] NVARCHAR(MAX)
     )
 GO
-    CREATE TABLE Formats_Movies(
+    CREATE TABLE Formats_Movies (
         movie_id BIGINT NOT NULL,
         format_id BIGINT NOT NULL
     )
@@ -125,14 +125,14 @@ GO
         province_id BIGINT NOT NULL
     )
 GO
-    CREATE TABLE Seat_Types(
+    CREATE TABLE Seat_Types (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
         [image] NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX)
     )
 GO
-    CREATE TABLE Seats(
+    CREATE TABLE Seats (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
         [status] BIT NOT NULL,
@@ -141,7 +141,7 @@ GO
         cinema_id BIGINT NOT NULL,
     )
 GO
-    CREATE TABLE Seats_Booking(
+    CREATE TABLE Seats_Booking (
         seat_id BIGINT NOT NULL,
         [booking_id] NVARCHAR(30) NOT NULL,
         [status] INT NOT NULL -- ĐÃ ĐẶT, ĐANG CHỌN, ĐÃ CHỌN

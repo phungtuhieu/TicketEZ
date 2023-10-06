@@ -15,6 +15,8 @@ const publicRoutes = [
     { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
     { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
     { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
+    { path: '/admin/actor', component: PageAdmin.AdminActor, layout: AdminLayout },
+    { path: '/admin/director', component: PageAdmin.AdminDirector, layout: AdminLayout },
 
     // User
     { path: '/', component: UserHome, layout: DefaultLayout },
