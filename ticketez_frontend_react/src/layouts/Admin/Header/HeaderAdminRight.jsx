@@ -3,7 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { faBell, faGear, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, Row, Input, Dropdown } from "antd";
-import React, { } from "react";
+import React, { useState } from "react";
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
 import { Menu } from 'antd';
@@ -11,6 +11,16 @@ import { Menu } from 'antd';
 const cx = classNames.bind(style);
 
 function HeaderAdminRight() {
+
+     const [visible, setVisible] = useState(false);
+
+     const showDrawer = () => {
+         setVisible(true);
+     };
+
+     const onClose = () => {
+         setVisible(false);
+     };
 
     const itemsBell = [
         {

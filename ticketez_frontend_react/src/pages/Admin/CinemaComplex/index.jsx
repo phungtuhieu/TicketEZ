@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, Card, Breadcrumb } from 'antd';
-import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined,  } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, HomeOutlined,  VideoCameraOutlined,  } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
@@ -9,7 +9,6 @@ import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 
 
 const cx = classNames.bind(style);
@@ -27,7 +26,7 @@ const AdminCinemaComplex = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
-    const [size, setSize] = useState('large');
+    const [size] = useState('large');
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -184,7 +183,7 @@ const AdminCinemaComplex = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    const [checkNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
 
@@ -211,7 +210,7 @@ const AdminCinemaComplex = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            
+            console.log(values);
             let resp;
             if(editData){
                 //xử lý khi thêm  call api rồi put lên
@@ -349,7 +348,7 @@ const AdminCinemaComplex = () => {
                                 {...formItemLayout}
                                 name="id"
                                 label="Id"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                                rules={[{ required: true, message: 'Vui lòng nhập tên ssss' }]}
                             >
                                 <Input placeholder="Please input your name" />
                             </Form.Item>
