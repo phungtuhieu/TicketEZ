@@ -138,7 +138,7 @@ GO
         [status] BIT NOT NULL,
         [description] NVARCHAR(MAX),
         seat_type_id BIGINT NOT NULL,
-        cinema_id BIGINT NOT NULL,
+		seat_chart_id BIGINT NOT NULL
     )
 GO
     CREATE TABLE Seats_Booking (
@@ -198,6 +198,15 @@ GO
         [status] BIT NOT NULL,
         cinema_type_id BIGINT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
+    )
+GO
+    CREATE TABLE SeatChart (
+        id BIGINT IDENTITY(1, 1) NOT NULL,
+        [name] NVARCHAR(255) NOT NULL,
+		[rows] int NOT NULL,
+		[columns] int NOT NULL,
+        [status] BIT NOT NULL,
+		cinema_id BIGINT NOT NULL
     )
 GO
     -- CHƯA HOÀN THIỆN - DISCOUNT
@@ -273,6 +282,12 @@ ALTER TABLE
     Cinemas
 ADD
     CONSTRAINT PK_Cinemas PRIMARY KEY (id);
+
+GO
+ALTER TABLE
+    SeatChart
+ADD
+    CONSTRAINT PK_SeatChart PRIMARY KEY (id);
 
 GO
 ALTER TABLE
@@ -383,6 +398,7 @@ ADD
     CONSTRAINT PK_Seats PRIMARY KEY (id);
 
 GO
+
 ALTER TABLE
     Seats_Booking
 ADD
@@ -553,7 +569,12 @@ GO
 ALTER TABLE
     [Seats]
 ADD
-    CONSTRAINT FK_Seats_Cinemas FOREIGN KEY (cinema_id) REFERENCES Cinemas(id)
+    CONSTRAINT FK_Seats_SeatChart FOREIGN KEY (seat_chart_id) REFERENCES SeatChart(id)
+GO
+ALTER TABLE
+    SeatChart
+ADD
+    CONSTRAINT FK_SeatChart_Cinemas FOREIGN KEY (cinema_id) REFERENCES Cinemas(id)
 GO
     -- /Seats
     -------------- Cinema_Complex
@@ -954,6 +975,7 @@ VALUES
     (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
 
 -- 8. Thêm dữ liệu về loại ghế
+/*
 INSERT INTO [TicketEZ].[dbo].[Seats] ([name], [status], [description], [seat_type_id], [cinema_id])
 VALUES
     (N'Ghế thường', 1, N'Ghế thông thường', 1, 1),
@@ -992,7 +1014,7 @@ VALUES
     (N'Ghế thường', 1, N'Ghế thông thường', 1, 16),
     (N'Ghế VIP', 0, N'Ghế VIP', 2, 17);
 
-
+	*/
   -- 9. Thêm dữ liệu cho bảng Movie_Studio
 INSERT INTO [TicketEZ].[dbo].[Movie_Studio] 
     ([name], [country], [email], [description])
@@ -1272,12 +1294,12 @@ VALUES
   (3, 2);
 
   -- 27 thêm dữ liệu bảng [Payment_Info]
-
+  /*
   INSERT INTO [TicketEZ].[dbo].[Payment_Info] ([transaction_id], [tmn_code], [booking_id], [amount], [pay_date], [order_info], [bank_code], [transaction_status])
 VALUES
   ('TT01','TMN001', 'booking1', 500000, '2023-10-15 10:30:00', 'Order #12345', 'BANK001', 1),
   ('TT02','TMN003', 'booking2', 1000000, '2023-10-17 11:45:00', 'Order #54321', 'BANK003', 2);
-
+  */
 -- 28. thêm dữ liệu vào bảng .[Reviews]
 
   INSERT INTO [TicketEZ].[dbo].[Reviews] ([comment], [rating], [create_date], [edit_date], [account_id], [movie_id])
@@ -1287,15 +1309,15 @@ VALUES
   ('Không thích phim này lắm', 2, '2023-10-22 17:20:00', NULL, '0866602116', 2);
 
   -- 29. theem dữ liệu vào bảng [Seats_Booking]
-
+  /*
   INSERT INTO [TicketEZ].[dbo].[Seats_Booking] ([seat_id], [booking_id], [status])
 VALUES
   ('1','booking1', 1), -- Giả sử status là True (1) cho trạng thái đã đặt chỗ
   ('2','booking1', 0), -- Giả sử status là False (0) cho trạng thái chưa đặt chỗ
   ('3','booking1', 1); -- Thêm dữ liệu cho các ghế khác với trạng thái khác nhau
-
+  */
   -- 30 thêm dữ liệu vào bảng .[Services_Booking]
-
+  /*
   INSERT INTO [TicketEZ].[dbo].[Services_Booking] ([booking_id], [service_id])
 VALUES
   ('booking1', 1), -- Thêm dịch vụ có ID 101 vào đặt chỗ có ID 1
@@ -1307,7 +1329,7 @@ VALUES
 VALUES
   (1, 'booking1'), -- Thêm mã giảm giá có ID 1 vào đặt chỗ có ID 101
   (3, 'booking2');
-
+*/
 SELECT * FROM Accounts
 SELECT * FROM Verification
 SELECT * FROM Reviews
