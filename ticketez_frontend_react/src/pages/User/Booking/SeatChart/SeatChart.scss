@@ -1,0 +1,75 @@
+.container {
+  width: 100%;
+  margin: auto;
+}
+
+@media (max-width: 900px) {
+
+  .grid {
+    width: 100%;
+  }
+
+  .grid td {
+    height: 25px; /* Giảm chiều cao */
+    width: 25px; /* Giảm chiều rộng */
+    padding: 5px 5px;
+  }
+} 
+.grid {
+  /* height: 600px; */
+  width: 100%;
+}
+
+
+.grid td {
+  height: 50px;
+  width: 50px;
+  padding: 15px 10px;
+  border: 2px solid rgb(249, 249, 249, 0.5);
+  text-align: center;
+  float: left;
+  margin: 5px;
+}
+
+.grid td div {
+ position: relative;
+ bottom: 50px;
+}
+
+.grid td:hover {
+  opacity: .7;
+  cursor: pointer;
+}
+
+.unavailable {
+  display: inline-block;
+  background-color: #404040;
+  pointer-events: none;
+}
+
+.reserved {
+  border-color: #1ea83c !important;
+  color: #fff;
+  background-color: #1ea83c!important;
+  display: inline-block;
+}
+
+.available {
+  color: white;
+}
+
+li {
+  list-style: none;
+}
+
+/* Trạng thái ghế thường */
+.normal-seat {
+  background-color: #5b2b9f; /* Màu nền cho ghế thường */
+  color: white; /* Màu chữ cho ghế thường */
+}
+
+/* Trạng thái ghế VIP */
+.vip-seat {
+  background-color: #b7232b; /* Màu nền cho ghế VIP */
+  color: white; /* Màu chữ cho ghế VIP */
+}

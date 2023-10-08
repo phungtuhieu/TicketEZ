@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import BaseTable from '~/components/common/BaseTable/BaseTable';
-import BaseModal from '~/components/common/BaseModal/BaseModal';
+import BaseModal from '~/components/Admin/BaseModal/BaseModal';
+import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import Highlighter from 'react-highlight-words';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

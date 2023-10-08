@@ -14,46 +14,45 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/cinemaType")
 
 public class CinemaTypeAPI {
-         @Autowired
-         CinemaTypeDAO cinemaTypeDAO;
+    @Autowired
+    CinemaTypeDAO cinemaTypeDAO;
 
-         @GetMapping
-         public ResponseEntity<List<CinemaType>> findAll() {
-                  return ResponseEntity.ok(cinemaTypeDAO.findAll());
-         }
+    @GetMapping
+    public ResponseEntity<List<CinemaType>> findAll() {
+        return ResponseEntity.ok(cinemaTypeDAO.findAll());
+    }
 
-         @GetMapping("/{id}")
-         public ResponseEntity<CinemaType> findById(@PathVariable("id") Long id) {
-                  if (!cinemaTypeDAO.existsById(id)) {
-                           return ResponseEntity.notFound().build();
-                  }
-                  return ResponseEntity.ok(cinemaTypeDAO.findById(id).get());
-         }
+    @GetMapping("/{id}")
+    public ResponseEntity<CinemaType> findById(@PathVariable("id") Long id) {
+        if (!cinemaTypeDAO.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(cinemaTypeDAO.findById(id).get());
+    }
 
-         @PostMapping
-         public ResponseEntity<CinemaType> post(@RequestBody CinemaType cinemaType) {
-                  cinemaTypeDAO.save(cinemaType);
-                  return ResponseEntity.ok(cinemaType);
-         }
+    @PostMapping
+    public ResponseEntity<CinemaType> post(@RequestBody CinemaType cinemaType) {
+        cinemaTypeDAO.save(cinemaType);
+        return ResponseEntity.ok(cinemaType);
+    }
 
-         @PutMapping("/{id}")
-         public ResponseEntity<CinemaType> put(@PathVariable("id") Long id, @RequestBody CinemaType cinemaType) {
-                  if (!cinemaTypeDAO.existsById(id)) {
-                           return ResponseEntity.notFound().build();
-                  }
-                  cinemaTypeDAO.save(cinemaType);
-                  return ResponseEntity.ok(cinemaType);
-         }
+    @PutMapping("/{id}")
+    public ResponseEntity<CinemaType> put(@PathVariable("id") Long id, @RequestBody CinemaType cinemaType) {
+        if (!cinemaTypeDAO.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        cinemaTypeDAO.save(cinemaType);
+        return ResponseEntity.ok(cinemaType);
+    }
 
-         @DeleteMapping("/{id}")
-         public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-                  cinemaTypeDAO.deleteById(id);
-                  return ResponseEntity.ok(true);
-         }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
+        cinemaTypeDAO.deleteById(id);
+        return ResponseEntity.ok(true);
+    }
 }

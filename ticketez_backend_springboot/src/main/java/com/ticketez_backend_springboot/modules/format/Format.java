@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.format;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 
 import jakarta.persistence.Entity;
@@ -23,6 +24,7 @@ public class Format {
 	private String name;
 	private String description;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "format")
 	private List<FormatMovie> formatMovies;
 

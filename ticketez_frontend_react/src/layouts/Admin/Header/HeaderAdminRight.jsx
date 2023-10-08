@@ -11,17 +11,6 @@ import { Menu } from 'antd';
 const cx = classNames.bind(style);
 
 function HeaderAdminRight() {
-
-     const [visible, setVisible] = useState(false);
-
-     const showDrawer = () => {
-         setVisible(true);
-     };
-
-     const onClose = () => {
-         setVisible(false);
-     };
-
     const itemsBell = [
         {
             key: '1',
@@ -76,7 +65,6 @@ function HeaderAdminRight() {
         },
     ];
 
-
     const menuItemsBell = (
         <Menu>
             {itemsBell.map((item) => (
@@ -96,15 +84,12 @@ function HeaderAdminRight() {
         <>
             {/* Đặt nội dung header phụ ở đây */}
             <Row style={{ width: '100%' }}>
-                <Col
-                    lg={15}
-                    xs={24}
-                    style={{ display: 'flex', alignItems: 'center', width: '100px' }}
-                >
-                    <div>
+                <Col lg={15} xs={24} style={{ display: 'flex', alignItems: 'center', width: '100px' }}>
+                    {/* <div>
                         <span className={cx('title-left')}>Home /</span>
                         <span className={cx('name-left')}> Dashboard</span>
-                    </div>
+                    </div> */}
+                    <span>administrator</span>
                 </Col>
                 <Col lg={9} xs={24} className={cx('item-hearder-right')} flex={1}>
                     <Input

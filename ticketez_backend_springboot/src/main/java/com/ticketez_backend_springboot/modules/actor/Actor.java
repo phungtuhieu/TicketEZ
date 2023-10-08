@@ -29,7 +29,6 @@ public class Actor {
 	private Date birthday;
 	private String avatar;
 
-
 	@JsonIgnore
 	@OneToMany(mappedBy = "actor")
 	private List<ActorMovie> actorsMovies;

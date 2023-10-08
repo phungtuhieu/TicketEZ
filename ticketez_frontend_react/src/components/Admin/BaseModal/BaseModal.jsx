@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
-import { modalSizes } from '~/constants/modalSizes';  // Adjust the path accordingly
+import { modalSizes } from '~/constants/modalSizes'; // Adjust the path accordingly
 import style from './BaseModal.module.scss';
 import classNames from 'classnames';
 

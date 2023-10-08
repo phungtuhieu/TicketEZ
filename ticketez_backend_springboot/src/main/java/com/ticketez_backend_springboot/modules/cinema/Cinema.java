@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.cinema;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.cinemaType.CinemaType;
 import com.ticketez_backend_springboot.modules.seat.Seat;
@@ -40,6 +41,7 @@ public class Cinema {
 	@OneToMany(mappedBy = "cinema")
 	private List<Seat> seats;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinema")
 	private List<Showtime> showtimes;
 }

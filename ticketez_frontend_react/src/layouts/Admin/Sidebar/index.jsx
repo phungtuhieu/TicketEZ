@@ -22,11 +22,14 @@ const items = [
     getItem('Rạp', 'grCinema', <FontAwesomeIcon icon={solidIcons.faTv} />, [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
         getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
+        getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
+        getItem(<Link to="/admin/province">Tỉnh</Link>, 'province'),
     ]),
 
     // Quản lý rạp phim
     getItem('Phim', 'grMovie', <FontAwesomeIcon icon={solidIcons.faVideo} />, [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
+        getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
     ]),
 
