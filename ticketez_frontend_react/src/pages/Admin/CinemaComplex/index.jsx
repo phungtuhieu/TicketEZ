@@ -9,6 +9,7 @@ import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import axiosClient from '~/api/global/axiosClient';
 
 
 const cx = classNames.bind(style);
@@ -263,19 +264,24 @@ const AdminCinemaComplex = () => {
     }
     //call api 
     const [posts, setPosts] = useState([]);
-    const getList = () => {
+    const getList = async () => {
         setLoading(true)
         try {
-            axios
-                .get('https://jsonplaceholder.typicode.com/posts')
-                .then((response) => {
-                    setPosts(response.data);
-                    console.log(response);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
+
+            const res = await  axiosClient.get('posts')
+            setPosts(res.data);
+            setLoading(false);
+            console.log(res.data);
+            // axios
+            //     .get('https://jsonplaceholder.typicode.com/posts')
+            //     .then((response) => {
+            //         setPosts(response.data);
+            //         console.log(response);
+            //         setLoading(false);
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error fetching data:', error);
+            //     });
         } catch (error) {
 
         }
