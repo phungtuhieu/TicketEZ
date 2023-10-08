@@ -38,10 +38,11 @@ public class Cinema {
 	@JoinColumn(name = "cinema_complex_id")
 	private CinemaComplex cinemaComplex;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinema")
 	private List<Seat> seats;
 
-	@JsonIgnore
+	@JsonIgnore 
 	@OneToMany(mappedBy = "cinema")
 	private List<Showtime> showtimes;
 }

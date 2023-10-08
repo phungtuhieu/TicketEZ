@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.province;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 
 import jakarta.persistence.Entity;
@@ -22,6 +23,7 @@ public class Province {
 
 	private String name;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "province")
 	private List<CinemaComplex> cinemaComplexes;
 

@@ -8,6 +8,7 @@ import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +17,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -26,8 +29,14 @@ public class Showtime {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String startTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "start_time")
+	private Date startTime;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "end_time")
 	private Date endTime;
+
 	private int status;
 
 	@ManyToOne
@@ -37,7 +46,6 @@ public class Showtime {
 	@ManyToOne
 	@JoinColumn(name = "cinema_id")
 	private Cinema cinema;
-
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "showtime")

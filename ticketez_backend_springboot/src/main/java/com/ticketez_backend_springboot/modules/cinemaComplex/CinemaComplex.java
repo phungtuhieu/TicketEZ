@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.cinemaComplex;
 import java.sql.Time;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.discount.Discount;
 import com.ticketez_backend_springboot.modules.event.Event;
@@ -37,15 +38,19 @@ public class CinemaComplex {
 	@JoinColumn(name = "province_id")
 	private Province province;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Event> events;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Service> services;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Discount> discounts;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Cinema> cinemas;
 }
