@@ -1,8 +1,5 @@
 package com.ticketez_backend_springboot.modules.movie;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.ResponseDTO;
+
 
 @CrossOrigin("*")
 @RestController
@@ -30,15 +29,14 @@ public class MovieAPI {
     MovieDAO dao;
     
     @GetMapping
-    public ResponseEntity<Map<String, Object>> findAll(@RequestParam("page") Optional<Integer> pageNo,
+    public ResponseEntity<ResponseDTO<Movie>> findAll(@RequestParam("page") Optional<Integer> pageNo,
     @RequestParam("limit") Optional<Integer> limit) {
         Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(5));
         Page<Movie> page = dao.findAll(pageable);
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("page", pageNo);
-        resp.put("limit", limit);
-        resp.put("totalItem", page.getContent().size() );
-        resp.put("data", page.getContent());
+        ResponseDTO<Movie> resp = new ResponseDTO<>();
+        resp.setTotalItem(page.getTotalElements());
+        resp.setTotalPage(page.getTotalPages());
+        resp.setData(page.getContent());
         return ResponseEntity.ok(resp);
     }
 
