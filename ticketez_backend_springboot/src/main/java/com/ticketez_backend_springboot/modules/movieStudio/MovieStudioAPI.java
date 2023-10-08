@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.movieStudio;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.ResponseDTO;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/movie-studio")
@@ -26,10 +29,16 @@ public class MovieStudioAPI{
     MovieStudioDAO dao;
 
     @GetMapping
-    public ResponseEntity<Page<MovieStudio>> findAll(@RequestParam("pageNo") Optional<Integer> pageNo) {
-        Pageable pageable = PageRequest.of(pageNo.orElse(0), 5);
+    public ResponseEntity<ResponseDTO<MovieStudio>> findAll(
+    @RequestParam("page") Optional<Integer> pageNo,
+    @RequestParam("limit") Optional<Integer> limit) {
+        Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(5));
         Page<MovieStudio> page = dao.findAll(pageable);
-        return ResponseEntity.ok(page);
+        ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
+        responeDTO.setData(page.getContent());
+        responeDTO.setTotalItem(page.getTotalElements());
+        responeDTO.setTotalPage(page.getTotalPages());
+        return ResponseEntity.ok(responeDTO);
     }
 
     @GetMapping("/{id}")
