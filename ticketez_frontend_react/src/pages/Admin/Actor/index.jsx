@@ -1,9 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, DatePicker, Modal, Upload } from 'antd';
-import ImgCrop from 'antd-img-crop';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-// import BaseTable from '~/components/common/BaseTable/BaseTable';
-// import BaseModal from '~/components/common/BaseModal/BaseModal';
+import BaseTable from '~/components/common/BaseTable/BaseTable';
+import BaseModal from '~/components/common/BaseModal/BaseModal';
 import Highlighter from 'react-highlight-words';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +22,15 @@ const AdminActor = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
+
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [form] = Form.useForm();
+    const [checkNick, setCheckNick] = useState(false);
+    const [resetForm, setResetForm] = useState(false);
+    const [editData, setEditData] = useState(null);
+    const [fileList, setFileList] = useState([]);
+    const [posts, setPosts] = useState([]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -153,6 +161,11 @@ const AdminActor = () => {
             title: 'Ảnh',
             dataIndex: 'avatar',
             ...getColumnSearchProps('avatar'),
+            render: (_, record) => (
+                <Space size="middle">
+                    <img src={`http://localhost:8081/api/upload/${record.avatar}`} alt="" width={65} />
+                </Space>
+            ),
         },
         {
             title: 'Action',
@@ -180,15 +193,6 @@ const AdminActor = () => {
         },
     ];
 
-    // modal
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
-    const [resetForm, setResetForm] = useState(false);
-    const [editData, setEditData] = useState(null);
-    const [fileList, setFileList] = useState([]);
-    
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
@@ -204,16 +208,24 @@ const AdminActor = () => {
     const handleDelete = async (record) => {
         const res = await axiosClient.delete(`actor/${record.id}`);
         if (res.code === 500) {
-            message.error('Không thể xoá vì ');
+            message.error('Xoá thất bại ');
         }
-        console.log(res);
+        if (res.status === 200) {
+            message.success('Xóa dữ liệu thành công');
+        } else {
+            message.error(res.message);
+        }
         getList();
-        message.success('Xóa dữ liệu thành công');
     };
 
     const handleEditData = (record) => {
         const formatDate = moment(record.birthday, 'YYYY-MM-DD');
-
+        const newUploadFile = {
+            uid: record.id.toString(),
+            name: record.avatar,
+            url: `http://localhost:8081/api/upload/${record.avatar}`,
+        };
+        setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -227,57 +239,62 @@ const AdminActor = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values);
-            // console.log(fileList);
-            values = {
-                ...values,
-                avatar: fileList[0]?.name || editData?.avatar || 'No avatar',
-            };
-            if (editData) {
+            if (fileList.length > 0) {
                 values = {
-                    id: editData.id,
                     ...values,
                 };
-                const res = await axiosClient.put(`actor/${editData.id}`, values);
-                console.log(res);
-
-                message.success('cập nhật thành công');
-            }
-
-            if (!editData) {
-                // values = {
-                //     ...values,
-                //     avatar: fileList[0].name,
-                // };
-                // try {
-                //     const res = await axiosClient.post('actor', values);
-                //     console.log(res);
-                // } catch (error) {
-                //     console.log(error);
-                // }
-
-                // if (fileList.length > 0) {
-                    let file = fileList[0];
-                    console.log(file);
+                if (editData) {
+                    console.log(values);
+                    values = {
+                        id: editData.id,
+                        ...values,
+                    };
+                    if (values.avatar.file) {
+                        const file = values.avatar.fileList[0].originFileObj;
+                        var formData = new FormData();
+                        formData.append('file_to_upload', file);
+                        const res = await axiosClient.post('upload', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        values = {
+                            ...values,
+                            avatar: res.data.fieldName,
+                        };
+                    }
+                    const res = await axiosClient.put(`actor/${editData.id}`, values);
+                    message.success('Cập nhật thành công');
+                }
+                if (!editData) {
+                    const file = values.avatar.fileList[0].originFileObj;
                     var formData = new FormData();
                     formData.append('file_to_upload', file);
-                    console.log(formData.get('file_to_upload'));
+                    const res = await axiosClient.post('upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
                     try {
-                        const res = await axiosClient.post('upload', formData);
-                        console.log(res);
+                        values = {
+                            ...values,
+                            avatar: res.data.fieldName,
+                        };
+                        const resp = await axiosClient.post('actor', values);
+                        message.success('Thêm thành công');
                     } catch (error) {
                         console.log(error);
                     }
-                   
-                // }
-                message.success('Thêm thành công');
+                }
+                setOpen(false);
+                form.resetFields();
+                setLoading(false);
+                setFileList([]);
+                getList();
+            } else {
+                setLoading(false);
+                message.error('vui lòng chọn ảnh');
             }
-
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setFileList([]);
-            getList();
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -302,25 +319,12 @@ const AdminActor = () => {
         console.log(form);
     };
     //call api
-    const [posts, setPosts] = useState([]);
     const getList = async () => {
         setLoading(true);
         try {
             const res = await axiosClient.get('actor');
-            // console.log(res);
             setPosts(res.data);
             setLoading(false);
-            // console.log(res.data);
-            // axios
-            //     .get('https://jsonplaceholder.typicode.com/posts')
-            //     .then((response) => {
-            //         setPosts(response.data);
-            //         console.log(response);
-            //         setLoading(false);
-            //     })
-            //     .catch((error) => {
-            //         console.error('Error fetching data:', error);
-            //     });
         } catch (error) {
             console.log(error);
         }
@@ -352,7 +356,7 @@ const AdminActor = () => {
                         Thêm
                     </Button>
                 </Col>
-                <Modal
+                <BaseModal
                     open={open}
                     width={'60%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
@@ -362,7 +366,7 @@ const AdminActor = () => {
                         <Button key="back" onClick={handleCancel}>
                             Thoát
                         </Button>,
-                        resetForm && ( // Conditionally render the "Làm mới" button only when editing
+                        resetForm && (
                             <Button key="reset" onClick={handleResetForm}>
                                 Làm mới
                             </Button>
@@ -377,7 +381,7 @@ const AdminActor = () => {
                             {...formItemLayout}
                             name="fullname"
                             label="Họ và tên"
-                            // rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                         >
                             <Input placeholder="Please input your name" />
                         </Form.Item>
@@ -386,36 +390,37 @@ const AdminActor = () => {
                             {...formItemLayout}
                             name="birthday"
                             label="Ngày sinh"
-                            // rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
                         >
                             <DatePicker placeholder="chọn ngày" format="DD-MM-YYYY" style={{ width: '100%' }} />
                         </Form.Item>
+
                         <Form.Item
                             {...formItemLayout}
-                            label="Ảnh"
+                            label="Upload"
                             name="avatar"
-                            rules={[{ required: true, message: 'Vui lòng ' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                         >
-                            {/* <ImgCrop rotationSlider> */}
-                                <Upload
-                                    listType="picture-card"
-                                    fileList={fileList}
-                                    onChange={onChangeUpload}
-                                    onPreview={onPreview}
-                                >
-                                    {fileList.length < 1 && '+ Upload'}
-                                </Upload>
-                            {/* </ImgCrop> */}
+                            <Upload
+                                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                listType="picture-card"
+                                onChange={onChangeUpload}
+                                onPreview={onPreview}
+                                fileList={fileList}
+                                name="avatar"
+                                maxCount={1}
+                            >
+                                {fileList.length < 2 && '+ Upload'}
+                            </Upload>
                         </Form.Item>
                     </Form>
-                </Modal>
+                </BaseModal>
             </Row>
-            <Table
+            <BaseTable
                 columns={columns}
                 onClick={() => {
                     handleDelete();
                 }}
-                // dataSource={posts}
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
