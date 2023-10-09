@@ -13,4 +13,5 @@ public class ResponseDTO<T> {
     private Integer totalPage;
     private Long totalItem;
     private List<T> data;
+
 }

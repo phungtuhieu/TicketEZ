@@ -1,5 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    DatePicker,
+    Upload,
+    Image,
+    Card,
+    Breadcrumb,
+} from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -9,8 +23,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
-import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
+import actorApi from '~/api/QuanLyPhim/actorApi';
+import uploadApi from '~/api/uploadApi';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -31,6 +47,23 @@ const AdminActor = () => {
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    const [workSomeThing, setWorkSomeThing] = useState(false);
+
+    //call api
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await actorApi.getActor();
+                setPosts(res.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -53,7 +86,7 @@ const AdminActor = () => {
             >
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Tìm kiếm ${dataIndex}`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -72,7 +105,7 @@ const AdminActor = () => {
                             width: 90,
                         }}
                     >
-                        Search
+                        Tìm
                     </Button>
                     <Button
                         onClick={() => clearFilters && handleReset(clearFilters)}
@@ -81,7 +114,7 @@ const AdminActor = () => {
                             width: 90,
                         }}
                     >
-                        Reset
+                        mới
                     </Button>
                     <Button
                         type="link"
@@ -94,7 +127,7 @@ const AdminActor = () => {
                             setSearchedColumn(dataIndex);
                         }}
                     >
-                        Filter
+                        Lọc
                     </Button>
                     <Button
                         type="link"
@@ -103,7 +136,7 @@ const AdminActor = () => {
                             close();
                         }}
                     >
-                        close
+                        Đóng
                     </Button>
                 </Space>
             </div>
@@ -142,9 +175,7 @@ const AdminActor = () => {
             title: 'Mã',
             dataIndex: 'id',
             width: '10%',
-            defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
-            ...getColumnSearchProps('id'),
         },
         {
             title: 'Họ và tên',
@@ -155,20 +186,18 @@ const AdminActor = () => {
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
-            ...getColumnSearchProps('birthday'),
         },
         {
             title: 'Ảnh',
             dataIndex: 'avatar',
-            ...getColumnSearchProps('avatar'),
             render: (_, record) => (
                 <Space size="middle">
-                    <img src={`http://localhost:8081/api/upload/${record.avatar}`} alt="" width={65} />
+                    <Image width={85} alt="ảnh rỗng" src={`http://localhost:8081/api/upload/${record.avatar}`} />
                 </Space>
             ),
         },
         {
-            title: 'Action',
+            title: 'Hoạt động',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -182,8 +211,8 @@ const AdminActor = () => {
                     <Popconfirm
                         title="Bạn có chắc"
                         description="Muốn xoá hay không?"
-                        okText="Yes"
-                        cancelText="No"
+                        okText="Đồng ý"
+                        cancelText="Huỷ"
                         onConfirm={() => handleDelete(record)}
                     >
                         <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
@@ -204,18 +233,25 @@ const AdminActor = () => {
         setResetForm(true);
         setFileList([]);
     };
+    
 
     const handleDelete = async (record) => {
-        const res = await axiosClient.delete(`actor/${record.id}`);
-        if (res.code === 500) {
-            message.error('Xoá thất bại ');
+        try {
+            const res = await actorApi.deleteActor(record.id);
+            await uploadApi.deleteUpload(record.avatar);
+            if (res.code === 500) {
+                message.error('Xoá thất bại ');
+            }
+            if (res.status === 200) {
+                funcUtils.notify("hello","error");
+            } else {
+                message.error(res.message);
+            }
+        } catch (error) {
+            console.log(error);
         }
-        if (res.status === 200) {
-            message.success('Xóa dữ liệu thành công');
-        } else {
-            message.error(res.message);
-        }
-        getList();
+       
+        setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
@@ -238,49 +274,35 @@ const AdminActor = () => {
     const handleOk = async () => {
         setLoading(true);
         try {
-            let values = await form.validateFields();
+            const values = await form.validateFields();
             if (fileList.length > 0) {
-                values = {
-                    ...values,
-                };
                 if (editData) {
-                    console.log(values);
-                    values = {
+                    let putData = {
                         id: editData.id,
                         ...values,
                     };
-                    if (values.avatar.file) {
-                        const file = values.avatar.fileList[0].originFileObj;
-                        var formData = new FormData();
-                        formData.append('file_to_upload', file);
-                        const res = await axiosClient.post('upload', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
-                        values = {
-                            ...values,
+                    if (putData.avatar.file) {
+                        const file = putData.avatar.fileList[0].originFileObj;
+                        const res = await uploadApi.putUpload(editData.avatar, file);
+                        putData = {
+                            ...putData,
                             avatar: res.data.fieldName,
                         };
                     }
-                    const res = await axiosClient.put(`actor/${editData.id}`, values);
+                    actorApi.putActor(putData);
                     message.success('Cập nhật thành công');
                 }
                 if (!editData) {
                     const file = values.avatar.fileList[0].originFileObj;
-                    var formData = new FormData();
-                    formData.append('file_to_upload', file);
-                    const res = await axiosClient.post('upload', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
+
+                    const res = await uploadApi.postUpload(file);
+
                     try {
-                        values = {
+                        const postData = {
                             ...values,
                             avatar: res.data.fieldName,
                         };
-                        const resp = await axiosClient.post('actor', values);
+                        await actorApi.postActor(postData);
                         message.success('Thêm thành công');
                     } catch (error) {
                         console.log(error);
@@ -290,7 +312,7 @@ const AdminActor = () => {
                 form.resetFields();
                 setLoading(false);
                 setFileList([]);
-                getList();
+                setWorkSomeThing(!workSomeThing);
             } else {
                 setLoading(false);
                 message.error('vui lòng chọn ảnh');
@@ -308,26 +330,11 @@ const AdminActor = () => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
 
-    useEffect(() => {
-        getList();
-    }, []);
-
     //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
         console.log(form);
-    };
-    //call api
-    const getList = async () => {
-        setLoading(true);
-        try {
-            const res = await axiosClient.get('actor');
-            setPosts(res.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
     };
 
     const onPreview = async (file) => {
@@ -346,7 +353,7 @@ const AdminActor = () => {
     };
 
     return (
-        <div>
+        <>
             <Row>
                 <Col span={22}>
                     <h1 className={cx('title')}>Bảng dữ liệu</h1>
@@ -441,7 +448,7 @@ const AdminActor = () => {
                 //     ),
                 // }}
             />
-        </div>
+        </>
     );
 };
 
