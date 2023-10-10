@@ -23,7 +23,7 @@ const AdminCinemaComplex = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
-    const [size, setSize] = useState('large');
+    const [size] = useState('large');
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -196,7 +196,7 @@ const AdminCinemaComplex = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    const [checkNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
 
@@ -358,7 +358,7 @@ const AdminCinemaComplex = () => {
                                 {...formItemLayout}
                                 name="id"
                                 label="Id"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                                rules={[{ required: true, message: 'Vui lòng nhập tên ssss' }]}
                             >
                                 <Input placeholder="Please input your name" />
                             </Form.Item>

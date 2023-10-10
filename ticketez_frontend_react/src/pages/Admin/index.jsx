@@ -16,3 +16,5 @@ export { default as AdminMovieStudio } from './MovieStudio';
 export { default as AdminActor } from './Actor';
 export { default as AdminDirector } from './Director';
 export { default as AdminFormat } from './Format';
+export { default as AdminAccount } from './Account';
+

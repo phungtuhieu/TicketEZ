@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseDTO<T> {
-    private Integer totalPage;
-    private Long totalItem;
+    private Integer totalPages;
+    private Long totalItems;
     private List<T> data;
+
 }

@@ -34,8 +34,8 @@ public class MovieAPI {
         Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(5));
         Page<Movie> page = dao.findAll(pageable);
         ResponseDTO<Movie> resp = new ResponseDTO<>();
-        resp.setTotalItem(page.getTotalElements());
-        resp.setTotalPage(page.getTotalPages());
+        resp.setTotalItems(page.getTotalElements());
+        resp.setTotalPages(page.getTotalPages());
         resp.setData(page.getContent());
         return ResponseEntity.ok(resp);
     }

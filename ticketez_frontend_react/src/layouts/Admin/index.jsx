@@ -10,10 +10,11 @@ import classNames from 'classnames/bind';
 
 // Ant Design
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Layout, Menu, Button, theme } from 'antd';
+import { Layout, Menu, Button, theme, Card } from 'antd';
 import { HeaderAdminLeft, HeaderAdminRight } from './Header';
 import { Footer } from 'antd/es/layout/layout';
 import Sidebar from './Sidebar';
+import { LayoutPageDefault } from '..';
 
 const { Header, Sider, Content } = Layout;
 const cx = classNames.bind(styles);
@@ -22,7 +23,11 @@ const AdminLayout = ({ children }) => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const path = window.location.pathname;
+
     return (
+        
         <Layout>
             <Sider trigger={null} theme="light" collapsible collapsed={collapsed} width={250}>
                 <Header
@@ -67,7 +72,7 @@ const AdminLayout = ({ children }) => {
                         // background: colorBgContainer,
                     }}
                 >
-                    {children}
+                    <LayoutPageDefault path={path}>{children}</LayoutPageDefault>
                 </Content>
                 <Footer
                     style={{

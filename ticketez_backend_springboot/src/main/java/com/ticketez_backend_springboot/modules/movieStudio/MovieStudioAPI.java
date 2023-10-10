@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,12 +33,13 @@ public class MovieStudioAPI{
     public ResponseEntity<ResponseDTO<MovieStudio>> findAll(
     @RequestParam("page") Optional<Integer> pageNo,
     @RequestParam("limit") Optional<Integer> limit) {
-        Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(5));
+        Sort sort  = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(10),sort);
         Page<MovieStudio> page = dao.findAll(pageable);
         ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
         responeDTO.setData(page.getContent());
-        responeDTO.setTotalItem(page.getTotalElements());
-        responeDTO.setTotalPage(page.getTotalPages());
+        responeDTO.setTotalItems(page.getTotalElements());
+        responeDTO.setTotalPages(page.getTotalPages());
         return ResponseEntity.ok(responeDTO);
     }
 
@@ -65,9 +67,12 @@ public class MovieStudioAPI{
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
+        if(!dao.existsById(id) ){
+           return ResponseEntity.notFound().build();
+        }
         dao.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(true);
     }
 
 }
