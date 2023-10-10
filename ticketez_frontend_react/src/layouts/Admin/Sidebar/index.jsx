@@ -17,7 +17,6 @@ function getItem(label, key, icon, children, type) {
 const items = [
     getItem(<Link to="/admin/index">Trang chủ</Link>, 'home', <FontAwesomeIcon icon={solidIcons.faHouse} />),
 
-  
     // Quản lý rạp phim
     getItem('Rạp', 'grCinema', <FontAwesomeIcon icon={solidIcons.faTv} />, [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
@@ -31,6 +30,7 @@ const items = [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
         getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
+        getItem(<Link to="/admin/mpaaRating">Phân loại</Link>, 'mpaaRating'),
     ]),
 
     // Quản lý ghế
