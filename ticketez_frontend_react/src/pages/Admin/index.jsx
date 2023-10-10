@@ -11,9 +11,10 @@ export { default as AdminSeat } from './Seat';
 export { default as AdminSeatType } from './SeatType';
 export { default as AdminCombo } from './Combo';
 export { default as AdminDiscount } from './Discount';
-export { default as AdminEvent } from './Event';
 export { default as AdminMovieStudio } from './MovieStudio';
 export { default as AdminActor } from './Actor';
 export { default as AdminDirector } from './Director';
 export { default as AdminAccount } from './Account';
 
+export { default as AdminEvent } from './Event';
+export { default as AdminMpaaRating } from './mpaaRating';

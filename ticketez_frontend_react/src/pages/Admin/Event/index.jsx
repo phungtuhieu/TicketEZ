@@ -1,5 +1,23 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Tag, Card, Switch, Select } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    DatePicker,
+    Tag,
+    Card,
+    Switch,
+    Select,
+    Upload,
+    Descriptions,
+    // Image,
+} from 'antd';
+import Image from 'antd/lib/image';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -10,6 +28,7 @@ import classNames from 'classnames/bind';
 import style from './Event.module.scss';
 import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
+import CustomCKEditor from '~/pages/Templates/Ckeditor';
 const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
@@ -147,39 +166,46 @@ const AdminShowtime = () => {
             ...getColumnSearchProps('id'),
         },
         {
-            title: 'Giờ bắt đầu',
-            dataIndex: 'startTime',
+            title: 'Tên',
+            dataIndex: 'name',
+            ...getColumnSearchProps('id'),
+        },
+
+        {
+            title: 'Ngày bắt đầu',
+            dataIndex: 'startDate',
             render: (startTime) => {
                 return startTime ? moment(startTime).format('DD-MM-YYYY HH:mm:ss') : '';
             },
         },
         {
-            title: 'Giờ kết thúc',
-            dataIndex: 'endTime',
+            title: 'Ngày kết thúc',
+            dataIndex: 'endDate',
             render: (endTime) => {
                 return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
             },
         },
         {
+            title: 'Banner',
+            dataIndex: 'banner',
+            width: '10%',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt={record.banner} width={65} />
+                </Space>
+            ),
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'status',
             render: (_, record) => {
-                const statusText = record.status === 1 ? 'Hoạt động' : 'Kết thúc';
-                const tagColor = record.status === 1 ? 'green' : 'red';
+                const statusText = record.status === true ? 'Hoạt động' : 'Kết thúc';
+                const tagColor = record.status === true ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
         },
-        {
-            title: 'Tiêu đề phim',
-            dataIndex: 'movie',
-            render: (movie) => (movie ? movie.title : ''),
-        },
-        {
-            title: 'Tên rạp chiếu',
-            dataIndex: 'cinema',
-            render: (cinema) => (cinema ? cinema.name : ''),
-        },
+
         {
             title: 'Action',
             render: (_, record) => (
@@ -214,13 +240,14 @@ const AdminShowtime = () => {
 
         setFileList([]);
         form.setFieldsValue({
+            status: true,
             'range-time-picker': [],
         });
     };
 
     const handleDelete = async (record) => {
         setResetForm(true);
-        const res = await axiosClient.delete(`showtime/${record.id}`);
+        const res = await axiosClient.delete(`event/${record.id}`);
         if (res.code === 500) {
             message.error('Xoá thất bại ');
         }
@@ -233,13 +260,18 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startTime ? moment(record.startTime) : null;
-        const formattedEndTime = record.endTime ? moment(record.endTime) : null;
+        const formattedStartTime = record.startDate ? moment(record.startDate) : null;
+        const formattedEndTime = record.endDate ? moment(record.endDate) : null;
 
+        const newUploadFile = {
+            uid: record.id.toString(),
+            url: `http://localhost:8081/api/upload/${record.banner}`,
+        };
+        setFileList([newUploadFile]);
         form.setFieldsValue({
-            status: record.status === 1,
-            movie: record.movie?.id,
-            cinema: record.cinema?.id,
+            ...record,
+            status: record.status === true,
+            cinemaComplex: record.cinemaComplex?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
 
@@ -253,7 +285,7 @@ const AdminShowtime = () => {
 
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
-    const [statusValue, setStatusValue] = useState(1);
+    const [statusValue, setStatusValue] = useState(true);
     const onChangeDate = (dates) => {
         if (dates && dates.length === 2) {
             setDataStartTime(dates[0]);
@@ -265,53 +297,76 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values.movie);
-            values = {
-                ...values,
-                startTime: dataStartTime,
-                endTime: dataEndTime,
-                status: statusValue,
-            };
-            console.log(values);
-            if (editData) {
-                const respMovie = await axiosClient.get(`movie/${values.movie}`);
-                const respCinema = await axiosClient.get(`cinema/${values.cinema}`);
-
+            if (fileList.length > 0) {
+                console.log('1', values);
                 values = {
                     ...values,
-                    startTime: new Date(dataStartTime),
-                    endTime: new Date(dataEndTime),
-                    movie: respMovie.data,
-                    cinema: respCinema.data,
+                    startDate: new Date(dataStartTime),
+                    endDate: new Date(dataEndTime),
+                    status: statusValue,
                 };
-                const res = await axiosClient.put(`showtime/${editData.id}`, values);
-                message.success('Cập nhật thành công');
-            }
-            if (!editData) {
-                try {
-                    const respMovie = await axiosClient.get(`movie/${values.movie}`);
-                    const respCinema = await axiosClient.get(`cinema/${values.cinema}`);
-
+                console.log(values);
+                if (editData) {
+                    const respCinemaComplex = await axiosClient.get(`cinemaComplex/${values.cinemaComplex}`);
                     values = {
+                        id: editData.id,
                         ...values,
-                        startTime: new Date(dataStartTime),
-                        endTime: new Date(dataEndTime),
-                        movie: respMovie.data,
-                        cinema: respCinema.data,
+                        cinemaComplex: respCinemaComplex.data,
                     };
-
-                    console.log(values);
-                    const resp = await axiosClient.post('showtime', values);
-                    message.success('Thêm thành công');
-                } catch (error) {
-                    console.log(error);
+                    if (values.banner.file) {
+                        const file = values.banner.fileList[0].originFileObj;
+                        var formData = new FormData();
+                        formData.append('file_to_upload', file);
+                        const res = await axiosClient.post('upload', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        values = {
+                            ...values,
+                            banner: res.data.fieldName,
+                            cinemaComplex: respCinemaComplex.data,
+                        };
+                    }
+                    console.log("2 " ,values );
+                    const res = await axiosClient.put(`event/${editData.id}`, values);
+                    console.log(res);
+                    message.success('Cập nhật thành công');
                 }
+                if (!editData) {
+                    const file = values.banner.fileList[0].originFileObj;
+                    var formData = new FormData();
+                    formData.append('file_to_upload', file);
+                    const res = await axiosClient.post('upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    const respCinemaComplex = await axiosClient.get(`cinemaComplex/${values.cinemaComplex}`);
+
+                    try {
+                        values = {
+                            ...values,
+                            banner: res.data.fieldName,
+                            cinemaComplex: respCinemaComplex.data,
+                        };
+                        console.log('value', values);
+                        const resp = await axiosClient.post('event', values);
+                        console.log('reps', resp);
+                        message.success('Thêm thành công');
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                setOpen(false);
+                form.resetFields();
+                setLoading(false);
+                setFileList([]);
+                getList();
+            } else {
+                setLoading(false);
+                message.error('vui lòng chọn ảnh');
             }
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setFileList([]);
-            getList();
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -327,8 +382,7 @@ const AdminShowtime = () => {
 
     useEffect(() => {
         getList();
-        apiSelectMovie();
-        apiSelectCinema();
+        apiSelectCinemaComplex();
     }, []);
 
     const handleResetForm = () => {
@@ -340,7 +394,7 @@ const AdminShowtime = () => {
     const getList = async () => {
         setLoading(true);
         try {
-            const res = await axiosClient.get('showtime');
+            const res = await axiosClient.get('event');
             setPosts(res.data);
             setLoading(false);
         } catch (error) {
@@ -348,22 +402,11 @@ const AdminShowtime = () => {
         }
     };
 
-    const [selectMovie, setSelectMovie] = useState();
-    const apiSelectMovie = async () => {
+    const [selectCinemaComplex, setSelectCinemaComplex] = useState();
+    const apiSelectCinemaComplex = async () => {
         try {
-            const resp = await axiosClient.get(`movie`);
-            setSelectMovie(resp.data.content);
-        } catch (error) {
-            console.error('Error fetching province data:', error);
-        }
-    };
-
-    const [selectCinema, setSelectCinema] = useState();
-    const apiSelectCinema = async () => {
-        try {
-            const resp = await axiosClient.get(`cinema`);
-            setSelectCinema(resp.data);
-            console.log(resp.data);
+            const resp = await axiosClient.get(`cinemaComplex`);
+            setSelectCinemaComplex(resp.data);
         } catch (error) {
             console.error('Error fetching province data:', error);
         }
@@ -378,6 +421,97 @@ const AdminShowtime = () => {
             },
         ],
     };
+
+    const propsUpload = {
+        onRemove: (file) => {
+            const index = fileList.indexOf(file);
+            const newFileList = fileList.slice();
+            newFileList.splice(index, 1);
+            setFileList(newFileList);
+        },
+        beforeUpload: (file) => {
+            setFileList([...fileList, file]);
+            return false;
+        },
+        fileList,
+    };
+
+    const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
+    const onPreview = async (file) => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+        const image = new Image();
+        image.src = src;
+        const imgWindow = window.open(src);
+        imgWindow?.document.write(image.outerHTML);
+    };
+
+    const [editorData, setEditorData] = useState('');
+
+    const handleEditorChange = (data) => {
+        setEditorData(data);
+    };
+
+    const itemsDescriptions = (record) => [
+        {
+            key: '1',
+            label: 'Id',
+            children: record.id,
+        },
+        {
+            key: '2',
+            label: 'Tên',
+            children: record.name,
+        },
+        {
+            key: '3',
+            label: 'Ngày bắt đầu',
+            children: moment(record.startDate).format('DD/MM/YYYY'),
+        },
+        {
+            key: '4',
+            label: 'Ngày kết thúc',
+            children: moment(record.endDate).format('DD/MM/YYYY'),
+        },
+        {
+            key: '7',
+            label: 'Cụm rạp',
+            children: record.cinemaComplex.name,
+        },
+        {
+            key: '6',
+            label: 'Trạng thái',
+            children: record.status === true ? 'Hoạt động' : 'Kết thúc',
+        },
+        {
+            key: '5',
+            label: 'Ảnh',
+            children: (
+                <Image
+                    src={`http://localhost:8081/api/upload/${record.banner}`}
+                    alt={record.banner}
+                    width={65}
+                    style={{ marginTop: '-10px' }}
+                />
+            ),
+        },
+        {
+            key: '8',
+            label: 'Mô tả',
+            children: record.description !== null && (
+                <span dangerouslySetInnerHTML={{ __html: record.description }} style={{ marginTop: '-15px' }} />
+            ),
+        },
+    ];
+
     return (
         <div>
             <Card>
@@ -418,12 +552,38 @@ const AdminShowtime = () => {
                         <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
                             <Form.Item label="Trạng thái" name="status">
                                 <Switch
-                                    checked={statusValue === 1}
-                                    onChange={(checked) => setStatusValue(checked ? 1 : 0)}
+                                    checked={statusValue === true}
+                                    onChange={(checked) => setStatusValue(checked ? true : false)}
                                     checkedChildren={'Đang hoạt động'}
                                     unCheckedChildren={'Kết Thúc '}
                                     defaultChecked
                                 />
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                label="Chọn Banner"
+                                name="banner"
+                                rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                            >
+                                <Upload
+                                    {...propsUpload}
+                                    listType="picture-card"
+                                    onChange={onChangeUpload}
+                                    onPreview={onPreview}
+                                    fileList={fileList}
+                                    name="icon"
+                                    maxCount={1}
+                                >
+                                    {fileList.length < 2 && '+ Upload'}
+                                </Upload>
+                            </Form.Item>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="name"
+                                label="Chọn phim"
+                                rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                            >
+                                <Input />
                             </Form.Item>
                             <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                                 <RangePicker
@@ -436,7 +596,7 @@ const AdminShowtime = () => {
 
                             <Form.Item
                                 {...formItemLayout}
-                                name="movie"
+                                name="cinemaComplex"
                                 label="Chọn phim"
                                 rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                             >
@@ -450,32 +610,19 @@ const AdminShowtime = () => {
                                     filterOption={(input, option) =>
                                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                     }
-                                    options={selectMovie?.map((movie) => ({
-                                        value: movie.id,
-                                        label: movie.title,
+                                    options={selectCinemaComplex?.map((cinemaComplex) => ({
+                                        value: cinemaComplex.id,
+                                        label: cinemaComplex.name,
                                     }))}
                                 />
                             </Form.Item>
                             <Form.Item
                                 {...formItemLayout}
-                                name="cinema"
+                                name="description"
                                 label="Chọn rạp"
                                 rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
                             >
-                                <Select
-                                    showSearch
-                                    placeholder="Chọn loại"
-                                    optionFilterProp="children"
-                                    // onChange={onchangeSelectLoaiVanBan}
-                                    //onSearch={onSearchSelectBox}
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={selectCinema?.map((cinema) => ({
-                                        value: cinema.id,
-                                        label: cinema.name,
-                                    }))}
-                                />
+                                <CustomCKEditor value={editorData} onChange={handleEditorChange} />
                             </Form.Item>
                         </Form>
                     </BaseModal>
@@ -488,22 +635,12 @@ const AdminShowtime = () => {
                     dataSource={posts.map((post) => ({
                         ...post,
                         key: post.id,
-                        birthday: `${('0' + new Date(post.birthday).getDate()).slice(-2)}-${(
-                            '0' +
-                            (new Date(post.birthday).getMonth() + 1)
-                        ).slice(-2)}-${new Date(post.birthday).getFullYear()}`,
                     }))}
-                    // expandable={{
-                    //     expandedRowRender: (record) => (
-                    //         <p
-                    //             style={{
-                    //                 margin: 0,
-                    //             }}
-                    //         >
-                    //             {record.body}
-                    //         </p>
-                    //     ),
-                    // }}
+                    expandable={{
+                        expandedRowRender: (record) => (
+                            <Descriptions title="Thông tin chi tiết" items={itemsDescriptions(record)} />
+                        ),
+                    }}
                 />
             </Card>
         </div>

@@ -22,13 +22,12 @@ const publicRoutes = [
     { path: '/admin/actor', component: PageAdmin.AdminActor, layout: AdminLayout },
     { path: '/admin/director', component: PageAdmin.AdminDirector, layout: AdminLayout },
     { path: '/admin/account', component: PageAdmin.AdminAccount, layout: AdminLayout },
+    { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
 
     // User
     { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },
     { path: '/', component: UserHome, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
-
-    
 ];
 
 const privateRoutes = [];

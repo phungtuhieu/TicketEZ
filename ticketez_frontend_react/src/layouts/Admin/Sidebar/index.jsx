@@ -17,7 +17,6 @@ function getItem(label, key, icon, children, type) {
 const items = [
     getItem(<Link to="/admin/index">Trang chủ</Link>, 'home', <FontAwesomeIcon icon={solidIcons.faHouse} />),
 
-  
     // Quản lý rạp phim
     getItem('Rạp', 'grCinema', <FontAwesomeIcon icon={solidIcons.faTv} />, [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
@@ -33,6 +32,7 @@ const items = [
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
         getItem(<Link to="/admin/actor">Tác giả</Link>, 'actor', null),
         getItem(<Link to="/admin/director">Đạo diễn</Link>, 'director', null),
+        getItem(<Link to="/admin/mpaaRating">Phân loại</Link>, 'mpaaRating'),
     ]),
 
     // Quản lý ghế
@@ -40,7 +40,6 @@ const items = [
         getItem(<Link to="/admin/seat">Ghế</Link>, 'seat', null),
         getItem(<Link to="/admin/seat-type">Loại ghế</Link>, 'seatType', null),
     ]),
-
 
     // Quản lý dịch vụ, sự kiện
     getItem('Dịch vụ & sự kiện', 'grServiceEvent', <FontAwesomeIcon icon={solidIcons.faCalendarCheck} />, [
@@ -57,7 +56,11 @@ const items = [
         ),
     ]),
     { type: 'divider' },
-    getItem(<Link to="/admin/account">Quản lý người dùng</Link>, 'grAccount', <FontAwesomeIcon icon={solidIcons.faUsers} />),
+    getItem(
+        <Link to="/admin/account">Quản lý người dùng</Link>,
+        'grAccount',
+        <FontAwesomeIcon icon={solidIcons.faUsers} />,
+    ),
 ];
 function Sidebar() {
     return <Menu mode="inline" items={items} />;
