@@ -214,7 +214,6 @@ const AdminShowtime = () => {
 
         setFileList([]);
         form.setFieldsValue({
-            status: 1,
             'range-time-picker': []
         });
     };

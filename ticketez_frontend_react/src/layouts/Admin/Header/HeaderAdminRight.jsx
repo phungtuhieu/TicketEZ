@@ -82,8 +82,7 @@ function HeaderAdminRight() {
 
     return (
         <>
-            {/* Đặt nội dung header phụ ở đây */}
-            <Row style={{ width: '100%' }}>
+            <Row style={{ width: '100%' }} className="background">
                 <Col lg={15} xs={24} style={{ display: 'flex', alignItems: 'center', width: '100px' }}>
                     {/* <div>
                         <span className={cx('title-left')}>Home /</span>
