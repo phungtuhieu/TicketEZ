@@ -363,7 +363,6 @@ const AdminMpaaRating = () => {
 
     return (
         <div>
-            <Card>
                 <Row>
                     <Col span={22}>
                         <h1 className={cx('title')}>Bảng dữ liệu</h1>
@@ -464,7 +463,6 @@ const AdminMpaaRating = () => {
                     //     ),
                     // }}
                 />
-            </Card>
         </div>
     );
 };

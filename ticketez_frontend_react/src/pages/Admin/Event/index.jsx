@@ -191,7 +191,7 @@ const AdminShowtime = () => {
             width: '10%',
             render: (_, record) => (
                 <Space size="middle">
-                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt={record.banner} width={65} />
+                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt={record.banner} width={65} loading='lazy'/>
                 </Space>
             ),
         },
@@ -514,7 +514,6 @@ const AdminShowtime = () => {
 
     return (
         <div>
-            <Card>
                 <Row>
                     <Col span={22}>
                         <h1 className={cx('title')}>Bảng dữ liệu</h1>
@@ -642,7 +641,6 @@ const AdminShowtime = () => {
                         ),
                     }}
                 />
-            </Card>
         </div>
     );
 };
