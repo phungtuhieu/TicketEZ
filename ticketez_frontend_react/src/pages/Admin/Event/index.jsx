@@ -19,7 +19,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminEvent = () => {
+const AdminShowtime = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -340,8 +340,8 @@ const AdminEvent = () => {
     const getList = async () => {
         setLoading(true);
         try {
-            const res = await axiosClient.get('event');
-            setPosts(res);
+            const res = await axiosClient.get('showtime');
+            setPosts(res.data);
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -510,4 +510,4 @@ const AdminEvent = () => {
     );
 };
 
-export default AdminEvent;
+export default AdminShowtime;
