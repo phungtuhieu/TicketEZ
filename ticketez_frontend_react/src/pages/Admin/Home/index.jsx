@@ -46,12 +46,14 @@ const apexChartOptions = {
             },
         },
     },
+    colors: ['#5F6F94', '#5D87FF', '#ABD9FF'],
 };
 
 const apexChartSeries = [
     {
         name: 'Net Profit',
         data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+        
     },
     {
         name: 'Revenue',
@@ -72,6 +74,7 @@ const seriesData = [
         name: 'series2',
         data: [11, 32, 45, 32, 34, 52, 41],
     },
+   
 ];
 const options = {
     chart: {
@@ -101,6 +104,7 @@ const options = {
             format: 'dd/MM/yy HH:mm',
         },
     },
+    colors: [ '#5D87FF','#5F6F94'],
 };
 
 const dataBieuDoTron = [44, 55, 41, 17, 15];
@@ -122,6 +126,7 @@ const optionsBieuDoTron = {
             },
         },
     ],
+    colors: ['#5F6F94', '#5D87FF', '#ABD9FF', '#85CDFD', '#97DEFF'],
 };
 
 const AdminIndex = () => {

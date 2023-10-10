@@ -1,8 +1,9 @@
-import { SearchOutlined } from '@ant-design/icons';
-import { faBell, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Col, Row, Input, Dropdown } from 'antd';
-import React from 'react';
+
+import { SearchOutlined } from "@ant-design/icons";
+import { faBell, faGear, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Col, Row, Input, Dropdown } from "antd";
+import React, { useState } from "react";
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
 import { Menu } from 'antd';
@@ -81,8 +82,7 @@ function HeaderAdminRight() {
 
     return (
         <>
-            {/* Đặt nội dung header phụ ở đây */}
-            <Row style={{ width: '100%' }}>
+            <Row style={{ width: '100%' }} className="background">
                 <Col lg={15} xs={24} style={{ display: 'flex', alignItems: 'center', width: '100px' }}>
                     {/* <div>
                         <span className={cx('title-left')}>Home /</span>

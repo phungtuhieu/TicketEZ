@@ -1,16 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Tag, Card, Switch, Select } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Card } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import BaseModal from '~/components/Admin/BaseModal/BaseModal';
-import BaseTable from '~/components/Admin/BaseTable/BaseTable';
+import BaseTable from '~/components/common/BaseTable/BaseTable';
+import BaseModal from '~/components/common/BaseModal/BaseModal';
 import Highlighter from 'react-highlight-words';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
-import style from './Event.module.scss';
+import style from './mpaaRating.module.scss';
 import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
-const { RangePicker } = DatePicker;
+import TextArea from 'antd/es/input/TextArea';
 
 const cx = classNames.bind(style);
 
@@ -19,10 +20,11 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminShowtime = () => {
+const AdminMpaaRating = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
+
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -144,41 +146,26 @@ const AdminShowtime = () => {
             width: '10%',
             defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
-            ...getColumnSearchProps('id'),
         },
         {
-            title: 'Giờ bắt đầu',
-            dataIndex: 'startTime',
-            render: (startTime) => {
-                return startTime ? moment(startTime).format('DD-MM-YYYY HH:mm:ss') : '';
-            },
+            title: 'Biểu tượng phân loại',
+            dataIndex: 'ratingCode',
+            width: '30%',
+            ...getColumnSearchProps('ratingCode'),
         },
         {
-            title: 'Giờ kết thúc',
-            dataIndex: 'endTime',
-            render: (endTime) => {
-                return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
-            },
+            title: 'Mô tả',
+            dataIndex: 'description',
+            ...getColumnSearchProps('description'),
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            render: (_, record) => {
-                const statusText = record.status === 1 ? 'Hoạt động' : 'Kết thúc';
-                const tagColor = record.status === 1 ? 'green' : 'red';
-
-                return <Tag color={tagColor}>{statusText}</Tag>;
-            },
-        },
-        {
-            title: 'Tiêu đề phim',
-            dataIndex: 'movie',
-            render: (movie) => (movie ? movie.title : ''),
-        },
-        {
-            title: 'Tên rạp chiếu',
-            dataIndex: 'cinema',
-            render: (cinema) => (cinema ? cinema.name : ''),
+            title: 'icon',
+            dataIndex: 'icon',
+            render: (_, record) => (
+                <Space size="middle">
+                    <img src={`http://localhost:8081/api/upload/${record.icon}`} alt="" width={65} />
+                </Space>
+            ),
         },
         {
             title: 'Action',
@@ -206,21 +193,20 @@ const AdminShowtime = () => {
         },
     ];
 
+    const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
+
     const showModal = () => {
         form.resetFields();
         setEditData(null);
         setOpen(true);
         setResetForm(true);
-
         setFileList([]);
-        form.setFieldsValue({
-            'range-time-picker': [],
-        });
     };
 
     const handleDelete = async (record) => {
-        setResetForm(true);
-        const res = await axiosClient.delete(`showtime/${record.id}`);
+        const res = await axiosClient.delete(`mpaaRating/${record.id}`);
         if (res.code === 500) {
             message.error('Xoá thất bại ');
         }
@@ -233,87 +219,86 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startTime ? moment(record.startTime) : null;
-        const formattedEndTime = record.endTime ? moment(record.endTime) : null;
-
-        form.setFieldsValue({
-            status: record.status === 1,
-            movie: record.movie?.id,
-            cinema: record.cinema?.id,
-            'range-time-picker': [formattedStartTime, formattedEndTime],
-        });
-
-        setDataStartTime(formattedStartTime);
-        setDataEndTime(formattedEndTime);
-        setStatusValue(record.status);
+        // const formatDate = moment(record.birthday, 'YYYY-MM-DD');
+        const newUploadFile = {
+            uid: record.id.toString(),
+            name: record.avatar,
+            url: `http://localhost:8081/api/upload/${record.icon}`,
+        };
+        setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
-    };
-
-    const [dataStartTime, setDataStartTime] = useState();
-    const [dataEndTime, setDataEndTime] = useState();
-    const [statusValue, setStatusValue] = useState(1);
-    const onChangeDate = (dates) => {
-        if (dates && dates.length === 2) {
-            setDataStartTime(dates[0]);
-            setDataEndTime(dates[1]);
-        }
+        form.setFieldsValue({
+            ...record,
+            //    birthday: formatDate,
+        });
     };
 
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values.movie);
-            values = {
-                ...values,
-                startTime: dataStartTime,
-                endTime: dataEndTime,
-                status: statusValue,
-            };
             console.log(values);
-            if (editData) {
-                const respMovie = await axiosClient.get(`movie/${values.movie}`);
-                const respCinema = await axiosClient.get(`cinema/${values.cinema}`);
-
+            if (fileList.length > 0) {
                 values = {
                     ...values,
-                    startTime: new Date(dataStartTime),
-                    endTime: new Date(dataEndTime),
-                    movie: respMovie.data,
-                    cinema: respCinema.data,
                 };
-                const res = await axiosClient.put(`showtime/${editData.id}`, values);
-                message.success('Cập nhật thành công');
-            }
-            if (!editData) {
-                try {
-                    const respMovie = await axiosClient.get(`movie/${values.movie}`);
-                    const respCinema = await axiosClient.get(`cinema/${values.cinema}`);
-
-                    values = {
-                        ...values,
-                        startTime: new Date(dataStartTime),
-                        endTime: new Date(dataEndTime),
-                        movie: respMovie.data,
-                        cinema: respCinema.data,
-                    };
-
+                if (editData) {
                     console.log(values);
-                    const resp = await axiosClient.post('showtime', values);
-                    message.success('Thêm thành công');
-                } catch (error) {
-                    console.log(error);
+                    values = {
+                        id: editData.id,
+                        ...values,
+                    };
+                    if (values.icon.file) {
+                        const file = values.icon.fileList[0].originFileObj;
+                        var formData = new FormData();
+                        formData.append('file_to_upload', file);
+                        const res = await axiosClient.post('upload', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        values = {
+                            ...values,
+                            icon: res.data.fieldName,
+                        };
+                    }
+                    const res = await axiosClient.put(`mpaaRating/${editData.id}`, values);
+                    message.success('Cập nhật thành công');
                 }
+                if (!editData) {
+                    const file = values.icon.fileList[0].originFileObj;
+                    var formData = new FormData();
+                    formData.append('file_to_upload', file);
+                    const res = await axiosClient.post('upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    try {
+                        values = {
+                            ...values,
+                            icon: res.data.fieldName,
+                        };
+                        const resp = await axiosClient.post('mpaaRating', values);
+                        message.success('Thêm thành công');
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                setOpen(false);
+                form.resetFields();
+                setLoading(false);
+                setFileList([]);
+                getList();
+            } else {
+                setLoading(false);
+                message.error('vui lòng chọn ảnh');
             }
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setFileList([]);
-            getList();
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
+            message.error('Có lỗi xảy ra vui lòng thử lại');
             setLoading(false);
         }
     };
@@ -327,20 +312,19 @@ const AdminShowtime = () => {
 
     useEffect(() => {
         getList();
-        apiSelectMovie();
-        apiSelectCinema();
     }, []);
 
+    //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
         console.log(form);
     };
-
+    //call api
     const getList = async () => {
         setLoading(true);
         try {
-            const res = await axiosClient.get('showtime');
+            const res = await axiosClient.get('mpaaRating');
             setPosts(res.data);
             setLoading(false);
         } catch (error) {
@@ -348,36 +332,35 @@ const AdminShowtime = () => {
         }
     };
 
-    const [selectMovie, setSelectMovie] = useState();
-    const apiSelectMovie = async () => {
-        try {
-            const resp = await axiosClient.get(`movie`);
-            setSelectMovie(resp.data.content);
-        } catch (error) {
-            console.error('Error fetching province data:', error);
+    const onPreview = async (file) => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
         }
+        const image = new Image();
+        image.src = src;
+        const imgWindow = window.open(src);
+        imgWindow?.document.write(image.outerHTML);
     };
 
-    const [selectCinema, setSelectCinema] = useState();
-    const apiSelectCinema = async () => {
-        try {
-            const resp = await axiosClient.get(`cinema`);
-            setSelectCinema(resp.data);
-            console.log(resp.data);
-        } catch (error) {
-            console.error('Error fetching province data:', error);
-        }
-    };
+      const propsUpload = {
+          onRemove: (file) => {
+              const index = fileList.indexOf(file);
+              const newFileList = fileList.slice();
+              newFileList.splice(index, 1);
+              setFileList(newFileList);
+          },
+          beforeUpload: (file) => {
+              setFileList([...fileList, file]);
+              return false;
+          },
+          fileList,
+      };
 
-    const rangeConfig = {
-        rules: [
-            {
-                type: 'array',
-                required: true,
-                message: 'Please select time!',
-            },
-        ],
-    };
     return (
         <div>
             <Card>
@@ -415,71 +398,47 @@ const AdminShowtime = () => {
                             </Button>,
                         ]}
                     >
-                        <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
-                            <Form.Item label="Trạng thái" name="status">
-                                <Switch
-                                    checked={statusValue === 1}
-                                    onChange={(checked) => setStatusValue(checked ? 1 : 0)}
-                                    checkedChildren={'Đang hoạt động'}
-                                    unCheckedChildren={'Kết Thúc '}
-                                    defaultChecked
-                                />
-                            </Form.Item>
-                            <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
-                                <RangePicker
-                                    showTime
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    value={[dataStartTime, dataEndTime]}
-                                    onChange={onChangeDate}
-                                />
+                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                            <Form.Item
+                                {...formItemLayout}
+                                name="ratingCode"
+                                label="Phân loại"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            >
+                                <Input placeholder="Please input your name" />
                             </Form.Item>
 
                             <Form.Item
                                 {...formItemLayout}
-                                name="movie"
-                                label="Chọn phim"
-                                rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                                name="description"
+                                label="Mô tả"
+                                rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
                             >
-                                <Select
-                                    style={{ width: '100%' }}
-                                    showSearch
-                                    placeholder="Chọn loại"
-                                    optionFilterProp="children"
-                                    // onChange={onchangeSelectLoaiVanBan}
-                                    //onSearch={onSearchSelectBox}
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={selectMovie?.map((movie) => ({
-                                        value: movie.id,
-                                        label: movie.title,
-                                    }))}
-                                />
+                                <TextArea />
                             </Form.Item>
+
                             <Form.Item
                                 {...formItemLayout}
-                                name="cinema"
-                                label="Chọn rạp"
-                                rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
+                                label="icon"
+                                name="icon"
+                                rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                             >
-                                <Select
-                                    showSearch
-                                    placeholder="Chọn loại"
-                                    optionFilterProp="children"
-                                    // onChange={onchangeSelectLoaiVanBan}
-                                    //onSearch={onSearchSelectBox}
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={selectCinema?.map((cinema) => ({
-                                        value: cinema.id,
-                                        label: cinema.name,
-                                    }))}
-                                />
+                                <Upload
+                                    {...propsUpload}
+                                    listType="picture-card"
+                                    onChange={onChangeUpload}
+                                    onPreview={onPreview}
+                                    fileList={fileList}
+                                    name="icon"
+                                    maxCount={1}
+                                >
+                                    {fileList.length < 2 && '+ Upload'}
+                                </Upload>
                             </Form.Item>
                         </Form>
                     </BaseModal>
                 </Row>
+
                 <BaseTable
                     columns={columns}
                     onClick={() => {
@@ -510,4 +469,4 @@ const AdminShowtime = () => {
     );
 };
 
-export default AdminShowtime;
+export default AdminMpaaRating;

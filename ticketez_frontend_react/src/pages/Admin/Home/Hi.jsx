@@ -31,7 +31,7 @@ const apexChartOptions = {
         colors: ['transparent'],
     },
     xaxis: {
-        categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        categories: ['aa', 'aaa', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
     },
     yaxis: {
         title: {
@@ -44,7 +44,7 @@ const apexChartOptions = {
     tooltip: {
         y: {
             formatter: function (val) {
-                return '$ ' + val + ' thousands';
+                return 'vnd ' + val + ' thousands';
             },
         },
     },
@@ -54,16 +54,22 @@ const apexChartSeries = [
     {
         name: 'Net Profit',
         data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+        style : {
+            color: 'black',
+        }
     },
     {
         name: 'Revenue',
         data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+        color: '#00FF00', // Thay đổi màu cho series 'Revenue'
     },
     {
         name: 'Free Cash Flow',
         data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
+        color: '#0000FF', // Thay đổi màu cho series 'Free Cash Flow'
     },
 ];
+
 
 const seriesData = [
     {
@@ -105,26 +111,26 @@ const options = {
     },
 };
 
-  const dataBieuDoTron = [44, 55, 41, 17, 15];
+const dataBieuDoTron = [44, 55, 41, 17, 15];
 
-  const optionsBieuDoTron = {
-      chart: {
-          type: 'donut',
-      },
-      responsive: [
-          {
-              breakpoint: 480,
-              options: {
-                  chart: {
-                      width: 200,
-                  },
-                  legend: {
-                      position: 'bottom',
-                  },
-              },
-          },
-      ],
-  };
+const optionsBieuDoTron = {
+    chart: {
+        type: 'donut',
+    },
+    responsive: [
+        {
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 200,
+                },
+                legend: {
+                    position: 'bottom',
+                },
+            },
+        },
+    ],
+};
 
 const Hi = () => {
     const [size, setSize] = useState('large');
