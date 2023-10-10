@@ -59,6 +59,11 @@ const items = [
             'group',
         ),
     ]),
+    // dạng phim
+    getItem('Định dạng phim', 'grFormat', <FontAwesomeIcon icon={solidIcons.faRemoveFormat} />, [
+        getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),
+
+    ]),
     { type: 'divider' },
     getItem('Quản lý người dùng', 'grAccount', <FontAwesomeIcon icon={solidIcons.faUsers} />),
 ];
