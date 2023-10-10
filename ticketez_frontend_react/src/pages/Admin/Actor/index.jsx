@@ -1,16 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import BaseModal from '~/components/Admin/BaseModal/BaseModal';
-import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import Highlighter from 'react-highlight-words';
-
+import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+
+import BaseModal from '~/components/Admin/BaseModal/BaseModal';
+import BaseTable from '~/components/Admin/BaseTable/BaseTable';
+import funcUtils from '~/utils/funcUtils';
+
+import { actorApi } from '~/api/admin';
+import uploadApi from '~/api/service/uploadApi';
+
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
-import axiosClient from '~/api/global/axiosClient';
-import moment from 'moment';
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -26,11 +30,28 @@ const AdminActor = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    // const [checkNick, setCheckNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    const [workSomeThing, setWorkSomeThing] = useState(false);
+
+    //call api
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await actorApi.getActor();
+                setPosts(res.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -53,7 +74,7 @@ const AdminActor = () => {
             >
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Tìm kiếm ${dataIndex}`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -72,7 +93,7 @@ const AdminActor = () => {
                             width: 90,
                         }}
                     >
-                        Search
+                        Tìm
                     </Button>
                     <Button
                         onClick={() => clearFilters && handleReset(clearFilters)}
@@ -81,7 +102,7 @@ const AdminActor = () => {
                             width: 90,
                         }}
                     >
-                        Reset
+                        mới
                     </Button>
                     <Button
                         type="link"
@@ -94,7 +115,7 @@ const AdminActor = () => {
                             setSearchedColumn(dataIndex);
                         }}
                     >
-                        Filter
+                        Lọc
                     </Button>
                     <Button
                         type="link"
@@ -103,7 +124,7 @@ const AdminActor = () => {
                             close();
                         }}
                     >
-                        close
+                        Đóng
                     </Button>
                 </Space>
             </div>
@@ -142,9 +163,7 @@ const AdminActor = () => {
             title: 'Mã',
             dataIndex: 'id',
             width: '10%',
-            defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
-            ...getColumnSearchProps('id'),
         },
         {
             title: 'Họ và tên',
@@ -155,20 +174,24 @@ const AdminActor = () => {
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
-            ...getColumnSearchProps('birthday'),
         },
         {
             title: 'Ảnh',
             dataIndex: 'avatar',
-            ...getColumnSearchProps('avatar'),
             render: (_, record) => (
                 <Space size="middle">
-                    <img src={`http://localhost:8081/api/upload/${record.avatar}`} alt="" width={65} />
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.avatar}`}
+                    />
                 </Space>
             ),
         },
         {
-            title: 'Action',
+            title: 'Hoạt động',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -182,8 +205,8 @@ const AdminActor = () => {
                     <Popconfirm
                         title="Bạn có chắc"
                         description="Muốn xoá hay không?"
-                        okText="Yes"
-                        cancelText="No"
+                        okText="Đồng ý"
+                        cancelText="Huỷ"
                         onConfirm={() => handleDelete(record)}
                     >
                         <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
@@ -206,16 +229,21 @@ const AdminActor = () => {
     };
 
     const handleDelete = async (record) => {
-        const res = await axiosClient.delete(`actor/${record.id}`);
-        if (res.code === 500) {
-            message.error('Xoá thất bại ');
+        try {
+            const res = await actorApi.deleteActor(record.id);
+            console.log(res);
+            if (res.status === 200) {
+                await uploadApi.deleteUpload(record.avatar);
+                funcUtils.notify(res.data, 'success');
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 409) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         }
-        if (res.status === 200) {
-            message.success('Xóa dữ liệu thành công');
-        } else {
-            message.error(res.message);
-        }
-        getList();
+
+        setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
@@ -238,51 +266,57 @@ const AdminActor = () => {
     const handleOk = async () => {
         setLoading(true);
         try {
-            let values = await form.validateFields();
+            const values = await form.validateFields();
             if (fileList.length > 0) {
-                values = {
-                    ...values,
-                };
                 if (editData) {
-                    console.log(values);
-                    values = {
+                    let putData = {
                         id: editData.id,
                         ...values,
                     };
-                    if (values.avatar.file) {
-                        const file = values.avatar.fileList[0].originFileObj;
-                        var formData = new FormData();
-                        formData.append('file_to_upload', file);
-                        const res = await axiosClient.post('upload', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
-                        values = {
-                            ...values,
-                            avatar: res.data.fieldName,
+                    if (putData.avatar.file) {
+                        const file = putData.avatar.fileList[0].originFileObj;
+                        const images = await uploadApi.putUpload(editData.avatar, file);
+                        putData = {
+                            ...putData,
+                            avatar: images,
                         };
                     }
-                    const res = await axiosClient.put(`actor/${editData.id}`, values);
-                    message.success('Cập nhật thành công');
+
+                    try {
+                        const resPut = await actorApi.putActor(putData.id, putData);
+                        console.log(resPut);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        console.log(error);
+                    }
                 }
                 if (!editData) {
-                    const file = values.avatar.fileList[0].originFileObj;
-                    var formData = new FormData();
-                    formData.append('file_to_upload', file);
-                    const res = await axiosClient.post('upload', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
                     try {
-                        values = {
+                        const file = values.avatar.fileList[0].originFileObj;
+                        const images = await uploadApi.postUpload(file);
+                        const postData = {
                             ...values,
-                            avatar: res.data.fieldName,
+                            avatar: images,
                         };
-                        const resp = await axiosClient.post('actor', values);
-                        message.success('Thêm thành công');
+                        console.log(postData);
+                        const resPost = await actorApi.postActor(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                        }
                     } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        // upload
+                        if(error.response.data.error) {
+                            funcUtils.notify(error.response.data.error, 'error');
+                        }
                         console.log(error);
                     }
                 }
@@ -290,7 +324,7 @@ const AdminActor = () => {
                 form.resetFields();
                 setLoading(false);
                 setFileList([]);
-                getList();
+                setWorkSomeThing(!workSomeThing);
             } else {
                 setLoading(false);
                 message.error('vui lòng chọn ảnh');
@@ -304,30 +338,15 @@ const AdminActor = () => {
         setOpen(false);
     };
 
-    useEffect(() => {
-        form.validateFields(['nickname']);
-    }, [checkNick, form]);
-
-    useEffect(() => {
-        getList();
-    }, []);
+    // useEffect(() => {
+    //     form.validateFields(['nickname']);
+    // }, [checkNick, form]);
 
     //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
         console.log(form);
-    };
-    //call api
-    const getList = async () => {
-        setLoading(true);
-        try {
-            const res = await axiosClient.get('actor');
-            setPosts(res.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
     };
 
     const onPreview = async (file) => {
@@ -346,7 +365,7 @@ const AdminActor = () => {
     };
 
     return (
-        <div>
+        <>
             <Row>
                 <Col span={22}>
                     <h1 className={cx('title')}>Bảng dữ liệu</h1>
@@ -400,9 +419,11 @@ const AdminActor = () => {
                             label="Upload"
                             name="avatar"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                            
                         >
                             <Upload
                                 action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                accept='.png, .jpg'
                                 listType="picture-card"
                                 onChange={onChangeUpload}
                                 onPreview={onPreview}
@@ -441,7 +462,7 @@ const AdminActor = () => {
                 //     ),
                 // }}
             />
-        </div>
+        </>
     );
 };
 

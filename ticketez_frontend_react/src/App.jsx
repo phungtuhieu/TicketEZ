@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
 import { DefaultLayout } from '~/layouts';
 import { Fragment } from 'react';
+import NotFound from './pages/NotFound/notFound';
+import { ToastContainer } from 'react-toastify';
 function App() {
     return (
         <Router>
@@ -9,7 +11,6 @@ function App() {
                 <Routes>
                     {publicRoutes.map((route, index) => {
                         const Page = route.component;
-
                         let Layout = DefaultLayout;
                         if (route.layout) {
                             Layout = route.layout;
@@ -23,11 +24,13 @@ function App() {
                                 element={
                                     <Layout>
                                         <Page />
+                                        <ToastContainer />
                                     </Layout>
                                 }
                             />
                         );
                     })}
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
         </Router>

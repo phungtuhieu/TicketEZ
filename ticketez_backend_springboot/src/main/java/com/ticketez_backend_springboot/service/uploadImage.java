@@ -8,9 +8,11 @@ import java.nio.file.Paths;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,28 +55,6 @@ public class uploadImage {
     }
   }
 
-  // @PostMapping()
-  // public ResponseEntity<?> uploadImageA(@RequestParam("file_to_upload")
-  // MultipartFile file) throws IOException {
-  // try {
-  // String path = Paths.get(System.getProperty("user.dir"),
-  // "src/main/resources/static/").toString();
-
-  // File dir = new File(path, "images");
-  // if (!dir.exists()) {
-  // dir.mkdirs();
-  // }
-  // System.out.println(dir);
-  // File uploadedFile = new File(dir, file.getOriginalFilename());
-  // file.transferTo(uploadedFile);
-  // return ResponseEntity.status(HttpStatus.OK).body(dir);
-
-  // } catch (Exception e) {
-  // return ResponseEntity.badRequest().body("Lỗi hình ảnh");
-
-  // }
-  // }
-
   @PostMapping()
   public ResponseEntity<?> uploadImageA(@RequestParam("file_to_upload") MultipartFile file) throws IOException {
 
@@ -84,6 +64,11 @@ public class uploadImage {
       response.put("error", "Please select a file to upload.");
       return ResponseEntity.badRequest().body(response);
     }
+    
+    if (file.getSize() > 10 * 1024 * 1024) { 
+      response.put("error", "Kích thước tệp vượt quá giới hạn 10MB. Thử lại sau!");
+      return ResponseEntity.badRequest().body(response);
+  }
 
     try {
       String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/").toString();
@@ -94,12 +79,12 @@ public class uploadImage {
       }
       String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
-      System.out.println(dir);
+     
       File uploadedFile = new File(dir, uniqueFileName);
       file.transferTo(uploadedFile);
 
+      response.put("PATH", path);
       response.put("destination", dir.toString());
-      // response.put("encoding", file.getEncoding());
       response.put("fieldName", uniqueFileName);
       response.put("filename", file.getOriginalFilename());
       response.put("mimetype", file.getContentType());
@@ -112,6 +97,67 @@ public class uploadImage {
     } catch (Exception e) {
       return ResponseEntity.badRequest().body("Lỗi hình ảnh");
 
+    }
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateImage(@PathVariable String id, @RequestParam("file_to_upload") MultipartFile file) throws IOException {
+      Map<String, String> response = new HashMap<>();
+  
+      String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/images/" + id).toString();
+  
+      File imageFile = new File(path);
+  
+      if (!imageFile.exists()) {
+          return uploadImageA(file);
+      }
+  
+      if (file.isEmpty()) {
+          response.put("error", "Vui lòng chọn một tập tin để tải lên");
+          return ResponseEntity.badRequest().body(response);
+      }
+       if (file.getSize() > 10 * 1024 * 1024) { 
+      response.put("error", "File size exceeds the limit of 10MB.");
+      return ResponseEntity.badRequest().body(response);
+  }
+  
+      try {
+          String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+          File updatedFile = new File(imageFile.getParent(), uniqueFileName);
+          file.transferTo(updatedFile);
+  
+          if (imageFile.delete()) {
+              response.put("destination", updatedFile.getParent());
+              response.put("fieldName", uniqueFileName);
+              response.put("filename", file.getOriginalFilename());
+              response.put("mimetype", file.getContentType());
+              response.put("originalName", file.getOriginalFilename());
+              response.put("path", "http://localhost:8081/api/upload/" + uniqueFileName);
+              response.put("size", Long.toString(file.getSize()));
+  
+              return ResponseEntity.status(HttpStatus.OK).body(response);
+          } else {
+              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể xóa tệp hình ảnh cũ.");
+          }
+      } catch (Exception e) {
+          return ResponseEntity.badRequest().body("Lỗi hình ảnh");
+      }
+  }
+  
+  
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteImage(@PathVariable String id) {
+    String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/images/" + id).toString();
+
+    File imageFile = new File(path);
+    if (!imageFile.exists()) {
+      return ResponseEntity.notFound().build();
+    }
+    if (imageFile.delete()) {
+      return ResponseEntity.ok("Xóa thành công");
+    } else {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể xóa hình ảnh.");
     }
   }
 

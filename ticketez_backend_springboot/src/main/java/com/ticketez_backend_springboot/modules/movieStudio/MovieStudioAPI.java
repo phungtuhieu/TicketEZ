@@ -38,8 +38,8 @@ public class MovieStudioAPI{
         Page<MovieStudio> page = dao.findAll(pageable);
         ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
         responeDTO.setData(page.getContent());
-        responeDTO.setTotalItem(page.getTotalElements());
-        responeDTO.setTotalPage(page.getTotalPages());
+        responeDTO.setTotalItems(page.getTotalElements());
+        responeDTO.setTotalPages(page.getTotalPages());
         return ResponseEntity.ok(responeDTO);
     }
 
