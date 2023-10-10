@@ -2,19 +2,24 @@ import axiosClient from '../../global/axiosClient';
 
 const url = 'director';
 const directorApi = {
-    getDirectorId: async (directorId) => {
+    getId: async (directorId) => {
         return axiosClient.get(url + '/' + directorId);
     },
-    getDirector: async () => {
-        return axiosClient.get(url);
+    get: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        const res = await axiosClient.get(url, { params } );
+        return  res.data;
     },
-    postDirector: async (data) => {
+    post: async (data) => {
         return axiosClient.post(url, data);
     },
-    putDirector: async (id ,data) => {
+    put: async (id ,data) => {
         return axiosClient.put(url + '/' + id, data);
     },
-    deleteDirector: async (directorId) => {
+    delete: async (directorId) => {
         return axiosClient.delete(url + '/' + directorId);
     },
 };

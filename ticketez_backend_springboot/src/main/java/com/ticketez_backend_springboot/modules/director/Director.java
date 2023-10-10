@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.director;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
 
 import jakarta.persistence.Entity;
@@ -24,7 +25,8 @@ public class Director {
 	private String fullname;
 	private Date birthday;
 	private String avatar;
-
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "director")
 	private List<DirectorMovie> directorsMovies;
 }

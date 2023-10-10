@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.seat;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatType.SeatType;
@@ -36,6 +37,7 @@ public class Seat {
 	@JoinColumn(name = "cinema_id")
 	private Cinema cinema;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "seat")
 	private List<SeatBooking> seatsBookings;
 }
