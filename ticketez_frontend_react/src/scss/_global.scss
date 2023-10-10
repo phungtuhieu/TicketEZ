@@ -1,0 +1,37 @@
+// Global styles
+
+$text-align-values: center right left end start;
+// text-align classes
+@each $value in $text-align-values {
+  .text-#{$value} {
+    text-align: $value;
+  }
+}
+
+$display-values: block inline inline-block flex grid none;
+// display classes
+@each $value in $display-values {
+  .d-#{$value} {
+    display: $value;
+  }
+}
+
+$base-values: 0 5 10 15 20 25 30;
+// gap classes
+@each $value in $base-values {
+  .g-#{$value} {
+    gap: $value + px;
+  }
+}
+// padding classes
+@each $value in $base-values {
+  .p-#{$value} {
+    padding: $value + px;
+  }
+}
+// margin classes
+@each $value in $base-values {
+  .m-#{$value} {
+    margin: $value + px;
+  }
+}
