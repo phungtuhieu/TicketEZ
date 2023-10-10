@@ -33,6 +33,7 @@ const items = [
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
         getItem(<Link to="/admin/actor">Tác giả</Link>, 'actor', null),
         getItem(<Link to="/admin/director">Đạo diễn</Link>, 'director', null),
+        getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),
     ]),
 
     // Quản lý ghế
@@ -55,11 +56,6 @@ const items = [
             ],
             'group',
         ),
-    ]),
-    // dạng phim
-    getItem('Định dạng phim', 'grFormat', <FontAwesomeIcon icon={solidIcons.faRemoveFormat} />, [
-        getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),
-
     ]),
     { type: 'divider' },
     getItem(<Link to="/admin/account">Quản lý người dùng</Link>, 'grAccount', <FontAwesomeIcon icon={solidIcons.faUsers} />),

@@ -11,6 +11,8 @@ import classNames from 'classnames/bind';
 import style from './scss.scss';
 import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
+import { formatApi } from '~/api/admin';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(style);
 
 ;
@@ -25,16 +27,15 @@ const AdminFormat = () => {
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [size, setSize] = useState('large');
-    const condition = true; 
+    const condition = true;
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
     const [checkNick, setCheckNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
-
+    const [workSomeThing, setWorkSomeThing] = useState(false);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -146,7 +147,6 @@ const AdminFormat = () => {
             title: 'Mã',
             dataIndex: 'id',
             width: '10%',
-            defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
             ...getColumnSearchProps('id'),
 
@@ -199,22 +199,25 @@ const AdminFormat = () => {
         setOpen(true);
         setResetForm(true);
     };
+
+
     const handleDelete = async (record) => {
         try {
-            const res = await axiosClient.delete(`format/${record.id}`);
+            const res = await formatApi.delete(record.id);
+            console.log(res);
             if (res.status === 200) {
-                message.success('Xóa dữ liệu thành công');
-                getList();
-            } else {
-                message.error(res.message);
+                funcUtils.notify("Xoá thành công", 'success');
             }
         } catch (error) {
-            message.error('Đã xảy ra lỗi khi xóa dữ liệu');
+            console.log(error);
+            funcUtils.notify(error.response.data, 'error');
         }
+
+        setWorkSomeThing(!workSomeThing);
     };
-    
-    
-    
+
+
+
     const handleEditData = (record) => {
         setOpen(true);
         setResetForm(false);
@@ -225,28 +228,52 @@ const AdminFormat = () => {
     };
 
 
-    const handleOk = async () => {
+ const handleOk = async () => {
         setLoading(true);
         try {
-            let values = await form.validateFields();
+            const values = await form.validateFields();
+  
+                if (editData) {
+                    let putData = {
+                        id: editData.id,
+                        ...values,
+                    };
+                    try {
+                        const resPut = await formatApi.put(putData.id, putData);
+                        console.log(resPut);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        funcUtils.notify(error.response.data, 'error');
+                        console.log(error);
+                    }
+                }
+                if (!editData) {
+                    try {
+                        const postData = {
+                            ...values,
+                        };
+                        console.log(postData);
+                        const resPost = await formatApi.post(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        funcUtils.notify(error.response.data, 'error');
+                        console.log(error);
+                    }
+                }
+                setOpen(false);
+                form.resetFields();
+                setLoading(false);
     
-            if (editData) {
-                const updatedData = {
-                    id: editData.id,
-                    name: values.name,
-                    description: values.description,
-                };
-    
-                const res = await axiosClient.put(`format/${editData.id}`, updatedData);
-                message.success('Cập nhật thành công');
-            }
-
-            setOpen(false);
-            form.resetFields();
-            getList();
+                setWorkSomeThing(!workSomeThing);
+            
+            
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
-        } finally {
             setLoading(false);
         }
     };
@@ -261,76 +288,82 @@ const AdminFormat = () => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
 
+
+  
     useEffect(() => {
+        const getList = async () => {
+            try {
+                const res = await formatApi.get()
+                setPosts(res.data);
+                console.log(res);
+            } catch (error) {
+                console.log(error);
+            }
+        };
         getList();
-    }, []);
+    }, [workSomeThing]);
 
     //form
     const handleResetForm = () => {
         form.resetFields();
-        setFileList([]);
         console.log(form);
     };
-    //call api
-    const getList = async () => {
-        setLoading(true);
-        try {
-            const res = await axiosClient.get('format');
-            setPosts(res.data.content);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+
+
+
 
     return (
 
         <div className={cx('card-chart-donut', condition ? 'bordered' : '')}>
-          <Row>
-                    <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                    </Col>
-
-                    <BaseModal
-                        open={open}
-                        width={'60%'}
-                        title={editData ? 'Cập nhật' : 'Thêm mới'}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Thoát
-                            </Button>,
-                            resetForm && ( 
-                                <Button key="reset" onClick={handleResetForm}>
-                                    Làm mới
-                                </Button>
-                            ),
-                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                                {editData ? 'Cập nhật' : 'Thêm mới'}
-                            </Button>,
-                        ]}
-                    >
-                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="name"
-                                label="Tên dạng phim"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="description"
-                                label="Mô tả"
-                                rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
-                            >
-                                <Input placeholder="Please input your description" />
-                            </Form.Item>
-                        </Form>
-                    </BaseModal>
-                </Row> 
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                        Thêm
+                    </Button>
+                </Col>
+                <BaseModal
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && (
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        ),
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="name"
+                            label="Tên dạng phim"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                        >
+                            <Input placeholder="Please input your name" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
+                        >
+                            <Input placeholder="Please input your description" />
+                        </Form.Item>
+                    </Form>
+                </BaseModal>
+            </Row>
 
             <BaseTable
                 columns={columns}
