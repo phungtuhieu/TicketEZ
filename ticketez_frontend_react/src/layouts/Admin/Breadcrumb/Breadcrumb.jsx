@@ -1,4 +1,4 @@
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import React from 'react';
 import { Breadcrumb } from 'antd';
 
@@ -78,7 +78,7 @@ const Bread = ({ path }) => {
         },
         {
             title: 'Admin',
-        },
+        }
     ];
 
     if (matchingItem) {

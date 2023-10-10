@@ -1,32 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
-import {
-    Button,
-    Input,
-    Space,
-    Col,
-    Row,
-    Form,
-    message,
-    Popconfirm,
-    DatePicker,
-    Upload,
-    Image,
-    Card,
-    Breadcrumb,
-} from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import BaseModal from '~/components/Admin/BaseModal/BaseModal';
-import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import Highlighter from 'react-highlight-words';
-
+import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+
+import BaseModal from '~/components/Admin/BaseModal/BaseModal';
+import BaseTable from '~/components/Admin/BaseTable/BaseTable';
+import funcUtils from '~/utils/funcUtils';
+
+import { actorApi } from '~/api/admin';
+import uploadApi from '~/api/service/uploadApi';
+
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
-import moment from 'moment';
-import actorApi from '~/api/QuanLyPhim/actorApi';
-import uploadApi from '~/api/uploadApi';
-import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -42,7 +30,7 @@ const AdminActor = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    // const [checkNick, setCheckNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
@@ -192,7 +180,13 @@ const AdminActor = () => {
             dataIndex: 'avatar',
             render: (_, record) => (
                 <Space size="middle">
-                    <Image width={85} alt="ảnh rỗng" src={`http://localhost:8081/api/upload/${record.avatar}`} />
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.avatar}`}
+                    />
                 </Space>
             ),
         },
@@ -233,24 +227,22 @@ const AdminActor = () => {
         setResetForm(true);
         setFileList([]);
     };
-    
 
     const handleDelete = async (record) => {
         try {
             const res = await actorApi.deleteActor(record.id);
-            await uploadApi.deleteUpload(record.avatar);
-            if (res.code === 500) {
-                message.error('Xoá thất bại ');
-            }
+            console.log(res);
             if (res.status === 200) {
-                funcUtils.notify("hello","error");
-            } else {
-                message.error(res.message);
+                await uploadApi.deleteUpload(record.avatar);
+                funcUtils.notify(res.data, 'success');
             }
         } catch (error) {
             console.log(error);
+            if (error.response.status === 409) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         }
-       
+
         setWorkSomeThing(!workSomeThing);
     };
 
@@ -283,28 +275,48 @@ const AdminActor = () => {
                     };
                     if (putData.avatar.file) {
                         const file = putData.avatar.fileList[0].originFileObj;
-                        const res = await uploadApi.putUpload(editData.avatar, file);
+                        const images = await uploadApi.putUpload(editData.avatar, file);
                         putData = {
                             ...putData,
-                            avatar: res.data.fieldName,
+                            avatar: images,
                         };
                     }
-                    actorApi.putActor(putData);
-                    message.success('Cập nhật thành công');
-                }
-                if (!editData) {
-                    const file = values.avatar.fileList[0].originFileObj;
-
-                    const res = await uploadApi.postUpload(file);
 
                     try {
+                        const resPut = await actorApi.putActor(putData.id, putData);
+                        console.log(resPut);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        console.log(error);
+                    }
+                }
+                if (!editData) {
+                    try {
+                        const file = values.avatar.fileList[0].originFileObj;
+                        const images = await uploadApi.postUpload(file);
                         const postData = {
                             ...values,
-                            avatar: res.data.fieldName,
+                            avatar: images,
                         };
-                        await actorApi.postActor(postData);
-                        message.success('Thêm thành công');
+                        console.log(postData);
+                        const resPost = await actorApi.postActor(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                        }
                     } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        // upload
+                        if(error.response.data.error) {
+                            funcUtils.notify(error.response.data.error, 'error');
+                        }
                         console.log(error);
                     }
                 }
@@ -326,9 +338,9 @@ const AdminActor = () => {
         setOpen(false);
     };
 
-    useEffect(() => {
-        form.validateFields(['nickname']);
-    }, [checkNick, form]);
+    // useEffect(() => {
+    //     form.validateFields(['nickname']);
+    // }, [checkNick, form]);
 
     //form
     const handleResetForm = () => {
@@ -407,9 +419,11 @@ const AdminActor = () => {
                             label="Upload"
                             name="avatar"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                            
                         >
                             <Upload
                                 action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                accept='.png, .jpg'
                                 listType="picture-card"
                                 onChange={onChangeUpload}
                                 onPreview={onPreview}

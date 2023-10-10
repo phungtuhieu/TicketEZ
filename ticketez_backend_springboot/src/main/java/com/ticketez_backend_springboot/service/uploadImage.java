@@ -64,6 +64,11 @@ public class uploadImage {
       response.put("error", "Please select a file to upload.");
       return ResponseEntity.badRequest().body(response);
     }
+    
+    if (file.getSize() > 10 * 1024 * 1024) { 
+      response.put("error", "Kích thước tệp vượt quá giới hạn 10MB. Thử lại sau!");
+      return ResponseEntity.badRequest().body(response);
+  }
 
     try {
       String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/").toString();
@@ -104,7 +109,6 @@ public class uploadImage {
       File imageFile = new File(path);
   
       if (!imageFile.exists()) {
-          // Tên ảnh không tồn tại, tạo tệp mới
           return uploadImageA(file);
       }
   
@@ -112,13 +116,16 @@ public class uploadImage {
           response.put("error", "Vui lòng chọn một tập tin để tải lên");
           return ResponseEntity.badRequest().body(response);
       }
+       if (file.getSize() > 10 * 1024 * 1024) { 
+      response.put("error", "File size exceeds the limit of 10MB.");
+      return ResponseEntity.badRequest().body(response);
+  }
   
       try {
           String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
           File updatedFile = new File(imageFile.getParent(), uniqueFileName);
           file.transferTo(updatedFile);
   
-          // Xóa tệp hình ảnh cũ
           if (imageFile.delete()) {
               response.put("destination", updatedFile.getParent());
               response.put("fieldName", uniqueFileName);

@@ -1,10 +1,10 @@
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const funcUtils = {
     notify: function (content, type) {
         const option = {
-            position: 'top-center',
+            position: 'top-right',
             autoClose: 1000,
             hideProgressBar: false,
             closeOnClick: true,
@@ -26,11 +26,13 @@ const funcUtils = {
             case 'success':
                 return toast.success(content, option);
 
+            case 'info':
+                return toast.info(content, option);
+
             default:
                 break;
         }
     },
-  
 };
 
 export default funcUtils;

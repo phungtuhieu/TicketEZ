@@ -1,11 +1,10 @@
 package com.ticketez_backend_springboot.modules.actor;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/actor")
@@ -27,36 +25,60 @@ public class ActorAPI {
 
     @GetMapping
     public ResponseEntity<List<Actor>> findAll() {
-        return ResponseEntity.ok(actorDAO.getAllActorDesc());
+        try {
+            return ResponseEntity.ok(actorDAO.getAllActorDesc());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Actor> findById(@PathVariable("id") Long id) {
-        if (!actorDAO.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        try {
+            if (!actorDAO.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(actorDAO.findById(id).get());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(actorDAO.findById(id).get());
+
     }
 
     @PostMapping
     public ResponseEntity<Actor> post(@RequestBody Actor actor) {
-        actorDAO.save(actor);
-        return ResponseEntity.ok(actor);
+        try {
+            actorDAO.save(actor);
+            return ResponseEntity.ok(actor);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Actor> put(@PathVariable("id") Long id, @RequestBody Actor actor) {
-        if (!actorDAO.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        try {
+            if (!actorDAO.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            actorDAO.save(actor);
+            return ResponseEntity.ok(actor);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        actorDAO.save(actor);
-        return ResponseEntity.ok(actor);
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-        actorDAO.deleteById(id);
-        return ResponseEntity.ok(true);
+    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+        try {
+            actorDAO.deleteById(id);
+            return ResponseEntity.ok().body("Xoá diễn viên thành công");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Không thể xóa diễn viên do tài liệu tham khảo hiện có");
+        }
+
     }
 }
