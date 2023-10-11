@@ -31,8 +31,6 @@ public class MPAARatingAPI {
     @Autowired
     MPAARatingDAO mpaaRatingDAO;
 
-
-
     @GetMapping
     public ResponseEntity<ResponseDTO<MPAARating>> findAll(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
@@ -89,9 +87,8 @@ public class MPAARatingAPI {
         }
     }
 
-
-     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             mpaaRatingDAO.deleteById(id);
             return ResponseEntity.ok().body("Xoá phân loại thành công");

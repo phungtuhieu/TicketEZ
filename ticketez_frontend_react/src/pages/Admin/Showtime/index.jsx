@@ -93,111 +93,98 @@ const AdminShowtime = () => {
         selectMovie();
     }, []);
 
-    //xử lý tìm kiếm
-    // const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    //     confirm();
-    //     setSearchText(selectedKeys[0]);
-    //     setSearchedColumn(dataIndex);
-    // };
+   // xử lý tìm kiếm
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
 
-    // const handleReset = (clearFilters) => {
-    //     clearFilters();
-    //     setSearchText('');
-    // };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
 
-    // const getColumnSearchProps = (dataIndex) => ({
-    //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-    //         <div
-    //             style={{
-    //                 padding: 8,
-    //             }}
-    //             onKeyDown={(e) => e.stopPropagation()}
-    //         >
-    //             <Input
-    //                 ref={searchInput}
-    //                 placeholder={`Search ${dataIndex}`}
-    //                 value={selectedKeys[0]}
-    //                 onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-    //                 onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-    //                 style={{
-    //                     marginBottom: 8,
-    //                     display: 'block',
-    //                 }}
-    //             />
-    //             <Space>
-    //                 <Button
-    //                     type="primary"
-    //                     onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-    //                     icon={<SearchOutlined />}
-    //                     size="small"
-    //                     style={{
-    //                         width: 90,
-    //                     }}
-    //                 >
-    //                     Search
-    //                 </Button>
-    //                 <Button
-    //                     onClick={() => clearFilters && handleReset(clearFilters)}
-    //                     size="small"
-    //                     style={{
-    //                         width: 90,
-    //                     }}
-    //                 >
-    //                     Reset
-    //                 </Button>
-    //                 <Button
-    //                     type="link"
-    //                     size="small"
-    //                     onClick={() => {
-    //                         confirm({
-    //                             closeDropdown: false,
-    //                         });
-    //                         setSearchText(selectedKeys[0]);
-    //                         setSearchedColumn(dataIndex);
-    //                     }}
-    //                 >
-    //                     Filter
-    //                 </Button>
-    //                 <Button
-    //                     type="link"
-    //                     size="small"
-    //                     onClick={() => {
-    //                         close();
-    //                     }}
-    //                 >
-    //                     close
-    //                 </Button>
-    //             </Space>
-    //         </div>
-    //     ),
-    //     filterIcon: (filtered) => (
-    //         <SearchOutlined
-    //             style={{
-    //                 color: filtered ? '#1677ff' : undefined,
-    //             }}
-    //         />
-    //     ),
-    //     onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    //     onFilterDropdownOpenChange: (visible) => {
-    //         if (visible) {
-    //             setTimeout(() => searchInput.current?.select(), 100);
-    //         }
-    //     },
-    //     render: (text, record) =>
-    //         searchedColumn === dataIndex ? (
-    //             <Highlighter
-    //                 highlightStyle={{
-    //                     backgroundColor: '#ffc069',
-    //                     padding: 0,
-    //                 }}
-    //                 searchWords={[searchText]}
-    //                 autoEscape
-    //                 textToHighlight={text ? text.toString() : ''}
-    //             />
-    //         ) : (
-    //             text
-    //         ),
-    // });
+   const getColumnSearchProps = (dataIndex) => ({
+       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+           <div
+               style={{
+                   padding: 8,
+               }}
+               onKeyDown={(e) => e.stopPropagation()}
+           >
+               <Input
+                   ref={searchInput}
+                   placeholder={`Nhập để tìm`}
+                   value={selectedKeys[0]}
+                   onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                   onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                   style={{
+                       marginBottom: 8,
+                       display: 'block',
+                   }}
+               />
+               <Space>
+                   <Button
+                       type="primary"
+                       onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                       icon={<SearchOutlined />}
+                       size="small"
+                       style={{
+                           width: 90,
+                       }}
+                   >
+                       Tìm
+                   </Button>
+                   <Button
+                       onClick={() => clearFilters && handleReset(clearFilters)}
+                       size="small"
+                       style={{
+                           width: 90,
+                       }}
+                   >
+                       làm mới
+                   </Button>
+                   <Button
+                       type="link"
+                       size="small"
+                       onClick={() => {
+                           close();
+                       }}
+                   >
+                       thoát
+                   </Button>
+               </Space>
+           </div>
+       ),
+       filterIcon: (filtered) => (
+           <SearchOutlined
+               style={{
+                   color: filtered ? '#1677ff' : undefined,
+               }}
+           />
+       ),
+       onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+       onFilterDropdownOpenChange: (visible) => {
+           if (visible) {
+               setTimeout(() => searchInput.current?.select(), 100);
+           }
+       },
+       render: (text, record) =>
+           searchedColumn === dataIndex ? (
+               <Highlighter
+                   highlightStyle={{
+                       backgroundColor: '#ffc069',
+                       padding: 0,
+                   }}
+                   searchWords={[searchText]}
+                   autoEscape
+                   textToHighlight={text ? text.toString() : ''}
+               />
+           ) : (
+               text
+           ),
+   });
 
     const columns = [
         {
@@ -206,7 +193,6 @@ const AdminShowtime = () => {
             width: '10%',
             defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
-           
         },
         {
             title: 'Giờ bắt đầu',
@@ -231,7 +217,14 @@ const AdminShowtime = () => {
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
+            onFilter: (value, record) => record.status.toString().indexOf(value) === 0,// Assuming 'value' is a string like 'true' or 'false'
+            filters: [
+                { text: 'Hoạt động', value: 1 },
+                { text: 'Kết thúc', value: 0 },
+            ],
+            filterMultiple: false,
         },
+
         {
             title: 'Tiêu đề phim',
             dataIndex: 'movie',

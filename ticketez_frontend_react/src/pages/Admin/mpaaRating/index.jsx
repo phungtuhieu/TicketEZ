@@ -76,7 +76,7 @@ const AdminMpaaRating = () => {
             >
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Nhập để tìm`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -95,7 +95,7 @@ const AdminMpaaRating = () => {
                             width: 90,
                         }}
                     >
-                        Search
+                        Tìm
                     </Button>
                     <Button
                         onClick={() => clearFilters && handleReset(clearFilters)}
@@ -104,20 +104,7 @@ const AdminMpaaRating = () => {
                             width: 90,
                         }}
                     >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
+                        làm mới
                     </Button>
                     <Button
                         type="link"
@@ -126,7 +113,7 @@ const AdminMpaaRating = () => {
                             close();
                         }}
                     >
-                        close
+                        thoát
                     </Button>
                 </Space>
             </div>
@@ -171,7 +158,7 @@ const AdminMpaaRating = () => {
         {
             title: 'Biểu tượng phân loại',
             dataIndex: 'ratingCode',
-            width: '30%',
+            width: '20%',
             ...getColumnSearchProps('ratingCode'),
         },
         {
