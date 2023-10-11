@@ -27,6 +27,7 @@ function AdminMovieStudio() {
     const searchInput = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataEdit, setDataEdit] = useState(null);
+    
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang

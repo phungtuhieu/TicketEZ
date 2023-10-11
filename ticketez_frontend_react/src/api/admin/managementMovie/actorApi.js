@@ -3,19 +3,24 @@ import axiosClient from '../../global/axiosClient';
 const url = 'actor';
 
 const actorApi = {
-    getActorId: async (actorId) => {
+    getId: async (actorId) => {
         return axiosClient.get(url + '/' + actorId);
     },
-    getActor: async () => {
-        return axiosClient.get(url);
+    getPage: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        const res = await axiosClient.get(url, { params });
+        return res.data ;
     },
-    postActor: async (data) => {
+    post: async (data) => {
         return axiosClient.post(url, data);
     },
-    putActor: async (id ,data) => {
+    put: async (id, data) => {
         return axiosClient.put(url + '/' + id, data);
     },
-    deleteActor: async (actorId) => {
+    delete: async (actorId) => {
         return axiosClient.delete(url + '/' + actorId);
     },
 };

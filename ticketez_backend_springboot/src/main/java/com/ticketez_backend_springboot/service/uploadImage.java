@@ -152,7 +152,7 @@ public class uploadImage {
 
     File imageFile = new File(path);
     if (!imageFile.exists()) {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.ok().build();
     }
     if (imageFile.delete()) {
       return ResponseEntity.ok("Xóa thành công");

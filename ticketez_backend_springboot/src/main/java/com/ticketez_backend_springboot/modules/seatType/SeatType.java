@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.seatType;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 
@@ -25,9 +26,11 @@ public class SeatType {
 	private String image;
 	private String description;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "seatType")
 	private List<Seat> seats;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "seatType")
 	private List<Price> prices;
 

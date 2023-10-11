@@ -11,7 +11,7 @@ const headers = {
 
 const uploadApi = {
     // getActor: async () => {},
-    postUpload: async (originFileObj) => {
+    post: async (originFileObj) => {
         var formData = new FormData();
         formData.append('file_to_upload', originFileObj);
         const dataUpload = await axiosClient.post(url, formData, headers);
@@ -25,7 +25,7 @@ const uploadApi = {
         return imageName;
     },
 
-    putUpload: async (id, originFileObj) => {
+    put: async (id, originFileObj) => {
         var formData = new FormData();
         formData.append('file_to_upload', originFileObj);
         const dataUpload = await axiosClient.put(url + '/' + id, formData, headers);
@@ -38,7 +38,7 @@ const uploadApi = {
         return imageName;
     },
 
-    deleteUpload: async (nameImage) => {
+    delete: async (nameImage) => {
         return axiosClient.delete(url + '/' + nameImage);
     },
 };

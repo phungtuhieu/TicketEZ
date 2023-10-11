@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Pagination } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import moment from 'moment';
@@ -38,20 +38,26 @@ const AdminActor = () => {
 
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
+    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+    const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     //call api
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await actorApi.getActor();
+                const res = await actorApi.getPage(currentPage, pageSize);
+                console.log(res);
+                setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
             } catch (error) {
                 console.log(error);
+                funcUtils.notify(error.response.data, 'error');
             }
         };
         getList();
-    }, [workSomeThing]);
+    }, [currentPage, pageSize, workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -176,7 +182,7 @@ const AdminActor = () => {
             dataIndex: 'birthday',
         },
         {
-            title: 'Ảnh',
+            title: 'Ảnh đại diện',
             dataIndex: 'avatar',
             render: (_, record) => (
                 <Space size="middle">
@@ -230,17 +236,15 @@ const AdminActor = () => {
 
     const handleDelete = async (record) => {
         try {
-            const res = await actorApi.deleteActor(record.id);
+            const res = await actorApi.delete(record.id);
             console.log(res);
             if (res.status === 200) {
-                await uploadApi.deleteUpload(record.avatar);
-                funcUtils.notify(res.data, 'success');
+                await uploadApi.delete(record.avatar);
+                funcUtils.notify("Xoá thành công", 'success');
             }
         } catch (error) {
             console.log(error);
-            if (error.response.status === 409) {
-                funcUtils.notify(error.response.data, 'error');
-            }
+            funcUtils.notify(error.response.data, 'error');
         }
 
         setWorkSomeThing(!workSomeThing);
@@ -275,7 +279,7 @@ const AdminActor = () => {
                     };
                     if (putData.avatar.file) {
                         const file = putData.avatar.fileList[0].originFileObj;
-                        const images = await uploadApi.putUpload(editData.avatar, file);
+                        const images = await uploadApi.put(editData.avatar, file);
                         putData = {
                             ...putData,
                             avatar: images,
@@ -283,40 +287,32 @@ const AdminActor = () => {
                     }
 
                     try {
-                        const resPut = await actorApi.putActor(putData.id, putData);
+                        const resPut = await actorApi.put(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật diễn viên thành công', 'success');
                         }
                     } catch (error) {
-                        if (error.status === 500) {
-                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
-                        }
+                        funcUtils.notify(error.response.data, 'error');
                         console.log(error);
                     }
                 }
                 if (!editData) {
                     try {
                         const file = values.avatar.fileList[0].originFileObj;
-                        const images = await uploadApi.postUpload(file);
+                        const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
                             avatar: images,
                         };
                         console.log(postData);
-                        const resPost = await actorApi.postActor(postData);
+                        const resPost = await actorApi.post(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm diễn viên thành công', 'success');
                         }
                     } catch (error) {
-                        if (error.status === 500) {
-                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
-                        }
-                        // upload
-                        if(error.response.data.error) {
-                            funcUtils.notify(error.response.data.error, 'error');
-                        }
+                        funcUtils.notify(error.response.data, 'error');
                         console.log(error);
                     }
                 }
@@ -364,6 +360,11 @@ const AdminActor = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
+    // Xử lý sự kiện thay đổi trang
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
     return (
         <>
             <Row>
@@ -376,6 +377,7 @@ const AdminActor = () => {
                     </Button>
                 </Col>
                 <BaseModal
+                    maskClosable={false}
                     open={open}
                     width={'60%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
@@ -402,7 +404,7 @@ const AdminActor = () => {
                             label="Họ và tên"
                             rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                         >
-                            <Input placeholder="Please input your name" />
+                            <Input placeholder="Họ và tên" />
                         </Form.Item>
 
                         <Form.Item
@@ -411,19 +413,18 @@ const AdminActor = () => {
                             label="Ngày sinh"
                             rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
                         >
-                            <DatePicker placeholder="chọn ngày" format="DD-MM-YYYY" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Ngày sinh" format="DD-MM-YYYY" style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
                             {...formItemLayout}
-                            label="Upload"
+                            label="Ảnh đại diện"
                             name="avatar"
-                            rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
-                            
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
                         >
                             <Upload
                                 action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-                                accept='.png, .jpg'
+                                accept=".png, .jpg"
                                 listType="picture-card"
                                 onChange={onChangeUpload}
                                 onPreview={onPreview}
@@ -438,6 +439,7 @@ const AdminActor = () => {
                 </BaseModal>
             </Row>
             <BaseTable
+                pagination={false}
                 columns={columns}
                 onClick={() => {
                     handleDelete();
@@ -450,18 +452,16 @@ const AdminActor = () => {
                         (new Date(post.birthday).getMonth() + 1)
                     ).slice(-2)}-${new Date(post.birthday).getFullYear()}`,
                 }))}
-                // expandable={{
-                //     expandedRowRender: (record) => (
-                //         <p
-                //             style={{
-                //                 margin: 0,
-                //             }}
-                //         >
-                //             {record.body}
-                //         </p>
-                //     ),
-                // }}
             />
+            <div className={cx('wrapp-pagination')}>
+                <Pagination
+                    showSizeChanger={false}
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalItems}
+                    onChange={handlePageChange}
+                />
+            </div>
         </>
     );
 };

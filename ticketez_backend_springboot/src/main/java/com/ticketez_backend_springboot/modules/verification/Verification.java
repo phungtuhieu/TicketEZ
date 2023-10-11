@@ -29,6 +29,7 @@ public class Verification {
 	@Column(name = "expires_at")
 	private Date expiresAt;
 	private boolean active;
+	
 	@ManyToOne
 	@JoinColumn(name = "account_id", referencedColumnName = "phone", insertable = false, updatable = false)
 	private Account account;

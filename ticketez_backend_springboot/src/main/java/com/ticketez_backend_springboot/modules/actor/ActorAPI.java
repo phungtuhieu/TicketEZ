@@ -1,6 +1,5 @@
 package com.ticketez_backend_springboot.modules.actor;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-import com.ticketez_backend_springboot.modules.movieStudio.MovieStudio;
 
 @CrossOrigin("*")
 @RestController
@@ -33,12 +31,12 @@ public class ActorAPI {
     ActorDAO actorDAO;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<Actor>> findAll(@RequestParam("page") Optional<Integer> pageNo,
+    public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
         try {
 
             if (pageNo.isPresent() && pageNo.get() == 0) {
-                return ResponseEntity.notFound().build();
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
@@ -49,55 +47,54 @@ public class ActorAPI {
             responseDTO.setTotalPages(page.getTotalPages());
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+           return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Actor> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {
             if (!actorDAO.existsById(id)) {
-                return ResponseEntity.notFound().build();
+               return new ResponseEntity<>("Không tìm thấy diễn viên", HttpStatus.NOT_FOUND);
             }
             return ResponseEntity.ok(actorDAO.findById(id).get());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
     @PostMapping
-    public ResponseEntity<Actor> post(@RequestBody Actor actor) {
+    public ResponseEntity<?> post(@RequestBody Actor actor) {
         try {
             actorDAO.save(actor);
             return ResponseEntity.ok(actor);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Actor> put(@PathVariable("id") Long id, @RequestBody Actor actor) {
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Actor actor) {
         try {
             if (!actorDAO.existsById(id)) {
-                return ResponseEntity.notFound().build();
+                return new ResponseEntity<>("Diễn viên không tồn tại", HttpStatus.NOT_FOUND);
             }
             actorDAO.save(actor);
             return ResponseEntity.ok(actor);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             actorDAO.deleteById(id);
-            return ResponseEntity.ok().body("Xoá diễn viên thành công");
+            return ResponseEntity.ok().build();
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Không thể xóa diễn viên do tài liệu tham khảo hiện có");
+            return new ResponseEntity<>("Không thể xóa diễn viên do tài liệu tham khảo hiện có", HttpStatus.CONFLICT);
         }
 
     }

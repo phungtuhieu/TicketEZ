@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.account;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.review.Review;
 
@@ -28,9 +29,11 @@ public class Account {
 	private boolean verified;
 	private int points;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<Review> reviews;
-
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<Booking> bookings;
 //

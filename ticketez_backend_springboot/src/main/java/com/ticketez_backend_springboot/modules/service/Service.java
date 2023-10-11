@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.priceService.PriceService;
 import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
@@ -32,9 +33,11 @@ public class Service {
 	@JoinColumn(name = "cinema_complex_id")
 	private CinemaComplex cinemaComplex;
 
+	@JsonIgnore 
 	@OneToMany(mappedBy = "service")
 	private List<PriceService> priceServices;
-
+	
+	@JsonIgnore 
 	@OneToMany(mappedBy = "service")
 	private List<ServiceBooking> servicesBookings;
 
