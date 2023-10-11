@@ -27,7 +27,7 @@ function AdminMovieStudio() {
     const searchInput = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataEdit, setDataEdit] = useState(null);
-    
+
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
@@ -99,19 +99,19 @@ function AdminMovieStudio() {
             message.error('Xoá thất bại');
         }
     };
-    const fetchData = async () => {
-        try {
-            const resp = await axiosClient.get(`movie-studio?page=${currentPage}&limit=${pageSize}`);
-            setList(resp.data.data);
-            setTotalItems(resp.data.totalItem);
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const resp = await axiosClient.get(`movie-studio?page=${currentPage}&limit=${pageSize}`);
+                setList(resp.data.data);
+                setTotalItems(resp.data.totalItem);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         fetchData();
-        console.log(currentPage, pageSize, workSomething);
     }, [currentPage, pageSize, workSomething]);
     const handleReset = (clearFilters) => {
         clearFilters();

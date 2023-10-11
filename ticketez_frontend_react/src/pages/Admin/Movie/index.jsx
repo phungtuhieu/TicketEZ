@@ -97,17 +97,17 @@ function AdminMovie() {
             message.error('Xoá thất bại');
         }
     };
-    const fetchData = async () => {
-        try {
-            const resp = await axiosClient.get(`movie?page=${currentPage}&limit=${pageSize}`);
-            setList(resp.data.data);
-            setTotalItems(resp.data.totalItem);
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const resp = await axiosClient.get(`movie?page=${currentPage}&limit=${pageSize}`);
+                setList(resp.data.data);
+                setTotalItems(resp.data.totalItem);
+            } catch (error) {
+                console.log(error);
+            }
+        };
         fetchData();
         console.log(currentPage, pageSize, workSomething);
     }, [currentPage, pageSize, workSomething]);
