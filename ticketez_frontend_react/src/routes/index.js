@@ -21,6 +21,7 @@ const publicRoutes = [
     { path: '/admin/movie-studio', component: PageAdmin.AdminMovieStudio, layout: AdminLayout },
     { path: '/admin/actor', component: PageAdmin.AdminActor, layout: AdminLayout },
     { path: '/admin/director', component: PageAdmin.AdminDirector, layout: AdminLayout },
+    { path: '/admin/format', component: PageAdmin.AdminFormat, layout: AdminLayout },
     { path: '/admin/account', component: PageAdmin.AdminAccount, layout: AdminLayout },
     { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
 

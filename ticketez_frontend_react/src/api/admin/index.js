@@ -16,6 +16,7 @@ export { default as  movieStudioApi } from './managementMovie/movieStudioApi';
 export { default as  showtimeApi } from './managementMovie/showtimeApi';
 export { default as  actorApi } from './managementMovie/actorApi';
 export { default as  directorApi } from './managementMovie/directorApi';
+export { default as  formatApi } from './managementMovie/formatApi';
 
 
 // seat

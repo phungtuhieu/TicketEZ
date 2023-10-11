@@ -1,11 +1,9 @@
 package com.ticketez_backend_springboot.modules.format;
 
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -27,10 +24,8 @@ public class FormatAPI {
     FormatDAO dao;
     
     @GetMapping
-    public ResponseEntity<Page<Format>> findAll(@RequestParam("pageNo") Optional<Integer> pageNo) {
-        Pageable pageable = PageRequest.of(pageNo.orElse(0), 5);
-        Page<Format> page = dao.findAll(pageable);
-        return ResponseEntity.ok(page);
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(dao.getAll());
     }
 
     @GetMapping("/{id}")
@@ -56,10 +51,15 @@ public class FormatAPI {
         return ResponseEntity.ok(format);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        dao.deleteById(id);
-        return ResponseEntity.ok().build();
+   @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        try {
+            dao.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Không thể xóa diễn viên do tài liệu tham khảo hiện có", HttpStatus.CONFLICT);
+        }
+
     }
 
 }

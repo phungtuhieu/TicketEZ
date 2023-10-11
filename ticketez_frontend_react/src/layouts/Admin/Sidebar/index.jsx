@@ -33,6 +33,7 @@ const items = [
         getItem(<Link to="/admin/actor">Tác giả</Link>, 'actor', null),
         getItem(<Link to="/admin/director">Đạo diễn</Link>, 'director', null),
         getItem(<Link to="/admin/mpaaRating">Phân loại</Link>, 'mpaaRating'),
+        getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),
     ]),
 
     // Quản lý ghế
