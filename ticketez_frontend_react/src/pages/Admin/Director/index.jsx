@@ -15,6 +15,7 @@ import uploadApi from '~/api/service/uploadApi';
 
 import classNames from 'classnames/bind';
 import style from './Director.module.scss';
+import PaginationCustom from '~/components/Admin/PaginationCustom';
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -196,7 +197,7 @@ const AdminDirector = () => {
             ),
         },
         {
-            title: 'Hoạt động',
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -440,9 +441,7 @@ const AdminDirector = () => {
             <BaseTable
                 pagination={false}
                 columns={columns}
-                onClick={() => {
-                    handleDelete();
-                }}
+                
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
@@ -453,8 +452,8 @@ const AdminDirector = () => {
                 }))}
             />
             <div className={cx('wrapp-pagination')}>
-                <Pagination
-                    showSizeChanger={false}
+            <PaginationCustom 
+                    howSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}
                     total={totalItems}

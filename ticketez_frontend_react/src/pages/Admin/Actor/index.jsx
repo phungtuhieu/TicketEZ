@@ -15,6 +15,7 @@ import uploadApi from '~/api/service/uploadApi';
 
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
+import PaginationCustom from '~/components/Admin/PaginationCustom';
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -197,7 +198,7 @@ const AdminActor = () => {
             ),
         },
         {
-            title: 'Hoạt động',
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -271,6 +272,7 @@ const AdminActor = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
+
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
@@ -278,6 +280,8 @@ const AdminActor = () => {
                         ...values,
                     };
                     if (putData.avatar.file) {
+                        console.log(putData);
+
                         const file = putData.avatar.fileList[0].originFileObj;
                         const images = await uploadApi.put(editData.avatar, file);
                         putData = {
@@ -285,7 +289,6 @@ const AdminActor = () => {
                             avatar: images,
                         };
                     }
-
                     try {
                         const resPut = await actorApi.put(putData.id, putData);
                         console.log(resPut);
@@ -441,9 +444,6 @@ const AdminActor = () => {
             <BaseTable
                 pagination={false}
                 columns={columns}
-                onClick={() => {
-                    handleDelete();
-                }}
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
@@ -454,13 +454,14 @@ const AdminActor = () => {
                 }))}
             />
             <div className={cx('wrapp-pagination')}>
-                <Pagination
-                    showSizeChanger={false}
+                <PaginationCustom 
+                    howSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}
                     total={totalItems}
                     onChange={handlePageChange}
                 />
+                
             </div>
         </>
     );
