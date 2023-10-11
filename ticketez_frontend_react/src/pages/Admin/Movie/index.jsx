@@ -3,7 +3,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Input, Pagination, Popconfirm, Row, Select, Space, message } from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 
-import style from './MovieStudio.module.scss';
+import style from './Movie.module.scss';
 import classNames from 'classnames/bind';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,8 +18,7 @@ const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
-
-function AdminMovieStudio() {
+function AdminMovie() {
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
@@ -41,13 +40,13 @@ function AdminMovieStudio() {
             const values = await form.validateFields();
             console.log(values);
             if (!dataEdit) {
-                const resp = await axiosClient.post('movie-studio', values);
+                const resp = await axiosClient.post('movie', values);
                 setLoadingButton(false);
                 setworkSomething(!workSomething);
                 form.resetFields();
                 message.success('thêm thành công');
             } else {
-                const resp = await axiosClient.put(`movie-studio/${dataEdit.id}`, {
+                const resp = await axiosClient.put(`movie/${dataEdit.id}`, {
                     ...values,
                     id: dataEdit.id,
                 });
@@ -88,7 +87,7 @@ function AdminMovieStudio() {
     const handleDelete = async (record) => {
         setLoadingButton(true);
         try {
-            const resp = await axiosClient.delete(`movie-studio/${record.id}`);
+            const resp = await axiosClient.delete(`movie/${record.id}`);
             if (resp.status === 200) {
                 setLoadingButton(false);
                 message.success('Đã xoá thành công!');
@@ -100,7 +99,7 @@ function AdminMovieStudio() {
     };
     const fetchData = async () => {
         try {
-            const resp = await axiosClient.get(`movie-studio?page=${currentPage}&limit=${pageSize}`);
+            const resp = await axiosClient.get(`movie?page=${currentPage}&limit=${pageSize}`);
             setList(resp.data.data);
             setTotalItems(resp.data.totalItem);
         } catch (error) {
@@ -378,4 +377,4 @@ function AdminMovieStudio() {
     );
 }
 
-export default AdminMovieStudio;
+export default AdminMovie;
