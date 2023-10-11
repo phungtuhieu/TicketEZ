@@ -1,96 +1,207 @@
-import React, { useState } from 'react';
-import { Button, Modal, Divider, Space, Tag } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Modal, Divider, Space, Tag, Radio } from 'antd';
 import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
 import FormOption from '../FormOption';
+import RRadioBox from '../RadioBox';
+import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
 
-function SeatChart() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const radioStyle = {
+    display: 'block',
+    marginBottom: '10px',
+    lineHeight: '1.5', // Chiều cao của Radio.Button
+};
 
-    const showModal = () => {
-        setIsModalOpen(true);
+const radioStyl = {
+    display: 'flex',
+    flexDirection: 'column', // Hiển thị các tùy chọn theo chiều dọc
+    alignItems: 'flex-start', // Đẩy các tùy chọn về phía trái
+};
+
+function SeatChart(props) {
+    const { rows, columns, idSeatChart } = props;
+
+    const createSeatArray = () => {
+        let seatRows = rows; // Số hàng
+        let seatColumns = columns; // Số cột
+        // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
+        const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
+
+        const seatState = {
+            seat: [],
+            seatAvailable: [],
+            seatReserved: [],
+            vipSeat: listSeatVip,
+            normalSeat: listSeatNormal,
+
+            seatUnavailable: ['A1', '13', '14'],
+        };
+
+        // Tạo mảng chỗ ngồi
+        const rowHeader = rowLabels.map((label) => label + ' ');
+
+        for (let i = 0; i < seatRows; i++) {
+            const row = [];
+            const rowAvailable = [];
+            const rowLabel = rowLabels[i];
+            for (let j = 1; j <= seatColumns; j++) {
+                const seatNumber = `${rowLabel}${j}`;
+                row.push(seatNumber);
+                if (!seatState.seatUnavailable.includes(seatNumber)) {
+                    rowAvailable.push(seatNumber);
+                }
+            }
+
+            seatState.seat.push(row);
+        }
+
+        // Thêm cột chú thích hàng ở bên trái
+        seatState.seatHeader = rowHeader;
+
+        return seatState;
     };
 
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
+    const [showSeat, setShowSeat] = useState(false);
+    const [reload, setReload] = useState(false);
+    const [listSeatNormal, setListSeatNormal] = useState([]);
+    const [listSeatVip, setListSeatVip] = useState([]);
+    const [seatState, setSeatState] = useState();
+    const [selectedSeatType, setSelectedSeatType] = useState('normal-seat'); // Mặc định ban đầu là 'normal-seat'
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
+    const fetchDataSeat = async () => {
+        try {
+            const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${2}`);
+            respVip.data.forEach((seat) => {
+                setListSeatVip((prevState) => [...prevState, seat.name]);
+            });
+            const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${1}`);
+            respNormal.data.forEach((seat) => {
+                setListSeatNormal((prevState) => [...prevState, seat.name]);
+            });
 
-    const [seatState, setSeatState] = useState({
-        seat: [
-            ['1', '2', '3', '4', '5', '6', '7', '8'],
-            ['11', '12', '13', '14', '15', '16', '17', '18'],
-            ['21', '22', '23', '24', '25', '26', '27', '28'],
-            ['31', '32', '33', '34', '35', '36', '37', '38'],
-            ['41', '42', '43', '44', '45', '46', '47', '48'],
-        ],
-        seatAvailable: [
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-            ['11', '12', '13', '14', '15', '16', '17', '18'],
-            ['21', '22', '23', '24', '25', '26', '27', '28'],
-            ['31', '32', '33', '34', '35', '36', 'n37', '38'],
-            ['41', '42', '43', '44', '45', '46', '47', '48'],
-        ],
-        seatReserved: [],
-        seatUnavailable: ['12', '13', '14'],
-    });
+            console.log(listSeatNormal);
+            console.log(listSeatVip);
+
+            if (listSeatVip.length>0 && listSeatNormal.length > 0) {
+                setSeatState(createSeatArray());
+                setShowSeat(true);
+                setReload(false);
+            } else {
+                setReload(true);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const onClickData = (seat) => {
-        showModal();
-        console.log(seat);
-        // Cập nhật trạng thái của ghế dựa trên seat
-        // if (seatState.seatReserved.indexOf(seat) > -1) {
-        //     setSeatState({
-        //         ...seatState,
-        //         seatAvailable: seatState.seatAvailable.concat(seat),
-        //         seatReserved: seatState.seatReserved.filter((res) => res !== seat),
-        //     });
-        // } else {
-        //     setSeatState({
-        //         ...seatState,
-        //         seatReserved: seatState.seatReserved.concat(seat),
-        //         seatAvailable: seatState.seatAvailable.filter((res) => res !== seat),
-        //     });
-        // }
+        const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
+        console.log('unavailable' + seatUnavailable);
+        console.log('normal' + normalSeat);
+        console.log('vip' + vipSeat);
+        console.log('------------------------------------------------');
+        if (selectedSeatType === 'normal-seat') {
+            if (vipSeat.indexOf(seat) > -1) {
+                normalSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+            if (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatAvailable.indexOf(seat), 1);
+            }
+            setSeatState({
+                ...seatState,
+                normalSeat: [...normalSeat, seat],
+            });
+        }
+        if (selectedSeatType === 'vip-seat') {
+            if (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
+            if (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatAvailable.indexOf(seat), 1);
+            }
+
+            setSeatState({
+                ...seatState,
+                vipSeat: [...vipSeat, seat],
+            });
+        }
+        if (selectedSeatType === 'unavailable') {
+            if (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
+            if (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+
+            setSeatState({
+                ...seatState,
+                seatUnavailable: [...seatUnavailable, seat],
+            });
+        }
     };
+
+    const onChange = (e) => {
+        console.log('radio checked', e.target.value);
+        setSelectedSeatType(e.target.value);
+    };
+
+    useEffect(() => {
+        fetchDataSeat();
+    }, [reload]);
 
     return (
         <div className={cx('container')}>
-            <Modal title="Chi tiết" visible={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <FormOption />
-            </Modal>
             <hr className={cx('screen')} />
             <h6 className={cx('screen-title')}>Màn hình</h6>
             <div className={cx('container-from')}>
-                <table className="grid">
-                    <tbody>
-                        {seatState.seat.map((numList, i) => (
-                            <tr key={i}>
-                                {numList.map((seat_no) => (
-                                    <td
-                                        className={
-                                            seatState.seatUnavailable.indexOf(seat_no) > -1
-                                                ? 'unavailable'
-                                                : seatState.seatReserved.indexOf(seat_no) > -1
-                                                ? 'reserved'
-                                                : seat_no.startsWith('2') // Kiểm tra nếu là ghế VIP
-                                                ? 'vip-seat'
-                                                : 'normal-seat' // Mặc định là ghế thường
-                                        }
-                                        key={seat_no}
-                                        onClick={() => onClickData(seat_no)}
-                                    >
-                                        {seat_no}
-                                    </td>
+                <div className={cx('tableleft')}>
+                    <table className="grid">
+                        {showSeat && (
+                            <tbody>
+                                {seatState.seatHeader.map((header, rowIndex) => (
+                                    <tr key={header}>
+                                        <td className="header-cell">{header}</td>
+                                        {seatState.seat[rowIndex].map((seat_no) => {
+                                            const seatClassName = `
+                                            ${
+                                                seatState.normalSeat.indexOf(seat_no) > -1
+                                                    ? 'normal-seat'
+                                                    : seatState.seatUnavailable.indexOf(seat_no) > -1
+                                                    ? 'unavailable'
+                                                    : seatState.vipSeat.indexOf(seat_no) > -1
+                                                    ? 'vip-seat'
+                                                    : 'normal-seatt'
+                                            } protected-element`;
+                                            return (
+                                                <td
+                                                    className={seatClassName}
+                                                    key={seat_no}
+                                                    onClick={() => onClickData(seat_no)}
+                                                >
+                                                    {seat_no}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
                                 ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            </tbody>
+                        )}
+                    </table>
+                </div>
+                <div className={cx('radiobox')}>
+                    <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
+                        <Radio style={radioStyle} value="unavailable">
+                            <Tag color="#404040">Đã đặt</Tag>
+                        </Radio>
+                        <Radio style={radioStyle} value="vip-seat">
+                            <Tag color="#b7232b">Ghế vip</Tag>
+                        </Radio>
+                        <Radio style={radioStyle} value="normal-seat">
+                            <Tag color="#5b2b9f">Ghế thường</Tag>
+                        </Radio>
+                    </Radio.Group>
+                </div>
             </div>
             <div className={cx('color')}>
                 <Space size={[0, 200]} wrap>

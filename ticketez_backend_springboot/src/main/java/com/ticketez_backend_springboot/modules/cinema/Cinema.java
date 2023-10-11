@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.cinemaType.CinemaType;
 import com.ticketez_backend_springboot.modules.seat.Seat;
+import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
 import jakarta.persistence.Entity;
@@ -40,7 +41,7 @@ public class Cinema {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinema")
-	private List<Seat> seats;
+	private List<SeatChart> seatCharts;
 
 	@JsonIgnore 
 	@OneToMany(mappedBy = "cinema")
