@@ -1,10 +1,18 @@
 import axiosClient from '../../global/axiosClient';
 
-const url = 'movie';
+const url = 'mpaaRating';
 
-const cinemaComplexApi = {
-    getId: async (actorId) => {
-        return axiosClient.get(url + '/' + actorId);
+const mpaaRatingApi = {
+    getId: async (Id) => {
+        return axiosClient.get(url + '/' + Id);
+    },
+    getPage: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        const res = await axiosClient.get(url, { params });
+        return res.data;
     },
     getAll: async () => {
         return axiosClient.get(url);
@@ -20,4 +28,4 @@ const cinemaComplexApi = {
     },
 };
 
-export default cinemaComplexApi;
+export default mpaaRatingApi;

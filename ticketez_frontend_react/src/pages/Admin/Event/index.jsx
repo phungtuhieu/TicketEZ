@@ -10,12 +10,11 @@ import {
     Popconfirm,
     DatePicker,
     Tag,
-    Card,
     Switch,
     Select,
     Upload,
     Descriptions,
-    // Image,
+    Pagination,
 } from 'antd';
 import Image from 'antd/lib/image';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
@@ -29,6 +28,9 @@ import style from './Event.module.scss';
 import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
 import CustomCKEditor from '~/pages/Templates/Ckeditor';
+import { eventApi } from '~/api/admin';
+import uploadApi from '~/api/service/uploadApi';
+import funcUtils from '~/utils/funcUtils';
 const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
@@ -45,11 +47,31 @@ const AdminShowtime = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    const [checkNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
+    const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
+    const [workSomeThing, setWorkSomeThing] = useState(false);
+
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await eventApi.getPage(currentPage, pageSize);
+                setPosts(res.data);
+                setTotalItems(res.totalItems);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [currentPage, pageSize, workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -72,7 +94,7 @@ const AdminShowtime = () => {
             >
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Nhập để tìm`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -91,7 +113,7 @@ const AdminShowtime = () => {
                             width: 90,
                         }}
                     >
-                        Search
+                        Tìm
                     </Button>
                     <Button
                         onClick={() => clearFilters && handleReset(clearFilters)}
@@ -100,20 +122,7 @@ const AdminShowtime = () => {
                             width: 90,
                         }}
                     >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
+                        làm mới
                     </Button>
                     <Button
                         type="link"
@@ -122,7 +131,7 @@ const AdminShowtime = () => {
                             close();
                         }}
                     >
-                        close
+                        thoát
                     </Button>
                 </Space>
             </div>
@@ -163,12 +172,11 @@ const AdminShowtime = () => {
             width: '10%',
             defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
-            ...getColumnSearchProps('id'),
         },
         {
             title: 'Tên',
             dataIndex: 'name',
-            ...getColumnSearchProps('id'),
+            ...getColumnSearchProps('name'),
         },
 
         {
@@ -191,7 +199,12 @@ const AdminShowtime = () => {
             width: '10%',
             render: (_, record) => (
                 <Space size="middle">
-                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt={record.banner} width={65} />
+                    <Image
+                        src={`http://localhost:8081/api/upload/${record.banner}`}
+                        alt="không có ảnh"
+                        width={65}
+                        loading="lazy"
+                    />
                 </Space>
             ),
         },
@@ -204,6 +217,12 @@ const AdminShowtime = () => {
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
+            onFilter: (value, record) => record.status === (value === 'true'), // Assuming 'value' is a string like 'true' or 'false'
+            filters: [
+                { text: 'Hoạt động', value: 'true' },
+                { text: 'Kết thúc', value: 'false' },
+            ],
+            filterMultiple: false,
         },
 
         {
@@ -246,17 +265,22 @@ const AdminShowtime = () => {
     };
 
     const handleDelete = async (record) => {
-        setResetForm(true);
-        const res = await axiosClient.delete(`event/${record.id}`);
-        if (res.code === 500) {
-            message.error('Xoá thất bại ');
-        }
-        if (res.status === 200) {
-            message.success('Xóa dữ liệu thành công');
-        } else {
-            message.error(res.message);
-        }
-        getList();
+      try {
+          const res = await eventApi.delete(record.id);
+          console.log(res);
+          if (res.status === 200) {
+            if(fileList.length > 0) {
+                await uploadApi.deleteUpload(record.banner);
+            }
+              funcUtils.notify(res.data, 'success');
+          }
+      } catch (error) {
+          console.log(error);
+          if (error.response.status === 409) {
+              funcUtils.notify(error.response.data, 'error');
+          }
+      }
+      setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
@@ -298,63 +322,60 @@ const AdminShowtime = () => {
         try {
             let values = await form.validateFields();
             if (fileList.length > 0) {
-                console.log('1', values);
-                values = {
-                    ...values,
-                    startDate: new Date(dataStartTime),
-                    endDate: new Date(dataEndTime),
-                    status: statusValue,
-                };
                 console.log(values);
                 if (editData) {
-                    const respCinemaComplex = await axiosClient.get(`cinemaComplex/${values.cinemaComplex}`);
-                    values = {
+                    let putData = {
                         id: editData.id,
                         ...values,
-                        cinemaComplex: respCinemaComplex.data,
+                        startDate: new Date(dataStartTime),
+                        endDate: new Date(dataEndTime),
                     };
-                    if (values.banner.file) {
-                        const file = values.banner.fileList[0].originFileObj;
-                        var formData = new FormData();
-                        formData.append('file_to_upload', file);
-                        const res = await axiosClient.post('upload', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
-                        values = {
-                            ...values,
-                            banner: res.data.fieldName,
-                            cinemaComplex: respCinemaComplex.data,
+                    console.log(putData);
+                    if (putData.banner.file) {
+                        const file = putData.banner.fileList[0].originFileObj;
+                        const images = await uploadApi.putUpload(editData.banner, file);
+                        putData = {
+                            ...putData,
+                            banner: images,
                         };
                     }
-                    console.log("2 " ,values );
-                    const res = await axiosClient.put(`event/${editData.id}`, values);
-                    console.log(res);
-                    message.success('Cập nhật thành công');
-                }
-                if (!editData) {
-                    const file = values.banner.fileList[0].originFileObj;
-                    var formData = new FormData();
-                    formData.append('file_to_upload', file);
-                    const res = await axiosClient.post('upload', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-                    const respCinemaComplex = await axiosClient.get(`cinemaComplex/${values.cinemaComplex}`);
 
                     try {
-                        values = {
-                            ...values,
-                            banner: res.data.fieldName,
-                            cinemaComplex: respCinemaComplex.data,
-                        };
-                        console.log('value', values);
-                        const resp = await axiosClient.post('event', values);
-                        console.log('reps', resp);
-                        message.success('Thêm thành công');
+                        const resPut = await eventApi.put(putData.id, putData , putData.cinemaComplex);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật sự kiện thành công', 'success');
+                        }
                     } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        console.log(error);
+                    }
+                      setWorkSomeThing(!workSomeThing);
+                } else {
+                    try {
+                        const file = values.banner.fileList[0].originFileObj;
+                        const images = await uploadApi.postUpload(file);
+                        const postData = {
+                            ...values,
+                            startDate: new Date(dataStartTime),
+                            endDate: new Date(dataEndTime),
+                            banner: images,
+                        };
+                        console.log(postData);
+                        const resPost = await eventApi.post(postData, postData.cinemaComplex);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm sự kiện thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        // upload
+                        if (error.response.data.error) {
+                            funcUtils.notify(error.response.data.error, 'error');
+                        }
                         console.log(error);
                     }
                 }
@@ -362,7 +383,7 @@ const AdminShowtime = () => {
                 form.resetFields();
                 setLoading(false);
                 setFileList([]);
-                getList();
+                setWorkSomeThing(!workSomeThing);
             } else {
                 setLoading(false);
                 message.error('vui lòng chọn ảnh');
@@ -381,7 +402,6 @@ const AdminShowtime = () => {
     }, [checkNick, form]);
 
     useEffect(() => {
-        getList();
         apiSelectCinemaComplex();
     }, []);
 
@@ -390,18 +410,10 @@ const AdminShowtime = () => {
         setFileList([]);
         console.log(form);
     };
-
-    const getList = async () => {
-        setLoading(true);
-        try {
-            const res = await axiosClient.get('event');
-            setPosts(res.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
+        const handlePageChange = (page, pageSize) => {
+            setCurrentPage(page);
+            setPageSize(pageSize);
+        };
     const [selectCinemaComplex, setSelectCinemaComplex] = useState();
     const apiSelectCinemaComplex = async () => {
         try {
@@ -514,135 +526,139 @@ const AdminShowtime = () => {
 
     return (
         <div>
-            <Card>
-                <Row>
-                    <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                    </Col>
-                    <Col span={2}>
-                        <Button
-                            type="primary"
-                            className={cx('button-title')}
-                            icon={<PlusOutlined />}
-                            onClick={showModal}
-                        >
-                            Thêm
-                        </Button>
-                    </Col>
-                    <BaseModal
-                        open={open}
-                        width={'60%'}
-                        title={editData ? 'Cập nhật' : 'Thêm mới'}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Thoát
-                            </Button>,
-                            resetForm && (
-                                <Button key="reset" onClick={handleResetForm}>
-                                    Làm mới
-                                </Button>
-                            ),
-                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                                {editData ? 'Cập nhật' : 'Thêm mới'}
-                            </Button>,
-                        ]}
-                    >
-                        <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
-                            <Form.Item label="Trạng thái" name="status">
-                                <Switch
-                                    checked={statusValue === true}
-                                    onChange={(checked) => setStatusValue(checked ? true : false)}
-                                    checkedChildren={'Đang hoạt động'}
-                                    unCheckedChildren={'Kết Thúc '}
-                                    defaultChecked
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                label="Chọn Banner"
-                                name="banner"
-                                rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
-                            >
-                                <Upload
-                                    {...propsUpload}
-                                    listType="picture-card"
-                                    onChange={onChangeUpload}
-                                    onPreview={onPreview}
-                                    fileList={fileList}
-                                    name="icon"
-                                    maxCount={1}
-                                >
-                                    {fileList.length < 2 && '+ Upload'}
-                                </Upload>
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="name"
-                                label="Chọn phim"
-                                rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
-                                <RangePicker
-                                    showTime
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    value={[dataStartTime, dataEndTime]}
-                                    onChange={onChangeDate}
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                {...formItemLayout}
-                                name="cinemaComplex"
-                                label="Chọn phim"
-                                rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
-                            >
-                                <Select
-                                    style={{ width: '100%' }}
-                                    showSearch
-                                    placeholder="Chọn loại"
-                                    optionFilterProp="children"
-                                    // onChange={onchangeSelectLoaiVanBan}
-                                    //onSearch={onSearchSelectBox}
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={selectCinemaComplex?.map((cinemaComplex) => ({
-                                        value: cinemaComplex.id,
-                                        label: cinemaComplex.name,
-                                    }))}
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="description"
-                                label="Chọn rạp"
-                                rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
-                            >
-                                <CustomCKEditor value={editorData} onChange={handleEditorChange} />
-                            </Form.Item>
-                        </Form>
-                    </BaseModal>
-                </Row>
-                <BaseTable
-                    columns={columns}
-                    onClick={() => {
-                        handleDelete();
-                    }}
-                    dataSource={posts.map((post) => ({
-                        ...post,
-                        key: post.id,
-                    }))}
-                    expandable={{
-                        expandedRowRender: (record) => (
-                            <Descriptions title="Thông tin chi tiết" items={itemsDescriptions(record)} />
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                        Thêm
+                    </Button>
+                </Col>
+                <BaseModal
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && (
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
                         ),
-                    }}
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
+                        <Form.Item label="Trạng thái" name="status">
+                            <Switch
+                                checked={statusValue === true}
+                                onChange={(checked) => setStatusValue(checked ? true : false)}
+                                checkedChildren={'Đang hoạt động'}
+                                unCheckedChildren={'Kết Thúc '}
+                                defaultChecked
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            label="Chọn Banner"
+                            name="banner"
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                        >
+                            <Upload
+                                {...propsUpload}
+                                listType="picture-card"
+                                onChange={onChangeUpload}
+                                onPreview={onPreview}
+                                fileList={fileList}
+                                name="icon"
+                                maxCount={1}
+                            >
+                                {fileList.length < 2 && '+ Upload'}
+                            </Upload>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="name"
+                            label="Chọn phim"
+                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
+                            <RangePicker
+                                showTime
+                                format="YYYY-MM-DD HH:mm:ss"
+                                value={[dataStartTime, dataEndTime]}
+                                onChange={onChangeDate}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="cinemaComplex"
+                            label="Chọn phim"
+                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn loại"
+                                optionFilterProp="children"
+                                // onChange={onchangeSelectLoaiVanBan}
+                                //onSearch={onSearchSelectBox}
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={selectCinemaComplex?.map((cinemaComplex) => ({
+                                    value: cinemaComplex.id,
+                                    label: cinemaComplex.name,
+                                }))}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Chọn rạp"
+                            rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
+                        >
+                            <CustomCKEditor value={editorData} onChange={handleEditorChange} />
+                        </Form.Item>
+                    </Form>
+                </BaseModal>
+            </Row>
+            <BaseTable
+                pagination={false}
+                columns={columns}
+                onClick={() => {
+                    handleDelete();
+                }}
+                dataSource={posts.map((post) => ({
+                    ...post,
+                    key: post.id,
+                }))}
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <Descriptions title="Thông tin chi tiết" items={itemsDescriptions(record)} />
+                    ),
+                }}
+            />
+            <div className={cx('wrapp-pagination')}>
+                <Pagination
+                    style={{ float: 'right', marginTop: '10px' }}
+                    showSizeChanger={false}
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalItems}
+                    onChange={handlePageChange}
                 />
-            </Card>
+            </div>
         </div>
     );
 };
