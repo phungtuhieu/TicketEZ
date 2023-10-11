@@ -329,7 +329,9 @@ const AdminShowtime = () => {
             console.log(values);
             if (editData) {
                 const resp = await showtimeApi.put(editData.id, values, values.movie, values.cinema);
-                message.success('Cập nhật thành công');
+                console.log(resp);
+                funcUtils.notify(resp.data, 'success');
+                 message.success('Cập nhật thành công');
             }
             if (!editData) {
                 try {
@@ -488,6 +490,7 @@ const AdminShowtime = () => {
             />
             <div className={cx('wrapp-pagination')}>
                 <Pagination
+                    style={{float: 'right', marginTop: '10px'}}
                     showSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}

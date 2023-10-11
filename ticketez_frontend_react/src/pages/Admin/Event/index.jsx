@@ -10,12 +10,10 @@ import {
     Popconfirm,
     DatePicker,
     Tag,
-    Card,
     Switch,
     Select,
     Upload,
     Descriptions,
-    // Image,
 } from 'antd';
 import Image from 'antd/lib/image';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
@@ -45,7 +43,7 @@ const AdminShowtime = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    const [checkNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
@@ -191,7 +189,7 @@ const AdminShowtime = () => {
             width: '10%',
             render: (_, record) => (
                 <Space size="middle">
-                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt={record.banner} width={65} loading='lazy'/>
+                    <Image src={`http://localhost:8081/api/upload/${record.banner}`} alt='không có ảnh' width={65} loading='lazy'/>
                 </Space>
             ),
         },

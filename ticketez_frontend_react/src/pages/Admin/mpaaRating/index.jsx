@@ -1,17 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Card } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, Pagination } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import BaseTable from '~/components/common/BaseTable/BaseTable';
 import BaseModal from '~/components/common/BaseModal/BaseModal';
 import Highlighter from 'react-highlight-words';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './mpaaRating.module.scss';
-import axiosClient from '~/api/global/axiosClient';
-import moment from 'moment';
 import TextArea from 'antd/es/input/TextArea';
+import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
+import uploadApi from '~/api/service/uploadApi';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -28,11 +28,32 @@ const AdminMpaaRating = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
+    const [checkNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    //phân trang
+    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
+    const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
+    const [workSomeThing, setWorkSomeThing] = useState(false);
+
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await mpaaRatingApi.getPage(currentPage, pageSize);
+                setPosts(res.data);
+                setTotalItems(res.totalItems);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [currentPage, pageSize, workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -163,7 +184,13 @@ const AdminMpaaRating = () => {
             dataIndex: 'icon',
             render: (_, record) => (
                 <Space size="middle">
-                    <img src={`http://localhost:8081/api/upload/${record.icon}`} alt="" width={65} />
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.icon}`}
+                    />
                 </Space>
             ),
         },
@@ -206,20 +233,22 @@ const AdminMpaaRating = () => {
     };
 
     const handleDelete = async (record) => {
-        const res = await axiosClient.delete(`mpaaRating/${record.id}`);
-        if (res.code === 500) {
-            message.error('Xoá thất bại ');
+        try {
+            const res = await mpaaRatingApi.delete(record.id);
+            if (res.status === 200) {
+                await uploadApi.deleteUpload(record.icon);
+                funcUtils.notify(res.data, 'success');
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 409) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         }
-        if (res.status === 200) {
-            message.success('Xóa dữ liệu thành công');
-        } else {
-            message.error(res.message);
-        }
-        getList();
+        setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        // const formatDate = moment(record.birthday, 'YYYY-MM-DD');
         const newUploadFile = {
             uid: record.id.toString(),
             name: record.avatar,
@@ -231,7 +260,6 @@ const AdminMpaaRating = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            //    birthday: formatDate,
         });
     };
 
@@ -239,51 +267,54 @@ const AdminMpaaRating = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values);
             if (fileList.length > 0) {
-                values = {
-                    ...values,
-                };
                 if (editData) {
-                    console.log(values);
-                    values = {
+                    let putData = {
                         id: editData.id,
                         ...values,
                     };
-                    if (values.icon.file) {
-                        const file = values.icon.fileList[0].originFileObj;
-                        var formData = new FormData();
-                        formData.append('file_to_upload', file);
-                        const res = await axiosClient.post('upload', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
-                        values = {
-                            ...values,
-                            icon: res.data.fieldName,
+                    if (putData.icon.file) {
+                        const file = putData.icon.fileList[0].originFileObj;
+                        const images = await uploadApi.putUpload(editData.icon, file);
+                        putData = {
+                            ...putData,
+                            icon: images,
                         };
                     }
-                    const res = await axiosClient.put(`mpaaRating/${editData.id}`, values);
-                    message.success('Cập nhật thành công');
-                }
-                if (!editData) {
-                    const file = values.icon.fileList[0].originFileObj;
-                    var formData = new FormData();
-                    formData.append('file_to_upload', file);
-                    const res = await axiosClient.post('upload', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
+
                     try {
-                        values = {
-                            ...values,
-                            icon: res.data.fieldName,
-                        };
-                        const resp = await axiosClient.post('mpaaRating', values);
-                        message.success('Thêm thành công');
+                        const resPut = await mpaaRatingApi.put(putData.id, putData);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                        }
                     } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        console.log(error);
+                    }
+                } else {
+                    try {
+                        const file = values.icon.fileList[0].originFileObj;
+                        const images = await uploadApi.postUpload(file);
+                        const postData = {
+                            ...values,
+                            icon: images,
+                        };
+                        console.log(postData);
+                        const resPost = await mpaaRatingApi.post(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.status === 500) {
+                            funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                        }
+                        // upload
+                        if (error.response.data.error) {
+                            funcUtils.notify(error.response.data.error, 'error');
+                        }
                         console.log(error);
                     }
                 }
@@ -291,7 +322,7 @@ const AdminMpaaRating = () => {
                 form.resetFields();
                 setLoading(false);
                 setFileList([]);
-                getList();
+                setWorkSomeThing(!workSomeThing);
             } else {
                 setLoading(false);
                 message.error('vui lòng chọn ảnh');
@@ -306,30 +337,20 @@ const AdminMpaaRating = () => {
         setOpen(false);
     };
 
+    //phân trang
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
+
     useEffect(() => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
-
-    useEffect(() => {
-        getList();
-    }, []);
 
     //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
-        console.log(form);
-    };
-    //call api
-    const getList = async () => {
-        setLoading(true);
-        try {
-            const res = await axiosClient.get('mpaaRating');
-            setPosts(res.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
     };
 
     const onPreview = async (file) => {
@@ -347,122 +368,113 @@ const AdminMpaaRating = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
-      const propsUpload = {
-          onRemove: (file) => {
-              const index = fileList.indexOf(file);
-              const newFileList = fileList.slice();
-              newFileList.splice(index, 1);
-              setFileList(newFileList);
-          },
-          beforeUpload: (file) => {
-              setFileList([...fileList, file]);
-              return false;
-          },
-          fileList,
-      };
+    const propsUpload = {
+        onRemove: (file) => {
+            const index = fileList.indexOf(file);
+            const newFileList = fileList.slice();
+            newFileList.splice(index, 1);
+            setFileList(newFileList);
+        },
+        beforeUpload: (file) => {
+            setFileList([...fileList, file]);
+            return false;
+        },
+        fileList,
+    };
 
     return (
         <div>
-                <Row>
-                    <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                    </Col>
-                    <Col span={2}>
-                        <Button
-                            type="primary"
-                            className={cx('button-title')}
-                            icon={<PlusOutlined />}
-                            onClick={showModal}
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                        Thêm
+                    </Button>
+                </Col>
+                <BaseModal
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && (
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        ),
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="ratingCode"
+                            label="Phân loại"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                         >
-                            Thêm
-                        </Button>
-                    </Col>
-                    <BaseModal
-                        open={open}
-                        width={'60%'}
-                        title={editData ? 'Cập nhật' : 'Thêm mới'}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Thoát
-                            </Button>,
-                            resetForm && (
-                                <Button key="reset" onClick={handleResetForm}>
-                                    Làm mới
-                                </Button>
-                            ),
-                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                                {editData ? 'Cập nhật' : 'Thêm mới'}
-                            </Button>,
-                        ]}
-                    >
-                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="ratingCode"
-                                label="Phân loại"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
+                            <Input placeholder="Please input your name" />
+                        </Form.Item>
 
-                            <Form.Item
-                                {...formItemLayout}
-                                name="description"
-                                label="Mô tả"
-                                rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
-                            >
-                                <TextArea />
-                            </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                        >
+                            <TextArea />
+                        </Form.Item>
 
-                            <Form.Item
-                                {...formItemLayout}
-                                label="icon"
+                        <Form.Item
+                            {...formItemLayout}
+                            label="icon"
+                            name="icon"
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                        >
+                            <Upload
+                                {...propsUpload}
+                                listType="picture-card"
+                                onChange={onChangeUpload}
+                                onPreview={onPreview}
+                                fileList={fileList}
                                 name="icon"
-                                rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
+                                maxCount={1}
                             >
-                                <Upload
-                                    {...propsUpload}
-                                    listType="picture-card"
-                                    onChange={onChangeUpload}
-                                    onPreview={onPreview}
-                                    fileList={fileList}
-                                    name="icon"
-                                    maxCount={1}
-                                >
-                                    {fileList.length < 2 && '+ Upload'}
-                                </Upload>
-                            </Form.Item>
-                        </Form>
-                    </BaseModal>
-                </Row>
+                                {fileList.length < 2 && '+ Upload'}
+                            </Upload>
+                        </Form.Item>
+                    </Form>
+                </BaseModal>
+            </Row>
 
-                <BaseTable
-                    columns={columns}
-                    onClick={() => {
-                        handleDelete();
-                    }}
-                    dataSource={posts.map((post) => ({
-                        ...post,
-                        key: post.id,
-                        birthday: `${('0' + new Date(post.birthday).getDate()).slice(-2)}-${(
-                            '0' +
-                            (new Date(post.birthday).getMonth() + 1)
-                        ).slice(-2)}-${new Date(post.birthday).getFullYear()}`,
-                    }))}
-                    // expandable={{
-                    //     expandedRowRender: (record) => (
-                    //         <p
-                    //             style={{
-                    //                 margin: 0,
-                    //             }}
-                    //         >
-                    //             {record.body}
-                    //         </p>
-                    //     ),
-                    // }}
+            <BaseTable
+                pagination={false}
+                columns={columns}
+                onClick={() => {
+                    handleDelete();
+                }}
+                dataSource={posts.map((post) => ({
+                    ...post,
+                    key: post.id,
+                }))}
+            />
+            <div className={cx('wrapp-pagination')}>
+                <Pagination
+                    style={{ float: 'right', marginTop: '10px' }}
+                    showSizeChanger={false}
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalItems}
+                    onChange={handlePageChange}
                 />
+            </div>
         </div>
     );
 };
