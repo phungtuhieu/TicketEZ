@@ -2,8 +2,9 @@ package com.ticketez_backend_springboot.modules.seat;
 
 import java.util.List;
 
-import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
+import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 import com.ticketez_backend_springboot.modules.seatType.SeatType;
 
 import jakarta.persistence.Entity;
@@ -25,7 +26,7 @@ public class Seat {
 	private Long id;
 
 	private String name;
-	private boolean status;
+	private Boolean status;
 	private String description;
 
 	@ManyToOne
@@ -33,9 +34,10 @@ public class Seat {
 	private SeatType seatType;
 
 	@ManyToOne
-	@JoinColumn(name = "cinema_id")
-	private Cinema cinema;
+	@JoinColumn(name = "seat_chart_id")
+	private SeatChart seatChart;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "seat")
 	private List<SeatBooking> seatsBookings;
 }

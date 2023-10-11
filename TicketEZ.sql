@@ -1,4 +1,4 @@
---USE [master] CREATE DATABASE TicketEZ
+USE [master] CREATE DATABASE TicketEZ
 GO
     -- DROP DATABASE TicketEZ 
     USE TicketEZ
@@ -974,47 +974,87 @@ VALUES
     (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
     (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
 
--- 8. Thêm dữ liệu về loại ghế
-/*
-INSERT INTO [TicketEZ].[dbo].[Seats] ([name], [status], [description], [seat_type_id], [cinema_id])
+-- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
+-- Chèn dữ liệu vào bảng SeatChart
+INSERT INTO SeatChart ([name], [rows], [columns], [status], cinema_id)
 VALUES
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 1),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 1),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 2),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 2),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 3),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 3),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 4),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 4),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 5),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 5),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 6),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 6),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 7),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 7),
-    (N'Ghế thường', 0, N'Ghế thông thường', 1, 8),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 8),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 9),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 9),
-    (N'Ghế thường', 0, N'Ghế thông thường', 1, 10),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 10),
-	(N'Ghế thường', 1, N'Ghế thông thường', 1, 11),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 12),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 13),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 14),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 15),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 16),
-	(N'Ghế VIP', 0, N'Ghế VIP', 2, 13),
-    (N'Ghế thường', 0, N'Ghế thông thường', 1, 10),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 10),
-	(N'Ghế thường', 1, N'Ghế thông thường', 1, 17),
-    (N'Ghế VIP', 1, N'Ghế VIP', 2, 17),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 13),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 15),
-    (N'Ghế thường', 1, N'Ghế thông thường', 1, 16),
-    (N'Ghế VIP', 0, N'Ghế VIP', 2, 17);
+    ('Biểu đồ 1', 10, 7, 1, 1),
+    ('Biểu đồ 2', 8, 12, 1, 1),
+    ('Biểu đồ 3', 12, 8, 0, 1);
+-- 8. Thêm dữ liệu về ghế
+INSERT INTO Seats ([name], [status], [description], seat_type_id, seat_chart_id)
+VALUES
+    (N'A1', 1, N'Ghế thông thường', 1, 1),
+    (N'A2', 1, N'Ghế VIP', 2, 1),
+    (N'A3', 1, N'Ghế thông thường', 1, 1),
+    (N'A4', 0, N'Ghế VIP', 2, 1),
+    (N'A5', 1, N'Ghế thông thường', 1, 1),
+    (N'A6', 1, N'Ghế VIP', 2, 1),
+    (N'A7', 1, N'Ghế thông thường', 1, 1),
+    (N'B1', 1, N'Ghế thông thường', 1, 1),
+    (N'B2', 1, N'Ghế VIP', 2, 1),
+    (N'B3', 1, N'Ghế thông thường', 1, 1),
+    (N'B4', 1, N'Ghế VIP', 2, 1),
+    (N'B5', 0, N'Ghế thông thường', 1, 1),
+    (N'B6', 1, N'Ghế VIP', 2, 1),
+    (N'B7', 1, N'Ghế thông thường', 1, 1),
+	(N'C1', 1, N'Ghế thông thường', 1, 1),
+    (N'C2', 1, N'Ghế VIP', 2, 1),
+    (N'C3', 1, N'Ghế thông thường', 2, 1),
+    (N'C4', 0, N'Ghế VIP', 2, 1),
+    (N'C5', 1, N'Ghế thông thường', 2, 1),
+    (N'C6', 1, N'Ghế VIP', 2, 1),
+	(N'C7', 0, N'Ghế VIP', 2, 1),
+    (N'D1', 1, N'Ghế VIP', 1, 1),
+    (N'D2', 1, N'Ghế thông thường', 1, 1),
+    (N'D3', 0, N'Ghế VIP', 1, 1),
+    (N'D4', 1, N'Ghế thông thường', 1, 1),
+    (N'D5', 0, N'Ghế VIP', 1, 1),
+	(N'D6', 0, N'Ghế VIP', 1, 1),
+	(N'D7', 0, N'Ghế VIP', 1, 1),
+	(N'E1', 1, N'Ghế thông thường', 1, 1),
+    (N'E2', 1, N'Ghế VIP', 2, 1),
+    (N'E3', 1, N'Ghế thông thường', 1, 1),
+    (N'E4', 0, N'Ghế VIP', 2, 1),
+    (N'E5', 1, N'Ghế thông thường', 1, 1),
+    (N'E6', 1, N'Ghế VIP', 2, 1),
+    (N'E7', 1, N'Ghế thông thường', 1, 1),
+	(N'F1', 1, N'Ghế thông thường', 1, 1),
+    (N'F2', 1, N'Ghế VIP', 2, 1),
+    (N'F3', 1, N'Ghế thông thường', 1, 1),
+    (N'F4', 0, N'Ghế VIP', 2, 1),
+    (N'F5', 1, N'Ghế thông thường', 1, 1),
+    (N'F6', 1, N'Ghế VIP', 2, 1),
+    (N'F7', 1, N'Ghế thông thường', 1, 1),
+	(N'G1', 1, N'Ghế thông thường', 1, 1),
+    (N'G2', 1, N'Ghế VIP', 2, 1),
+    (N'G3', 1, N'Ghế thông thường', 1, 1),
+    (N'G4', 0, N'Ghế VIP', 2, 1),
+    (N'G5', 1, N'Ghế thông thường', 1, 1),
+    (N'G6', 1, N'Ghế VIP', 2, 1),
+    (N'G7', 1, N'Ghế thông thường', 1, 1),
+	(N'H1', 1, N'Ghế thông thường', 1, 1),
+    (N'H2', 1, N'Ghế VIP', 2, 1),
+    (N'H3', 1, N'Ghế thông thường', 1, 1),
+    (N'H4', 0, N'Ghế VIP', 2, 1),
+    (N'H5', 1, N'Ghế thông thường', 1, 1),
+    (N'H6', 1, N'Ghế VIP', 2, 1),
+    (N'H7', 1, N'Ghế thông thường', 1, 1),
+	(N'I1', 1, N'Ghế thông thường', 1, 1),
+    (N'I2', 1, N'Ghế VIP', 2, 1),
+    (N'I3', 1, N'Ghế thông thường', 1, 1),
+    (N'I4', 0, N'Ghế VIP', 2, 1),
+    (N'I5', 1, N'Ghế thông thường', 1, 1),
+    (N'I6', 1, N'Ghế VIP', 2, 1),
+    (N'I7', 1, N'Ghế thông thường', 1, 1),
+	(N'J1', 1, N'Ghế thông thường', 1, 1),
+    (N'J2', 1, N'Ghế VIP', 2, 1),
+    (N'J3', 1, N'Ghế thông thường', 1, 1),
+    (N'J4', 0, N'Ghế VIP', 2, 1),
+    (N'J5', 1, N'Ghế thông thường', 1, 1),
+    (N'J6', 1, N'Ghế VIP', 2, 1),
+    (N'J7', 1, N'Ghế thông thường', 1, 1)
 
-	*/
   -- 9. Thêm dữ liệu cho bảng Movie_Studio
 INSERT INTO [TicketEZ].[dbo].[Movie_Studio] 
     ([name], [country], [email], [description])
@@ -1348,6 +1388,7 @@ SELECT * FROM Provinces
 SELECT * FROM Cinema_Complex
 SELECT * FROM Seat_Types
 SELECT * FROM Seats
+SELECT * FROM SeatChart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
 SELECT * FROM Events

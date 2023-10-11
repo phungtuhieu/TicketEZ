@@ -160,12 +160,10 @@ const AdminCinemaComplex = () => {
         {
             title: 'opening_time',
             dataIndex: 'opening_time',
-            
         },
         {
             title: 'closing_time',
             dataIndex: 'closing_time',
-           
         },
         {
             title: 'Action',
@@ -228,16 +226,16 @@ const AdminCinemaComplex = () => {
             if (editData) {
                 // xử lý khi thêm  call api rồi put lên
                 // code mẫu
-                 axios
-                     .put('http://localhost:8081/api/cinemaComplex', values)
-                     .then((response) => {
-                         setPosts(response.data);
-                         console.log(response);
-                         setLoading(false);
-                     })
-                     .catch((error) => {
-                         console.error('Error fetching data:', error);
-                     });
+                axios
+                    .put('http://localhost:8081/api/cinemaComplex', values)
+                    .then((response) => {
+                        setPosts(response.data);
+                        console.log(response);
+                        setLoading(false);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error);
+                    });
                 message.success('cập nhật thành công');
             } else {
                 //xử lý thêm  call api rồi push lun tương tự như edit
