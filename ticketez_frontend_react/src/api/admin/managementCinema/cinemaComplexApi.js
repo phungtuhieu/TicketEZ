@@ -1,12 +1,21 @@
 import axiosClient from '../../global/axiosClient';
 
-const url = 'movie';
+const url = 'cinemaComplex';
 
 const cinemaComplexApi = {
-    getId: async (actorId) => {
-        return axiosClient.get(url + '/' + actorId);
+    getId: async (cinemaComplexId) => {
+        return axiosClient.get(url + '/' + cinemaComplexId);
     },
-    getAll: async () => {
+    getPage: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        const res = await axiosClient.get(url, { params });
+        return res.data;
+    },
+
+    get: async () => {
         return axiosClient.get(url);
     },
     post: async (data) => {
@@ -15,8 +24,8 @@ const cinemaComplexApi = {
     put: async (id, data) => {
         return axiosClient.put(url + '/' + id, data);
     },
-    delete: async (actorId) => {
-        return axiosClient.delete(url + '/' + actorId);
+    delete: async (cinemaComplexId) => {
+        return axiosClient.delete(url + '/' + cinemaComplexId);
     },
 };
 

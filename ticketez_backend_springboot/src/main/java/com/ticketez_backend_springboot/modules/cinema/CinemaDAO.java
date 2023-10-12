@@ -4,9 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
-
-public interface CinemaDAO extends JpaRepository<Cinema, String> {
+public interface CinemaDAO extends JpaRepository<Cinema, Long> {
 
   List<Cinema> findByCinemaComplexId(Long cinemaComplexId);
 }
