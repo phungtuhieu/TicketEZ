@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Pagination } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,6 +15,10 @@ import uploadApi from '~/api/service/uploadApi';
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -258,7 +261,6 @@ const AdminActor = () => {
     };
 
     const handleEditData = (record) => {
-        const formatDate = moment(record.birthday, 'YYYY-MM-DD');
         const newUploadFile = {
             uid: record.id.toString(),
             name: record.avatar,
@@ -270,7 +272,7 @@ const AdminActor = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            birthday: formatDate,
+            birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
 

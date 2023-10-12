@@ -1,22 +1,38 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Tag } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import moment from 'moment';
+import React, {  useState, useEffect } from 'react';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    DatePicker,
+    Upload,
+    Image,
+    Tag,
+    Select,
+    Switch,
+} from 'antd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faTrash, faLockOpen, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faLockOpen, faLock } from '@fortawesome/free-solid-svg-icons';
 
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
 
-import { actorApi, accountApi } from '~/api/admin';
+import { accountApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 
 import classNames from 'classnames/bind';
 import style from './Account.module.scss';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
 
@@ -26,10 +42,6 @@ const formItemLayout = {
 };
 
 const AdminAccount = () => {
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
-
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -100,7 +112,6 @@ const AdminAccount = () => {
             title: 'email',
             dataIndex: 'email',
             // width: '10%',
-            sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Hoạt động',
@@ -112,12 +123,6 @@ const AdminAccount = () => {
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
             align: 'center',
-            onFilter: (value, record) => record.active === (value === 'true'),
-            filters: [
-                { text: 'Hoạt động', value: 'true' },
-                { text: 'Kết thúc', value: 'false' },
-            ],
-            filterMultiple: false,
         },
         {
             title: 'Thao tác',
@@ -134,8 +139,8 @@ const AdminAccount = () => {
                     )}
 
                     <Popconfirm
-                        title="Bạn có chắc"
-                        description="Muốn xoá hay không?"
+                        title={record.active ? 'Khoá tài khoản' : 'Mở khoá tài khoản'}
+                        description={record.active ? 'Chắn chắn khoá?' : 'Chắn chắn mở?'}
                         okText="Đồng ý"
                         cancelText="Huỷ"
                         onConfirm={() => handleActive(record)}
@@ -159,7 +164,12 @@ const AdminAccount = () => {
         try {
             if (record.phone) {
                 const active = record.active ? false : true;
-                await accountApi.patchActive(record.phone, active);
+                const res = await accountApi.patchActive(record.phone, active);
+                if (res.status === 200 && !active) {
+                    funcUtils.notify('Khoá tài khoản thành công', 'success');
+                } else {
+                    funcUtils.notify('Mở tài khoản thành công', 'success');
+                }
             }
         } catch (error) {
             console.log(error);
@@ -170,7 +180,6 @@ const AdminAccount = () => {
 
     const handleEditData = (record) => {
         console.log(record);
-        const formatDate = moment(record.birthday, 'YYYY-MM-DD');
         const newUploadFile = {
             uid: record.phone.toString(),
             name: record.image,
@@ -182,7 +191,7 @@ const AdminAccount = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            birthday: formatDate,
+            birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
 
@@ -190,11 +199,11 @@ const AdminAccount = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
+            console.log(values);
             if (fileList.length > 0) {
                 if (editData) {
                     let upl = {
                         ...values,
-                        gender: true,
                     };
                     console.log(upl);
                     if (upl.image.fileList) {
@@ -258,6 +267,11 @@ const AdminAccount = () => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
+
+    const handleChange = (value) => {
+        console.log(`selected ${value}`);
+        setActive(value);
+    };
     return (
         <>
             <Row>
@@ -266,8 +280,23 @@ const AdminAccount = () => {
                 </Col>
 
                 <Col>
-                    <Button onClick={() => setActive(!active)}>{active ? 'hoạt động' : 'không'}</Button>
-                    <Input  onChange={(e) => setSearch(e.target.value)}/>
+                    <Select
+                        defaultValue={true}
+                        style={{
+                            width: 150,
+                        }}
+                        onChange={handleChange}
+                        options={[
+                            {
+                                label: 'Danh sách tài khoản',
+                                options: [
+                                    { label: 'Hoạt động', value: true },
+                                    { label: 'Bị khoá', value: false },
+                                ],
+                            },
+                        ]}
+                    />
+                    <Input onChange={(e) => setSearch(e.target.value)} />
                 </Col>
 
                 <BaseModal
@@ -308,7 +337,7 @@ const AdminAccount = () => {
                             label="Ngày sinh"
                             rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
                         >
-                            <DatePicker placeholder="Ngày sinh" format="DD-MM-YYYY" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Ngày sinh" format={'DD-MM-YYYY'} style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
@@ -316,8 +345,9 @@ const AdminAccount = () => {
                             name="gender"
                             label="Giới tính"
                             rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            valuePropName="checked"
                         >
-                            <Input placeholder="Họ và tên" />
+                            <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked />
                         </Form.Item>
 
                         <Form.Item

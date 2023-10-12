@@ -27,7 +27,6 @@ const AdminLayout = ({ children }) => {
     const path = window.location.pathname;
 
     return (
-        
         <Layout>
             <Sider trigger={null} theme="light" collapsible collapsed={collapsed} width={250}>
                 <Header
