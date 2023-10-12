@@ -11,6 +11,7 @@ import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+import { movieApi } from '~/api/admin';
 
 const cx = classNames.bind(style);
 
@@ -111,7 +112,7 @@ function AdminMovie() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resp = await axiosClient.get(`movie?page=${currentPage}&limit=${pageSize}`);
+                const resp = await movieApi.getByPage(currentPage, pageSize);
                 setList(resp.data.data);
                 setTotalItems(resp.data.totalItem);
             } catch (error) {

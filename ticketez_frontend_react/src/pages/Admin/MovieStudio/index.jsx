@@ -11,6 +11,7 @@ import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -40,13 +41,12 @@ function AdminMovieStudio() {
         setLoadingButton(true);
         try {
             const values = await form.validateFields();
-            console.log(values);
             if (!dataEdit) {
                 const resp = await axiosClient.post('movie-studio', values);
                 setLoadingButton(false);
                 setworkSomething(!workSomething);
                 form.resetFields();
-                message.success('thêm thành công');
+                funcUtils.notify('Thêm thành công', 'success');
             } else {
                 const resp = await axiosClient.put(`movie-studio/-1`, {
                     ...values,
@@ -55,13 +55,13 @@ function AdminMovieStudio() {
                 setLoadingButton(false);
                 setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
                 setworkSomething(!workSomething);
-                message.success('cập nhật thành công');
+                funcUtils.notify('Cập nhật thành công', 'success');
                 form.setFieldValue(resp.data);
             }
         } catch (error) {
             setLoadingButton(false);
             if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
+                funcUtils.notify(error.response.data, 'error');
             } else {
                 console.log(error);
             }
@@ -96,14 +96,14 @@ function AdminMovieStudio() {
             const resp = await axiosClient.delete(`movie-studio/${record.id}`);
             if (resp.status === 200) {
                 setLoadingButton(false);
-                message.success('Đã xoá thành công!');
+                funcUtils.notify('Đã xoá thành công', 'success');
                 setworkSomething(!workSomething);
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
                 message.error(error.response.data);
             } else {
-                message.error('Xoá thất bại');
+                funcUtils.notify('Xoá thất bại', 'success');
                 console.log(error);
             }
         }
@@ -117,7 +117,7 @@ function AdminMovieStudio() {
                 setTotalItems(resp.data.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
+                    funcUtils.notify(error.response.data, 'error');
                 } else {
                     console.log(error);
                 }

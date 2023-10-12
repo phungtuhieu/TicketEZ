@@ -20,17 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/movie")
 public class MovieAPI {
     @Autowired
     MovieDAO dao;
-    
+
     @GetMapping
-    public ResponseEntity<ResponseDTO<Movie>> findAll(@RequestParam("page") Optional<Integer> pageNo,
-    @RequestParam("limit") Optional<Integer> limit) {
+    public ResponseEntity<ResponseDTO<Movie>> findAll(
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<Integer> search) {
         Pageable pageable = PageRequest.of(pageNo.orElse(0), limit.orElse(5));
         Page<Movie> page = dao.findAll(pageable);
         ResponseDTO<Movie> resp = new ResponseDTO<>();
