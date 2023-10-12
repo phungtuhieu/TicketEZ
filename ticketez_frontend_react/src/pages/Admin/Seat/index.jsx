@@ -22,7 +22,7 @@ function AdminSeat() {
     const [idSeatChart, setIdSeatChart] = useState();
 
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
-    const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(null);
+    const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
     const [selectedOptionCinema, setSelectedOptionCinema] = useState(false);
     // Ẩn hiên ghé là phải check lúc chọn vào biểu đồ
@@ -34,6 +34,7 @@ function AdminSeat() {
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
+            
         } catch (error) {
             console.error(error);
         }
@@ -46,7 +47,7 @@ function AdminSeat() {
             const dataCinema = resp.data;
             console.log(dataCinema);
             setCinemaDaTa(dataCinema);
-            setSelectedCinemaComplex(idCInemacomplex);
+            setSelectedCinemaComplex(true);
         } catch (error) {
             console.error(error);
         }
