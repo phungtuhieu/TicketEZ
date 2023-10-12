@@ -211,13 +211,14 @@ const AdminShowtime = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'status',
+            align: 'center',
             render: (_, record) => {
                 const statusText = record.status === true ? 'Hoạt động' : 'Kết thúc';
                 const tagColor = record.status === true ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
-            onFilter: (value, record) => record.status === (value === 'true'), // Assuming 'value' is a string like 'true' or 'false'
+            onFilter: (value, record) => record.status === (value === 'true'),
             filters: [
                 { text: 'Hoạt động', value: 'true' },
                 { text: 'Kết thúc', value: 'false' },
