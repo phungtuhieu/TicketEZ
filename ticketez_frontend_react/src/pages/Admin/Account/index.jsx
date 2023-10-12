@@ -53,16 +53,13 @@ const AdminAccount = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await accountApi.getPage(currentPage, pageSize, active, search);
+                const res = await accountApi.getByPage(currentPage, pageSize, active, search);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
             } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
-                } else {
-                    console.log(error);
-                }
+                console.log(error);
+                funcUtils.notify(error.response.data, 'error');
             }
         };
         getList();
@@ -165,11 +162,8 @@ const AdminAccount = () => {
                 await accountApi.patchActive(record.phone, active);
             }
         } catch (error) {
-            if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
-            } else {
-                console.log(error);
-            }
+            console.log(error);
+            funcUtils.notify(error.response.data, 'error');
         }
         setWorkSomeThing(!workSomeThing);
     };
@@ -273,7 +267,7 @@ const AdminAccount = () => {
 
                 <Col>
                     <Button onClick={() => setActive(!active)}>{active ? 'hoạt động' : 'không'}</Button>
-                    <Input onChange={(e) => setSearch(e.target.value)} />
+                    <Input  onChange={(e) => setSearch(e.target.value)}/>
                 </Col>
 
                 <BaseModal

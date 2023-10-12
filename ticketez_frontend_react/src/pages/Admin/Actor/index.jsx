@@ -47,7 +47,7 @@ const AdminActor = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await actorApi.getPage(currentPage, pageSize);
+                const res = await actorApi.getByPage(currentPage, pageSize);
                 console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
@@ -296,7 +296,7 @@ const AdminActor = () => {
                         };
                     }
                     try {
-                        const resPut = await actorApi.put(putData.id, putData);
+                        const resPut = await actorApi.update(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật diễn viên thành công', 'success');
@@ -318,7 +318,7 @@ const AdminActor = () => {
                             avatar: images,
                         };
                         console.log(postData);
-                        const resPost = await actorApi.post(postData);
+                        const resPost = await actorApi.create(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm diễn viên thành công', 'success');

@@ -47,7 +47,7 @@ const AdminDirector = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await directorApi.get(currentPage, pageSize);
+                const res = await directorApi.getByPage(currentPage, pageSize);
                 console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
@@ -287,7 +287,7 @@ const AdminDirector = () => {
                     }
 
                     try {
-                        const resPut = await directorApi.put(putData.id, putData);
+                        const resPut = await directorApi.update(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật đạo diễn thành công', 'success');
@@ -306,7 +306,7 @@ const AdminDirector = () => {
                             avatar: images,
                         };
                         console.log(postData);
-                        const resPost = await directorApi.post(postData);
+                        const resPost = await directorApi.create(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm đạo diễn thành công', 'success');
