@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Input, Pagination, Popconfirm, Row, Select, Space, message } from 'antd';
+import { Button, Col, DatePicker, Form, Input, Popconfirm, Rate, Row, Select, Space, TimePicker, message } from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 
 import style from './Movie.module.scss';
@@ -12,13 +12,11 @@ import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
 import { movieApi } from '~/api/admin';
+import '~/scss/_global.scss';
+import moment from 'moment';
 
 const cx = classNames.bind(style);
 
-const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 20 },
-};
 function AdminMovie() {
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
@@ -32,6 +30,10 @@ function AdminMovie() {
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomething, setworkSomething] = useState(10); // Số mục trên mỗi trang
     const [loadingButton, setLoadingButton] = useState(false); // Số mục trên mỗi trang
+    const formItemLayout = {
+        labelCol: { span: 6 },
+        wrapperCol: { span: 20 },
+    };
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -113,8 +115,9 @@ function AdminMovie() {
         const fetchData = async () => {
             try {
                 const resp = await movieApi.getByPage(currentPage, pageSize);
+                console.log(resp);
                 setList(resp.data);
-                setTotalItems(resp.data.totalItem);
+                setTotalItems(resp.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
@@ -124,7 +127,6 @@ function AdminMovie() {
             }
         };
         fetchData();
-        console.log(currentPage, pageSize, workSomething);
     }, [currentPage, pageSize, workSomething]);
     const handleReset = (clearFilters) => {
         clearFilters();
@@ -226,32 +228,43 @@ function AdminMovie() {
 
     const columns = [
         {
-            title: 'Tên hãng',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Tên phim',
+            dataIndex: 'title',
+            key: 'title',
             sorter: {
-                compare: (a, b) => a.name.localeCompare(b.name),
+                compare: (a, b) => a.title.localeCompare(b.name),
                 multiple: 4,
             },
-            ...getColumnSearchProps('name'),
+            ...getColumnSearchProps('title'),
+        },
+        {
+            title: 'Thời lượng',
+            dataIndex: 'duration',
+            key: 'duration',
+            ...getColumnSearchProps('duration'),
+        },
+        {
+            title: 'Ngày phát hành',
+            dataIndex: 'releaseDate',
+            key: 'releaseDate',
+            ...getColumnSearchProps('releaseDate'),
+            render: (_, record) => {
+                const formattedDate = moment(record.releaseDate).format('DD-MM-YYYY');
+                return <span>{formattedDate}</span>;
+            },
         },
         {
             title: 'Quốc gia',
             dataIndex: 'country',
             key: 'country',
-            ...getColumnSearchProps('country'),
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email',
-            ...getColumnSearchProps('email'),
+            title: 'Đánh giá',
+            dataIndex: 'rating',
+            key: 'rating',
+            render: (_, record) => <Rate disabled value={record.rating} />,
         },
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
-        },
+
         {
             title: 'Thao tác',
             key: 'description',
@@ -275,7 +288,52 @@ function AdminMovie() {
             ),
         },
     ];
-
+    const config = {
+        rules: [
+            {
+                type: 'object',
+                required: true,
+                message: 'Vui lòng chọn thời gian!',
+            },
+        ],
+    };
+    const expandedRowRender = (record) => {
+        return (
+            <div>
+                <ul className="ms-10">
+                    <li>
+                        <span>
+                            <b>Mô tả: </b> {record.description}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Hãng phim: </b> {`${record.movieStudio.name} (${record.movieStudio.country})`}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Loại phim (MPAA): </b>{' '}
+                        </span>
+                        {`${record.mpaaRating.ratingCode} ( ${record.mpaaRating.description})`}
+                    </li>
+                    <li>
+                        <span>
+                            <b>Video trailer: </b>
+                            <a
+                                href={record.videoTrailer}
+                                className={cx('table-link-video')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {record.videoTrailer}
+                            </a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        );
+    };
     // Xử lý sự kiện thay đổi trang
     const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);
@@ -333,18 +391,46 @@ function AdminMovie() {
                     autoComplete="off"
                 >
                     <Form.Item
-                        label="Tên hãng"
-                        name="name"
+                        label="Tên phim"
+                        name="title"
                         rules={[
                             {
                                 required: true,
-                                message: 'Vui lòng nhập tên hãng phim!',
+                                message: 'Vui lòng nhập tên phim!',
                             },
                         ]}
                     >
                         <Input />
                     </Form.Item>
-
+                    <Form.Item name="time-picker" label="Thời lượng" {...config}>
+                        <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
+                    </Form.Item>
+                    <Form.Item name="date-time-picker" label="Ngày phát hành" {...config}>
+                        <DatePicker placeholder="Chọn ngày phát hành" format="YYYY-MM-DD" />
+                    </Form.Item>
+                    <Form.Item name="ss" label="Quốc tịch" rules={[{ required: true }]}>
+                        <Select
+                            placeholder="Chọn quốc tịch ở bên dưới"
+                            // onChange={onGenderChange}
+                            allowClear
+                        >
+                            <Select.Option value="VN">sss Nam</Select.Option>
+                            <Select.Option value="EN">sssAnh</Select.Option>
+                            <Select.Option value="IDA">Ấn Độ</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label="Link trailer video"
+                        name="videoTrailer"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Vui lòng nhập link video trailer!',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
                     <Form.Item name="country" label="Quốc tịch" rules={[{ required: true }]}>
                         <Select
                             placeholder="Chọn quốc tịch ở bên dưới"
@@ -356,18 +442,7 @@ function AdminMovie() {
                             <Select.Option value="IDA">Ấn Độ</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item
-                        label="Email"
-                        name="email"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập email của hãng phim!',
-                            },
-                        ]}
-                    >
-                        <Input />
-                    </Form.Item>
+
                     <Form.Item name={'description'} label="Mô tả">
                         <Input.TextArea />
                     </Form.Item>
@@ -380,6 +455,7 @@ function AdminMovie() {
                     ...item,
                     key: item.id,
                 }))}
+                expandable={{ expandedRowRender }}
             />
 
             <PaginationCustom

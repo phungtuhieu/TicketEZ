@@ -33,7 +33,8 @@ public class MovieStudioAPI {
     @GetMapping
     public ResponseEntity<?> findAll(
             @RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit) {
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<String> search) {
         try {
             if (pageNo.isPresent() && pageNo.get() == 0) {
                 return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);

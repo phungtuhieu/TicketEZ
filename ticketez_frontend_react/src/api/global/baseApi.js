@@ -25,7 +25,7 @@ class BaseApi {
         return axiosClient.delete(`${this.uri}/${id}`);
     }
 
-    async getByPage(page, limit, search = '') {
+    async getByPage(page = 1, limit = 10, search = '') {
         const params = {
             page,
             limit,
