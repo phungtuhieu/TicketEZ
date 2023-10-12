@@ -35,7 +35,6 @@ function SeatChart(props) {
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-
             seatUnavailable: ['A1', '13', '14'],
         };
 
@@ -84,7 +83,7 @@ function SeatChart(props) {
             console.log(listSeatNormal);
             console.log(listSeatVip);
 
-            if (listSeatVip.length>0 && listSeatNormal.length > 0) {
+            if (listSeatVip.length > 0 && listSeatNormal.length > 0) {
                 setSeatState(createSeatArray());
                 setShowSeat(true);
                 setReload(false);
@@ -95,18 +94,17 @@ function SeatChart(props) {
             console.error(error);
         }
     };
+    
     const onClickData = (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
-        console.log('unavailable' + seatUnavailable);
-        console.log('normal' + normalSeat);
-        console.log('vip' + vipSeat);
+ 
         console.log('------------------------------------------------');
         if (selectedSeatType === 'normal-seat') {
-            if (vipSeat.indexOf(seat) > -1) {
-                normalSeat.splice(vipSeat.indexOf(seat), 1);
+            while (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
             }
-            if (seatUnavailable.indexOf(seat) > -1) {
-                seatUnavailable.splice(seatAvailable.indexOf(seat), 1);
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
             }
             setSeatState({
                 ...seatState,
@@ -114,11 +112,11 @@ function SeatChart(props) {
             });
         }
         if (selectedSeatType === 'vip-seat') {
-            if (normalSeat.indexOf(seat) > -1) {
+            while (normalSeat.indexOf(seat) > -1) {
                 normalSeat.splice(normalSeat.indexOf(seat), 1);
             }
-            if (seatUnavailable.indexOf(seat) > -1) {
-                seatUnavailable.splice(seatAvailable.indexOf(seat), 1);
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
             }
 
             setSeatState({
@@ -127,18 +125,20 @@ function SeatChart(props) {
             });
         }
         if (selectedSeatType === 'unavailable') {
-            if (normalSeat.indexOf(seat) > -1) {
+            while (normalSeat.indexOf(seat) > -1) {
                 normalSeat.splice(normalSeat.indexOf(seat), 1);
             }
-            if (vipSeat.indexOf(seat) > -1) {
+            while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
             }
-
             setSeatState({
                 ...seatState,
                 seatUnavailable: [...seatUnavailable, seat],
+                
             });
+            
         }
+    ;
     };
 
     const onChange = (e) => {
