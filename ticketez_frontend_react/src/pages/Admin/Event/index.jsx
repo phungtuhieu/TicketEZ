@@ -418,7 +418,7 @@ const AdminShowtime = () => {
     const apiSelectCinemaComplex = async () => {
         try {
             const resp = await axiosClient.get(`cinemaComplex`);
-            setSelectCinemaComplex(resp.data);
+            setSelectCinemaComplex(resp.data.data);
         } catch (error) {
             console.error('Error fetching province data:', error);
         }
