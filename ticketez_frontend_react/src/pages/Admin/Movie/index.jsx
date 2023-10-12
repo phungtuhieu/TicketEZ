@@ -58,7 +58,12 @@ function AdminMovie() {
             }
         } catch (error) {
             setLoadingButton(false);
-            message.error('thêm thất bại');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                message.error('Thêm thất bại');
+                console.log(error);
+            }
         }
     };
     const handleResetForm = () => {
@@ -94,7 +99,12 @@ function AdminMovie() {
                 setworkSomething(!workSomething);
             }
         } catch (error) {
-            message.error('Xoá thất bại');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                message.error('Xoá thất bại');
+                console.log(error);
+            }
         }
     };
 
@@ -105,7 +115,11 @@ function AdminMovie() {
                 setList(resp.data.data);
                 setTotalItems(resp.data.totalItem);
             } catch (error) {
-                console.log(error);
+                if (error.hasOwnProperty('response')) {
+                    message.error(error.response.data);
+                } else {
+                    console.log(error);
+                }
             }
         };
         fetchData();

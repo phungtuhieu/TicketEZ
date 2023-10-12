@@ -26,61 +26,80 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/movie-studio")
-public class MovieStudioAPI{
+public class MovieStudioAPI {
     @Autowired
     MovieStudioDAO dao;
 
     @GetMapping
     public ResponseEntity<?> findAll(
-    @RequestParam("page") Optional<Integer> pageNo,
-    @RequestParam("limit") Optional<Integer> limit) {
-        if (pageNo.isPresent() && pageNo.get() == 0) {
-            return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
+            }
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+            Page<MovieStudio> page = dao.findAll(pageable);
+            ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
+            responeDTO.setData(page.getContent());
+            responeDTO.setTotalItems(page.getTotalElements());
+            responeDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(responeDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Sort sort = Sort.by(Sort.Order.desc("id"));
-        Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-        Page<MovieStudio> page = dao.findAll(pageable);
-        ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
-        responeDTO.setData(page.getContent());
-        responeDTO.setTotalItems(page.getTotalElements());
-        responeDTO.setTotalPages(page.getTotalPages());
-        return ResponseEntity.ok(responeDTO);
+
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        if (!dao.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        try {
+             if (!dao.existsById(id)) {
+           return new ResponseEntity<>("Dữ liệu không tồn tại", HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(dao.findById(id).get());
+            return ResponseEntity.ok(dao.findById(id).get());
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi khi tìm kiếm dữ liệu", HttpStatus.CONFLICT);
+        }
+       
     }
 
     @PostMapping
     public ResponseEntity<?> post(@RequestBody MovieStudio movieStudio) {
         try {
             dao.save(movieStudio);
+             return ResponseEntity.ok(movieStudio);
         } catch (Exception e) {
             return new ResponseEntity<>("Không thể thêm dữ liệu mới", HttpStatus.CONFLICT);
         }
-        return ResponseEntity.ok(movieStudio);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieStudio movieStudio) {
-        if (!dao.existsById(id)) {
-            return new ResponseEntity<>("Không tìm thấy dữ liệu", HttpStatus.NOT_FOUND);
+        try {
+             if (!dao.existsById(id)) {
+                return new ResponseEntity<>("Không tìm thấy dữ liệu", HttpStatus.NOT_FOUND);
+            }
+            dao.save(movieStudio);
+            return ResponseEntity.ok(movieStudio);
+        } catch (Exception e) {
+           return new ResponseEntity<>("Lỗi khi cập nhật dữ liệu",HttpStatus.CONFLICT);
         }
-        dao.save(movieStudio);
-        return ResponseEntity.ok(movieStudio);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-        if(!dao.existsById(id) ){
-           return ResponseEntity.notFound().build();
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        try {
+            if (!dao.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            dao.deleteById(id);
+            return ResponseEntity.ok(true);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Không thể xoá, dữ liệu đã được sử dụng ở nơi khác", HttpStatus.CONFLICT);
         }
-        dao.deleteById(id);
-        return ResponseEntity.ok(true);
+
     }
 
 }

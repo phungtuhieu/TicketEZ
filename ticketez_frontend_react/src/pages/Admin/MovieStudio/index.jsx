@@ -60,7 +60,11 @@ function AdminMovieStudio() {
             }
         } catch (error) {
             setLoadingButton(false);
-            message.error('thêm thất bại');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
+            }
         }
     };
     const handleResetForm = () => {
@@ -96,7 +100,12 @@ function AdminMovieStudio() {
                 setworkSomething(!workSomething);
             }
         } catch (error) {
-            message.error('Xoá thất bại');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                message.error('Xoá thất bại');
+                console.log(error);
+            }
         }
     };
 
@@ -107,7 +116,11 @@ function AdminMovieStudio() {
                 setList(resp.data.data);
                 setTotalItems(resp.data.totalItem);
             } catch (error) {
-                console.log(error);
+                if (error.hasOwnProperty('response')) {
+                    message.error(error.response.data);
+                } else {
+                    console.log(error);
+                }
             }
         };
 
@@ -315,8 +328,6 @@ function AdminMovieStudio() {
                     style={{
                         maxWidth: 600,
                     }}
-                    // onFinish={onFinish}
-                    // onFinishFailed={onFinishFailed}
                     autoComplete="off"
                 >
                     <Form.Item

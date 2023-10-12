@@ -58,8 +58,11 @@ const AdminAccount = () => {
                 setPosts(res.data);
                 setLoading(false);
             } catch (error) {
-                console.log(error);
-                funcUtils.notify(error.response.data, 'error');
+                if (error.hasOwnProperty('response')) {
+                    message.error(error.response.data);
+                } else {
+                    console.log(error);
+                }
             }
         };
         getList();
@@ -162,8 +165,11 @@ const AdminAccount = () => {
                 await accountApi.patchActive(record.phone, active);
             }
         } catch (error) {
-            console.log(error);
-            funcUtils.notify(error.response.data, 'error');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
+            }
         }
         setWorkSomeThing(!workSomeThing);
     };
@@ -267,7 +273,7 @@ const AdminAccount = () => {
 
                 <Col>
                     <Button onClick={() => setActive(!active)}>{active ? 'hoạt động' : 'không'}</Button>
-                    <Input  onChange={(e) => setSearch(e.target.value)}/>
+                    <Input onChange={(e) => setSearch(e.target.value)} />
                 </Col>
 
                 <BaseModal

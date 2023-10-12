@@ -1,5 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, Card, Breadcrumb, Switch, Select, Pagination } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    Table,
+    Card,
+    Breadcrumb,
+    Switch,
+    Select,
+    Pagination,
+} from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -11,7 +26,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { faL, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { cinemaApi, cinemaComplexApi } from '~/api/admin';
-import { cinemaTypeApi} from '~/api/admin';
+import { cinemaTypeApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import axiosClient from '~/api/global/axiosClient';
 
@@ -22,7 +37,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminCinema = () =>{
+const AdminCinema = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -41,31 +56,31 @@ const AdminCinema = () =>{
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [cinemaType, setCinemaType] = useState([]);
     const [cinemaComplex, setCinemaComplex] = useState([]);
-     //api
-     useEffect(() => {
+    //api
+    useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-               const res = await cinemaApi.getPage(currentPage, pageSize);
-               const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
-               setCinemaType(cinemaType.data);
-               setCinemaComplex(cinemaComplex.data);
-            //    const resType = await cinemaTypeApi.getCinemaType();
-               console.log(res);
-            //    console.log(resType);
-               setTotalItems(res.totalItems);
-               setPosts(res.data);
-               setLoading(false);
-    
+                const res = await cinemaApi.getPage(currentPage, pageSize);
+                const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
+                setCinemaType(cinemaType.data);
+                setCinemaComplex(cinemaComplex.data);
+                //    const resType = await cinemaTypeApi.getCinemaType();
+                console.log(res);
+                //    console.log(resType);
+                setTotalItems(res.totalItems);
+                setPosts(res.data);
+                setLoading(false);
             } catch (error) {
-                console.log(error);
-                funcUtils.notify(error.response.data, 'error');
-
-            }   
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    console.log(error);
+                }
+            }
         };
         getList();
     }, [currentPage, pageSize, workSomeThing]);
-    
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -172,7 +187,6 @@ const AdminCinema = () =>{
             ),
     });
 
-   
     const columns = [
         Table.EXPAND_COLUMN,
         {
@@ -189,32 +203,26 @@ const AdminCinema = () =>{
             width: '20%',
             ...getColumnSearchProps('name'),
         },
-        
+
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             width: '20%',
-            render: (status) => (
-                <span>{status ? 'Hoạt động' : 'Ngừng hoạt động'}</span>
-            ),
+            render: (status) => <span>{status ? 'Hoạt động' : 'Ngừng hoạt động'}</span>,
         },
         {
             title: 'Loại rạp',
             dataIndex: 'cinemaType',
             width: '20%',
             ...getColumnSearchProps('name'),
-            render: (cinemaType) => (
-                <span>{cinemaType.typeName}</span>
-            ),
+            render: (cinemaType) => <span>{cinemaType.typeName}</span>,
         },
         {
             title: 'Cụm rạp',
             dataIndex: 'cinemaComplex',
             width: '50%',
             ...getColumnSearchProps('name'),
-            render: (cinemaComplex) => (
-                <span>{cinemaComplex.name}</span>
-            ),
+            render: (cinemaComplex) => <span>{cinemaComplex.name}</span>,
         },
         {
             title: 'Action',
@@ -247,20 +255,19 @@ const AdminCinema = () =>{
         setResetForm(true);
     };
 
-    const handleDelete  = async (record) => {
-       try {
-        const res = await cinemaApi.delete(record.id);
-        console.log(res);
-        if (res.status === 200) {
-            funcUtils.notify(res.data, 'success');
-        
+    const handleDelete = async (record) => {
+        try {
+            const res = await cinemaApi.delete(record.id);
+            console.log(res);
+            if (res.status === 200) {
+                funcUtils.notify(res.data, 'success');
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 409) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         }
-       } catch (error) {
-        console.log(error);
-        if (error.response.status === 409) {
-            funcUtils.notify(error.response.data, 'error');
-        }
-    }
         setWorkSomeThing(!workSomeThing);
     };
 
@@ -269,16 +276,15 @@ const AdminCinema = () =>{
         setResetForm(false);
         setEditData(record);
         console.log(record);
-        form.setFieldsValue({...record, cinemaType: record.cinemaType.id, cinemaComplex: record.cinemaComplex.id});
+        form.setFieldsValue({ ...record, cinemaType: record.cinemaType.id, cinemaComplex: record.cinemaComplex.id });
     };
-    
 
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
             if (values.status === undefined) {
-                values = {...values, status: true}
+                values = { ...values, status: true };
             }
             console.log(values.cinemaType);
             console.log(values.cinemaComplex);
@@ -303,7 +309,6 @@ const AdminCinema = () =>{
             setLoading(false);
             setWorkSomeThing(!workSomeThing);
             // getList();
-          
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -320,47 +325,46 @@ const AdminCinema = () =>{
     };
     const onChange = (checked) => {
         console.log(`switch to ${checked}`);
-      };
-      const handlePageChange = (page, pageSize) => {
+    };
+    const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
 
-    
     return (
         <>
-                <Row>
-                    <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu Rạp</h1>
-                    </Col>
-                    <Col span={2}>
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu Rạp</h1>
+                </Col>
+                <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
-                    </Col>
-                    <BaseModal
-                      maskClosable={false}
-                        open={open}
-                        width={'60%'}
-                        title={editData ? 'Cập nhật' : 'Thêm mới'}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Thoát
-                            </Button>,
-                            resetForm && ( // Conditionally render the "Làm mới" button only when editing
-                                <Button key="reset" onClick={handleResetForm}>
-                                    Làm mới
-                                </Button>
-                            ),
-                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                                {editData ? 'Cập nhật' : 'Thêm mới'}
-                            </Button>,
-                        ]}
-                    >
-                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                            {/* <Form.Item
+                </Col>
+                <BaseModal
+                    maskClosable={false}
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && ( // Conditionally render the "Làm mới" button only when editing
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        ),
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                        {/* <Form.Item
                                 {...formItemLayout}
                                 name="id"
                                 label="Id"
@@ -368,102 +372,100 @@ const AdminCinema = () =>{
                             >
                                 <Input placeholder="Please input your name" />
                             </Form.Item> */}
-                            <Form.Item
-                                {...formItemLayout}
-                                name="name"
-                                label="Tên rạp"
-                                rules={[{ required: true, message: 'Vui lòng nhập rạp' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="status"
-                                label="Trạng thái"
-                                rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
-                            >
-                                 <Switch defaultChecked onChange={onChange} />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="cinemaType"
-                                label="Loại rạp"
-                                rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
-                            >
-                                 <Select
-                                     style={{ width: '100%' }}
-                                     showSearch
-                                     placeholder="Chọn loại"
-                                     optionFilterProp="children"
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    
-                                    options={[
-                                        {
-                                            value: editData?.cinemaType?.id, // Sử dụng cinemaType từ record khi có
-                                            label: editData?.cinemaType?.typeName,
-                                        },
-                                        ...cinemaType.map((typeName) => ({
-                                            value: typeName.id,
-                                            label: typeName.typeName,
-                                        }))
-                                    ]}
-                                      allowClear
-                                    />
-                            </Form.Item>       
-                            <Form.Item
-                                {...formItemLayout}
-                                name="cinemaComplex"
-                                label="Cụm rạp"
-                                rules={[{ required: true, message: 'Vui lòng chọn cụm rạp' }]}
-                            >
-                                 <Select
-                                     style={{ width: '100%' }}
-                                     showSearch
-                                     placeholder="Chọn loại"
-                                     optionFilterProp="children"
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    
-                                    options={[
-                                        {
-                                            value: editData?.cinemaComplex?.id, // Sử dụng cinemaType từ record khi có
-                                            label: editData?.cinemaComplex?.name,
-                                        },
-                                        ...cinemaComplex.map((name) => ({
-                                            value: name.id,
-                                            label: name.name,
-                                        }))
-                                    ]}
-                                      allowClear
-                                    />
-                            </Form.Item>       
-                        </Form>
-                    </BaseModal>
-                </Row>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="name"
+                            label="Tên rạp"
+                            rules={[{ required: true, message: 'Vui lòng nhập rạp' }]}
+                        >
+                            <Input placeholder="Please input your name" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="status"
+                            label="Trạng thái"
+                            rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                        >
+                            <Switch defaultChecked onChange={onChange} />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="cinemaType"
+                            label="Loại rạp"
+                            rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn loại"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={[
+                                    {
+                                        value: editData?.cinemaType?.id, // Sử dụng cinemaType từ record khi có
+                                        label: editData?.cinemaType?.typeName,
+                                    },
+                                    ...cinemaType.map((typeName) => ({
+                                        value: typeName.id,
+                                        label: typeName.typeName,
+                                    })),
+                                ]}
+                                allowClear
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="cinemaComplex"
+                            label="Cụm rạp"
+                            rules={[{ required: true, message: 'Vui lòng chọn cụm rạp' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn loại"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={[
+                                    {
+                                        value: editData?.cinemaComplex?.id, // Sử dụng cinemaType từ record khi có
+                                        label: editData?.cinemaComplex?.name,
+                                    },
+                                    ...cinemaComplex.map((name) => ({
+                                        value: name.id,
+                                        label: name.name,
+                                    })),
+                                ]}
+                                allowClear
+                            />
+                        </Form.Item>
+                    </Form>
+                </BaseModal>
+            </Row>
 
-                <BaseTable
-                    columns={columns}
-                    onClick={() => {
-                        handleDelete();
-                    }}
-                    // dataSource={posts}
-                    dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                    expandable={{
-                        expandedRowRender: (record) => (
-                            <p
-                                style={{
-                                    margin: 0,
-                                }}
-                            >
-                                {record.body}
-                            </p>
-                        ),
-                    }}
-                />
-             <div className={cx('wrapp-pagination')}>
+            <BaseTable
+                columns={columns}
+                onClick={() => {
+                    handleDelete();
+                }}
+                // dataSource={posts}
+                dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <p
+                            style={{
+                                margin: 0,
+                            }}
+                        >
+                            {record.body}
+                        </p>
+                    ),
+                }}
+            />
+            <div className={cx('wrapp-pagination')}>
                 <Pagination
                     showSizeChanger={false}
                     current={currentPage}

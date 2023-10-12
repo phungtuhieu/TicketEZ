@@ -53,8 +53,11 @@ const AdminActor = () => {
                 setPosts(res.data);
                 setLoading(false);
             } catch (error) {
-                console.log(error);
-                funcUtils.notify(error.response.data, 'error');
+                if (error.hasOwnProperty('response')) {
+                    message.error(error.response.data);
+                } else {
+                    console.log(error);
+                }
             }
         };
         getList();
@@ -241,11 +244,14 @@ const AdminActor = () => {
             console.log(res);
             if (res.status === 200) {
                 await uploadApi.delete(record.avatar);
-                funcUtils.notify("Xoá thành công", 'success');
+                funcUtils.notify('Xoá thành công', 'success');
             }
         } catch (error) {
-            console.log(error);
-            funcUtils.notify(error.response.data, 'error');
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
+            }
         }
 
         setWorkSomeThing(!workSomeThing);
@@ -296,8 +302,11 @@ const AdminActor = () => {
                             funcUtils.notify('Cập nhật diễn viên thành công', 'success');
                         }
                     } catch (error) {
-                        funcUtils.notify(error.response.data, 'error');
-                        console.log(error);
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
                     }
                 }
                 if (!editData) {
@@ -315,8 +324,11 @@ const AdminActor = () => {
                             funcUtils.notify('Thêm diễn viên thành công', 'success');
                         }
                     } catch (error) {
-                        funcUtils.notify(error.response.data, 'error');
-                        console.log(error);
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
                     }
                 }
                 setOpen(false);
@@ -454,14 +466,13 @@ const AdminActor = () => {
                 }))}
             />
             <div className={cx('wrapp-pagination')}>
-                <PaginationCustom 
+                <PaginationCustom
                     howSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}
                     total={totalItems}
                     onChange={handlePageChange}
                 />
-                
             </div>
         </>
     );
