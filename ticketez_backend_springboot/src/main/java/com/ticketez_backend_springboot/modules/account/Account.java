@@ -21,11 +21,14 @@ public class Account {
 	private String phone;
 	private String fullname;
 	private String email;
-	private String password;
+	private String password; 
 	private Date birthday;
 	private boolean gender;
+	private String image;
 	private boolean role;
 	private boolean active;
+
+	
 	private boolean verified;
 	private int points;
 
