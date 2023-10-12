@@ -113,7 +113,7 @@ function AdminMovie() {
         const fetchData = async () => {
             try {
                 const resp = await movieApi.getByPage(currentPage, pageSize);
-                setList(resp.data.data);
+                setList(resp.data);
                 setTotalItems(resp.data.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
