@@ -48,7 +48,7 @@ function AdminMovieStudio() {
                 form.resetFields();
                 message.success('thêm thành công');
             } else {
-                const resp = await axiosClient.put(`movie-studio/${dataEdit.id}`, {
+                const resp = await axiosClient.put(`movie-studio/-1`, {
                     ...values,
                     id: dataEdit.id,
                 });

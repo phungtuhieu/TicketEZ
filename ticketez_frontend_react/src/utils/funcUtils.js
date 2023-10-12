@@ -11,7 +11,7 @@ const funcUtils = {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: 'colored',
+            theme: 'light',
         };
 
         if (!content) return toast.error('Có lỗi vui lòng liên hệ quản trị viên!', option);
