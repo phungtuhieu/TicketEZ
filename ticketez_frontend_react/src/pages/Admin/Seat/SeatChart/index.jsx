@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Divider, Space, Tag, Radio } from 'antd';
+import { Button, Modal, Divider, Space, Tag, Radio, Col, Row, Card } from 'antd';
 import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
 import FormOption from '../FormOption';
@@ -94,10 +94,10 @@ function SeatChart(props) {
             console.error(error);
         }
     };
-    
+
     const onClickData = (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
- 
+
         console.log('------------------------------------------------');
         if (selectedSeatType === 'normal-seat') {
             while (vipSeat.indexOf(seat) > -1) {
@@ -134,11 +134,8 @@ function SeatChart(props) {
             setSeatState({
                 ...seatState,
                 seatUnavailable: [...seatUnavailable, seat],
-                
             });
-            
         }
-    ;
     };
 
     const onChange = (e) => {
@@ -151,75 +148,97 @@ function SeatChart(props) {
     }, [reload]);
 
     return (
-        <div className={cx('container')}>
-            <hr className={cx('screen')} />
-            <h6 className={cx('screen-title')}>Màn hình</h6>
-            <div className={cx('container-from')}>
-                <div className={cx('tableleft')}>
-                    <table className="grid">
-                        {showSeat && (
-                            <tbody>
-                                {seatState.seatHeader.map((header, rowIndex) => (
-                                    <tr key={header}>
-                                        <td className="header-cell">{header}</td>
-                                        {seatState.seat[rowIndex].map((seat_no) => {
-                                            const seatClassName = `
-                                            ${
-                                                seatState.normalSeat.indexOf(seat_no) > -1
-                                                    ? 'normal-seat'
-                                                    : seatState.seatUnavailable.indexOf(seat_no) > -1
-                                                    ? 'unavailable'
-                                                    : seatState.vipSeat.indexOf(seat_no) > -1
-                                                    ? 'vip-seat'
-                                                    : 'normal-seatt'
-                                            } protected-element`;
-                                            return (
-                                                <td
-                                                    className={seatClassName}
-                                                    key={seat_no}
-                                                    onClick={() => onClickData(seat_no)}
-                                                >
-                                                    {seat_no}
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        )}
-                    </table>
-                </div>
-                <div className={cx('radiobox')}>
-                    <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
-                        <Radio style={radioStyle} value="unavailable">
-                            <Tag color="#404040">Đã đặt</Tag>
-                        </Radio>
-                        <Radio style={radioStyle} value="vip-seat">
-                            <Tag color="#b7232b">Ghế vip</Tag>
-                        </Radio>
-                        <Radio style={radioStyle} value="normal-seat">
-                            <Tag color="#5b2b9f">Ghế thường</Tag>
-                        </Radio>
-                    </Radio.Group>
-                </div>
-            </div>
-            <div className={cx('color')}>
-                <Space size={[0, 200]} wrap>
-                    <Tag className={cx('tagg')} color="#404040">
-                        Đã đặt
-                    </Tag>
-                    <Tag className={cx('tagg')} color="#208135">
-                        ghế bạn chọn
-                    </Tag>
-                    <Tag className={cx('tagg')} color="#b7232b">
-                        Ghế vip
-                    </Tag>
-                    <Tag className={cx('tagg')} color="#5b2b9f">
-                        Ghế thường
-                    </Tag>
-                </Space>
-            </div>
-        </div>
+        <>
+            <Card className={cx('card')}>
+                <Row>
+                    <Col span={24}>
+                        <hr className={cx('screen')} />
+                        <h6 className={cx('screen-title')}>Màn hình</h6>
+                    </Col>
+                    <Col span={24}>
+                        <Row>
+                            <Col span={18}>
+                                <table className="grid">
+                                    {showSeat && (
+                                        <tbody>
+                                            {seatState.seatHeader.map((header, rowIndex) => (
+                                                <tr key={header}>
+                                                    <td className="header-cell">{header}</td>
+                                                    {seatState.seat[rowIndex].map((seat_no) => {
+                                                        const seatClassName = `
+                                                ${
+                                                    seatState.normalSeat.indexOf(seat_no) > -1
+                                                        ? 'normal-seat'
+                                                        : seatState.seatUnavailable.indexOf(seat_no) > -1
+                                                        ? 'unavailable'
+                                                        : seatState.vipSeat.indexOf(seat_no) > -1
+                                                        ? 'vip-seat'
+                                                        : 'normal-seatt'
+                                                } protected-element`;
+                                                        return (
+                                                            <td
+                                                                className={seatClassName}
+                                                                key={seat_no}
+                                                                onClick={() => onClickData(seat_no)}
+                                                            >
+                                                                {seat_no}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    )}
+                                </table>
+                            </Col>
+                            <Col span={6} className={cx('col-right-radioBox-btn')}>
+                                <Row>
+                                    
+                                    <Col span={24} >
+                                        <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
+                                            <Radio style={radioStyle} value="unavailable">
+                                                <Tag color="#404040">Đã đặt</Tag>
+                                            </Radio>
+                                            <Radio style={radioStyle} value="vip-seat">
+                                                <Tag color="#b7232b">Ghế vip</Tag>
+                                            </Radio>
+                                            <Radio style={radioStyle} value="normal-seat">
+                                                <Tag color="#5b2b9f">Ghế thường</Tag>
+                                            </Radio>
+                                        </Radio.Group>
+                                    </Col>
+                                    <Col span={24} style={{marginTop: 30}} >
+                                        <div className={cx('custom-btn')}>
+                                            <Button className={cx('btn')} type="primary">
+                                                Cập nhật ghế
+                                            </Button>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col span={24}>
+                        <div className={cx('container-tag')}>
+                            <Space size={[0, 200]} wrap>
+                                <Tag className={cx('tagg')} color="#404040">
+                                    Đã đặt
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#208135">
+                                    ghế bạn chọn
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#b7232b">
+                                    Ghế vip
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#5b2b9f">
+                                    Ghế thường
+                                </Tag>
+                            </Space>
+                        </div>
+                    </Col>
+                </Row>
+            </Card>
+        </>
     );
 }
 
