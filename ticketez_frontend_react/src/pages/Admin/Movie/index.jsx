@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Form, Input, Popconfirm, Rate, Row, Select, Space, TimePicker, message } from 'antd';
+import { Button, Col, DatePicker, Form, Input, Popconfirm, Row, Select, Space, TimePicker, message } from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 
 import style from './Movie.module.scss';
@@ -11,13 +11,14 @@ import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
-import { movieApi } from '~/api/admin';
+import { movieApi, movieStudioApi } from '~/api/admin';
 import '~/scss/_global.scss';
 import moment from 'moment';
 
 const cx = classNames.bind(style);
 
 function AdminMovie() {
+    const formatDate = 'DD-MM-YYYY';
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
@@ -49,8 +50,11 @@ function AdminMovie() {
                 form.resetFields();
                 message.success('thêm thành công');
             } else {
-                const resp = await axiosClient.put(`movie/${dataEdit.id}`, {
+                const resp = await movieApi.update(dataEdit.id, {
                     ...values,
+                    releaseDate: moment(values.releaseDate).format('YYYY-MM-DD'),
+                    duration: moment(values.duration).format('HH:mm:ss'),
+                    rating: dataEdit.rating,
                     id: dataEdit.id,
                 });
                 setLoadingButton(false);
@@ -79,11 +83,16 @@ function AdminMovie() {
             setDataEdit(null);
         }
     };
-    const handleEditData = (record) => {
+    const handleEditData = async (id) => {
+        const resp = await movieApi.getById(id);
+        let data = resp.data;
         setIsModalOpen(true);
-        setDataEdit(record);
+        setDataEdit(data);
+        console.log(data);
         form.setFieldsValue({
-            ...record,
+            ...data,
+            releaseDate: moment(data.releaseDate, 'DD-MM-YYYY'),
+            duration: moment(data.duration, 'HH:mm:ss'),
         });
     };
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -114,10 +123,18 @@ function AdminMovie() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resp = await movieApi.getByPage(currentPage, pageSize);
-                console.log(resp);
-                setList(resp.data);
-                setTotalItems(resp.totalItem);
+                const [movieData, movieStudioData] = await Promise.all([
+                    movieApi.getByPage(currentPage, pageSize),
+                    // movieStudioApi.get(),
+                ]);
+                // console.log(movieData);
+                console.log(movieStudioData.data);
+                const formatData = movieData.data.map((item) => ({
+                    ...item,
+                    releaseDate: moment(item.releaseDate, formatDate).format(formatDate),
+                }));
+                setList(formatData);
+                setTotalItems(movieData.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
@@ -241,45 +258,45 @@ function AdminMovie() {
             title: 'Thời lượng',
             dataIndex: 'duration',
             key: 'duration',
-            ...getColumnSearchProps('duration'),
+            // ...getColumnSearchProps('duration'),
         },
         {
             title: 'Ngày phát hành',
             dataIndex: 'releaseDate',
             key: 'releaseDate',
-            ...getColumnSearchProps('releaseDate'),
-            render: (_, record) => {
-                const formattedDate = moment(record.releaseDate).format('DD-MM-YYYY');
-                return <span>{formattedDate}</span>;
-            },
+            // render: (_, record) => {
+            //     const formattedDate = moment(record.releaseDate).format('DD-MM-YYYY');
+            //     return <span>{formattedDate}</span>;
+            // },
         },
         {
             title: 'Quốc gia',
             dataIndex: 'country',
             key: 'country',
+            ...getColumnSearchProps('country'),
         },
         {
             title: 'Đánh giá',
             dataIndex: 'rating',
             key: 'rating',
-            render: (_, record) => <Rate disabled value={record.rating} />,
         },
 
         {
             title: 'Thao tác',
-            key: 'description',
-            render: (_, record) => (
+            dataIndex: 'id',
+            key: 'id',
+            render: (id) => (
                 <Space size="middle">
                     <FontAwesomeIcon
                         icon={solidIcons.faPen}
-                        onClick={() => handleEditData(record)}
+                        onClick={() => handleEditData(id)}
                         className={cx('icon-pen')}
                     />
                     <Popconfirm
                         title="Bạn có chắc"
                         description="Muốn xoá hay không?"
                         okText="Yes"
-                        onConfirm={() => handleDelete(record)}
+                        onConfirm={() => handleDelete(id)}
                         cancelText="No"
                     >
                         <FontAwesomeIcon icon={solidIcons.faTrash} className={cx('icon-trash')} />
@@ -366,17 +383,21 @@ function AdminMovie() {
                 onOk={handleOk}
                 onCancel={handleCancelModal}
                 footer={[
-                    <Button key="back" onClick={handleCancelModal}>
-                        Thoát
-                    </Button>,
-                    !dataEdit && (
-                        <Button key="reset" onClick={handleResetForm}>
-                            Làm mới
+                    <div className={cx('wrapp-btn-modal')}>
+                        <Button key="back" onClick={handleCancelModal}>
+                            Thoát
                         </Button>
-                    ),
-                    <Button key="submit" type="primary" loading={loadingButton} onClick={handleOk}>
-                        {dataEdit ? 'Cập nhật' : 'Thêm'}
-                    </Button>,
+
+                        {!dataEdit && (
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        )}
+
+                        <Button key="submit" type="primary" loading={loadingButton} onClick={handleOk}>
+                            {dataEdit ? 'Cập nhật' : 'Thêm'}
+                        </Button>
+                    </div>,
                 ]}
             >
                 <Form
@@ -402,21 +423,46 @@ function AdminMovie() {
                     >
                         <Input />
                     </Form.Item>
-                    <Form.Item name="time-picker" label="Thời lượng" {...config}>
+                    <Form.Item name="duration" label="Thời lượng" {...config}>
                         <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
                     </Form.Item>
-                    <Form.Item name="date-time-picker" label="Ngày phát hành" {...config}>
-                        <DatePicker placeholder="Chọn ngày phát hành" format="YYYY-MM-DD" />
+                    {dataEdit && (
+                        <Form.Item
+                            label="Đánh giá"
+                            name="rating"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập tên phim!',
+                                },
+                            ]}
+                        >
+                            <Input disabled />
+                        </Form.Item>
+                    )}
+                    <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
+                        <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
                     </Form.Item>
-                    <Form.Item name="ss" label="Quốc tịch" rules={[{ required: true }]}>
+                    <Form.Item name="country" label="Quốc gia" rules={[{ required: true }]}>
                         <Select
-                            placeholder="Chọn quốc tịch ở bên dưới"
+                            placeholder="Chọn quốc gia ở bên dưới"
                             // onChange={onGenderChange}
                             allowClear
                         >
                             <Select.Option value="VN">sss Nam</Select.Option>
                             <Select.Option value="EN">sssAnh</Select.Option>
                             <Select.Option value="IDA">Ấn Độ</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="movieStudio" label="hãng phim" rules={[{ required: true }]}>
+                        <Select
+                            placeholder="Chọn quốc gia ở bên dưới"
+                            // onChange={onGenderChange}
+                            allowClear
+                        >
+                            {/* <Select.Option value="VN">sss Nam</Select.Option>
+                            <Select.Option value="EN">sssAnh</Select.Option>
+                            <Select.Option value="IDA">Ấn Độ</Select.Option> */}
                         </Select>
                     </Form.Item>
                     <Form.Item
@@ -433,7 +479,8 @@ function AdminMovie() {
                     </Form.Item>
                     <Form.Item name="country" label="Quốc tịch" rules={[{ required: true }]}>
                         <Select
-                            placeholder="Chọn quốc tịch ở bên dưới"
+                            placeholder="Chọn quốc gia
+                                ở bên dưới"
                             // onChange={onGenderChange}
                             allowClear
                         >
