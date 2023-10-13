@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.actor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ActorAPI {
     ActorDAO actorDAO;
 
     @GetMapping
-    public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
+    public ResponseEntity<?> findByPage(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
         try {
 
@@ -48,15 +49,21 @@ public class ActorAPI {
             responseDTO.setTotalPages(page.getTotalPages());
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
-           return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Actor>> findAll() {
+        List<Actor> actors = actorDAO.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(actors);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {
             if (!actorDAO.existsById(id)) {
-               return new ResponseEntity<>("Không tìm thấy diễn viên", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("Không tìm thấy diễn viên", HttpStatus.NOT_FOUND);
             }
             return ResponseEntity.ok(actorDAO.findById(id).get());
         } catch (Exception e) {
@@ -88,7 +95,6 @@ public class ActorAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
