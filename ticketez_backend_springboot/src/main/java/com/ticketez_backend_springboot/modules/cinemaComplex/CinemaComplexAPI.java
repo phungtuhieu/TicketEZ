@@ -54,7 +54,7 @@ public class CinemaComplexAPI {
         }
     }
 
-      @GetMapping("/get-all")
+      @GetMapping("/getAll")
     public ResponseEntity<List<CinemaComplex>> findAll() {
         List<CinemaComplex> seats = cinemaComplexDao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(seats);

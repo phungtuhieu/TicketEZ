@@ -90,7 +90,7 @@ const AdminShowtime = () => {
             const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.get()]);
             console.log('movie', movie);
             console.log('cinema', cinema);
-            setSelectMovie(movie.data.data);
+            setSelectMovie(movie.data);
             setSelectCinema(cinema.data.data );
         };
 
@@ -285,9 +285,9 @@ const AdminShowtime = () => {
             }
         } catch (error) {
             console.log(error);
-            if (error.response.status === 409) {
-                funcUtils.notify(error.response.data, 'error');
-            }
+            // if (error.response.status === 409) {
+            //     funcUtils.notify(error.response.data, 'error');
+            // }
         }
 
         setWorkSomeThing(!workSomeThing);

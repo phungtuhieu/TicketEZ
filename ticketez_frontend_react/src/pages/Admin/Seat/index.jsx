@@ -30,7 +30,8 @@ function AdminSeat() {
 
 
     const fetchDataCinemaComplex = async () => {
-        const cinemaComplexApi = new BaseApi('cinemaComplex/get-all');
+        const cinemaComplexApi = new BaseApi('cinemaComplex');
+        
         try {
             const resp = await cinemaComplexApi.getAll()
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API

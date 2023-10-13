@@ -117,7 +117,7 @@ const AdminAccount = () => {
             title: 'Hoạt động',
             dataIndex: 'active',
             render: (_, record) => {
-                const statusText = record.active ? 'sống' : 'chết ';
+                const statusText = record.active ? 'Hoạt động' : 'Khoá ';
                 const tagColor = record.active ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
