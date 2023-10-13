@@ -13,10 +13,14 @@ const cinemaTypeApi = {
         return axiosClient.get(url);
     },
     post: async (data) => {
-        return axiosClient.post(url, data);
+        const values = { ...data};
+        console.log('values', values);
+        return axiosClient.post(url, values);
     },
-    put: async(id, data) => {
-        return axiosClient.put(url + '/' + id, data);
+    put: async (id, data) => {
+        
+        const values = { id: id, ...data };
+        return axiosClient.put(url + '/' + id, values);
     },
     delete: async (cinemaTypeId) => {
         return axiosClient.delete(url + '/' + cinemaTypeId);
