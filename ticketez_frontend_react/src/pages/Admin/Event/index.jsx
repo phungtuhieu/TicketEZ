@@ -31,6 +31,10 @@ import CustomCKEditor from '~/pages/Templates/Ckeditor';
 import { eventApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
@@ -211,13 +215,14 @@ const AdminShowtime = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'status',
+            align: 'center',
             render: (_, record) => {
                 const statusText = record.status === true ? 'Hoạt động' : 'Kết thúc';
                 const tagColor = record.status === true ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
-            onFilter: (value, record) => record.status === (value === 'true'), // Assuming 'value' is a string like 'true' or 'false'
+            onFilter: (value, record) => record.status === (value === 'true'),
             filters: [
                 { text: 'Hoạt động', value: 'true' },
                 { text: 'Kết thúc', value: 'false' },
@@ -265,27 +270,27 @@ const AdminShowtime = () => {
     };
 
     const handleDelete = async (record) => {
-      try {
-          const res = await eventApi.delete(record.id);
-          console.log(res);
-          if (res.status === 200) {
-            if(fileList.length > 0) {
-                await uploadApi.deleteUpload(record.banner);
+        try {
+            const res = await eventApi.delete(record.id);
+            console.log(res);
+            if (res.status === 200) {
+                if (fileList.length > 0) {
+                    await uploadApi.deleteUpload(record.banner);
+                }
+                funcUtils.notify(res.data, 'success');
             }
-              funcUtils.notify(res.data, 'success');
-          }
-      } catch (error) {
-          console.log(error);
-          if (error.response.status === 409) {
-              funcUtils.notify(error.response.data, 'error');
-          }
-      }
-      setWorkSomeThing(!workSomeThing);
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 409) {
+                funcUtils.notify(error.response.data, 'error');
+            }
+        }
+        setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startDate ? moment(record.startDate) : null;
-        const formattedEndTime = record.endDate ? moment(record.endDate) : null;
+        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD HH:mm:ss');
 
         const newUploadFile = {
             uid: record.id.toString(),
@@ -341,7 +346,7 @@ const AdminShowtime = () => {
                     }
 
                     try {
-                        const resPut = await eventApi.put(putData.id, putData , putData.cinemaComplex);
+                        const resPut = await eventApi.put(putData.id, putData, putData.cinemaComplex);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật sự kiện thành công', 'success');
                         }
@@ -351,7 +356,7 @@ const AdminShowtime = () => {
                         }
                         console.log(error);
                     }
-                      setWorkSomeThing(!workSomeThing);
+                    setWorkSomeThing(!workSomeThing);
                 } else {
                     try {
                         const file = values.banner.fileList[0].originFileObj;
@@ -410,10 +415,10 @@ const AdminShowtime = () => {
         setFileList([]);
         console.log(form);
     };
-        const handlePageChange = (page, pageSize) => {
-            setCurrentPage(page);
-            setPageSize(pageSize);
-        };
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
     const [selectCinemaComplex, setSelectCinemaComplex] = useState();
     const apiSelectCinemaComplex = async () => {
         try {
@@ -594,7 +599,7 @@ const AdminShowtime = () => {
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
-                                format="YYYY-MM-DD HH:mm:ss"
+                                format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
                             />
@@ -636,9 +641,6 @@ const AdminShowtime = () => {
             <BaseTable
                 pagination={false}
                 columns={columns}
-                onClick={() => {
-                    handleDelete();
-                }}
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
