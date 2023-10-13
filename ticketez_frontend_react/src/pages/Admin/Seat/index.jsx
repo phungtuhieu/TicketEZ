@@ -2,7 +2,7 @@ import MySelect from '~/components/Admin/SelectSeach';
 import classNames from 'classnames/bind';
 import style from './Seat.module.scss';
 import { useState, useEffect } from 'react';
-import SeatChart from './SeatChart';
+import SeatChart from '~/pages/Admin/Seat/SeatChart';
 import { Card, Breadcrumb, Select, Col, Row, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import BaseApi from '~/api/global/baseApi'

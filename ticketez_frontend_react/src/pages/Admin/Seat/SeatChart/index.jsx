@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Divider, Space, Tag, Radio, Col, Row, Card } from 'antd';
 import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
+// import '~/pages/User/Booking/SeatChart/chart.scss'
 import FormOption from '../FormOption';
 import RRadioBox from '../RadioBox';
 import axiosClient from '~/api/global/axiosClient';
