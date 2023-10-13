@@ -223,7 +223,9 @@ const AdminMpaaRating = () => {
         try {
             const res = await mpaaRatingApi.delete(record.id);
             if (res.status === 200) {
-                await uploadApi.deleteUpload(record.icon);
+                 if (fileList.length > 0) {
+                     await uploadApi.deleteUpload(record.icon);
+                 }
                 funcUtils.notify(res.data, 'success');
             }
         } catch (error) {

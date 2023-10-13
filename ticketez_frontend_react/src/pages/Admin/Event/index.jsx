@@ -31,6 +31,10 @@ import CustomCKEditor from '~/pages/Templates/Ckeditor';
 import { eventApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
@@ -285,8 +289,8 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startDate ? moment(record.startDate) : null;
-        const formattedEndTime = record.endDate ? moment(record.endDate) : null;
+        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD HH:mm:ss');
 
         const newUploadFile = {
             uid: record.id.toString(),
@@ -595,7 +599,7 @@ const AdminShowtime = () => {
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
-                                format="YYYY-MM-DD HH:mm:ss"
+                                format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
                             />

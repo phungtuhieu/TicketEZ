@@ -25,7 +25,12 @@ import style from './Showtime.module.scss';
 import moment from 'moment';
 import { showtimeApi, cinemaApi, movieApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 const { RangePicker } = DatePicker;
+
 
 const cx = classNames.bind(style);
 
@@ -87,7 +92,7 @@ const AdminShowtime = () => {
             console.log('cinema', cinema);
 
             setSelectMovie(movie.data.data);
-            setSelectCinema(cinema.data.data);
+            setSelectCinema(cinema.data.data );
         };
 
         selectMovie();
@@ -290,8 +295,8 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startTime ? moment(record.startTime) : null;
-        const formattedEndTime = record.endTime ? moment(record.endTime) : null;
+        const formattedStartTime = dayjs(record.startTime, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.endTime, 'YYYY-MM-DD HH:mm:ss');
 
         form.setFieldsValue({
             status: record.status === 1,
@@ -422,7 +427,7 @@ const AdminShowtime = () => {
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
-                                format="YYYY-MM-DD HH:mm:ss"
+                                format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
                             />
