@@ -44,7 +44,7 @@ const AdminMpaaRating = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await mpaaRatingApi.getPage(currentPage, pageSize);
+                const res = await mpaaRatingApi.getByPage(currentPage, pageSize);
                 setPosts(res.data);
                 setTotalItems(res.totalItems);
                 setLoading(false);
@@ -223,7 +223,9 @@ const AdminMpaaRating = () => {
         try {
             const res = await mpaaRatingApi.delete(record.id);
             if (res.status === 200) {
-                await uploadApi.deleteUpload(record.icon);
+                 if (fileList.length > 0) {
+                     await uploadApi.delete(record.icon);
+                 }
                 funcUtils.notify(res.data, 'success');
             }
         } catch (error) {
@@ -262,7 +264,7 @@ const AdminMpaaRating = () => {
                     };
                     if (putData.icon.file) {
                         const file = putData.icon.fileList[0].originFileObj;
-                        const images = await uploadApi.putUpload(editData.icon, file);
+                        const images = await uploadApi.put(editData.icon, file);
                         putData = {
                             ...putData,
                             icon: images,
@@ -270,9 +272,9 @@ const AdminMpaaRating = () => {
                     }
 
                     try {
-                        const resPut = await mpaaRatingApi.put(putData.id, putData);
+                        const resPut = await mpaaRatingApi.update(putData.id, putData);
                         if (resPut.status === 200) {
-                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                            funcUtils.notify('Cập nhật phân loại thành công', 'success');
                         }
                     } catch (error) {
                         if (error.status === 500) {
@@ -283,16 +285,16 @@ const AdminMpaaRating = () => {
                 } else {
                     try {
                         const file = values.icon.fileList[0].originFileObj;
-                        const images = await uploadApi.postUpload(file);
+                        const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
                             icon: images,
                         };
                         console.log(postData);
-                        const resPost = await mpaaRatingApi.post(postData);
+                        const resPost = await mpaaRatingApi.create(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
-                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                            funcUtils.notify('Thêm phân loại thành công', 'success');
                         }
                     } catch (error) {
                         if (error.status === 500) {

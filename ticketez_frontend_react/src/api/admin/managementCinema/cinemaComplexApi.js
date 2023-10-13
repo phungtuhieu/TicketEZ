@@ -1,4 +1,5 @@
 import axiosClient from '../../global/axiosClient';
+import provinceApi from './provinceApi';
 
 const url = 'cinemaComplex';
 
@@ -18,11 +19,21 @@ const cinemaComplexApi = {
     get: async () => {
         return axiosClient.get(url);
     },
-    post: async (data) => {
-        return axiosClient.post(url, data);
+    post: async (data, provinceId) => {
+        const [province] = await Promise.all([
+            provinceApi.getId(provinceId),
+           
+        ]);
+        const values = { ...data, province: province.data};
+        console.log('values', values);
+        return axiosClient.post(url, values);
     },
-    put: async (id, data) => {
-        return axiosClient.put(url + '/' + id, data);
+    put: async (id, data, provinceId) => {
+        const [province] = await Promise.all([
+            provinceApi.getId(provinceId),
+        ]);
+        const values = { id: id, ...data, province:  province.data};
+        return axiosClient.put(url + '/' + id, values);
     },
     delete: async (cinemaComplexId) => {
         return axiosClient.delete(url + '/' + cinemaComplexId);

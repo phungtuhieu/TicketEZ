@@ -22,7 +22,6 @@ const items = [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
         getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
         getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
-        getItem(<Link to="/admin/province">Tỉnh</Link>, 'province'),
     ]),
 
     // Quản lý rạp phim
@@ -30,7 +29,7 @@ const items = [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
         getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
-        getItem(<Link to="/admin/actor">Tác giả</Link>, 'actor', null),
+        getItem(<Link to="/admin/actor">Diễn viên</Link>, 'actor', null),
         getItem(<Link to="/admin/director">Đạo diễn</Link>, 'director', null),
         getItem(<Link to="/admin/mpaaRating">Phân loại</Link>, 'mpaaRating'),
         getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),

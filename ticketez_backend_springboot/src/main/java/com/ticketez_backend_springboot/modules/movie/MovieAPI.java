@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.movie;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,14 @@ public class MovieAPI {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+     @GetMapping("/getAll")
+    public ResponseEntity<List<Movie>> findAll() {
+        List<Movie> movies = dao.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(movies);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> findById(@PathVariable("id") Long id) {

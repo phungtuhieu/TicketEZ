@@ -64,7 +64,7 @@ const AdminCinema = () => {
                 const res = await cinemaApi.getPage(currentPage, pageSize);
                 const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
                 setCinemaType(cinemaType.data);
-                setCinemaComplex(cinemaComplex.data);
+                setCinemaComplex(cinemaComplex.data.data);
                 //    const resType = await cinemaTypeApi.getCinemaType();
                 console.log(res);
                 //    console.log(resType);

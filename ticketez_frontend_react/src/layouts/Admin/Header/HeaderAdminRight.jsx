@@ -107,7 +107,10 @@ function HeaderAdminRight() {
                             pointAtCenter: true,
                         }}
                     >
-                        <FontAwesomeIcon icon={faBell} className={cx('icon-item-hearder-right')} />
+                        <FontAwesomeIcon
+                            icon={faBell}
+                            className={cx('icon-item-hearder-right')}
+                        />
                     </Dropdown>
 
                     <Dropdown
@@ -117,7 +120,10 @@ function HeaderAdminRight() {
                             pointAtCenter: true,
                         }}
                     >
-                        <FontAwesomeIcon icon={faGear} className={cx('icon-item-hearder-right')} />
+                        <FontAwesomeIcon
+                            icon={faGear}
+                            className={cx('icon-item-hearder-right')}
+                        />
                     </Dropdown>
                 </Col>
             </Row>

@@ -300,6 +300,7 @@ function AdminMovieStudio() {
                 </Col>
             </Row>
             <BaseModal
+                maskClosable={false}
                 forceRender
                 className={cx('modal-form')}
                 open={isModalOpen}

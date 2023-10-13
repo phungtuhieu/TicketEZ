@@ -10,7 +10,7 @@ const BaseModal = ({ size = 'medium', children, ...props }) => {
     const modalSize = Object.entries(modalSizes).find((sz) => sz[0] === size)?.[1];
 
     return (
-        <Modal getContainer={false}  width={modalSize} className={cx('modal')} {...props}>
+        <Modal getContainer={false} forceRender maskClosable={false}  width={modalSize} className={cx('modal')} {...props}>
             {children}
         </Modal>
     );
