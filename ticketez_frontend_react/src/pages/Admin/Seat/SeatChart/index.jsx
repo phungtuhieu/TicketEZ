@@ -138,9 +138,11 @@ function SeatChart(props) {
             });
             
         }
-    ;
     };
 
+    const handelUpdate   = () => {
+        setShowSeat(false);
+    };
     const onChange = (e) => {
         console.log('radio checked', e.target.value);
         setSelectedSeatType(e.target.value);
