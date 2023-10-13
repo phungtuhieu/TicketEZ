@@ -82,12 +82,12 @@ const AdminShowtime = () => {
     //load dữ liệu của selectAPi từ Cinema và Movie
     useEffect(() => {
         const selectMovie = async () => {
-            const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.getAll()]);
+            const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.get()]);
             console.log('movie', movie);
             console.log('cinema', cinema);
 
             setSelectMovie(movie.data.data);
-            setSelectCinema(cinema.data);
+            setSelectCinema(cinema.data.data);
         };
 
         selectMovie();
