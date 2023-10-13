@@ -54,6 +54,9 @@ public class CinemaAPI {
         }
     }
 
+
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {
@@ -66,6 +69,21 @@ public class CinemaAPI {
         }
 
     }
+
+    
+    @GetMapping("by-cinema-complex/{idCinemacomplex}")
+    public ResponseEntity<?> findCinemaByCinemaComplex(@PathVariable("idCinemacomplex") Long id) {
+        try {
+            if (!cinemaDAO.existsById(id)) {
+                return new ResponseEntity<>("Không tìm thấy rạp", HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(cinemaDAO.findByCinemaComplexId(id));
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 
     @PostMapping
     public ResponseEntity<?> post(@RequestBody Cinema cinema) {
