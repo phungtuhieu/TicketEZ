@@ -31,7 +31,6 @@ dayjs.extend(customParseFormat);
 
 const { RangePicker } = DatePicker;
 
-
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -91,13 +90,13 @@ const AdminShowtime = () => {
             console.log('movie', movie);
             console.log('cinema', cinema);
             setSelectMovie(movie.data);
-            setSelectCinema(cinema.data.data );
+            setSelectCinema(cinema.data.data);
         };
 
         selectMovie();
     }, []);
 
-   // xử lý tìm kiếm
+    // xử lý tìm kiếm
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
@@ -109,86 +108,86 @@ const AdminShowtime = () => {
         setSearchText('');
     };
 
-   const getColumnSearchProps = (dataIndex) => ({
-       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-           <div
-               style={{
-                   padding: 8,
-               }}
-               onKeyDown={(e) => e.stopPropagation()}
-           >
-               <Input
-                   ref={searchInput}
-                   placeholder={`Nhập để tìm`}
-                   value={selectedKeys[0]}
-                   onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                   onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                   style={{
-                       marginBottom: 8,
-                       display: 'block',
-                   }}
-               />
-               <Space>
-                   <Button
-                       type="primary"
-                       onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                       icon={<SearchOutlined />}
-                       size="small"
-                       style={{
-                           width: 90,
-                       }}
-                   >
-                       Tìm
-                   </Button>
-                   <Button
-                       onClick={() => clearFilters && handleReset(clearFilters)}
-                       size="small"
-                       style={{
-                           width: 90,
-                       }}
-                   >
-                       làm mới
-                   </Button>
-                   <Button
-                       type="link"
-                       size="small"
-                       onClick={() => {
-                           close();
-                       }}
-                   >
-                       thoát
-                   </Button>
-               </Space>
-           </div>
-       ),
-       filterIcon: (filtered) => (
-           <SearchOutlined
-               style={{
-                   color: filtered ? '#1677ff' : undefined,
-               }}
-           />
-       ),
-       onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-       onFilterDropdownOpenChange: (visible) => {
-           if (visible) {
-               setTimeout(() => searchInput.current?.select(), 100);
-           }
-       },
-       render: (text, record) =>
-           searchedColumn === dataIndex ? (
-               <Highlighter
-                   highlightStyle={{
-                       backgroundColor: '#ffc069',
-                       padding: 0,
-                   }}
-                   searchWords={[searchText]}
-                   autoEscape
-                   textToHighlight={text ? text.toString() : ''}
-               />
-           ) : (
-               text
-           ),
-   });
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Nhập để tìm`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Tìm
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        làm mới
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        thoát
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text, record) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     const columns = [
         {
@@ -221,7 +220,7 @@ const AdminShowtime = () => {
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
-            onFilter: (value, record) => record.status.toString().indexOf(value) === 0,// Assuming 'value' is a string like 'true' or 'false'
+            onFilter: (value, record) => record.status.toString().indexOf(value) === 0, // Assuming 'value' is a string like 'true' or 'false'
             filters: [
                 { text: 'Hoạt động', value: 1 },
                 { text: 'Kết thúc', value: 0 },
@@ -327,19 +326,19 @@ const AdminShowtime = () => {
             if (editData) {
                 const resp = await showtimeApi.put(editData.id, values, values.movie, values.cinema);
                 console.log(resp);
-                funcUtils.notify("Cập nhật thành công", 'success');
+                funcUtils.notify('Cập nhật thành công', 'success');
                 //  message.success('Cập nhật thành công');
             }
             if (!editData) {
                 try {
                     console.log(values);
                     const resp = await showtimeApi.post(values, values.movie, values.cinema);
-                    if(resp.status === 200) {
-                       funcUtils.notify("Thêm thành công", 'success');
+                    if (resp.status === 200) {
+                        funcUtils.notify('Thêm thành công', 'success');
                     }
                 } catch (error) {
                     console.log(error);
-                      funcUtils.notify(error.response.data, 'error');
+                    funcUtils.notify(error.response.data, 'error');
                 }
             }
             setOpen(false);
@@ -365,7 +364,6 @@ const AdminShowtime = () => {
             },
         ],
     };
-
 
     //phân trang
     const handlePageChange = (page, pageSize) => {
@@ -490,7 +488,7 @@ const AdminShowtime = () => {
             />
             <div className={cx('wrapp-pagination')}>
                 <Pagination
-                    style={{float: 'right', marginTop: '10px'}}
+                    style={{ float: 'right', marginTop: '10px' }}
                     showSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}
