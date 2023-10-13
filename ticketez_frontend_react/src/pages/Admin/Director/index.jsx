@@ -136,7 +136,6 @@ const AdminDirector = () => {
             }
         } catch (error) {
             console.log(error);
-            funcUtils.notify(error.response.data, 'error');
         }
 
         setWorkSomeThing(!workSomeThing);
