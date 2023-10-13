@@ -90,7 +90,6 @@ const AdminShowtime = () => {
             const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.get()]);
             console.log('movie', movie);
             console.log('cinema', cinema);
-
             setSelectMovie(movie.data.data);
             setSelectCinema(cinema.data.data );
         };
@@ -328,16 +327,19 @@ const AdminShowtime = () => {
             if (editData) {
                 const resp = await showtimeApi.put(editData.id, values, values.movie, values.cinema);
                 console.log(resp);
-                funcUtils.notify(resp.data, 'success');
-                 message.success('Cập nhật thành công');
+                funcUtils.notify("Cập nhật thành công", 'success');
+                //  message.success('Cập nhật thành công');
             }
             if (!editData) {
                 try {
                     console.log(values);
                     const resp = await showtimeApi.post(values, values.movie, values.cinema);
-                    message.success('Thêm thành công');
+                    if(resp.status === 200) {
+                       funcUtils.notify("Thêm thành công", 'success');
+                    }
                 } catch (error) {
                     console.log(error);
+                      funcUtils.notify(error.response.data, 'error');
                 }
             }
             setOpen(false);

@@ -338,7 +338,7 @@ const AdminShowtime = () => {
                     console.log(putData);
                     if (putData.banner.file) {
                         const file = putData.banner.fileList[0].originFileObj;
-                        const images = await uploadApi.putUpload(editData.banner, file);
+                        const images = await uploadApi.put(editData.banner, file);
                         putData = {
                             ...putData,
                             banner: images,
@@ -360,7 +360,7 @@ const AdminShowtime = () => {
                 } else {
                     try {
                         const file = values.banner.fileList[0].originFileObj;
-                        const images = await uploadApi.postUpload(file);
+                        const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
                             startDate: new Date(dataStartTime),

@@ -136,7 +136,7 @@ const AdminIndex = () => {
             {/* 4 card thống kê  */}
             <Row gutter={24} className={cx('body')}>
                 <Col xs={24} lg={6}>
-                    <Card bordered={false} className={cx('card-top')}>
+                    <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
                                 <span className={cx('title-card-top')}>Today's Moneys</span>
@@ -226,7 +226,7 @@ const AdminIndex = () => {
             </Row>
             <Row gutter={24}>
                 <Col xs={24} lg={16}>
-                    <Card bordered={false} className={cx('card-top')}>
+                    <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <div id="chart">
                             <span>
                                 <span className={cx('money-card-top')}>Biểu đồ thống kê doanh thu</span>
@@ -268,7 +268,7 @@ const AdminIndex = () => {
             </Row>
             <Row gutter={24}>
                 <Col xs={24} lg={24}>
-                    <Card bordered={false} className={cx('card-chart-donut')}>
+                    <Card bordered={false} className={cx('card-chart-donut')} style={{ marginLeft: '-13px' }}>
                         <div>
                             <span>
                                 <span className={cx('money-card-top')}>Biểu đồ thống kê số lượng vé</span>
