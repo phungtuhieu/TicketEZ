@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Pagination } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,6 +15,10 @@ import uploadApi from '~/api/service/uploadApi';
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -47,7 +50,7 @@ const AdminActor = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await actorApi.getPage(currentPage, pageSize);
+                const res = await actorApi.getByPage(currentPage, pageSize);
                 console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
@@ -247,18 +250,13 @@ const AdminActor = () => {
                 funcUtils.notify('Xoá thành công', 'success');
             }
         } catch (error) {
-            if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
-            } else {
                 console.log(error);
-            }
         }
 
         setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        const formatDate = moment(record.birthday, 'YYYY-MM-DD');
         const newUploadFile = {
             uid: record.id.toString(),
             name: record.avatar,
@@ -270,7 +268,7 @@ const AdminActor = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            birthday: formatDate,
+            birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
 
@@ -296,7 +294,7 @@ const AdminActor = () => {
                         };
                     }
                     try {
-                        const resPut = await actorApi.put(putData.id, putData);
+                        const resPut = await actorApi.update(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật diễn viên thành công', 'success');
@@ -318,7 +316,7 @@ const AdminActor = () => {
                             avatar: images,
                         };
                         console.log(postData);
-                        const resPost = await actorApi.post(postData);
+                        const resPost = await actorApi.create(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm diễn viên thành công', 'success');

@@ -36,6 +36,14 @@ public class AccountAPI {
     @Autowired
     AccountDAO accountDAO;
 
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Account>> findAll() {
+        List<Account> accounts = accountDAO.findAllByOrderByPhoneDesc();
+        return ResponseEntity.ok(accounts);
+    }
+
+
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit,
@@ -58,6 +66,8 @@ public class AccountAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    
 
     @GetMapping("/{phone}")
     public ResponseEntity<?> findById(@PathVariable("phone") String phone) {

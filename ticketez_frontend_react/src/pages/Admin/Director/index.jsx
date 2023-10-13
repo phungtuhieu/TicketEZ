@@ -1,8 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Pagination } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,12 +8,16 @@ import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
 
-import {  directorApi } from '~/api/admin';
+import { directorApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 
 import classNames from 'classnames/bind';
 import style from './Director.module.scss';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
 const formItemLayout = {
@@ -24,10 +26,6 @@ const formItemLayout = {
 };
 
 const AdminDirector = () => {
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
-
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -47,7 +45,7 @@ const AdminDirector = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await directorApi.get(currentPage, pageSize);
+                const res = await directorApi.getByPage(currentPage, pageSize);
                 console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
@@ -58,111 +56,6 @@ const AdminDirector = () => {
         };
         getList();
     }, [currentPage, pageSize, workSomeThing]);
-
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText('');
-    };
-
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Tìm kiếm ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: 'block',
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Tìm
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        mới
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Lọc
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        Đóng
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? '#1677ff' : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownOpenChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
-        },
-        render: (text, record) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: '#ffc069',
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
-    });
 
     const columns = [
         {
@@ -175,7 +68,6 @@ const AdminDirector = () => {
             title: 'Họ và tên',
             dataIndex: 'fullname',
             width: '30%',
-            ...getColumnSearchProps('fullname'),
         },
         {
             title: 'Ngày sinh',
@@ -240,18 +132,16 @@ const AdminDirector = () => {
             console.log(res);
             if (res.status === 200) {
                 await uploadApi.delete(record.avatar);
-                funcUtils.notify("Xoá thành công", 'success');
+                funcUtils.notify('Xoá thành công', 'success');
             }
         } catch (error) {
             console.log(error);
-            funcUtils.notify(error.response.data, 'error');
         }
 
         setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        const formatDate = moment(record.birthday, 'YYYY-MM-DD');
         const newUploadFile = {
             uid: record.id.toString(),
             name: record.avatar,
@@ -263,7 +153,7 @@ const AdminDirector = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            birthday: formatDate,
+            birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
 
@@ -287,7 +177,7 @@ const AdminDirector = () => {
                     }
 
                     try {
-                        const resPut = await directorApi.put(putData.id, putData);
+                        const resPut = await directorApi.update(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật đạo diễn thành công', 'success');
@@ -306,7 +196,7 @@ const AdminDirector = () => {
                             avatar: images,
                         };
                         console.log(postData);
-                        const resPost = await directorApi.post(postData);
+                        const resPost = await directorApi.create(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm đạo diễn thành công', 'success');
@@ -441,7 +331,6 @@ const AdminDirector = () => {
             <BaseTable
                 pagination={false}
                 columns={columns}
-                
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
@@ -452,7 +341,7 @@ const AdminDirector = () => {
                 }))}
             />
             <div className={cx('wrapp-pagination')}>
-            <PaginationCustom 
+                <PaginationCustom
                     howSizeChanger={false}
                     current={currentPage}
                     pageSize={pageSize}

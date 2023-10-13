@@ -25,7 +25,12 @@ import style from './Showtime.module.scss';
 import moment from 'moment';
 import { showtimeApi, cinemaApi, movieApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 const { RangePicker } = DatePicker;
+
 
 const cx = classNames.bind(style);
 
@@ -82,12 +87,11 @@ const AdminShowtime = () => {
     //load dữ liệu của selectAPi từ Cinema và Movie
     useEffect(() => {
         const selectMovie = async () => {
-            const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.getAll()]);
+            const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.get()]);
             console.log('movie', movie);
             console.log('cinema', cinema);
-
-            setSelectMovie(movie.data.data);
-            setSelectCinema(cinema.data);
+            setSelectMovie(movie.data);
+            setSelectCinema(cinema.data.data );
         };
 
         selectMovie();
@@ -281,17 +285,17 @@ const AdminShowtime = () => {
             }
         } catch (error) {
             console.log(error);
-            if (error.response.status === 409) {
-                funcUtils.notify(error.response.data, 'error');
-            }
+            // if (error.response.status === 409) {
+            //     funcUtils.notify(error.response.data, 'error');
+            // }
         }
 
         setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = record.startTime ? moment(record.startTime) : null;
-        const formattedEndTime = record.endTime ? moment(record.endTime) : null;
+        const formattedStartTime = dayjs(record.startTime, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.endTime, 'YYYY-MM-DD HH:mm:ss');
 
         form.setFieldsValue({
             status: record.status === 1,
@@ -323,16 +327,19 @@ const AdminShowtime = () => {
             if (editData) {
                 const resp = await showtimeApi.put(editData.id, values, values.movie, values.cinema);
                 console.log(resp);
-                funcUtils.notify(resp.data, 'success');
-                 message.success('Cập nhật thành công');
+                funcUtils.notify("Cập nhật thành công", 'success');
+                //  message.success('Cập nhật thành công');
             }
             if (!editData) {
                 try {
                     console.log(values);
                     const resp = await showtimeApi.post(values, values.movie, values.cinema);
-                    message.success('Thêm thành công');
+                    if(resp.status === 200) {
+                       funcUtils.notify("Thêm thành công", 'success');
+                    }
                 } catch (error) {
                     console.log(error);
+                      funcUtils.notify(error.response.data, 'error');
                 }
             }
             setOpen(false);
@@ -422,7 +429,7 @@ const AdminShowtime = () => {
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
-                                format="YYYY-MM-DD HH:mm:ss"
+                                format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
                             />

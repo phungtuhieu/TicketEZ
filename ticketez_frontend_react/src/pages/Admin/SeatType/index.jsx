@@ -105,42 +105,18 @@ function AdminSeatType() {
     };
     return (
         <div>
-            <Card bordered={false} className={cx('card-Breadcrumb')}>
-                <Breadcrumb
-                    items={[
-                        {
-                            href: '',
-                            title: <HomeOutlined />,
-                        },
-                        {
-                            href: '',
-                            title: (
-                                <>
-                                    <VideoCameraOutlined />
-                                    <span> Ghế</span>
-                                </>
-                            ),
-                        },
-                        {
-                            title: 'ghế',
-                        },
-                    ]}
-                />
-            </Card>
-            <Card bordered={false} className={cx('card-chart-donut')}>
-                <div className={cx('right')}>
-                    <Button type="primary" onClick={showModal}>
-                        Thêm mới
-                    </Button>
-                    <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                    <FormOption/>
-                    </Modal>
-                </div>
+            <div className={cx('right')}>
+                <Button type="primary" onClick={showModal}>
+                    Thêm mới
+                </Button>
+                <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                    <FormOption />
+                </Modal>
+            </div>
 
-                <div>
-                    <Table columns={columns} dataSource={data} onChange={onChange} />;
-                </div>
-            </Card>
+            <div>
+                <Table columns={columns} dataSource={data} onChange={onChange} />;
+            </div>
         </div>
     );
 }

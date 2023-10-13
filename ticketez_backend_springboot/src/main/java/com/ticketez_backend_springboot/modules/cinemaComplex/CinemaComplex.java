@@ -10,6 +10,7 @@ import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.province.Province;
 import com.ticketez_backend_springboot.modules.service.Service;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +19,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -31,7 +34,12 @@ public class CinemaComplex {
 	private String name;
 	private String address;
 	private String phone;
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "opening_time")
 	private Time openingTime;
+	@Temporal(TemporalType.TIME)
+	@Column(name = "closing_time")
 	private Time closingTime;
 
 	@ManyToOne

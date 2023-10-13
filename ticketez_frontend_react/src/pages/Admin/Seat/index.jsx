@@ -3,9 +3,9 @@ import classNames from 'classnames/bind';
 import style from './Seat.module.scss';
 import { useState, useEffect } from 'react';
 import SeatChart from './SeatChart';
-import { Card, Breadcrumb, Select } from 'antd';
+import { Card, Breadcrumb, Select, Col, Row, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-
+import BaseApi from '~/api/global/baseApi'
 import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
@@ -28,13 +28,15 @@ function AdminSeat() {
     // Ẩn hiên ghé là phải check lúc chọn vào biểu đồ
     const [selectedOption, setSelectedOption] = useState(false);
 
+
     const fetchDataCinemaComplex = async () => {
+        const cinemaComplexApi = new BaseApi('cinemaComplex');
+        
         try {
-            const resp = await axiosClient.get(`cinemaComplex`);
+            const resp = await cinemaComplexApi.getAll()
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
-            
         } catch (error) {
             console.error(error);
         }
@@ -148,11 +150,12 @@ function AdminSeat() {
 
     return (
         <>
-            <div className={cx('rright')}>
-                <div className={cx('left')}>
-                    <div className={cx('wrap')}>
+            <Row className={cx('container')} style={{ width: '100%' }}>
+                <Col style={{ backgroundColor: 'transparent' }} className={cx('col-first')} span={8}>
+                    <Card className={cx('card')} title="Ghế" bordered={true} style={{ width: 300 }}>
                         <h3>Chọn cụm rạp</h3>
                         <Select
+                            className={cx('select')}
                             showSearch
                             placeholder="Chọn cụm rạp"
                             optionFilterProp="children"
@@ -163,45 +166,46 @@ function AdminSeat() {
                             }
                             options={options}
                         />
-                    </div>
-
-                    <div className={cx('wrap')}>
-                        <h3>Chọn rạp</h3>
                         {selectedCinemaComplex && (
-                            <Select
-                                showSearch
-                                placeholder="Chọn cụm rạp"
-                                optionFilterProp="children"
-                                onChange={onChangeCinema}
-                                onSearch={onSearchCinema}
-                                filterOption={(input, option) =>
-                                    option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                }
-                                options={optionsCinema}
-                            />
+                            <>
+                                <h3>Chọn rạp</h3>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Chọn cụm rạp"
+                                    optionFilterProp="children"
+                                    onChange={onChangeCinema}
+                                    onSearch={onSearchCinema}
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    options={optionsCinema}
+                                />
+                            </>
                         )}
-                    </div>
-
-                    <div className={cx('wrap')}>
-                        <h3>Chọn sơ đồ</h3>
                         {selectedOptionCinema && (
-                            <Select
-                                showSearch
-                                placeholder="Select a person"
-                                optionFilterProp="children"
-                                onChange={onChange}
-                                onSearch={onSearch}
-                                filterOption={filterOption}
-                                options={optionsSeatchart}
-                            />
+                            <>
+                                <h3>Chọn sơ đồ</h3>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Select a person"
+                                    optionFilterProp="children"
+                                    onChange={onChange}
+                                    onSearch={onSearch}
+                                    filterOption={filterOption}
+                                    options={optionsSeatchart}
+                                />
+                            </>
                         )}
-                    </div>
-                </div>
 
-                <div className={cx('right')}>
+                       
+                    </Card>
+                </Col>
+                <Col span={16}>
                     {selectedOption && <SeatChart rows={row} columns={col} idSeatChart={idSeatChart} />}
-                </div>
-            </div>
+                </Col>  
+            </Row>
         </>
     );
 }
