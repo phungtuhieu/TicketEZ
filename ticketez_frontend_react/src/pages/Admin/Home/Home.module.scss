@@ -11,8 +11,7 @@
     text-decoration: none solid rgba(242, 246, 250, 0.85);
     color: #a0aec0;
     word-spacing: 0px;
-    padding: 0 0 2px 0;
-     font-family: var(--font-family);
+    font-family: var(--font-family);
 }
 
 .button-card-top {
@@ -35,6 +34,8 @@
     border-radius: 15px;
     font-family: var(--font-family);
     margin-bottom: 20px;
+    margin-top: 5px;
+    padding-left: -10px;
 }
 
 .money-card-top {
