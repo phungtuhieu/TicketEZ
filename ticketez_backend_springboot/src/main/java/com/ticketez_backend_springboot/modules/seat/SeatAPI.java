@@ -59,15 +59,14 @@ public class SeatAPI {
     // return ResponseEntity.ok(seat);
     // }
 
-    // @PutMapping("/{id}")
-    // public ResponseEntity<Seat> put(@PathVariable("id") Long id, @RequestBody
-    // Seat seat) {
-    // if (!seatDAO.existsById(id)) {
-    // return ResponseEntity.notFound().build();
-    // }
-    // seatDAO.save(seat);
-    // return ResponseEntity.ok(seat);
-    // }
+    @PutMapping("/{id}")
+    public ResponseEntity<Seat> put(@PathVariable("id") Long id, @RequestBody Seat seat) {
+        if (!seatDAO.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        seatDAO.save(seat);
+        return ResponseEntity.ok(seat);
+    }
 
     // @DeleteMapping("/{id}")
     // public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {

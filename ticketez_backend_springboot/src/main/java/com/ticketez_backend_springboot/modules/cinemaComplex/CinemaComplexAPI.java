@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.ticketez_backend_springboot.modules.seat.Seat;
 
 @CrossOrigin("*")
 @RestController
@@ -51,6 +52,12 @@ public class CinemaComplexAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+      @GetMapping("/get-all")
+    public ResponseEntity<List<CinemaComplex>> findAll() {
+        List<CinemaComplex> seats = cinemaComplexDao.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(seats);
     }
 
     @GetMapping("/{id}")

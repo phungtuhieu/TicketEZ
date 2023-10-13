@@ -5,6 +5,7 @@ import style from './SearChart.module.scss';
 import FormOption from '../FormOption';
 import RRadioBox from '../RadioBox';
 import axiosClient from '~/api/global/axiosClient';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -35,7 +36,7 @@ function SeatChart(props) {
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-            seatUnavailable: ['A1', '13', '14'],
+            seatUnavailable: [],
         };
 
         // Tạo mảng chỗ ngồi
@@ -66,18 +67,35 @@ function SeatChart(props) {
     const [reload, setReload] = useState(false);
     const [listSeatNormal, setListSeatNormal] = useState([]);
     const [listSeatVip, setListSeatVip] = useState([]);
+    const [allSeats, setAllSeats] = useState([]);
+    const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat'); // Mặc định ban đầu là 'normal-seat'
 
     const fetchDataSeat = async () => {
         try {
+            const respAll = await axiosClient.get(`seat/getAll`);
+            setAllSeats(respAll.data);
             const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${2}`);
-            respVip.data.forEach((seat) => {
-                setListSeatVip((prevState) => [...prevState, seat.name]);
+            const newVipSeats = respVip.data.map((seat) => seat.name);
+            setListSeatVip((prevState) => {
+                for (const newSeat of newVipSeats) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
             });
+
             const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${1}`);
-            respNormal.data.forEach((seat) => {
-                setListSeatNormal((prevState) => [...prevState, seat.name]);
+            const newNormalSeats = respNormal.data.map((seat) => seat.name);
+            setListSeatNormal((prevState) => {
+                for (const newSeat of newNormalSeats) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
             });
 
             console.log(listSeatNormal);
@@ -95,10 +113,64 @@ function SeatChart(props) {
         }
     };
 
+    const onClickUpdate = () => {
+        const seatVipAndNormal = [
+            ...seatState.vipSeat.map((seat) => ({ name: seat, type: 2 })),
+            ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
+        ];
+
+        const updatedSeat = allSeats.map((allSeat) => {
+            const matchingItem = seatVipAndNormal.find((seat) => allSeat.name === seat.name);
+            if (matchingItem) {
+                return {
+                    ...allSeat,
+                    seatType: {
+                        id: matchingItem.type,
+                    },
+                    seatChart: {
+                        id: idSeatChart,
+                    },
+                };
+            }
+            return allSeat;
+        });
+        try {
+            updatedSeat.forEach((seat) => {
+                handelUpdate(seat.id, seat);
+                setShowInfo('success');
+                setTimeout(() => {
+                    setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
+                }, 1000);
+            });
+        } catch (error) {
+            setShowInfo('error');
+            setTimeout(() => {
+                setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
+            }, 1000);
+        }
+        console.log(updatedSeat);
+    };
+    const [showInfo, setShowInfo] = useState('');
+    useEffect(() => {
+        if (showInfo === 'success') {
+            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
+        }
+        if (showInfo === 'error') {
+            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'error');
+        }
+    }, [showInfo]);
+
+    const handelUpdate = async (idSeat, dataSeat) => {
+        let data = dataSeat;
+
+        const respVip = await axiosClient.put(`seat/${idSeat}`, data);
+    };
+
     const onClickData = (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
 
         console.log('------------------------------------------------');
+
         if (selectedSeatType === 'normal-seat') {
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
@@ -138,6 +210,9 @@ function SeatChart(props) {
         }
     };
 
+    // const handelUpdate   = () => {
+    //     setShowSeat(false);
+    // };
     const onChange = (e) => {
         console.log('radio checked', e.target.value);
         setSelectedSeatType(e.target.value);
@@ -193,8 +268,7 @@ function SeatChart(props) {
                             </Col>
                             <Col span={6} className={cx('col-right-radioBox-btn')}>
                                 <Row>
-                                    
-                                    <Col span={24} >
+                                    <Col span={24}>
                                         <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
                                             <Radio style={radioStyle} value="unavailable">
                                                 <Tag color="#404040">Đã đặt</Tag>
@@ -207,9 +281,9 @@ function SeatChart(props) {
                                             </Radio>
                                         </Radio.Group>
                                     </Col>
-                                    <Col span={24} style={{marginTop: 30}} >
+                                    <Col span={24} style={{ marginTop: 30 }}>
                                         <div className={cx('custom-btn')}>
-                                            <Button className={cx('btn')} type="primary">
+                                            <Button className={cx('btn')} type="primary" onClick={onClickUpdate}>
                                                 Cập nhật ghế
                                             </Button>
                                         </div>

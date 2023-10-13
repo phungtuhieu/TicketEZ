@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import SeatChart from './SeatChart';
 import { Card, Breadcrumb, Select, Col, Row, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-
+import BaseApi from '~/api/global/baseApi'
 import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
@@ -28,9 +28,11 @@ function AdminSeat() {
     // Ẩn hiên ghé là phải check lúc chọn vào biểu đồ
     const [selectedOption, setSelectedOption] = useState(false);
 
+
     const fetchDataCinemaComplex = async () => {
+        const cinemaComplexApi = new BaseApi('cinemaComplex/get-all');
         try {
-            const resp = await axiosClient.get(`cinemaComplex`);
+            const resp = await cinemaComplexApi.getAll()
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
