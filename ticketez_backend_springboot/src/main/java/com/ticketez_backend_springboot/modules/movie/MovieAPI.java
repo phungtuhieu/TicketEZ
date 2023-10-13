@@ -30,7 +30,7 @@ public class MovieAPI {
     MovieDAO dao;
 
     @GetMapping
-    public ResponseEntity<?> findAll(
+    public ResponseEntity<?> findByPage(
             @RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit,
             @RequestParam("search") Optional<String> search) {
