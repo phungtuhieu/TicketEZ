@@ -28,6 +28,9 @@ axiosClient.interceptors.response.use(
                 case 401:
                     funcUtils.notify(error.response.data.message, 'error');
                     break;
+                case httpStatus.CONFLICT:
+                        funcUtils.notify(error.response.data, 'error');
+                        break;
                 default:
                     funcUtils.notify(error.response.data.message, 'error');
                     break;
