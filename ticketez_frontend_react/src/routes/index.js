@@ -3,6 +3,8 @@ import UserContact from '~/pages/User/Contact';
 import * as PageAdmin from '~/pages/Admin';
 import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
+import LoginPage from '~/pages/Templates/LoginPage';
+import LoginSignin from '~/components/Auth/LoginResgiter';
 
 const publicRoutes = [
     //Admin
@@ -30,7 +32,7 @@ const publicRoutes = [
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     // { path: '/contact', component: UserContact, layout: DefaultLayout },
-    { path: '/booking-details', component: PageUser.BookingDetail, layout: DefaultLayout },
+    { path: '/login', component: LoginSignin, layout: DefaultLayout },
 ];
 
 const privateRoutes = [];
