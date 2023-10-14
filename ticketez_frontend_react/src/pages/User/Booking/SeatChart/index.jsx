@@ -6,11 +6,23 @@ import '../SeatChart/chart.scss';
 import axiosClient from '~/api/global/axiosClient';
 import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
+import { BookingDetail } from '../..';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
     const { rows, columns, idSeatChart } = props;
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
     const createSeatArray = () => {
         let seatRows = 10;
         let seatColumns = 7;
@@ -179,7 +191,7 @@ function SeatChart(props) {
     return (
         <>
             <Card className="card" style={{ display: 'flex' }}>
-                <Row className='ca'>
+                <Row className="ca">
                     <Col span={24}>
                         <hr className={cx('screen')} />
                         <h6 className={cx('screen-title')}>Màn hình</h6>
@@ -220,52 +232,52 @@ function SeatChart(props) {
                             )}
                         </table>
                     </Col>
-                    
                 </Row>
-                
+
                 <Row gutter={50}>
-                        <Col span={120}>
-                            <div style={{ marginTop: '50px' }}>
-                                <Space size={[0, 200]} wrap>
-                                    <Tag className={cx('tagg')} color="#404040">
-                                        Đã đặt
-                                    </Tag>
-                                    <Tag className={cx('tagg')} color="#208135">
-                                        ghế bạn chọn
-                                    </Tag>
-                                    <Tag className={cx('tagg')} color="#b7232b">
-                                        Ghế vip
-                                    </Tag>
-                                    <Tag className={cx('tagg')} color="#5b2b9f">
-                                        Ghế thường
-                                    </Tag>
-                                </Space>
-                            </div>
-                        </Col>
-                        <Col span={100}>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
-                                <Button
-                                    style={{
-                                        width: '200px',
-                                        height: '70px',
-                                        backgroundColor: '#EB2F96',
-                                        fontWeight: 'bolder',
-                                    }}
-                                    className={cx('btn')}
-                                    type="primary"
-                                    onClick={onClickUpdate}
-                                    icon={
-                                        <ShoppingOutlined
-                                            style={{ fontSize: '32px' }} // Đổi kích thước và màu sắc
-                                        />
-                                    }
-                                >
-                                    Mua vé
-                                </Button>
-                            </div>
-                        </Col>
-                    </Row>
+                    <Col span={120}>
+                        <div style={{ marginTop: '50px' }}>
+                            <Space size={[0, 200]} wrap>
+                                <Tag className={cx('tagg')} color="#404040">
+                                    Đã đặt
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#208135">
+                                    ghế bạn chọn
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#b7232b">
+                                    Ghế vip
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#5b2b9f">
+                                    Ghế thường
+                                </Tag>
+                            </Space>
+                        </div>
+                    </Col>
+                    <Col span={100}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
+                            <Button
+                                style={{
+                                    width: '200px',
+                                    height: '70px',
+                                    backgroundColor: '#EB2F96',
+                                    fontWeight: 'bolder',
+                                }}
+                                className={cx('btn')}
+                                type="primary"
+                                onClick={showModal}
+                                icon={
+                                    <ShoppingOutlined
+                                        style={{ fontSize: '32px' }} // Đổi kích thước và màu sắc
+                                    />
+                                }
+                            >
+                                Mua vé
+                            </Button>
+                        </div>
+                    </Col>
+                </Row>
             </Card>
+            <BookingDetail open={isModalOpen} onCancel={handleCancel} />
         </>
     );
 }

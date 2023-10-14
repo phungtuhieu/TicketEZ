@@ -6,33 +6,20 @@ import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcon from '@fortawesome/free-solid-svg-icons';
 const cx = classNames.bind(style);
-function BookingDetail() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+function BookingDetail(props) {
     const [text, setText] = useState('https://ant.design/');
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
 
     return (
         <>
-            <Button type="primary" onClick={showModal}>
-                Open Modal
-            </Button>
             <Modal
+                {...props}
                 title="Thanh toán"
                 className={cx('modal-custom')}
                 width={760}
-                open={isModalOpen}
+                // open={isModalOpen}
                 // onOk={handleOk}
-                onCancel={handleCancel}
-                footer={''}
+
+                footer={null}
             >
                 <Row className={cx('content-info-details', 'ps-0')}>
                     <Col span={13} className="pe-20">

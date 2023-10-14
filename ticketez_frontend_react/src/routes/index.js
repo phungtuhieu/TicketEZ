@@ -26,7 +26,7 @@ const publicRoutes = [
     { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
 
     // User
-    // { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },
+    { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     // { path: '/contact', component: UserContact, layout: DefaultLayout },
     { path: '/booking-details', component: PageUser.BookingDetail, layout: DefaultLayout },
