@@ -44,7 +44,7 @@ const AdminService = () => {
             try {
                 const [res, cinemaComplex] = await Promise.all([
                     serviceApi.getByPage(currentPage, pageSize),
-                    cinemaComplexApi.get(),
+                    cinemaComplexApi.getPage(),
                 ]);
                 console.log(cinemaComplex.data);
                 console.log(res);
@@ -188,7 +188,7 @@ const AdminService = () => {
             // ...getColumnSearchProps('description'),
         },
         {
-            title: 'Chọn Rạp',
+            title: 'Rạp',
             dataIndex: 'nameCinemaComplex',
             width: '30%',
             // ...getColumnSearchProps('cinemaComplex'),
