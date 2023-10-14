@@ -127,8 +127,8 @@ function AdminMovie() {
                     movieApi.getByPage(currentPage, pageSize),
                     // movieStudioApi.get(),
                 ]);
-                // console.log(movieData);
-                console.log(movieStudioData.data);
+                console.log(movieData);
+                // console.log(movieStudioData.data);
                 const formatData = movieData.data.map((item) => ({
                     ...item,
                     releaseDate: moment(item.releaseDate, formatDate).format(formatDate),
