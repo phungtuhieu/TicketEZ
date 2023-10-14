@@ -1,5 +1,6 @@
 import UserHome from '~/pages/User/Home';
 import UserContact from '~/pages/User/Contact';
+import UserProfile from '~/pages/User/Profile';
 import * as PageAdmin from '~/pages/Admin';
 import { MovieDef } from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
@@ -29,6 +30,7 @@ const publicRoutes = [
     { path: '/movie/:id', component: MovieDef, layout: DefaultLayout },
     { path: '/', component: UserHome, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
+    { path: '/profile', component:  UserProfile, layout: DefaultLayout },
 ];
 
 const privateRoutes = [];
