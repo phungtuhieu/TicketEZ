@@ -1,4 +1,6 @@
-USE [master] CREATE DATABASE TicketEZ
+USE [master] 
+GO
+CREATE DATABASE TicketEZ
 GO
     -- DROP DATABASE TicketEZ 
     USE TicketEZ
