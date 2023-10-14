@@ -66,7 +66,18 @@ const data = [
     {
       url: '/account',
       title: 'Quản lý người dùng',
+      
   },
+  {
+    url: '/format',
+    title: 'Dạng phim',
+    
+},
+{
+    url: '/service',
+    title: 'dịch vụ',
+    
+},
 ];
 
 const Bread = ({ path }) => {

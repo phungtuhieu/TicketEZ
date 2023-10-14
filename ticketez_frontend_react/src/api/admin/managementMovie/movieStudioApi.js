@@ -1,21 +1,9 @@
-import axiosClient from '../../global/axiosClient';
+import BaseApi from '~/api/global/baseApi';
 
-const baseUrl = 'movie-studio';
-const movieStudioApi = {
-    getById: async (id) => {
-        return axiosClient.get(`${baseUrl}/${id}`);
-    },
-    getAll: async () => {
-        return axiosClient.get(baseUrl);
-    },
-    post: async (data) => {
-        return axiosClient.post(baseUrl, data);
-    },
-    put: async (id, data) => {
-        return axiosClient.put(`${baseUrl}/${id}`, data);
-    },
-    delete: async (id) => {
-        return axiosClient.delete(`${baseUrl}/${id}`);
-    },
-};
+class MovieStudioApi extends BaseApi {
+    constructor() {
+        super('movie-studio');
+    }
+}
+const movieStudioApi = new MovieStudioApi();
 export default movieStudioApi;
