@@ -178,7 +178,7 @@ function AdminPriceService() {
             ...record,
             status: record.status === 1,
             service: record.service?.id,
-            cinemaComplex: record.service.cinemaComplex?.name,
+            cinemaComplex: record.service.cinemaComplex?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
 
