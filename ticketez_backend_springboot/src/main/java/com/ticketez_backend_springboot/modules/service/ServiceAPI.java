@@ -52,6 +52,12 @@ public class ServiceAPI {
 		}
 	}
 
+	@GetMapping("/getAll")
+	public ResponseEntity<List<Service>> findAll() {
+		List<Service> services = dao.findAllByOrderByIdDesc();
+		return ResponseEntity.ok(services);
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findById(@PathVariable("id") Long id) {
 		try {

@@ -1,9 +1,8 @@
-
-import { SearchOutlined } from "@ant-design/icons";
-import { faBell, faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Row, Input, Dropdown } from "antd";
-import React, { useState } from "react";
+import { SearchOutlined } from '@ant-design/icons';
+import { faBell, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Col, Row, Input, Dropdown } from 'antd';
+import React, { useState } from 'react';
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
 import { Menu } from 'antd';
@@ -98,7 +97,7 @@ function HeaderAdminRight() {
                         prefix={<SearchOutlined className="site-form-item-icon" />}
                     />
                     <span className={cx('icon-item-hearder-right')}>
-                        <FontAwesomeIcon icon={faUser} /> Đăng nhập
+                        <FontAwesomeIcon icon={faUser} />
                     </span>
                     <Dropdown
                         overlay={menuItemsBell}
@@ -107,10 +106,7 @@ function HeaderAdminRight() {
                             pointAtCenter: true,
                         }}
                     >
-                        <FontAwesomeIcon
-                            icon={faBell}
-                            className={cx('icon-item-hearder-right')}
-                        />
+                        <FontAwesomeIcon icon={faBell} className={cx('icon-item-hearder-right')} />
                     </Dropdown>
 
                     <Dropdown
@@ -120,10 +116,7 @@ function HeaderAdminRight() {
                             pointAtCenter: true,
                         }}
                     >
-                        <FontAwesomeIcon
-                            icon={faGear}
-                            className={cx('icon-item-hearder-right')}
-                        />
+                        <FontAwesomeIcon icon={faGear} className={cx('icon-item-hearder-right')} />
                     </Dropdown>
                 </Col>
             </Row>

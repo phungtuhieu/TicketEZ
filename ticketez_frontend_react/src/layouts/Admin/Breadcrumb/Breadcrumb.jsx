@@ -78,6 +78,11 @@ const data = [
     title: 'dịch vụ',
     
 },
+{
+    url: '/priceService',
+    title: 'Giá dịch vụ',
+    
+},
 ];
 
 const Bread = ({ path }) => {

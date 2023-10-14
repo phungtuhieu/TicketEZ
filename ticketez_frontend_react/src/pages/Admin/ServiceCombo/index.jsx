@@ -42,9 +42,12 @@ const AdminService = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const [res, cinemaComplex] = await Promise.all([serviceApi.getByPage(currentPage, pageSize), cinemaComplexApi.get()]);
-                 console.log(cinemaComplex.data);
-                 console.log(res);
+                const [res, cinemaComplex] = await Promise.all([
+                    serviceApi.getByPage(currentPage, pageSize),
+                    cinemaComplexApi.getPage(),
+                ]);
+                console.log(cinemaComplex.data);
+                console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -59,7 +62,6 @@ const AdminService = () => {
         };
         getList();
     }, [currentPage, pageSize, workSomeThing]);
-
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -186,7 +188,7 @@ const AdminService = () => {
             // ...getColumnSearchProps('description'),
         },
         {
-            title: 'Chọn Rạp',
+            title: 'Rạp',
             dataIndex: 'nameCinemaComplex',
             width: '30%',
             // ...getColumnSearchProps('cinemaComplex'),
@@ -291,46 +293,45 @@ const AdminService = () => {
                         id: editData.id,
                         ...values,
                     };
-                   if (putData.image.file) {
-                       console.log(putData);
+                    if (putData.image.file) {
+                        console.log(putData);
 
-                       const file = putData.image.fileList[0].originFileObj;
-                       const images = await uploadApi.put(editData.image, file);
-                       putData = {
-                           ...putData,
-                           image: images,
-                       };
-                   }
-                   try {
-                    const resPut = await serviceApi.put( editData.id, putData , putData.cinemaComplex);
-                       console.log(resPut);
-                       if (resPut.status === 200) {
-                           funcUtils.notify('Cập nhật dịch thành công', 'success');
-                       }
-                   } catch (error) {
-                       if (error.hasOwnProperty('response')) {
-                           message.error(error.response.data);
-                       } else {
-                           console.log(error);
-                       }
-                    console.log(putData);
+                        const file = putData.image.fileList[0].originFileObj;
+                        const images = await uploadApi.put(editData.image, file);
+                        putData = {
+                            ...putData,
+                            image: images,
+                        };
+                    }
+                    try {
+                        const resPut = await serviceApi.put(editData.id, putData, putData.cinemaComplex);
+                        console.log(resPut);
+                        if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật dịch thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
+                        console.log(putData);
                     }
                 }
                 if (!editData) {
                     try {
-
-                       const file = values.image.fileList[0].originFileObj;
-                       const images = await uploadApi.post(file);
-                       const postData = {
-                           ...values,
-                           image: images,
-                       };
-                       console.log(postData);
-                       const resPost = await serviceApi.post(postData,postData.cinemaComplex);
-                       console.log('resPost', resPost);
-                       if (resPost.status === 200) {
-                           funcUtils.notify('Thêm dịch vụ thành công', 'success');
-                       }
+                        const file = values.image.fileList[0].originFileObj;
+                        const images = await uploadApi.post(file);
+                        const postData = {
+                            ...values,
+                            image: images,
+                        };
+                        console.log(postData);
+                        const resPost = await serviceApi.post(postData, postData.cinemaComplex);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm dịch vụ thành công', 'success');
+                        }
 
                         console.log(values);
                     } catch (error) {
@@ -346,10 +347,10 @@ const AdminService = () => {
                 setLoading(false);
                 setFileList([]);
                 setWorkSomeThing(!workSomeThing);
-           } else {
-               setLoading(false);
-               message.error('vui lòng chọn ảnh');
-             }
+            } else {
+                setLoading(false);
+                message.error('vui lòng chọn ảnh');
+            }
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -435,7 +436,7 @@ const AdminService = () => {
                         >
                             <Input placeholder="Họ và tên" />
                         </Form.Item>
-                        <Form.Item 
+                        <Form.Item
                             {...formItemLayout}
                             name="cinemaComplex"
                             label="Chọn "

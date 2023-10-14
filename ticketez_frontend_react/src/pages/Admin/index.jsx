@@ -20,3 +20,4 @@ export { default as AdminAccount } from './Account';
 export { default as AdminEvent } from './Event';
 export { default as AdminMpaaRating } from './mpaaRating';
 export { default as AdminService } from './ServiceCombo';
+export { default as AdminPriceService } from './PriceService';

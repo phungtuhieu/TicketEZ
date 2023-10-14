@@ -316,39 +316,37 @@ function AdminMovie() {
     };
     const expandedRowRender = (record) => {
         return (
-            <div>
-                <ul className="ms-10">
-                    <li>
-                        <span>
-                            <b>Mô tả: </b> {record.description}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Hãng phim: </b> {`${record.movieStudio.name} (${record.movieStudio.country})`}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Loại phim (MPAA): </b>{' '}
-                        </span>
-                        {`${record.mpaaRating.ratingCode} ( ${record.mpaaRating.description})`}
-                    </li>
-                    <li>
-                        <span>
-                            <b>Video trailer: </b>
-                            <a
-                                href={record.videoTrailer}
-                                className={cx('table-link-video')}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {record.videoTrailer}
-                            </a>
-                        </span>
-                    </li>
-                </ul>
-            </div>
+            <ul className={cx('wrapp-more-info')}>
+                <li>
+                    <span>
+                        <b>Mô tả: </b> {record.description}
+                    </span>
+                </li>
+                <li>
+                    <span>
+                        <b>Hãng phim: </b> {`${record.movieStudio.name} (${record.movieStudio.country})`}
+                    </span>
+                </li>
+                <li>
+                    <span>
+                        <b>Loại phim (MPAA): </b>{' '}
+                    </span>
+                    {`${record.mpaaRating.ratingCode} ( ${record.mpaaRating.description})`}
+                </li>
+                <li>
+                    <span>
+                        <b>Video trailer: </b>
+                        <a
+                            href={record.videoTrailer}
+                            className={cx('table-link-video')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {record.videoTrailer}
+                        </a>
+                    </span>
+                </li>
+            </ul>
         );
     };
     // Xử lý sự kiện thay đổi trang
@@ -361,7 +359,7 @@ function AdminMovie() {
         <>
             <Row>
                 <Col span={22}>
-                    <h1>Hãng phim</h1>
+                    <h1>Phim</h1>
                 </Col>
                 <Col span={2} className={cx('wrap-act-top-right')}>
                     <Button
