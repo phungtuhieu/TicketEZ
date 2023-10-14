@@ -29,6 +29,18 @@ $base-values: 0 5 10 15 20 25 30;
         padding: $value + px;
     }
 }
+// padding-top classes
+@each $value in $base-values {
+    .pt-#{$value} {
+        padding-top: $value + px;
+    }
+}
+// padding-bottom classes
+@each $value in $base-values {
+    .pb-#{$value} {
+        padding-bottom: $value + px;
+    }
+}
 // padding-left classes
 @each $value in $base-values {
     .ps-#{$value} {
@@ -59,4 +71,20 @@ $base-values: 0 5 10 15 20 25 30;
     .me-#{$value} {
         margin-right: $value + px;
     }
+}
+// margin-left classes
+@each $value in $base-values {
+    .mt-#{$value} {
+        margin-top: $value + px;
+    }
+}
+// margin-rigth classes
+@each $value in $base-values {
+    .mb-#{$value} {
+        margin-bottom: $value + px;
+    }
+}
+.text-gray-500 {
+    --tw-text-opacity: 1;
+    color: rgb(115 115 115 / var(--tw-text-opacity));
 }
