@@ -3,3 +3,12 @@
     justify-content: center;
     align-items: center;
 }
+.table-link-video {
+    color: var(--primary-color);
+    &:hover {
+        text-decoration: underline;
+    }
+}
+.wrapp-btn-modal {
+    margin-right: 30px;
+}
