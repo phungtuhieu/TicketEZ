@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
+import { Button, Checkbox,  Form, Input } from 'antd';
 import styles from './loginForm.module.scss';
 import classNames from 'classnames/bind';
 
@@ -29,7 +29,7 @@ const App = () => (
             onFinishFailed={onFinishFailed}
             autoComplete="off"
         >
-            <Form.Item   wrapperCol={{ span:24}} >
+            <Form.Item wrapperCol={{ span: 24 }}>
                 <div className={cx('name-login')}>
                     <h1>Đăng nhập</h1>
                     <span className={cx('des-name-login')}>
@@ -67,7 +67,7 @@ const App = () => (
                 <Checkbox>nhớ tôi ?</Checkbox>
             </Form.Item>
             <Form.Item wrapperCol={{ span: 16, offset: 8 }}>
-                <Button type="primary" htmlType="submit" block>
+                <Button type="primary" htmlType="submit" block className={cx('buttonSubmit')}>
                     Đăng nhập
                 </Button>
             </Form.Item>
