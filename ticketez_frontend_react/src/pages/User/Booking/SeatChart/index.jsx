@@ -7,6 +7,8 @@ import axiosClient from '~/api/global/axiosClient';
 import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -187,56 +189,116 @@ function SeatChart(props) {
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
+    const [tableScale, setTableScale] = useState(1);
+
+    const handleZoomIn = () => {
+        setTableScale(tableScale + 0.1);
+    };
+
+    const handleZoomOut = () => {
+        if (tableScale > 1) {
+            setTableScale(tableScale - 0.1);
+        }
+    };
 
     return (
         <>
+            <button onClick={handleZoomIn}>Phóng to</button>
+            <button onClick={handleZoomOut}>Thu nhỏ</button>
+
             <Card className="card" style={{ display: 'flex' }}>
-                <Row className="ca">
-                    <Col span={24}>
-                        <hr className={cx('screen')} />
-                        <h6 className={cx('screen-title')}>Màn hình</h6>
-                    </Col>
-                    <Col span={24}>
-                        <table className="grid">
-                            {showSeat && (
-                                <tbody>
-                                    {seatState.seatHeader.map((header, rowIndex) => (
-                                        <tr key={header}>
-                                            <td className="header-cell">{header}</td>
-                                            {seatState.seat[rowIndex].map((seat_no) => {
-                                                const seatClassName = `
-                                                ${
-                                                    seatState.normalSeat.indexOf(seat_no) > -1
-                                                        ? 'normal-seat'
-                                                        : seatState.seatUnavailable.indexOf(seat_no) > -1
-                                                        ? 'unavailable'
-                                                        : seatState.vipSeat.indexOf(seat_no) > -1
-                                                        ? 'vip-seat'
-                                                        : seatState.seatReserved.indexOf(seat_no) > -1
-                                                        ? 'reserved'
-                                                        : 'reservedd'
-                                                } protected-element`;
-                                                return (
-                                                    <td
-                                                        className={seatClassName}
-                                                        key={seat_no}
-                                                        onClick={() => onClickData(seat_no)}
-                                                    >
-                                                        {seat_no}
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            )}
-                        </table>
-                    </Col>
+                <Row className="card">
+                    <DndProvider backend={HTML5Backend}>
+                        <div
+                            id="divContainer"
+                            style={{
+                                overflowY: 'auto',
+                                overflowX: 'scroll',
+                                height: '400px',
+                                width: '600px',
+                                position: 'relative',
+                                display: 'flex', // Bật chế độ hiển thị flex
+                                justifyContent: 'center', // Căn giữa theo chiều ngang
+                            }}
+                        >
+                            <div style={{ minWidth: '3000px' }}>
+                                <div style={{ marginBottom: '200px', backgroundColor: 'red' }}></div>
+
+                                <table
+                                    className="grid "
+                                    style={{ maxWidth: '100%', maxHeight: '100%', transform: `scale(${tableScale})` }}
+                                >
+                                    {showSeat && (
+                                        <tbody>
+                                            <div
+                                                style={{
+                                                    position: 'relative',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <div
+                                                    className="screen"
+                                                    style={{
+                                                        backgroundColor: 'white',
+                                                        width: '200px',
+                                                        marginBottom: '20px',
+                                                    }}
+                                                >
+                                                    .
+                                                </div>
+                                            </div>
+
+                                            {seatState.seatHeader.map((header, rowIndex) => (
+                                                <tr key={header}>
+                                                    <td className="header-cell">{header}</td>
+                                                    {seatState.seat[rowIndex].map((seat_no) => {
+                                                        const seatClassName = `
+                                                                                ${
+                                                                                    seatState.normalSeat.indexOf(
+                                                                                        seat_no,
+                                                                                    ) > -1
+                                                                                        ? 'normal-seat'
+                                                                                        : seatState.seatUnavailable.indexOf(
+                                                                                              seat_no,
+                                                                                          ) > -1
+                                                                                        ? 'unavailable'
+                                                                                        : seatState.vipSeat.indexOf(
+                                                                                              seat_no,
+                                                                                          ) > -1
+                                                                                        ? 'vip-seat'
+                                                                                        : seatState.seatReserved.indexOf(
+                                                                                              seat_no,
+                                                                                          ) > -1
+                                                                                        ? 'reserved'
+                                                                                        : 'reservedd'
+                                                                                } protected-element`;
+
+                                                        return (
+                                                            <td
+                                                                className={seatClassName}
+                                                                key={seat_no}
+                                                                onClick={() => onClickData(seat_no)}
+                                                            >
+                                                                {seat_no}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    )}
+                                </table>
+                            </div>
+                        </div>
+                    </DndProvider>
                 </Row>
 
-                <Row gutter={50}>
-                    <Col span={120}>
-                        <div style={{ marginTop: '50px' }}>
+                <hr></hr>
+                <Row gutter={10}>
+                    <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
+                        <hr></hr>
+                        <div style={{ padding: '10px' }}>
                             <Space size={[0, 200]} wrap>
                                 <Tag className={cx('tagg')} color="#404040">
                                     Đã đặt
@@ -253,27 +315,49 @@ function SeatChart(props) {
                             </Space>
                         </div>
                     </Col>
-                    <Col span={100}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
-                            <Button
-                                style={{
-                                    width: '200px',
-                                    height: '70px',
-                                    backgroundColor: '#EB2F96',
-                                    fontWeight: 'bolder',
-                                }}
-                                className={cx('btn')}
-                                type="primary"
-                                onClick={showModal}
-                                icon={
-                                    <ShoppingOutlined
-                                        style={{ fontSize: '32px' }} // Đổi kích thước và màu sắc
-                                    />
-                                }
-                            >
-                                Mua vé
-                            </Button>
-                        </div>
+                    <Col
+                        span={100}
+                        xs={24}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            paddingTop: '50px',
+                        }}
+                    >
+                        <Col span={24} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                            <div style={{ padding: '10px', color: 'white' }}>
+                                <h3>Ghế bạn đã chọn:</h3>
+                                {seatState && seatState.seatReserved && seatState.seatReserved.length > 0 ? (
+                                    seatState.seatReserved.map((seat, index) => <p key={index}>{seat}</p>)
+                                ) : (
+                                    <p>Không có ghế nào được chọn.</p>
+                                )}
+                            </div>
+                        </Col>
+                        <Row>
+                            <Col span={24} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <div>
+                                    <Button
+                                        style={{
+                                            width: '200px',
+                                            height: '70px',
+                                            backgroundColor: '#EB2F96',
+                                            fontWeight: 'bolder',
+                                        }}
+                                        className={cx('btn')}
+                                        type="primary"
+                                        onClick={showModal}
+                                        icon={
+                                            <ShoppingOutlined
+                                                style={{ fontSize: '32px' }} // Đổi kích thước và màu sắc
+                                            />
+                                        }
+                                    >
+                                        Mua vé
+                                    </Button>
+                                </div>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
             </Card>

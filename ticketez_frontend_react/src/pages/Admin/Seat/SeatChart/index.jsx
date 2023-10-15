@@ -227,7 +227,7 @@ function SeatChart(props) {
         <>
             <Card className={cx('card')}>
                 <Row>
-                    <Col span={24}>
+                    <Col className={cx('div-screen')} span={16} style={{marginLeft:'45px'}}>
                         <hr className={cx('screen')} />
                         <h6 className={cx('screen-title')}>Màn hình</h6>
                     </Col>

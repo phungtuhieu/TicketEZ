@@ -6,6 +6,18 @@
     background-color: rgb(34, 30, 30);
 }
 
+#divContainer {
+    width: 100%;
+    overflow: auto;
+    overflow-x: auto; /* Thêm thanh cuộn ngang */
+}
+
+table.grid {
+    min-width: 100%;
+    white-space: nowrap; /* Ngăn các dòng văn bản bị ngắt khi cuộn ngang */
+    table-layout: fixed; /* Cố định độ rộng cột để tránh sự thay đổi đột ngột */
+}
+  
 .ca{
     padding: 20px;
     border: 1px solid rgb(241, 241, 241);
@@ -118,4 +130,20 @@ li {
 /* Trong tệp CSS hoặc SCSS của bạn */
 .protected-element {
     user-select: none; /* Ngăn chọn văn bản */
+}
+
+.screen {
+    border-radius: 10px 10px 0px 0px;
+    background-color: white;
+    width: 100%;
+    height: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background-color: transparent;
 }
