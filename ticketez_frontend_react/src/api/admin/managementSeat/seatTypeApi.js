@@ -1,8 +1,10 @@
-import axiosClient from '../../global/axiosClient';
+import BaseApi from '~/api/global/baseApi';
 
-const url = '';
-const seatTypeApi = {
-    
-};
-
+class SeatTypeApi extends BaseApi {
+    constructor() {
+        super('seatType');
+    }
+}
+const seatTypeApi = new SeatTypeApi();
 export default seatTypeApi;
+

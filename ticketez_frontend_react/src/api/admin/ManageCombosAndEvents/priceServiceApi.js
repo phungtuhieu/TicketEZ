@@ -1,23 +1,10 @@
-import axiosClient from '../../global/axiosClient';
+import BaseApi from '~/api/global/baseApi';
 
-const url = 'price-service';
+class PriceServiceApi extends BaseApi {
+    constructor() {
+        super('priceService');
+    }
 
-const priceServiceApi = {
-    getserviceId: async (priceServiceApi) => {
-        return axiosClient.get(url + '/' + priceServiceApi);
-    },
-    get: async () => {
-        return axiosClient.get(url);
-    },
-    post: async (data) => {
-        return axiosClient.post(url, data);
-    },
-    put: async (id ,data) => {
-        return axiosClient.put(url + '/' + id, data);
-    },
-    delete: async (priceServiceApi) => {
-        return axiosClient.delete(url + '/' + priceServiceApi);
-    },
-};
-
+}
+const priceServiceApi = new PriceServiceApi();
 export default priceServiceApi;

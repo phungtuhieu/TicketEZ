@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+.body {
+    background-color: #ffffff;
+    font-family: var(--font-family);
+}
+.loginForm {
+    margin-top: 20px;
+}
+.name-login {
+    margin-top: -40px;
+    margin-bottom: 10px;
+    margin-left: 140px;
+}
+.des-name-login {
+    margin-top: -10px;
+    color: #a4a2a2;
+}
+
+.buttonSubmit {
+    background: #e50813;
+    outline: none;
+    border: none;
+    color: #fff;
+    padding: 12px 40px;
+    font-weight: 500;
+    font-size: 17px;
+    height: 40px;
+}
+
+.buttonSubmit:hover {
+    background: #e50813;
+    outline: none;
+    border: none;
+    color: #fff;
+    padding: 12px 40px;
+    font-weight: 500;
+    font-size: 17px;
+    height: 40px;
+}

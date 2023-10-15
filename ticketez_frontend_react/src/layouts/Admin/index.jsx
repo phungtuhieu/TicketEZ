@@ -1,16 +1,14 @@
 // React
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 // Scss
-
 import styles from './Admin.module.scss';
 import './AdminCustomAntDesgin.scss';
 import classNames from 'classnames/bind';
 
 // Ant Design
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Layout, Menu, Button, theme, Card } from 'antd';
+import { Layout, Menu, Button, theme, Card, Skeleton } from 'antd';
 import { HeaderAdminLeft, HeaderAdminRight } from './Header';
 import { Footer } from 'antd/es/layout/layout';
 import Sidebar from './Sidebar';
@@ -19,6 +17,14 @@ import { LayoutPageDefault } from '..';
 const { Header, Sider, Content } = Layout;
 const cx = classNames.bind(styles);
 const AdminLayout = ({ children }) => {
+
+     const [isLoading, setIsLoading] = useState(true);
+     const [active, setActive] = useState(true);
+     useEffect(() => {
+         setTimeout(() => {
+             setIsLoading(false);
+         }, 1000);
+     }, []);
     const [collapsed, setCollapsed] = useState(false);
     const {
         token: { colorBgContainer },
@@ -71,7 +77,10 @@ const AdminLayout = ({ children }) => {
                         // background: colorBgContainer,
                     }}
                 >
-                    <LayoutPageDefault path={path}>{children}</LayoutPageDefault>
+                    <div>
+                        {isLoading && <Skeleton active={active} />}
+                        {!isLoading && <LayoutPageDefault path={path}>{children}</LayoutPageDefault>}
+                    </div>
                 </Content>
                 <Footer
                     style={{

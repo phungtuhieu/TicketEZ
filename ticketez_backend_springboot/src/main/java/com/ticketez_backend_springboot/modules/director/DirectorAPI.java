@@ -31,6 +31,13 @@ public class DirectorAPI {
 
     @Autowired
     DirectorDAO directorDAO;
+
+     @GetMapping("/getAll")
+    public ResponseEntity<List<Director>> findAll() {
+        List<Director> directors = directorDAO.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(directors);
+    }
+
     
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,

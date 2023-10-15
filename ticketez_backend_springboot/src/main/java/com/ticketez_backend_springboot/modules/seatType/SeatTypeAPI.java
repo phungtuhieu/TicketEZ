@@ -3,6 +3,8 @@ package com.ticketez_backend_springboot.modules.seatType;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,9 +23,9 @@ public class SeatTypeAPI {
     @Autowired
     SeatTypeDAO seatTypeDAO;
 
-    @GetMapping
+    @GetMapping("getAll")
     public ResponseEntity<List<SeatType>> findAll() {
-        return ResponseEntity.ok(seatTypeDAO.findAll());
+        return ResponseEntity.ok(seatTypeDAO.findAllByOrderByIdDesc());
     }
 
     @GetMapping("/{id}")
@@ -50,8 +52,13 @@ public class SeatTypeAPI {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-        seatTypeDAO.deleteById(id);
-        return ResponseEntity.ok(true);
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        try {
+            seatTypeDAO.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Không thể xóa diễn viên do tài liệu tham khảo hiện có", HttpStatus.CONFLICT);
+        }
+
     }
 }

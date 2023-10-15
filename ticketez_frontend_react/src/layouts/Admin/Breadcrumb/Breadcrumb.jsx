@@ -5,7 +5,7 @@ import { Breadcrumb } from 'antd';
 const data = [
     {
         url: '/index',
-        title: 'Thống kế phim',
+        title: 'Trang chủ',
     },
     {
         url: '/cinema-complex',
@@ -66,7 +66,18 @@ const data = [
     {
       url: '/account',
       title: 'Quản lý người dùng',
+      
   },
+  {
+    url: '/format',
+    title: 'Dạng phim',
+    
+},
+{
+    url: '/service',
+    title: 'dịch vụ',
+    
+},
 ];
 
 const Bread = ({ path }) => {

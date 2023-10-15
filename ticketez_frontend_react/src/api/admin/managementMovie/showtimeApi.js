@@ -17,13 +17,13 @@ const showtimeApi = {
         return res.data;
     },
     post: async (data, movieId, cinemaId) => {
-        const [movie, cinema] = await Promise.all([movieApi.getId(movieId), cinemaApi.getId(cinemaId)]);
+        const [movie, cinema] = await Promise.all([movieApi.getById(movieId), cinemaApi.getId(cinemaId)]);
         const values = { ...data, movie: movie.data, cinema: cinema.data };
         console.log('values', values);
         return axiosClient.post(url, values);
     },
     put: async (id, data, movieId, cinemaId) => {
-        const [movie, cinema] = await Promise.all([movieApi.getId(movieId), cinemaApi.getId(cinemaId)]);
+        const [movie, cinema] = await Promise.all([movieApi.getById(movieId), cinemaApi.getId(cinemaId)]);
         const values = {id: id, ...data, movie: movie.data, cinema: cinema.data };
 
         return axiosClient.put(url + '/' + id, values);
