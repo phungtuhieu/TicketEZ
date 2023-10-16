@@ -1,0 +1,50 @@
+.khung {
+    overflow: auto;
+    height: 550px !important;
+
+
+    .modal-header-col1-inputSearch {
+        height: 36px;
+        border-radius: 0.3rem;
+        
+    
+        .ant-input-suffix {
+            color: var(--ViTri--color-d4d4d4);
+        }
+    
+        &:focus-within {
+            border-color: #404040;
+            box-shadow: none;
+        }
+        &:focus {
+            background-color: red !important;
+        }
+    
+        &:hover {
+            border-color: var(--ViTri--color-d4d4d4);
+        }
+        ::placeholder {
+            color: #404040;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
