@@ -206,6 +206,7 @@ function SeatChart(props) {
         fetchDataSeat();
     }, [reload]);
 
+    // Phóng to thu nhỏ
     const [tableScale, setTableScale] = useState(1);
 
 
