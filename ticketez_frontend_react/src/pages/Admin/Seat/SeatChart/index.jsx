@@ -37,7 +37,7 @@ function SeatChart(props) {
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-            seatUnavailable: [],
+            seatUnavailable: ['J7'],
         };
 
         // Tạo mảng chỗ ngồi
@@ -171,7 +171,11 @@ function SeatChart(props) {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
 
         console.log('------------------------------------------------');
+        console.log("Vip", vipSeat);
 
+        console.log("normal", normalSeat);
+
+        console.log("Đã đặt",seatUnavailable);
         if (selectedSeatType === 'normal-seat') {
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);

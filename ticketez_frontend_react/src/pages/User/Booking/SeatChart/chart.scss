@@ -147,3 +147,9 @@ li {
 ::-webkit-scrollbar-thumb {
     background-color: transparent;
 }
+
+.hoverDiv:hover {
+    background-color: 'red';
+    color: 'white'; 
+}
+
