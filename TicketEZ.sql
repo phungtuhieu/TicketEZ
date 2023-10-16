@@ -158,7 +158,7 @@ GO
 CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
-    [image] NVARCHAR(255) NOT NULL,
+    [image] NVARCHAR(MAX) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -169,6 +169,7 @@ GO
         phone NVARCHAR(15) NOT NULL,
         opening_time TIME(0) NOT NULL,
         closing_time TIME(0) NOT NULL,
+        cinema_chain_id BIGINT NOT NULL,
         province_id BIGINT NOT NULL
     )
 GO
@@ -716,6 +717,11 @@ GO
 ALTER TABLE
     Cinema_Complex
 ADD
+    CONSTRAINT FK_CinemaComplex_Cinema_Chains FOREIGN KEY (cinema_chain_id) REFERENCES Cinema_Chains(id)
+GO
+ALTER TABLE
+    Cinema_Complex
+ADD
     CONSTRAINT FK_CinemaComplex_Provinces FOREIGN KEY (province_id) REFERENCES Provinces(id)
 GO
 ALTER TABLE
@@ -1002,24 +1008,32 @@ VALUES
 (N'Quốc Dũng Films', N'Việt Nam', 'info@quocdungfilms.vn', N'Nhà sản xuất phim Quốc Dũng Films tại Việt Nam.'),
 (N'Phim Tây Bắc', N'Việt Nam', 'contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
 GO
--- 2. thêm dữ liệu bảng cinema complex
-  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time], [province_id])
+INSERT INTO Cinema_Chains ([name],[image],[description])
 VALUES
-    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00', 2),
-    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00', 2),
-    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00', 5),
-    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00', 5),
-    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00', 54),
-    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00', 54),
-    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00', 55),
-    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00', 55),
-    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00', 1),
-    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00', 1),
-    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 42),
-    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00', 42),
-    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00', 42),
-    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00', 42),
-    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00', 42);
+(N'CGV',N'img', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'img',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'img',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'img', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'img', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+GO
+-- 2. thêm dữ liệu bảng cinema complex
+  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time], [cinema_chain_id],[province_id])
+VALUES
+    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',1, 2),
+    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00', 2,2),
+    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00', 3,5),
+    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00', 4,5),
+    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00', 5,54),
+    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00', 2,54),
+    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00', 3,55),
+    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00', 1,55),
+    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',4, 1),
+    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',5, 1),
+    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 1,42),
+    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00', 3,42),
+    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00', 2,42),
+    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00', 1,42),
+    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00', 4,42);
 GO
 
 
@@ -1059,14 +1073,7 @@ VALUES
 	(N'Cinema 16', 1, 8, 5),
 	(N'Cinema 17', 0, 6, 5);
 GO
-INSERT INTO Cinema_Chains ([name],[image],[description])
-VALUES
-(N'CGV',N'img', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'img',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'img',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'img', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'img', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
-GO
+
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
 INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
 VALUES
@@ -1113,9 +1120,9 @@ GO
 -- Chèn dữ liệu vào bảng SeatChart
 INSERT INTO Seat_Chart ([name], [rows], [columns], [status], cinema_id)
 VALUES
-    ('Biểu đồ 1', 10, 7, 1, 1),
-    ('Biểu đồ 2', 8, 12, 1, 1),
-    ('Biểu đồ 3', 12, 8, 0, 1);
+    (N'Sơ đồ 1', 10, 7, 1, 1),
+    (N'Sơ đồ 2', 8, 12, 1, 1),
+    (N'Sơ đồ 3', 12, 8, 0, 1);
 GO
 -- 8. Thêm dữ liệu về ghế
 INSERT INTO Seats ([name], [status], [description], seat_type_id, seat_chart_id)
