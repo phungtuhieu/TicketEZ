@@ -18,6 +18,7 @@ import moment from 'moment';
 const cx = classNames.bind(style);
 
 function AdminMovie() {
+    const [status, setStatus] = useState();
     const formatDate = 'DD-MM-YYYY';
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
