@@ -7,10 +7,10 @@ import CumRap from './ListCumRap/CumRap';
 function ShowTimes() {
     return (
         <div className="wrapper">
-            <Card bordered={false} style={{ width: 1088, marginTop: 30 }}>
+            <Card bordered={false} style={{ width: 1088, marginTop: 30, }} >
                 <Row >
-                    <Col span={24}className='bo' style={{ height: 140, backgroundColor: '#ffffff' }}>
-                        <Row className='bo'>
+                    <Col span={24} className='bo' style={{ height: 140, backgroundColor: '#ffffff' }}>
+                        <Row >
                             <Col
                                 span={24}
                                 style={{

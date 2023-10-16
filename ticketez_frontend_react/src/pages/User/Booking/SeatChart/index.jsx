@@ -202,7 +202,7 @@ function SeatChart(props) {
     };
 
     return (
-        <>
+        <div className='baoBoc'>
             <button onClick={handleZoomIn}>Phóng to</button>
             <button onClick={handleZoomOut}>Thu nhỏ</button>
 
@@ -362,7 +362,7 @@ function SeatChart(props) {
                 </Row>
             </Card>
             <BookingDetail open={isModalOpen} onCancel={handleCancel} />
-        </>
+        </div>
     );
 }
 

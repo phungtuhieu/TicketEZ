@@ -3,9 +3,12 @@ import { Button, Modal, Row, Col, Input } from 'antd';
 import { EnvironmentOutlined, AimOutlined } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import './ViTri.scss';
+import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 import axiosClient from '~/api/global/axiosClient';
+import classNames from 'classnames/bind';
+import style from './ViTri.module.scss';
+
+const cx = classNames.bind(style);
 
 function ViTri() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,40 +38,49 @@ function ViTri() {
         setIsModalOpen(false);
     };
     return (
-        <div className='wrapper-vitri'>
-            <span className="title">Vị trí </span>
-            <Button className="btn-first" onClick={showModal} icon={<EnvironmentOutlined />}>
+        <div className={cx('wrapper-vitri')}>
+            <span className={cx('title')}>Vị trí </span>
+            <Button className={cx('btn-first')} onClick={showModal} icon={<EnvironmentOutlined />}>
                 {provinces}
-                <span className="btn-first-icon-right">
+                <span className={cx('btn-first-icon-right')}>
                     <FontAwesomeIcon icon={faAngleDown} />
                 </span>
             </Button>
             <Modal
-                className="modal"
+                className={cx('modal','slideIn')}
                 footer={[
-                    <Button className="modal-footer-btn-close" onClick={handleCancel}>
+                    <Button className={cx('modal-footer-btn-close')} onClick={handleCancel}>
                         Đóng
                     </Button>,
                 ]}
                 open={isModalOpen}
                 onOk={handleOk}
+                closeIcon={false}
                 onCancel={handleCancel}
             >
-                <Row className="modal-header">
-                    <Col span={24} className="modal-header-col1">
-                        <span className="modal-header-col1-title">Chọn địa điểm</span>
+                <div className={cx('icon-close')}>
+                    <FontAwesomeIcon icon={faXmark} onClick={handleCancel} />
+                </div>
+
+                <Row className={cx('modal-header')}>
+                    <Col span={24} className={cx('modal-header-col1')}>
+                        <span className={cx('modal-header-col1-title')}>Chọn địa điểm</span>
                         <Input
-                            className="modal-header-col1-inputSearch"
+                            className={cx('modal-header-col1-inputSearch')}
                             suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                             placeholder="Tìm địa điểm ..."
                         />
                     </Col>
-                    <Col span={24} className="modal-header-col2">
+                    <Col span={24} className={cx('modal-header-col2')}>
                         {dataProvinces.map((a, index) => (
                             <Button
                                 key={index}
                                 type={a.name === provinces ? '' : 'text'}
-                                className={a.name === provinces ? 'btn btn-active' : 'btn btn-text'}
+                                // className={a.name === provinces ? 'btn btn-active' : 'btn btn-text'}
+                                className={cx('btn', {
+                                    'btn-active': a.name === provinces,
+                                    'btn-text': a.name !== provinces,
+                                })}
                                 onClick={() => {
                                     console.log(a.name);
                                     setProvinces(a.name);
@@ -87,7 +99,7 @@ function ViTri() {
                 </Row>
             </Modal>
 
-            <Button className="btn-second" icon={<AimOutlined />}>
+            <Button className={cx('btn-second')} icon={<AimOutlined />}>
                 Gần bạn
             </Button>
         </div>

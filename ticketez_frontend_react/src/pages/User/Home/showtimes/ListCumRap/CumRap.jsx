@@ -4,11 +4,25 @@ import { EnvironmentOutlined, AimOutlined } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import './CumRap.scss';
 
 import { Avatar, List, Skeleton } from 'antd';
+import classNames from 'classnames/bind';
+import style from './CumRap.module.scss'
+
+const cx = classNames.bind(style)
+
+
+
+
+
+
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
+
+
+
+
+
 const CumRap = () => {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -61,11 +75,11 @@ const CumRap = () => {
             </div>
         ) : null;
     return (
-        <div className='khung'>
+        <div className={cx('khung')}>
             <Row>
                 <Col span={24} style={{padding: 10}}>
                     <Input
-                        className="modal-header-col1-inputSearch"
+                        className={cx('modal-header-col1-inputSearch')}
                         suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                         placeholder="Tìm theo tên rạp ..."
                     />
@@ -73,7 +87,6 @@ const CumRap = () => {
                 <Col span={24}>
                     {' '}
                     <List
-                        className="demo-loadmore-list"
                         loading={initLoading}
                         itemLayout="horizontal"
                         loadMore={loadMore}
