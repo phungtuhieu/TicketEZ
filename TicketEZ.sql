@@ -115,7 +115,7 @@ GO
         MPAA_rating_id BIGINT NOT NULL
     )
 GO
-    CREATE TABLE Formats (
+    CREATE TABLE Formats (      
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(20) NOT NULL,
         [description] NVARCHAR(MAX)
@@ -158,6 +158,7 @@ GO
 CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
+    [image] NVARCHAR(255) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -1058,13 +1059,13 @@ VALUES
 	(N'Cinema 16', 1, 8, 5),
 	(N'Cinema 17', 0, 6, 5);
 GO
-INSERT INTO Cinema_Chains ([name], [description])
+INSERT INTO Cinema_Chains ([name],[image],[description])
 VALUES
-(N'CGV', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex', N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'img', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'img',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'img',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'img', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'img', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
 INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
