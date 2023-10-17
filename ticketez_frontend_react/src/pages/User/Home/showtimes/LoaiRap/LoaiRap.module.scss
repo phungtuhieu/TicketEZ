@@ -1,3 +1,31 @@
+.Loai-rap-col {
+    height: 92.8px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow: auto;
+    cursor: pointer;
+    margin: 2px 0;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+        cursor: pointer;
+    }
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        cursor: pointer;
+
+        background: #555;
+    }
+}
+
 .wrapper {
     // background-color: aqua;
     display: flex;

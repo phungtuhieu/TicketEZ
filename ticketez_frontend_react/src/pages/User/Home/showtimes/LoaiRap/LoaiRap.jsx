@@ -1,71 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Row, Col, Input } from 'antd';
-import { EnvironmentOutlined, AimOutlined } from '@ant-design/icons';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-
+import React, { useState } from 'react';
+import { Row, Col } from 'antd';
 import classNames from 'classnames/bind';
-
 import style from './LoaiRap.module.scss';
+import CumRap from '../ListCumRap/CumRap';
+
 const cx = classNames.bind(style);
 
-function LoaiRap() {
+function LoaiRap({ diaDiem }) {
     const [a, setA] = useState(true);
+    const [loai, setLoai] = useState('tất cả');
+
+    const diemVaLoai = {
+        diaDiem,
+        loai,
+    };
+    console.log('lay duoc dia diem roi', diaDiem);
 
     return (
-        <div className={cx('wrapper')}>
-            <div className={cx('container', { active: a, titleA: !a })}>
-                <div className={cx('border')}>
-                    <img
-                        className={cx('img')}
-                        src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                        alt=""
-                    />
+        <Row style={{ height: '100%' }}>
+            <Col span={24} className={cx('Loai-rap-col')}>
+                <div className={cx('wrapper')}>
+                    <div className={cx('container', { active: a, titleA: !a })}>
+                        <div className={cx('border')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                alt=""
+                            />
+                        </div>
+                        <div className={cx('title')}>Tất cả</div>
+                    </div>
+                    <div className={cx('container')} onClick={() => setLoai('1')}>
+                        <div className={cx('border')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                alt=""
+                            />
+                        </div>
+                        <div className={cx('title')}>Lotte Cinnnnn</div>
+                    </div>
+                    <div className={cx('container')} onClick={() => setLoai('2')}>
+                        <div className={cx('border')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                alt=""
+                            />
+                        </div>
+                        <div className={cx('title')}>Beta Cineeeee</div>
+                    </div>
+                    <div className={cx('container')} onClick={() => setLoai('3')}>
+                        <div className={cx('border')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                alt=""
+                            />
+                        </div>
+                        <div className={cx('title')}>Galaxy Cinnn</div>
+                    </div>
                 </div>
-                <div className={cx('title')}>Tất cả</div>
-            </div>
-            <div className={cx('container')}>
-                <div className={cx('border')}>
-                    <img
-                        className={cx('img')}
-                        src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                        alt=""
-                    />
-                </div>
-                <div className={cx('title')}>Lotte Cinnnnn</div>
-            </div>
-            <div className={cx('container')}>
-                <div className={cx('border')}>
-                    <img
-                        className={cx('img')}
-                        src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                        alt=""
-                    />
-                </div>
-                <div className={cx('title')}>Beta Cineeeee</div>
-            </div>
-            <div className={cx('container')}>
-                <div className={cx('border')}>
-                    <img
-                        className={cx('img')}
-                        src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                        alt=""
-                    />
-                </div>
-                <div className={cx('title')}>Galaxy Cinnn</div>
-            </div>
-            <div className={cx('container')}>
-                <div className={cx('border')}>
-                    <img
-                        className={cx('img')}
-                        src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                        alt=""
-                    />
-                </div>
-                <div className={cx('title')}>galaxy19991kcsnda</div>
-            </div>
-        </div>
+            </Col>
+            <CumRap diaVaLoai={diemVaLoai} />
+        </Row>
     );
 }
 
