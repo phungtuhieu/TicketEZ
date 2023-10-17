@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Form, Input, Popconfirm, Row, Select, Space, TimePicker, message } from 'antd';
+import { Button, Col, DatePicker, Form, Image, Input, Popconfirm, Row, Select, Space, TimePicker, Upload, message } from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 
 import style from './Movie.module.scss';
@@ -20,6 +20,7 @@ const cx = classNames.bind(style);
 function AdminMovie() {
     const [status, setStatus] = useState();
     const formatDate = 'DD-MM-YYYY';
+    const [fileList, setFileList] = useState([]);
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
@@ -243,7 +244,9 @@ function AdminMovie() {
                 text
             ),
     });
-
+    const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
     const columns = [
         {
             title: 'Tên phim',
@@ -254,6 +257,24 @@ function AdminMovie() {
                 multiple: 4,
             },
             ...getColumnSearchProps('title'),
+        },
+        
+        {
+            title: 'Poster',
+            dataIndex: 'poster',
+            key: 'poster',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.poster}`}
+                    />
+                </Space>
+            ),
+            // ...getColumnSearchProps('duration'),
         },
         {
             title: 'Thời lượng',
@@ -422,6 +443,25 @@ function AdminMovie() {
                     >
                         <Input />
                     </Form.Item>
+                    <Form.Item
+                            {...formItemLayout}
+                            label="Ảnh đại diện"
+                            name="avatar"
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                        >
+                            <Upload
+                                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                accept=".png, .jpg"
+                                listType="picture-card"
+                                onChange={onChangeUpload}
+                                // onPreview={onPreview}
+                                fileList={fileList}
+                                name="avatar"
+                                maxCount={1}
+                            >
+                                {fileList.length < 1 && '+ Upload'}
+                            </Upload>
+                        </Form.Item>
                     <Form.Item name="duration" label="Thời lượng" {...config}>
                         <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
                     </Form.Item>
@@ -439,6 +479,7 @@ function AdminMovie() {
                             <Input disabled />
                         </Form.Item>
                     )}
+                    
                     <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
                         <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
                     </Form.Item>
