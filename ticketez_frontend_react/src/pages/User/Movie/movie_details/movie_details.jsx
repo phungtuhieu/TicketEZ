@@ -14,7 +14,7 @@ const MovieDetails = (props) => {
 
     function setZoom() {
         if (navigator.appVersion.indexOf('Win') !== -1) {
-            document.body.style.zoom = '75%';
+            document.body.style.zoom = '80%';
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.discount.Discount;
 import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.province.Province;
@@ -61,4 +62,11 @@ public class CinemaComplex {
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Cinema> cinemas;
+
+	@ManyToOne
+	@JoinColumn(name = "cinema_chain_id")
+	private CinemaChain cinemaChain;
+
+
+
 }
