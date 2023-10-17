@@ -47,8 +47,4 @@ public class Cinema {
 	@JsonIgnore 
 	@OneToMany(mappedBy = "cinema")
 	private List<Showtime> showtimes;
-
-	@ManyToOne
-	@JoinColumn(name ="cinema_chain_id")
-	private CinemaChain cinemaChain;
 }
