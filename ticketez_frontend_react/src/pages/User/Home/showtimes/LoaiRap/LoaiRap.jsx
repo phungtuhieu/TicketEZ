@@ -60,6 +60,17 @@ function LoaiRap({ diaDiem }) {
                         </div>
                         <div className={cx('title')}>Galaxy Cinnn</div>
                     </div>
+                    <div className={cx('container')} onClick={() => setLoai('2')}>
+                        <div className={cx('border')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                alt=""
+                            />
+                        </div>
+                        <div className={cx('title')}>Beta Cineeeee</div>
+                    </div>
+                   
                 </div>
             </Col>
             <CumRap diaVaLoai={diemVaLoai} />

@@ -145,11 +145,7 @@
             }
         }
     }
-
     .modal-header-col2 {
-        // background-color: rebeccapurple;
-        // display: flex;
-
         width: 100%;
         display: flex;
         max-height: 430px;
@@ -170,12 +166,7 @@
             border-color: #d82d8b;
             font-weight: 500;
 
-            // &:hover {
-            //     color: #d82d8b !important;
-            //     border-color: #d82d8b !important;
-            //     --tw-bg-opacity: 1;
-            //     background-color: rgb(250 250 250 / var(--tw-bg-opacity));
-            // }
+           
         }
         .btn-text {
             &:hover {

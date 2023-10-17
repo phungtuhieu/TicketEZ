@@ -4,10 +4,10 @@ import { EnvironmentOutlined, AimOutlined } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
-import axiosClient from '~/api/global/axiosClient';
 import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
+import axios from 'axios';
 
 const cx = classNames.bind(style);
 
@@ -17,9 +17,10 @@ function ViTri() {
     const [provinces, setProvinces] = useState('Thành phố Hà Nội');
     const [dataProvinces, setDataProvinces] = useState([]);
 
+
     useEffect(() => {
         const get = async () => {
-            const res = await axiosClient.get('https://provinces.open-api.vn/api/');
+            const res = await axios.get('https://provinces.open-api.vn/api/');
             // console.log(res.data);
             setDataProvinces(res.data);
         };

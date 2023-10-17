@@ -124,7 +124,7 @@ const CumRap = ({ diaVaLoai }) => {
                     </Row>
                 </div>
             </Col>
-            <Col span={16} style={{ minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
+            <Col span={16} style={{ width: '100%', minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
                 <ListPhim />
             </Col>
         </>
