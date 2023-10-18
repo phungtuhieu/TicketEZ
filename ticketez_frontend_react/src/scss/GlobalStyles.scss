@@ -17,5 +17,15 @@ body {
     text-rendering: optimizeSpeed;
 }
 
-
+.ant-collapse{
+    border: none !important;
+    border-radius: 0px;
+    padding: 0 !important;
+    margin: 0 -10px !important;
+    background-color: transparent !important;
     
+}
+.ant-collapse-item {
+    border: none !important;
+
+}
