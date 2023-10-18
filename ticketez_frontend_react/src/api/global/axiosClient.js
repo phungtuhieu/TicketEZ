@@ -9,7 +9,9 @@ const axiosClient = axios.create({
     baseURL: baseUrl,
     headers: {
         'Content-type': 'application/json',
+    
     },
+    withCredentials: true,
 });
 
 axiosClient.interceptors.response.use(

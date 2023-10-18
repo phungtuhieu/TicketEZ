@@ -43,7 +43,9 @@ const items = [
 
     // Quản lý dịch vụ, sự kiện
     getItem('Dịch vụ & sự kiện', 'grServiceEvent', <FontAwesomeIcon icon={solidIcons.faCalendarCheck} />, [
-        getItem(<Link to="/admin/combo">Combo</Link>, 'combo'),
+        getItem(<Link to="/admin/combo">Combo</Link>, 'combo', null),
+        getItem(<Link to="/admin/service">Dịch vụ</Link>, 'service'),
+        getItem(<Link to="/admin/priceService">Giá dịch vụ</Link>, 'priceService'),
         getItem(
             'Sự kiện',
             'grEvent',

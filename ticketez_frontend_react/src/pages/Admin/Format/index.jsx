@@ -8,7 +8,7 @@ import Highlighter from 'react-highlight-words';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
-import style from './scss.scss';
+import style from './Format.module.scss';
 import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
 import { formatApi } from '~/api/admin';

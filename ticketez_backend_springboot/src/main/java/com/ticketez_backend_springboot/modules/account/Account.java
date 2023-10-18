@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ticketez_backend_springboot.modules.accountRole.AccountRole;
+import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.review.Review;
 
@@ -39,7 +41,14 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<Booking> bookings;
-//
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	private List<AccountRole> accountRoles;
+
+	@OneToMany(mappedBy = "account")
+	private List<ActivityLog> activityLogs;
+	
 //	@OneToMany(mappedBy = "account")
 //	private List<ServiceBooking> servicesBookings;
 

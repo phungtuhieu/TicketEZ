@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.childSeatChart.ChildSeatChart;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
@@ -50,5 +51,11 @@ public class Showtime {
 	@JsonIgnore
 	@OneToMany(mappedBy = "showtime")
 	private List<Booking> bookings;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "showTime")
+	private List<ChildSeatChart> childSeatCharts;
+
+
 
 }

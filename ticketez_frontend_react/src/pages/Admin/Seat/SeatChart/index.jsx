@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Divider, Space, Tag, Radio, Col, Row, Card } from 'antd';
 import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
+// import '~/pages/User/Booking/SeatChart/chart.scss'
 import FormOption from '../FormOption';
 import RRadioBox from '../RadioBox';
 import axiosClient from '~/api/global/axiosClient';
@@ -36,7 +37,7 @@ function SeatChart(props) {
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-            seatUnavailable: [],
+            seatUnavailable: ['J7'],
         };
 
         // Tạo mảng chỗ ngồi
@@ -170,7 +171,11 @@ function SeatChart(props) {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
 
         console.log('------------------------------------------------');
+        console.log("Vip", vipSeat);
 
+        console.log("normal", normalSeat);
+
+        console.log("Đã đặt",seatUnavailable);
         if (selectedSeatType === 'normal-seat') {
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
@@ -226,7 +231,7 @@ function SeatChart(props) {
         <>
             <Card className={cx('card')}>
                 <Row>
-                    <Col span={24}>
+                    <Col className={cx('div-screen')} span={16} style={{marginLeft:'45px'}}>
                         <hr className={cx('screen')} />
                         <h6 className={cx('screen-title')}>Màn hình</h6>
                     </Col>

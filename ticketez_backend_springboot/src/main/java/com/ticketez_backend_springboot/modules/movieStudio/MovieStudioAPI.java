@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/movie-studio")
 public class MovieStudioAPI {
@@ -33,7 +32,8 @@ public class MovieStudioAPI {
     @GetMapping
     public ResponseEntity<?> findAll(
             @RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit) {
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<String> search) {
         try {
             if (pageNo.isPresent() && pageNo.get() == 0) {
                 return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);

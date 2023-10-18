@@ -28,4 +28,5 @@ export { default as  seatTypeApi } from './managementSeat/seatTypeApi'
 export { default as  comboApi } from './ManageCombosAndEvents/comboApi'
 export { default as  discountApi } from './ManageCombosAndEvents/discountApi'
 export { default as  eventApi } from './ManageCombosAndEvents/eventApi'
+export { default as  serviceApi } from './ManageCombosAndEvents/serviceApi'
 
