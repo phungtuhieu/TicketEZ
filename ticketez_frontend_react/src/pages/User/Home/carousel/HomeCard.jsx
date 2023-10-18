@@ -8,7 +8,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
             <Row>
                 <Col style={{ backgroundColor: 'red' }}>
                     <div className="coverImage">
-                        <img src={cover} alt=""  />
+                        <img src={cover} alt="" />
                     </div>
                 </Col>
                 <Col>
@@ -22,10 +22,10 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                                 <i className="fa fa-star"></i>
                                 <i className="fa fa-star-half"></i>
                                 <label>{rating}(Imdb)</label>
-                                <span>GP</span>
+                                <span className="border">GP</span>
                                 <label>{time}</label>
                             </div>
-                            <p className='description'>{desc}</p>
+                            <p className="description">{desc}</p>
                             <div className="cast">
                                 <p>
                                     <span>Starring </span>
@@ -40,7 +40,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                                     {tags}
                                 </p>
                             </div>
-                            <button className="">
+                            <button className="border">
                                 <i className="fas fa-play"></i> PLAY NOW
                             </button>
                         </Col>

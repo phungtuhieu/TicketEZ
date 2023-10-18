@@ -1,6 +1,5 @@
-package com.ticketez_backend_springboot.modules.movieStudio;
+package com.ticketez_backend_springboot.modules.movieProducer;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,11 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/movie-studio")
-public class MovieStudioAPI {
+@RequestMapping("/api/movie-producer")
+public class MovieProducerAPI {
     @Autowired
-    MovieStudioDAO dao;
-
+    MovieProducerDAO dao;
+    
     @GetMapping
     public ResponseEntity<?> findAll(
             @RequestParam("page") Optional<Integer> pageNo,
@@ -41,8 +40,8 @@ public class MovieStudioAPI {
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<MovieStudio> page = dao.findAll(pageable);
-            ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
+            Page<MovieProducer> page = dao.findAll(pageable);
+            ResponseDTO<MovieProducer> responeDTO = new ResponseDTO<>();
             responeDTO.setData(page.getContent());
             responeDTO.setTotalItems(page.getTotalElements());
             responeDTO.setTotalPages(page.getTotalPages());
@@ -67,23 +66,23 @@ public class MovieStudioAPI {
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody MovieStudio movieStudio) {
+    public ResponseEntity<?> post(@RequestBody MovieProducer movieProducer) {
         try {
-            dao.save(movieStudio);
-             return ResponseEntity.ok(movieStudio);
+            dao.save(movieProducer);
+             return ResponseEntity.ok(movieProducer);
         } catch (Exception e) {
             return new ResponseEntity<>("Không thể thêm dữ liệu mới", HttpStatus.CONFLICT);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieStudio movieStudio) {
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieProducer movieProducer) {
         try {
              if (!dao.existsById(id)) {
                 return new ResponseEntity<>("Không tìm thấy dữ liệu", HttpStatus.NOT_FOUND);
             }
-            dao.save(movieStudio);
-            return ResponseEntity.ok(movieStudio);
+            dao.save(movieProducer);
+            return ResponseEntity.ok(movieProducer);
         } catch (Exception e) {
            return new ResponseEntity<>("Lỗi khi cập nhật dữ liệu",HttpStatus.CONFLICT);
         }
