@@ -195,22 +195,61 @@
             text-align: left;
 
             .container-thong-tin-phim {
+                height: 64px;
+                margin: 0 0 10px 0;
+
+                .ten-phim {
+                    font-size: 16px;
+                    font-weight: 500;
+                    color: #262626;
+                    padding-top: 3px;
+                }
+
+                .the-loai-phim {
+                    font-size: 12px;
+                    color: #b7b7b7;
+                    line-height: 13px;
+                }
             }
 
             .container-suat-chieu {
+
+                .title {
+                    margin-bottom: 0.5rem;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+
                 .suat-chieu {
                     display: flex;
                     max-height: 430px;
                     flex-wrap: wrap;
                     gap: 10px;
+                    margin-bottom: 15px;
                 }
-                .btn-suat-chieu { 
+                .btn-suat-chieu {
                     width: calc(25% - 10px);
-                }
+                    border-color: #38bdf8;
+                    color: #0284c7;
+                    font-size: 13px;
 
-                .gio-bat-dau::after {
-                    content: "~";
-                    padding: 0px 5px;
+                    &:hover {
+                        color: #0d9dde;
+                    }
+
+                    .gio-bat-dau {
+                        font-weight: 600;
+
+                        &::after {
+                            content: '~';
+                            padding: 0px 5px;
+                            font-weight: 400;
+                        }
+                    }
+
+                    .gio-ket-thuc {
+                        font-size: 11.5px;
+                    }
                 }
             }
         }

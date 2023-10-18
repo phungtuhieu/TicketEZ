@@ -114,19 +114,49 @@ function ListPhim() {
                         <Col span={20} className={cx('col2-movie')}>
                             <Row>
                                 <Col span={24} className={cx('container-thong-tin-phim')}>
-                                    <div className={cx('')}>16</div>
-                                    <div className={cx('')}>Muôn Kiếp Nhân Duyên</div>
-                                    <div className={cx('')}>Chính Kịch, Lãng Mạn</div>
+                                    <div className={cx('k')}>K</div>
+                                    <div className={cx('ten-phim')}>Muôn Kiếp Nhân Duyên</div>
+                                    <div className={cx('the-loai-phim')}>Chính Kịch, Lãng Mạn</div>
                                 </Col>
                                 <Col span={24} className={cx('container-suat-chieu')}>
-                                    <div>2D Phụ đề</div>
+                                    <div className={cx('title')}>2D Phụ đề</div>
                                     <div className={cx('suat-chieu')}>
                                         <Button className={cx('btn-suat-chieu')} danger>
                                             <span className={cx('gio-bat-dau')}>20:45</span>
                                             <span className={cx('gio-ket-thuc')}>21:45</span>
                                         </Button>
+                                        <Button className={cx('btn-suat-chieu')} danger>
+                                            <span className={cx('gio-bat-dau')}>20:45</span>
+                                            <span className={cx('gio-ket-thuc')}>21:45</span>
+                                        </Button>
+                                        <Button className={cx('btn-suat-chieu')} danger>
+                                            <span className={cx('gio-bat-dau')}>20:45</span>
+                                            <span className={cx('gio-ket-thuc')}>21:45</span>
+                                        </Button>
+                                        <Button className={cx('btn-suat-chieu')} danger>
+                                            <span className={cx('gio-bat-dau')}>20:45</span>
+                                            <span className={cx('gio-ket-thuc')}>21:45</span>
+                                        </Button>
+                                        <Button className={cx('btn-suat-chieu')} danger>
+                                            <span className={cx('gio-bat-dau')}>20:45</span>
+                                            <span className={cx('gio-ket-thuc')}>21:45</span>
+                                        </Button>
+
                                     </div>
                                 </Col>
+
+                                <Col span={24} className={cx('container-suat-chieu')}>
+                                    <div className={cx('title')}>2D Phụ đề</div>
+                                    <div className={cx('suat-chieu')}>
+                                        <Button className={cx('btn-suat-chieu')} danger>
+                                            <span className={cx('gio-bat-dau')}>20:45</span>
+                                            <span className={cx('gio-ket-thuc')}>21:45</span>
+                                        </Button>
+                                       
+
+                                    </div>
+                                </Col>
+                                
                             </Row>
                         </Col>
                     </Row>
