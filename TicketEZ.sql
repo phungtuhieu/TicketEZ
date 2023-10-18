@@ -104,6 +104,7 @@ GO
     CREATE TABLE Movies (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         title NVARCHAR (500) NOT NULL,
+        poster NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX) NOT NULL,
         duration TIME(0) NOT NULL,
         release_date DATE NOT NULL,
