@@ -83,12 +83,14 @@ ul.mar li {
 }
 // Đã đặt
 .unavailable {
+    border-radius: 10px;
     display: inline-block;
     background-color: #404040;
     // pointer-events: none;
 }
 // Ghế bạn chọn
 .reserved {
+    border-radius: 10px;
     border-color: #1ea83c !important;
     color: #fff;
     background-color: #1ea83c !important;
@@ -97,12 +99,14 @@ ul.mar li {
 
 /*ghế thường */
 .normal-seat {
+    border-radius: 10px;
     background-color: #5b2b9f; /* Màu nền cho ghế thường */
     color: white; /* Màu chữ cho ghế thường */
 }
 
 /*ghế VIP */
 .vip-seat {
+    border-radius: 10px;
     background-color: #b7232b; /* Màu nền cho ghế VIP */
     color: white; /* Màu chữ cho ghế VIP */
 }

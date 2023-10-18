@@ -27,8 +27,6 @@ public class Account {
 	private Date birthday;
 	private boolean gender;
 	private String image;
-	private boolean role;
-	private boolean active;
 
 	
 	private boolean verified;
