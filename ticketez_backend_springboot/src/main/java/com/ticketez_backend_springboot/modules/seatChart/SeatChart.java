@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.seatChart;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ticketez_backend_springboot.modules.childSeatChart.ChildSeatChart;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.priceService.PriceService;
 import com.ticketez_backend_springboot.modules.seat.Seat;
@@ -35,4 +36,9 @@ public class SeatChart {
     @JsonIgnore
     @OneToMany(mappedBy = "seatChart")
     private List<Seat> Seats;
+
+     @JsonIgnore
+    @OneToMany(mappedBy = "seatChart")
+    private List<ChildSeatChart> childSeatCharts;
+
 }

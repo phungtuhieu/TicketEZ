@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/movie")
 public class MovieAPI {

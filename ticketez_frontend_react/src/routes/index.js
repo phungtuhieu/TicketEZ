@@ -33,6 +33,7 @@ const publicRoutes = [
     { path: '/login', component: LoginSignin, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
+    { path: '/movie-details', component: PageUser.MovieDetails, layout: DefaultLayout },
 ];
 
 const privateRoutes = [];

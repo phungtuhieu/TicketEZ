@@ -19,9 +19,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}cinemaComplex",
+									"raw": "{{url}}cinemaComplex/getAll",
 									"host": [
 										"{{url}}cinemaComplex"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All cụm rạp By Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}cinemaComplex?page=1&limit=10",
+									"host": [
+										"{{url}}cinemaComplex"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -117,6 +144,23 @@
 					"item": [
 						{
 							"name": "All rạp",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}cinema/getAll",
+									"host": [
+										"{{url}}cinema"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All rạp By Page",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -432,9 +476,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}movie",
+									"raw": "{{url}}movie/getAll",
 									"host": [
 										"{{url}}movie"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All phim By Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}movie?page=1&limit=10",
+									"host": [
+										"{{url}}movie"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -530,6 +601,23 @@
 					"item": [
 						{
 							"name": "All hãng phim",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}movie-studio/getAll",
+									"host": [
+										"{{url}}movie-studio"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All hãng phim By Page",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -636,9 +724,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}showtime",
+									"raw": "{{url}}showtime/getAll",
 									"host": [
 										"{{url}}showtime"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All xuất chiếu Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}showtime?page=1&limit=10",
+									"host": [
+										"{{url}}showtime"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -734,6 +849,23 @@
 					"item": [
 						{
 							"name": "All diễn viên",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}actor/getAll",
+									"host": [
+										"{{url}}actor"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All diễn viên By Page",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -846,9 +978,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}director",
+									"raw": "{{url}}director/getAll",
 									"host": [
 										"{{url}}director"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All đạo diễn By Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}director?page=1&limit=10",
+									"host": [
+										"{{url}}director"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -1139,9 +1298,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}seatType",
+									"raw": "{{url}}seatType/getAll",
 									"host": [
 										"{{url}}seatType"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All loại ghế By Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}seatType?page=1&limit=10",
+									"host": [
+										"{{url}}seatType"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -1242,6 +1428,23 @@
 					"item": [
 						{
 							"name": "All combo",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}service/getAll",
+									"host": [
+										"{{url}}service"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All combo By Page",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -1446,12 +1649,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}event/1",
+									"raw": "{{url}}event/8",
 									"host": [
 										"{{url}}event"
 									],
 									"path": [
-										"1"
+										"8"
 									]
 								}
 							},
@@ -1495,12 +1698,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}event/1",
+									"raw": "{{url}}event/8",
 									"host": [
 										"{{url}}event"
 									],
 									"path": [
-										"1"
+										"8"
 									]
 								}
 							},
@@ -1536,9 +1739,44 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}account",
+							"raw": "{{url}}account/getAll",
 							"host": [
 								"{{url}}account"
+							],
+							"path": [
+								"getAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All người dùng By Page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}account?page=1&limit=10&active=false&search=",
+							"host": [
+								"{{url}}account"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "active",
+									"value": "false"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
 							]
 						}
 					},
@@ -1550,11 +1788,38 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}account/0866602116",
+							"raw": "{{url}}account/0994949994",
 							"host": [
 								"{{url}}account"
 							],
 							"path": [
+								"0994949994"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sửa actice",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n        \"active\": false\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}account/active/0866602116",
+							"host": [
+								"{{url}}account"
+							],
+							"path": [
+								"active",
 								"0866602116"
 							]
 						}
@@ -1562,7 +1827,34 @@
 					"response": []
 				},
 				{
-					"name": "Thêm đạo diễn Copy 6",
+					"name": "Sửa thông tin người dùng",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\": \"a\",\r\n    \"birthday\": \"2000-23-03\",\r\n    \"gender\": false,\r\n    \"email\": \"c\",\r\n    \"image\": \"D\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}account/infoUser/0866602116",
+							"host": [
+								"{{url}}account"
+							],
+							"path": [
+								"infoUser",
+								"0866602116"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Thêm người dùng",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -1576,14 +1868,26 @@
 					"response": []
 				},
 				{
-					"name": "Sửa đạo diễn Copy 6",
+					"name": "Sửa người dùng",
 					"request": {
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\": \"0994949994\",\r\n    \"fullname\": \"Nguyễn Hoàng Dinh\",\r\n    \"email\": \"Dinh@gmail.com\",\r\n    \"password\": \"dinh069\",\r\n    \"birthday\": \"2003-09-23T17:00:00.000+00:00\",\r\n    \"gender\": false,\r\n    \"image\": \"profile_image.jpg\",\r\n    \"role\": false,\r\n    \"active\": true,\r\n    \"verified\": true,\r\n    \"points\": 1000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{url}}",
+							"raw": "{{url}}account/0994949994",
 							"host": [
-								"{{url}}"
+								"{{url}}account"
+							],
+							"path": [
+								"0994949994"
 							]
 						}
 					},
@@ -1657,9 +1961,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}format",
+									"raw": "{{url}}booking",
 									"host": [
-										"{{url}}format"
+										"{{url}}booking"
 									]
 								}
 							},
@@ -1923,9 +2227,36 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}price-service",
+									"raw": "{{url}}price-service/getAll",
 									"host": [
 										"{{url}}price-service"
+									],
+									"path": [
+										"getAll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All giá dịch vụ By Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}price-service?page1&limit=10",
+									"host": [
+										"{{url}}price-service"
+									],
+									"query": [
+										{
+											"key": "page1",
+											"value": null
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
 									]
 								}
 							},
@@ -2519,6 +2850,10 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Statistics",
+			"item": []
 		}
 	],
 	"event": [
