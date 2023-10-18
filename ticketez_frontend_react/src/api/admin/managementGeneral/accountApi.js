@@ -42,18 +42,18 @@ class AccountApi extends BaseApi {
     constructor() {
         super('account');
     }
-    async getByPage(page, limit, active, search) {
+    async getByPage(page, limit, search, status) {
         const params = {
             page,
             limit,
-            active,
             search,
+            status,
         };
         const res = await axiosClient.get(url, { params });
         return res.data;
     }
-    async patchActive(id, booleanActive) {
-        return axiosClient.patch(url + '/active/' + id, { active: booleanActive });
+    async patchStatus(id, Status) {
+        return axiosClient.patch(url + '/status/' + id, { status: Status });
     }
     async patchInfoUser(id, data) {
         return axiosClient.patch(url + '/infoUser/' + id, data);

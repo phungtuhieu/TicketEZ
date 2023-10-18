@@ -1,4 +1,4 @@
-import React, {  useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Button,
     Input,
@@ -32,6 +32,7 @@ import PaginationCustom from '~/components/Admin/PaginationCustom';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useDebounce } from '~/hooks';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -57,25 +58,28 @@ const AdminAccount = () => {
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
 
-    const [active, setActive] = useState(true);
+    const [status, setStatus] = useState(1);
     const [search, setSearch] = useState('');
+
+    const valueSearchDelay = useDebounce(search, 500);
 
     //call api
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await accountApi.getByPage(currentPage, pageSize, active, search);
+                const res = await accountApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
+                console.log(res.data);
             } catch (error) {
                 console.log(error);
                 funcUtils.notify(error.response.data, 'error');
             }
         };
         getList();
-    }, [currentPage, pageSize, workSomeThing, active, search]);
+    }, [currentPage, pageSize, workSomeThing, status, valueSearchDelay]);
 
     const columns = [
         {
@@ -111,14 +115,17 @@ const AdminAccount = () => {
         {
             title: 'email',
             dataIndex: 'email',
-            // width: '10%',
+        },
+        {
+            title: 'Địa chỉ',
+            dataIndex: 'address',
         },
         {
             title: 'Hoạt động',
-            dataIndex: 'active',
+            dataIndex: 'status',
             render: (_, record) => {
-                const statusText = record.active ? 'Hoạt động' : 'Khoá ';
-                const tagColor = record.active ? 'green' : 'red';
+                const statusText = record.status === 1 ? 'Hoạt động' : 'Khoá ';
+                const tagColor = record.status === 1 ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
@@ -128,7 +135,7 @@ const AdminAccount = () => {
             title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
-                    {record.active && (
+                    {record.status === 1 && (
                         <FontAwesomeIcon
                             icon={faPen}
                             className={cx('icon-pen')}
@@ -139,13 +146,13 @@ const AdminAccount = () => {
                     )}
 
                     <Popconfirm
-                        title={record.active ? 'Khoá tài khoản' : 'Mở khoá tài khoản'}
-                        description={record.active ? 'Chắn chắn khoá?' : 'Chắn chắn mở?'}
+                        title={record.status === 1 ? 'Khoá tài khoản' : 'Mở khoá tài khoản'}
+                        description={record.status === 1 ? 'Chắn chắn khoá?' : 'Chắn chắn mở?'}
                         okText="Đồng ý"
                         cancelText="Huỷ"
-                        onConfirm={() => handleActive(record)}
+                        onConfirm={() => handleStatus(record)}
                     >
-                        {record.active ? (
+                        {record.status === 1 ? (
                             <FontAwesomeIcon icon={faLockOpen} className={cx('icon-trash')} />
                         ) : (
                             <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />
@@ -160,12 +167,12 @@ const AdminAccount = () => {
         setFileList(newFileList);
     };
 
-    const handleActive = async (record) => {
+    const handleStatus = async (record) => {
         try {
-            if (record.phone) {
-                const active = record.active ? false : true;
-                const res = await accountApi.patchActive(record.phone, active);
-                if (res.status === 200 && !active) {
+            if (record.id) {
+                const status = record.status === 1 ? 2 : 1;
+                const res = await accountApi.patchStatus(record.id, status);
+                if (res.status === 200 && status === 2) {
                     funcUtils.notify('Khoá tài khoản thành công', 'success');
                 } else {
                     funcUtils.notify('Mở tài khoản thành công', 'success');
@@ -199,7 +206,7 @@ const AdminAccount = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            console.log(values);
+            console.log('values:::::', values);
             if (fileList.length > 0) {
                 if (editData) {
                     let upl = {
@@ -215,7 +222,7 @@ const AdminAccount = () => {
                             image: image,
                         };
                     }
-                    await accountApi.patchInfoUser(values.phone, upl);
+                    await accountApi.patchInfoUser(values.id, upl);
                     funcUtils.notify('Cập nhật diễn viên thành công', 'success');
                 }
                 setOpen(false);
@@ -270,7 +277,7 @@ const AdminAccount = () => {
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
-        setActive(value);
+        setStatus(value);
     };
     return (
         <>
@@ -281,7 +288,7 @@ const AdminAccount = () => {
 
                 <Col>
                     <Select
-                        defaultValue={true}
+                        defaultValue={1}
                         style={{
                             width: 150,
                         }}
@@ -290,8 +297,8 @@ const AdminAccount = () => {
                             {
                                 label: 'Danh sách tài khoản',
                                 options: [
-                                    { label: 'Hoạt động', value: true },
-                                    { label: 'Bị khoá', value: false },
+                                    { label: 'Hoạt động', value: 1 },
+                                    { label: 'Bị khoá', value: 2 },
                                 ],
                             },
                         ]}
@@ -321,12 +328,12 @@ const AdminAccount = () => {
                     ]}
                 >
                     <Form form={form} name="dynamic_rule" onFinish={handleOk} style={{ maxWidth: 1000 }}>
-                        <Form.Item name="phone" style={{ display: 'none' }}></Form.Item>
+                        <Form.Item name="id" style={{ display: 'none' }}></Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="fullname"
                             label="Họ và tên"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
                         >
                             <Input placeholder="Họ và tên" />
                         </Form.Item>
@@ -335,18 +342,12 @@ const AdminAccount = () => {
                             {...formItemLayout}
                             name="birthday"
                             label="Ngày sinh"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập ngày sinh' }]}
                         >
-                            <DatePicker placeholder="Ngày sinh" format={'DD-MM-YYYY'} style={{ width: '100%' }} />
+                            <DatePicker placeholder="Ngày sinh..." format={'DD-MM-YYYY'} style={{ width: '100%' }} />
                         </Form.Item>
 
-                        <Form.Item
-                            {...formItemLayout}
-                            name="gender"
-                            label="Giới tính"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
-                            valuePropName="checked"
-                        >
+                        <Form.Item {...formItemLayout} name="gender" label="Giới tính" valuePropName="checked">
                             <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked />
                         </Form.Item>
 
@@ -354,9 +355,39 @@ const AdminAccount = () => {
                             {...formItemLayout}
                             name="email"
                             label="Emai"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập email' },
+                                {
+                                    pattern: /^[A-Za-z0-9._%+-]+@gmail\.com$/,
+                                    message: 'Email không hợp lệ. Phải có đuôi @email.com',
+                                },
+                            ]}
                         >
-                            <Input placeholder="Họ và tên" />
+                            <Input placeholder="email..." />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="phone"
+                            label="Số điện thoại"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập số điện thoại' },
+                                {
+                                    pattern: /^0\d{9}$/,
+                                    message: 'Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và gồm 10 số.',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Số điện thoại..." />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="address"
+                            label="Địa chỉ"
+                            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                        >
+                            <Input placeholder="Địa chỉ..." />
                         </Form.Item>
 
                         <Form.Item
@@ -382,11 +413,12 @@ const AdminAccount = () => {
                 </BaseModal>
             </Row>
             <BaseTable
+                loading={loading}
                 pagination={false}
                 columns={columns}
                 dataSource={posts.map((post) => ({
                     ...post,
-                    key: post.phone,
+                    key: post.id,
                     birthday: `${('0' + new Date(post.birthday).getDate()).slice(-2)}-${(
                         '0' +
                         (new Date(post.birthday).getMonth() + 1)

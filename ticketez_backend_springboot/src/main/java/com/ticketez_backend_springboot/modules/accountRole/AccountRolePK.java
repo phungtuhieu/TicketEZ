@@ -21,11 +21,11 @@ import lombok.Setter;
 
 public class AccountRolePK implements Serializable  {
 
-    @JoinColumn(name = "account_id", insertable = false, updatable = false)
+    @Column(name = "account_id", insertable = false, updatable = false)
     private Long accountID;
 
 
-    @JoinColumn(name = "role_id", insertable = false, updatable = false)
+    @Column(name = "role_id", insertable = false, updatable = false)
     private Long roleID ;
 
     public AccountRolePK(Long accountID, Long roleID) {

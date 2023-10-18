@@ -250,7 +250,7 @@ const AdminActor = () => {
                 funcUtils.notify('Xoá thành công', 'success');
             }
         } catch (error) {
-                console.log(error);
+            console.log(error);
         }
 
         setWorkSomeThing(!workSomeThing);
