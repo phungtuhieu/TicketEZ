@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Form, Input, Popconfirm, Row, Select, Space, TimePicker, message } from 'antd';
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Image,
+    Input,
+    Popconfirm,
+    Row,
+    Select,
+    Space,
+    TimePicker,
+    Upload,
+    message,
+} from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 
 import style from './Movie.module.scss';
@@ -14,13 +28,21 @@ import PaginationCustom from '~/components/Admin/PaginationCustom';
 import { movieApi, movieStudioApi } from '~/api/admin';
 import '~/scss/_global.scss';
 import moment from 'moment';
+import uploadApi from '~/api/service/uploadApi';
+import httpStatus from '~/api/global/httpStatus';
+import movieProducerApi from '~/api/admin/managementMovie/movieProducerApi';
+import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 
 const cx = classNames.bind(style);
 
 function AdminMovie() {
     const [status, setStatus] = useState();
     const formatDate = 'DD-MM-YYYY';
+    const [fileList, setFileList] = useState([]);
     const [list, setList] = useState([]);
+    const [movieStudios, setMovieStudios] = useState([]);
+    const [movieProducers, setMovieProducers] = useState([]);
+    const [listMPPA, setListMPPA] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -44,25 +66,38 @@ function AdminMovie() {
         try {
             const values = await form.validateFields();
             console.log(values);
-            if (!dataEdit) {
-                const resp = await axiosClient.post('movie', values);
-                setLoadingButton(false);
-                setworkSomething(!workSomething);
-                form.resetFields();
-                message.success('thêm thành công');
-            } else {
-                const resp = await movieApi.update(dataEdit.id, {
-                    ...values,
-                    releaseDate: moment(values.releaseDate).format('YYYY-MM-DD'),
-                    duration: moment(values.duration).format('HH:mm:ss'),
-                    rating: dataEdit.rating,
-                    id: dataEdit.id,
-                });
-                setLoadingButton(false);
-                setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
-                setworkSomething(!workSomething);
-                message.success('cập nhật thành công');
-                form.setFieldValue(resp.data);
+            let movieStudio = movieStudios.find((studio) => studio.id === values.movieStudio);
+            let movieProducer = movieProducers.find((mProducer) => mProducer.id === values.movieProducer);
+            console.log(movieStudio);
+            if (fileList.length > 0) {
+                if (!dataEdit) {
+                    let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
+                    const resp = await movieApi.create({
+                        ...values,
+                        poster: imageName,
+                    });
+                    setLoadingButton(false);
+                    setworkSomething(!workSomething);
+                    form.resetFields();
+                    if (resp.status === httpStatus.OK) {
+                        message.success('thêm thành công');
+                    }
+                } else {
+                    const resp = await movieApi.update(dataEdit.id, {
+                        ...values,
+                        releaseDate: moment(values.releaseDate).format('YYYY-MM-DD'),
+                        duration: moment(values.duration).format('HH:mm:ss'),
+                        rating: dataEdit.rating,
+                        id: dataEdit.id,
+                    });
+                    setLoadingButton(false);
+                    setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
+                    setworkSomething(!workSomething);
+                    if (resp.status === httpStatus.OK) {
+                        message.success('cập nhật thành công');
+                    }
+                    form.setFieldValue(resp.data);
+                }
             }
         } catch (error) {
             setLoadingButton(false);
@@ -87,11 +122,19 @@ function AdminMovie() {
     const handleEditData = async (id) => {
         const resp = await movieApi.getById(id);
         let data = resp.data;
+        setFileList([
+            {
+                uid: data.id.toString(),
+                name: data.poster,
+                url: `http://localhost:8081/api/upload/${data.poster}`,
+            },
+        ]);
         setIsModalOpen(true);
         setDataEdit(data);
         console.log(data);
         form.setFieldsValue({
             ...data,
+            movieStudio: data.movieStudio.id,
             releaseDate: moment(data.releaseDate, 'DD-MM-YYYY'),
             duration: moment(data.duration, 'HH:mm:ss'),
         });
@@ -124,12 +167,16 @@ function AdminMovie() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [movieData, movieStudioData] = await Promise.all([
+                const [movieData, movieStudioData, movieProducerData, mppaData] = await Promise.all([
                     movieApi.getByPage(currentPage, pageSize),
-                    // movieStudioApi.get(),
+                    movieStudioApi.getByPage(1, 10),
+                    movieProducerApi.getByPage(1, 10),
+                    mpaaRatingApi.getByPage(1, 10),
                 ]);
-                console.log(movieData);
-                // console.log(movieStudioData.data);
+                console.log(movieStudioData);
+                setMovieStudios(movieStudioData.data);
+                setMovieProducers(movieProducerData.data);
+                setListMPPA(mppaData.data);
                 const formatData = movieData.data.map((item) => ({
                     ...item,
                     releaseDate: moment(item.releaseDate, formatDate).format(formatDate),
@@ -243,7 +290,9 @@ function AdminMovie() {
                 text
             ),
     });
-
+    const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
     const columns = [
         {
             title: 'Tên phim',
@@ -254,6 +303,24 @@ function AdminMovie() {
                 multiple: 4,
             },
             ...getColumnSearchProps('title'),
+        },
+
+        {
+            title: 'Poster',
+            dataIndex: 'poster',
+            key: 'poster',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.poster}`}
+                    />
+                </Space>
+            ),
+            // ...getColumnSearchProps('duration'),
         },
         {
             title: 'Thời lượng',
@@ -382,7 +449,7 @@ function AdminMovie() {
                 onOk={handleOk}
                 onCancel={handleCancelModal}
                 footer={[
-                    <div className={cx('wrapp-btn-modal')}>
+                    <div key="wrapp" className={cx('wrapp-btn-modal')}>
                         <Button key="back" onClick={handleCancelModal}>
                             Thoát
                         </Button>
@@ -422,6 +489,25 @@ function AdminMovie() {
                     >
                         <Input />
                     </Form.Item>
+                    <Form.Item
+                        {...formItemLayout}
+                        label="Ảnh đại diện"
+                        name="poster"
+                        rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                    >
+                        <Upload
+                            action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                            accept=".png, .jpg"
+                            listType="picture-card"
+                            onChange={onChangeUpload}
+                            // onPreview={onPreview}
+                            fileList={fileList}
+                            name="poster"
+                            maxCount={1}
+                        >
+                            {fileList.length < 1 && '+ Upload'}
+                        </Upload>
+                    </Form.Item>
                     <Form.Item name="duration" label="Thời lượng" {...config}>
                         <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
                     </Form.Item>
@@ -439,6 +525,7 @@ function AdminMovie() {
                             <Input disabled />
                         </Form.Item>
                     )}
+
                     <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
                         <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
                     </Form.Item>
@@ -453,15 +540,37 @@ function AdminMovie() {
                             <Select.Option value="IDA">Ấn Độ</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="movieStudio" label="hãng phim" rules={[{ required: true }]}>
-                        <Select
-                            placeholder="Chọn quốc gia ở bên dưới"
-                            // onChange={onGenderChange}
-                            allowClear
-                        >
-                            {/* <Select.Option value="VN">sss Nam</Select.Option>
-                            <Select.Option value="EN">sssAnh</Select.Option>
-                            <Select.Option value="IDA">Ấn Độ</Select.Option> */}
+                    <Form.Item label="hãng phim" rules={[{ required: true }]} name="movieStudio">
+                        <Select placeholder="Chọn hãng phim" allowClear>
+                            {movieStudios.map((item) => {
+                                return (
+                                    <Select.Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Select.Option>
+                                );
+                            })}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Hãng sản xuất" rules={[{ required: true }]} name="movieProducer">
+                        <Select placeholder="Chọn hãng sản xuất phim" allowClear>
+                            {movieProducers.map((item) => {
+                                return (
+                                    <Select.Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Select.Option>
+                                );
+                            })}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Loại phim" rules={[{ required: true }]} name="mppaRating">
+                        <Select placeholder="Chọn loại phim" allowClear>
+                            {listMPPA.map((item) => {
+                                return (
+                                    <Select.Option key={item.id} value={item.id}>
+                                        {item.ratingCode}
+                                    </Select.Option>
+                                );
+                            })}
                         </Select>
                     </Form.Item>
                     <Form.Item
@@ -475,18 +584,6 @@ function AdminMovie() {
                         ]}
                     >
                         <Input />
-                    </Form.Item>
-                    <Form.Item name="country" label="Quốc tịch" rules={[{ required: true }]}>
-                        <Select
-                            placeholder="Chọn quốc gia
-                                ở bên dưới"
-                            // onChange={onGenderChange}
-                            allowClear
-                        >
-                            <Select.Option value="VN">Việt Nam</Select.Option>
-                            <Select.Option value="EN">Anh</Select.Option>
-                            <Select.Option value="IDA">Ấn Độ</Select.Option>
-                        </Select>
                     </Form.Item>
 
                     <Form.Item name={'description'} label="Mô tả">

@@ -1,10 +1,22 @@
-.wrapper-vitri {
-    padding: 10px 20px 0 20px;
 
-    .title {
-        font-size: 16px;
-        margin-right: 12px;
-    }
+.khungne {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.ten-phim{
+    font-size: 20px;
+    color: #000000;
+    font-weight: 600;
+    // margin-right: 30px;
+}
+
+.wrapper-vitri {
+    
+
+    
     .btn-first {
         color: var(--ViTri--color-and-border-color);
         border-color: var(--ViTri--color-and-border-color);
