@@ -9,9 +9,7 @@ const axiosClient = axios.create({
     baseURL: baseUrl,
     headers: {
         'Content-type': 'application/json',
-    
     },
-    withCredentials: true,
 });
 
 axiosClient.interceptors.response.use(
@@ -31,8 +29,8 @@ axiosClient.interceptors.response.use(
                     funcUtils.notify(error.response.data.message, 'error');
                     break;
                 case httpStatus.CONFLICT:
-                        funcUtils.notify(error.response.data, 'error');
-                        break;
+                    funcUtils.notify(error.response.data, 'error');
+                    break;
                 default:
                     funcUtils.notify(error.response.data.message, 'error');
                     break;

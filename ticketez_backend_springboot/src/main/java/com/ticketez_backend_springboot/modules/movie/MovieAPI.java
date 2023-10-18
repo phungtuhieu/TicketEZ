@@ -25,6 +25,7 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/movie")
 public class MovieAPI {
     @Autowired
