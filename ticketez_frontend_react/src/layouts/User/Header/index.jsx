@@ -9,6 +9,12 @@ const Header = () => {
                 <div className="container flexSB">
                     <nav className="flexSB">
                         <div className="logo">
+                            <button data-text="Awesome" className="button">
+                                <span className="actual-text">&nbsp;TICKETEZ&nbsp;</span>
+                                <span className="hover-text" aria-hidden="true">
+                                    &nbsp;TICKETEZ&nbsp;
+                                </span>
+                            </button>
                             {/* <img src="./images/logo.png" alt="" /> */}
                         </div>
                         {/*<ul className='flexSB'>*/}

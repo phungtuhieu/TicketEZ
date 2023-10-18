@@ -133,6 +133,9 @@
 .cast p span {
     color: #e50813;
 }
+.border{
+    border-radius: 10px;
+}
 
 /*  */
 .palyButton {
