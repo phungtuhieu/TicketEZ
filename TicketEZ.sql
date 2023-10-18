@@ -1219,18 +1219,18 @@ VALUES
     ('R', 'R_icon.png', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
     ('NC-17', 'NC-17_icon.png', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
 GO
-INSERT INTO Movies (title, [description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
+INSERT INTO Movies (title, poster,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
 VALUES
-(N'Người Tình', N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5, 1, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Nữ Đại Gia', N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2, 2, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Biệt Đội Mật Mã', N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Rừng Xà Nu', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1, 4, 4, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Cuộc Chiến Ánh Sáng', N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 5, 5, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
-(N'Bão Tố Trái Đất', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5, 1, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Tình Yêu Hồi Sinh', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7, 2, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Cậu Bé Thần Thánh', N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Siêu Nhân Trái Đất', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Tinh Hoa Đất Việt', N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
+(N'Người Tình', N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5, 1, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Nữ Đại Gia', N'imaage.img' ,N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2, 2, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Biệt Đội Mật Mã', N'imaage.img' ,N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Rừng Xà Nu', N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1, 4, 4, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 5, 5, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
+(N'Bão Tố Trái Đất', N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5, 1, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Tình Yêu Hồi Sinh', N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7, 2, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Cậu Bé Thần Thánh', N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Siêu Nhân Trái Đất', N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Tinh Hoa Đất Việt', N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
 
   -- 13. Thêm dữ liệu cho bảng Discounts
