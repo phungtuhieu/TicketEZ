@@ -6,6 +6,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import ProductCard from './ProductCard';
 import img from '~/assets/img';
+import { Button, Typography } from 'antd';
+
+const { Title } = Typography;
+
 
 const cx = classNames.bind(style);
 const SampleNextArrow = (props) => {
@@ -32,7 +36,7 @@ const SamplePrevArrow = (props) => {
 const MovieUpcoming = () => {
    const slides = [];
 
-   for (let i = 0; i <= 20; i++) {
+   for (let i = 1; i <= 20; i++) {
        slides.push({
            id: i,
            img: img.datrungphuongnam,
@@ -76,10 +80,10 @@ const MovieUpcoming = () => {
         prevArrow: <SamplePrevArrow />,
     };
     return (
-        <div className={cx('body')} >
-            <p className={cx('name-card')}>
-                <span className={cx('title-name-card')}>Phim đang chiếu</span>
-            </p>
+        <div className={cx('body')}>
+            <Title level={1}>
+                Phim sắp chiếu
+            </Title>
 
             <Slider {...settings} className={cx('slider')}>
                 {slides.map((slide, index) => (
@@ -88,6 +92,7 @@ const MovieUpcoming = () => {
                     </div>
                 ))}
             </Slider>
+            <Button type='primary' classNames={cx('button-movie-upcoming')}>Tìm phim chiếu rạp</Button>
         </div>
     );
 };
