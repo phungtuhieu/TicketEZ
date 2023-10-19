@@ -83,7 +83,7 @@ function AdminSeat() {
 
     const fetchDataChildSeatChart = async (value) => {
         try {
-            const resp = await axiosClient.get(`child-seat-chart/${value}`);
+            const resp = await axiosClient.get(`showtime/get-showtime-by-seatchart/${value}`);
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataChildSeatChart = resp.data;
             setSeatChildrenSeatChartDaTa(dataChildSeatChart);
@@ -99,7 +99,6 @@ function AdminSeat() {
         console.log(value);
         try {
             const resp = await axiosClient.get(`booking/by-show-time/${value}`);
-            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const data = resp.data;
             data.forEach((element) => {
                 console.log(element.id);
@@ -204,7 +203,7 @@ function AdminSeat() {
     // Xuất chiếu-------------------------------------------
 
     const optionsChildShowTime = seatChildrenSeatChartDaTa.map((showTime) => ({
-        value: showTime.showTimeId,
+        value: showTime.id,
         label: showTime.startTime + showTime.endTime,
     }));
     // Booking---------------------------------------------------
