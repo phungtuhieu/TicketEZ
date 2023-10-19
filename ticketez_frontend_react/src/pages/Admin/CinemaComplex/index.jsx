@@ -16,6 +16,7 @@ import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { TimePicker } from 'antd';
+import cinemaChainsApi from '~/api/admin/managementCinema/cinemaChainApi';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -43,6 +44,7 @@ const AdminCinemaComplex = () => {
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [province, setProvince] = useState([]);
+    const [cinemaChains, setCinemaChains] = useState([]);
     const [openingTime, setOpeningTime] = useState(null);
 const [closingTime, setClosingTime] = useState(null);
 
@@ -52,8 +54,9 @@ const [closingTime, setClosingTime] = useState(null);
             setLoading(true);
             try {
                 const res = await cinemaComplexApi.getPage(currentPage, pageSize);
-                const [province] = await Promise.all([provinceApi.get()]);
+                const [province, cinemaChains] = await Promise.all([provinceApi.get(), cinemaChainsApi.get()]);
                 setProvince(province.data);
+                setCinemaChains(cinemaChains.data)
     
                 console.log(res);
                 //    console.log(resType);
@@ -219,6 +222,12 @@ const [closingTime, setClosingTime] = useState(null);
             render: (province) => <span>{province.name}</span>
         },
         {
+            title: 'Thuộc loại',
+            dataIndex: 'cinemaChain',
+            ...getColumnSearchProps('cinemaChain'),
+            render: (cinemaChains) => <span>{cinemaChains.name}</span>
+        },
+        {
             title: 'Action',
             render: (_, record) => (
                 <Space size="middle">
@@ -280,6 +289,7 @@ const [closingTime, setClosingTime] = useState(null);
             openingTime: formattedStartime,
             closingTime: formattedEndtime,
             province: record.province.id,
+            cinemaChain: record.cinemaChain.id
         });
     };
 
@@ -288,19 +298,15 @@ const [closingTime, setClosingTime] = useState(null);
         try {
             let values = await form.validateFields();
             console.log(values.province);
+            console.log(values.cinemaChain);
 
-            // const requestData = {
-            //     ...values,
-            //     openingTime: openingTime,
-            //     closingTime: closingTime,
-            // };
             if (editData) {
                 values ={
                     ...values,
                     openingTime: values.openingTime.format('HH:mm:ss'),
                     closingTime: values.closingTime.format('HH:mm:ss'),
                 }
-                const resp = await cinemaComplexApi.put(editData.id, values, values.province);
+                const resp = await cinemaComplexApi.put(editData.id, values, values.province, values.cinemaChain);
                 console.log(resp);
                 funcUtils.notify('Cập nhật thành công', 'success');
             }
@@ -313,7 +319,7 @@ const [closingTime, setClosingTime] = useState(null);
                         closingTime: values.closingTime.format('HH:mm:ss'),
                     }
                     console.log(values);
-                    const resp = await cinemaComplexApi.post(values, values.province);
+                    const resp = await cinemaComplexApi.post(values, values.province, values.cinemaChain);
                     // message.success('Thêm thành công');
                     funcUtils.notify('Thêm thành công', 'success');
                 } catch (error) {
@@ -444,7 +450,7 @@ const onChangeEndTime = (time, timeString) => {
                         <Form.Item
                             {...formItemLayout}
                             name="province"
-                            label="Loại rạp"
+                            label="Thuộc tỉnh"
                             rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
                         >
                             <Select
@@ -461,6 +467,33 @@ const onChangeEndTime = (time, timeString) => {
                                         label: editData?.province?.name,
                                     },
                                     ...province.map((namepr) => ({
+                                        value: namepr.id,
+                                        label: namepr.name,
+                                    })),
+                                ]}
+                                allowClear
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="cinemaChain"
+                            label="Thuộc loại"
+                            rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn loại"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={[
+                                    {
+                                        value: editData?.cinemaChains?.id, // Sử dụng cinemaType từ record khi có
+                                        label: editData?.cinemaChains?.name,
+                                    },
+                                    ...cinemaChains.map((namepr) => ({
                                         value: namepr.id,
                                         label: namepr.name,
                                     })),

@@ -22,6 +22,7 @@ const items = [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
         getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
         getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
+        getItem(<Link to="/admin/cinema-chains">Loại Cụm rạp</Link>, 'cinemaChains'),
     ]),
 
     // Quản lý rạp phim
