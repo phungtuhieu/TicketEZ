@@ -276,7 +276,6 @@ const AdminActor = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {

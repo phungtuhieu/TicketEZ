@@ -2,7 +2,7 @@ import funcUtils from '~/utils/funcUtils';
 import axiosClient from '../global/axiosClient';
 
 const url = 'upload';
-
+const baseUrl = process.env.REACT_APP_TICKET_PRODUCTION_REST_API;
 const headers = {
     headers: {
         'Content-Type': 'multipart/form-data',
@@ -25,10 +25,10 @@ const uploadApi = {
         return imageName;
     },
 
-    put: async (id, originFileObj) => {
+    put: async (imgName, originFileObj) => {
         var formData = new FormData();
         formData.append('file_to_upload', originFileObj);
-        const dataUpload = await axiosClient.put(url + '/' + id, formData, headers);
+        const dataUpload = await axiosClient.put(url + '/' + imgName, formData, headers);
         if (dataUpload.data.error) {
             funcUtils.notify(dataUpload.data.error, 'error');
             return null;
@@ -36,6 +36,9 @@ const uploadApi = {
 
         const imageName = dataUpload.data.fieldName;
         return imageName;
+    },
+    get: (imageName) => {
+        return baseUrl + 'upload/' + imageName;
     },
 
     delete: async (nameImage) => {
