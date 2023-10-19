@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.booking.Booking;
-import com.ticketez_backend_springboot.modules.childSeatChart.ChildSeatChart;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,10 +52,8 @@ public class Showtime {
 	@OneToMany(mappedBy = "showtime")
 	private List<Booking> bookings;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "showTime")
-	private List<ChildSeatChart> childSeatCharts;
-
-
+	@ManyToOne
+	@JoinColumn(name = "seat_chart_id")
+	private SeatChart seatChart;
 
 }

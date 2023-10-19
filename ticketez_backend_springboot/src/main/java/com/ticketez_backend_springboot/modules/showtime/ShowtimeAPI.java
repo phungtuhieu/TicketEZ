@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.showtime;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,13 @@ public class ShowtimeAPI {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    // Lấy show time theo seatchart
+
+    @GetMapping("get-showtime-by-seatchart/{id}")
+    public ResponseEntity<List<Showtime>> findShowtimeBySeatChart(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(showtimeDAO.findShowtimesBySeatChartId(id));
     }
 
     @GetMapping("/{id}")
