@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "seatchart")
+@Table(name = "Seat_Chart")
 @Data
 public class SeatChart {
     @Id

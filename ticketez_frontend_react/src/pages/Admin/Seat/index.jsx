@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import SeatChart from '~/pages/Admin/Seat/SeatChart';
 import { Card, Breadcrumb, Select, Col, Row, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import BaseApi from '~/api/global/baseApi'
+import BaseApi from '~/api/global/baseApi';
 import axiosClient from '~/api/global/axiosClient';
 
 const cx = classNames.bind(style);
@@ -17,23 +17,36 @@ function AdminSeat() {
     const [cinemaDaTa, setCinemaDaTa] = useState([]);
     // Dữ liệu bảng đồ
     const [seatChartDaTa, setSeatChartDaTa] = useState([]);
+    // Dữ liệu xuất chiếu
+    const [seatChildrenSeatChartDaTa, setSeatChildrenSeatChartDaTa] = useState([]);
+    // Dữ liệu booking
+    const [bookingData, setBookingData] = useState([]);
+    // Dữ liệu seatBooking
+    const [seatBookingData, setSeatBookingData] = useState([]);
     const [row, setRow] = useState();
     const [col, setCol] = useState();
     const [idSeatChart, setIdSeatChart] = useState();
 
+    // Dữ liệu tên ghế đã đặt
+    const [nameSeat, setNameSeat] = useState([]);
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
     const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
     const [selectedOptionCinema, setSelectedOptionCinema] = useState(false);
-    // Ẩn hiên ghé là phải check lúc chọn vào biểu đồ
-    const [selectedOption, setSelectedOption] = useState(false);
 
+    // Ẩn hiên xuất chiếu là phải check lúc chọn vào biểu đồ
+    const [selectedOption, setSelectedOption] = useState(false);
+    // ẩn hiện ghế là phải chọn xuất chiếu
+    const [selectedOptionShowTime, setSelectedOptionShowTime] = useState(false);
+
+    // Sử dụng một biến state để theo dõi sự thay đổi của row và col
+    const [seatChartDataChanged, setSeatChartDataChanged] = useState(false);
 
     const fetchDataCinemaComplex = async () => {
         const cinemaComplexApi = new BaseApi('cinemaComplex');
-        
+
         try {
-            const resp = await cinemaComplexApi.getAll()
+            const resp = await cinemaComplexApi.getAll();
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
@@ -68,6 +81,60 @@ function AdminSeat() {
         }
     };
 
+    const fetchDataChildSeatChart = async (value) => {
+        try {
+            const resp = await axiosClient.get(`child-seat-chart/${value}`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const dataChildSeatChart = resp.data;
+            setSeatChildrenSeatChartDaTa(dataChildSeatChart);
+
+            setSelectedOption(true);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchDataBooking = async (value) => {
+        setSeatBookingData([]);
+        console.log(value);
+        try {
+            const resp = await axiosClient.get(`booking/by-show-time/${value}`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const data = resp.data;
+            data.forEach((element) => {
+                console.log(element.id);
+                fetchDataSeatBooking(element.id);
+            });
+
+            setBookingData(data);
+            setSelectedOption(true);
+
+            console.log(seatBookingData);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchDataSeatBooking = async (value) => {
+        try {
+            const resp = await axiosClient.get(`seatBooking/name-seat/${value}`);
+            const data = resp.data;
+            console.log(data);
+            data.forEach((newItem) => {
+                // Kiểm tra xem newItem đã tồn tại trong mảng hay chưa
+                if (!seatBookingData.includes(newItem)) {
+                    // Nếu chưa tồn tại, thì thêm vào mảng
+                    setSeatBookingData((prev) => [...prev, newItem]);
+                }
+            });
+
+            setSelectedOption(true);
+            console.log('----------------------------------------------------------------');
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const fetchDataSeat = async (value) => {
         try {
             const resp = await axiosClient.get(`seatchart/${value}`);
@@ -77,14 +144,20 @@ function AdminSeat() {
             setIdSeatChart(resp.data.id);
             setRow(rowData);
             setCol(colData);
-            setSelectedOption(true);
+            setSelectedOptionShowTime(false);
+            setSelectedOptionShowTime(true);
+
             console.log(`Rows: ${rowData}, Columns: ${colData}`);
         } catch (error) {
             console.error(error);
         }
     };
+    // Gọi lại ghế khi có thay đổi để cập nhật lại ghế
+    useEffect(() => {
+        setSeatChartDataChanged(!seatChartDataChanged);
+    }, [row, col, seatBookingData]);
 
-    // Cụm rạp
+    // Cụm rạp----------------------------------------------------------
 
     useEffect(() => {
         fetchDataCinemaComplex();
@@ -97,6 +170,10 @@ function AdminSeat() {
 
     const onChangeCinemaComplex = (value) => {
         fetchDataCinema(value);
+        setSelectedCinemaComplex(false);
+        setSelectedOptionCinema(false);
+        setSelectedOption(false);
+        setSelectedOptionShowTime(false);
 
         console.log(`selected ${value}`);
     };
@@ -104,7 +181,7 @@ function AdminSeat() {
         console.log('search:', value);
     };
 
-    // Rạp
+    // Rạp-----------------------------------------------------
 
     useEffect(() => {}, [cinemaDaTa]);
 
@@ -115,13 +192,30 @@ function AdminSeat() {
 
     const onChangeCinema = (value) => {
         fetchDataSeatChart(value);
+        setSelectedOptionCinema(false);
+        setSelectedOption(false);
+        setSelectedOptionShowTime(false);
         console.log(`selected ${value}`);
     };
     const onSearchCinema = (value) => {
         console.log('search:', value);
     };
 
-    // sơ đồ rạp
+    // Xuất chiếu-------------------------------------------
+
+    const optionsChildShowTime = seatChildrenSeatChartDaTa.map((showTime) => ({
+        value: showTime.showTimeId,
+        label: showTime.startTime + showTime.endTime,
+    }));
+    // Booking---------------------------------------------------
+
+    // hành động khi chọn xuất chiếu
+    const onChangeShowTime = (value) => {
+        console.log(`selected ${value}`);
+        fetchDataBooking(value);
+        // fetchDataSeat(value);
+    };
+    // sơ đồ rạp-----------------------------------------------------------------------
 
     const optionsSeatchart = seatChartDaTa.map((seatChart) => ({
         value: seatChart.id,
@@ -139,13 +233,20 @@ function AdminSeat() {
 
     // hành động khi chọn sơ đồ
     const onChange = (value) => {
-        setSelectedOption(false);
-        console.log(`selected ${value}`);
         fetchDataSeat(value);
+        fetchDataChildSeatChart(value);
+
+        setSelectedOption(false);
+
+        console.log(`selected ${value}`);
     };
 
     const onSearch = (value) => {
         console.log('search:', value);
+    };
+
+    const check = () => {
+        console.log(seatBookingData);
     };
 
     return (
@@ -199,12 +300,37 @@ function AdminSeat() {
                             </>
                         )}
 
-                       
+                        {selectedOption && (
+                            <>
+                                <h3>Chọn xuất chiếu</h3>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Select a person"
+                                    optionFilterProp="children"
+                                    onChange={onChangeShowTime}
+                                    onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    options={optionsChildShowTime}
+                                />
+                            </>
+                        )}
+                        <button onClick={check}>checl</button>
                     </Card>
                 </Col>
                 <Col span={16}>
-                    {selectedOption && <SeatChart rows={row} columns={col} idSeatChart={idSeatChart} />}
-                </Col>  
+                    {selectedOptionShowTime && (
+                        <SeatChart
+                            rows={row}
+                            columns={col}
+                            nameSeat={seatBookingData}
+                            idSeatChart={idSeatChart}
+                            key={seatChartDataChanged}
+                        />
+                    )}
+                </Col>
             </Row>
         </>
     );

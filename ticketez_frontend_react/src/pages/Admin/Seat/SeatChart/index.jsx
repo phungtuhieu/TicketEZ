@@ -23,23 +23,22 @@ const radioStyl = {
 };
 
 function SeatChart(props) {
-    const { rows, columns, idSeatChart } = props;
+    const { rows, columns, nameSeat, idSeatChart } = props;
 
     const createSeatArray = () => {
         let seatRows = rows; // Số hàng
         let seatColumns = columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
-
+        console.log(nameSeat);
         const seatState = {
             seat: [],
             seatAvailable: [],
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-            seatUnavailable: ['J7'],
+            seatUnavailable: nameSeat,
         };
-
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
 
@@ -171,11 +170,11 @@ function SeatChart(props) {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
 
         console.log('------------------------------------------------');
-        console.log("Vip", vipSeat);
+        console.log('Vip', vipSeat);
 
-        console.log("normal", normalSeat);
+        console.log('normal', normalSeat);
 
-        console.log("Đã đặt",seatUnavailable);
+        console.log('Đã đặt', seatUnavailable);
         if (selectedSeatType === 'normal-seat') {
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
@@ -231,7 +230,7 @@ function SeatChart(props) {
         <>
             <Card className={cx('card')}>
                 <Row>
-                    <Col className={cx('div-screen')} span={16} style={{marginLeft:'45px'}}>
+                    <Col className={cx('div-screen')} span={8} style={{ marginLeft: '140px' }}>
                         <hr className={cx('screen')} />
                         <h6 className={cx('screen-title')}>Màn hình</h6>
                     </Col>
@@ -243,14 +242,14 @@ function SeatChart(props) {
                                         <tbody>
                                             {seatState.seatHeader.map((header, rowIndex) => (
                                                 <tr key={header}>
-                                                    <td className="header-cell">{header}</td>
+                                                    <td className="header-cell protected-element">{header}</td>
                                                     {seatState.seat[rowIndex].map((seat_no) => {
                                                         const seatClassName = `
                                                 ${
-                                                    seatState.normalSeat.indexOf(seat_no) > -1
-                                                        ? 'normal-seat'
-                                                        : seatState.seatUnavailable.indexOf(seat_no) > -1
+                                                    seatState.seatUnavailable.indexOf(seat_no) > -1
                                                         ? 'unavailable'
+                                                        : seatState.normalSeat.indexOf(seat_no) > -1
+                                                        ? 'normal-seat'
                                                         : seatState.vipSeat.indexOf(seat_no) > -1
                                                         ? 'vip-seat'
                                                         : 'normal-seatt'
