@@ -10,14 +10,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountDTO {
+
+	private String id;
     private String phone;
 	private String fullname;
 	private String email;
 	private Date birthday;
 	private boolean gender;
 	private String image;
-	private boolean role;
-	private boolean active;
+	private Integer status;
+	private String address;
 	private boolean verified;
 
 }

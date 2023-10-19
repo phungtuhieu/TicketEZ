@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/movie-studio")
 public class MovieStudioAPI {
     @Autowired

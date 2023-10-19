@@ -12,7 +12,7 @@ class BaseApi {
     async getAll() {
         return axiosClient.get(this.uri + '/getAll');
     }
-
+    
     async create(data) {
         return axiosClient.post(this.uri, data);
     }

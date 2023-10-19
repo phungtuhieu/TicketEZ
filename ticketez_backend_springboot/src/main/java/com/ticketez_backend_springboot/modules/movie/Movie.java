@@ -10,6 +10,7 @@ import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.genreMovie.GenreMovie;
+import com.ticketez_backend_springboot.modules.movieProducer.MovieProducer;
 import com.ticketez_backend_springboot.modules.movieStudio.MovieStudio;
 import com.ticketez_backend_springboot.modules.mpaaRating.MPAARating;
 import com.ticketez_backend_springboot.modules.price.Price;
@@ -37,7 +38,7 @@ public class Movie implements Serializable {
 	private String title;
 	private String description;
 
-	private String poster;
+	// private String poster;
 	private Time duration;
 	@Column(name = "release_date")
 	private Date releaseDate;
@@ -51,6 +52,10 @@ public class Movie implements Serializable {
 	@JoinColumn(name = "movie_studio_id")
 	private MovieStudio movieStudio;
 
+	
+	@ManyToOne
+	@JoinColumn(name = "movie_producer_id")
+	private MovieProducer movieProducer;
 	
 	@ManyToOne
 	@JoinColumn(name = "MPAA_rating_id")
