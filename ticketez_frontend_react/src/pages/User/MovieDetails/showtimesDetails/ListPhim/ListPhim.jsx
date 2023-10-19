@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Row, Col, Collapse } from 'antd';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-
-import { Avatar, List, Skeleton } from 'antd';
+import { Button, Row, Col, Collapse } from 'antd';
+import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
 
 const cx = classNames.bind(style);
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
 
 function ListPhim() {
     const [ngay, setNgay] = useState(1);
@@ -25,7 +16,11 @@ function ListPhim() {
     const [data, setData] = useState([]);
     const [list, setList] = useState([]);
 
-    // console.log("diavaloairoine~:", diaVaLoai);
+    const [activeKey, setActiveKey] = useState(null);
+    const handleCollapseChange = (key) => {
+        setActiveKey(key);
+    };
+
     useEffect(() => {
         fetch(fakeDataUrl)
             .then((res) => res.json())
@@ -56,9 +51,8 @@ function ListPhim() {
                 setLoading(false);
                 window.dispatchEvent(new Event('resize'));
             });
-        console.log(count);
-        console.log(list);
     };
+
     const loadMore =
         !initLoading && !loading ? (
             <div
@@ -76,14 +70,52 @@ function ListPhim() {
             </div>
         ) : null;
 
-  
     const newList = list.map((item, index) => {
         return {
             ...item,
             key: index,
-            children: <p>{text}</p>,
+            children: (
+                <Row className={cx('col2-movie')}>
+                    
+                    <Col span={24} className={cx('container-suat-chieu')}>
+                        <div className={cx('title')}>2D Phụ đề</div>
+                        <div className={cx('suat-chieu')}>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                        </div>
+                    </Col>
+
+                    <Col span={24} className={cx('container-suat-chieu')}>
+                        <div className={cx('title')}>2D Phụ đề</div>
+                        <div className={cx('suat-chieu')}>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                        </div>
+                    </Col>
+                </Row>
+            ),
             label: (
-                <>
+              
                     <Row className={cx('wrapper-a')}>
                         <Col span={2} style={{}}>
                             <div className={cx('border-img')}>
@@ -94,27 +126,25 @@ function ListPhim() {
                                 />
                             </div>
                         </Col>
-                        <Col span={22}>
-                            <Row>
-                                <Col span={24} className={cx('ten-rap')} onClick={() => console.log('item', item)}>
-                                    {/* Lịch chiếu phim Lotte Phú Thọ */}
+                        <Col span={22} style={{ width:'100%'}}>
+                            <Row style={{ width:'100%'}}>
+                                <Col  ol span={24} className={cx('ten-rap')} onClick={() => console.log('item', item)}>
                                     {item.email}
                                 </Col>
                                 <Col span={24} className={cx('container-info')}>
                                     <div className={cx('chi-tiet-dia-chi')}>
-                                        Tầng 4 Lotte Mart Phú Thọ, Số 968 đường Ba Tháng Hai, P.15, Quận 11
+                                        Tầng 4 Lotte Mart Phú Thọ, Số 968 đường Ba Tháng Hai, P.15, Quận 11 Tháng Hai, P.15, Quận 11 Tháng Hai, P.15, Quận 11
                                     </div>
                                     <div className={cx('ban-do')}>[Bản đồ]</div>
                                 </Col>
                             </Row>
                         </Col>
                     </Row>
-                </>
+              
             ),
         };
     });
 
-    console.log('newwlisst', newList);
     return (
         <>
             <List
@@ -125,9 +155,14 @@ function ListPhim() {
                 renderItem={(item) => (
                     <List.Item className={cx('list-item')}>
                         <Skeleton avatar title={false} paragraph={{ rows: 1 }} loading={item.loading} active>
-                            <Collapse key={item.key} bordered={false} classNames={cx('coll')} accordion items={[item]}>
-                                {/* <FontAwesomeIcon className={cx('icon')} icon={faAngleRight} /> */}
-                            </Collapse>
+                            <Collapse
+                                activeKey={activeKey}
+                                accordion
+                                onChange={handleCollapseChange}
+                                key={item.key}
+                                bordered={false}
+                                items={[item]}
+                            />
                         </Skeleton>
                     </List.Item>
                 )}
