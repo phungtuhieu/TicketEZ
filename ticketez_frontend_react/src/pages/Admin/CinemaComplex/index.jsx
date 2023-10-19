@@ -210,10 +210,12 @@ const [closingTime, setClosingTime] = useState(null);
         {
             title: 'Giờ mở cửa',
             dataIndex: 'openingTime',
+            width: '10%',
         },
         {
             title: 'Giờ đóng cửa',
             dataIndex: 'closingTime',
+            width: '10%',
         },
         {
             title: 'Thuộc tỉnh',
@@ -510,19 +512,10 @@ const onChangeEndTime = (time, timeString) => {
                     onClick={() => {
                         handleDelete();
                     }}
-                    // dataSource={posts}
+                    // dataSource={posts}Pagination = false 
+                    pagination={false}
                     dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                    expandable={{
-                        expandedRowRender: (record) => (
-                            <p
-                                style={{
-                                    margin: 0,
-                                }}
-                            >
-                                {record.body}
-                            </p>
-                        ),
-                    }}
+                   
                 />
                 <div className={cx('wrapp-pagination')}>
                 <Pagination

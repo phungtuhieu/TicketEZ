@@ -181,18 +181,18 @@ const AdminCinemaType = () =>  {
     });
     const columns = [
         Table.EXPAND_COLUMN,
-        {
-            title: 'id',
-            dataIndex: 'id',
-            width: '10%',
-            // ...getColumnSearchProps('id'),
-            sorter: (a, b) => a.id - b.id,
-            // defaultSortOrder: 'descend',
-        },
+        // {
+        //     title: 'id',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     // ...getColumnSearchProps('id'),
+        //     sorter: (a, b) => a.id - b.id,
+        //     // defaultSortOrder: 'descend',
+        // },
         {
             title: 'Tên loại rạp',
             dataIndex: 'typeName',
-            width: '20%',
+            width: '40%',
             ...getColumnSearchProps('typeName'),
         },
         {
@@ -366,13 +366,10 @@ const AdminCinemaType = () =>  {
                             onChange={onChange}
                             placeholder="can resize"
                             />
-                        </Form.Item>
-    
-                       
+                        </Form.Item>                   
                     </Form>
                 </BaseModal>
             </Row>
-
             <BaseTable
                 columns={columns}
                 onClick={() => {
@@ -380,17 +377,7 @@ const AdminCinemaType = () =>  {
                 }}
                 // dataSource={posts}
                 dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <p
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {record.body}
-                        </p>
-                    ),
-                }}
+               
             />
         </>
     );

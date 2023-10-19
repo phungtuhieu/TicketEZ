@@ -14,6 +14,7 @@ import {
     Switch,
     Select,
     Pagination,
+    Tag
 } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
@@ -189,14 +190,14 @@ const AdminCinema = () => {
 
     const columns = [
         Table.EXPAND_COLUMN,
-        {
-            title: 'id',
-            dataIndex: 'id',
-            width: '10%',
-            // ...getColumnSearchProps('id'),
-            sorter: (a, b) => a.id - b.id,
-            // defaultSortOrder: 'descend',
-        },
+        // {
+        //     title: 'id',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     // ...getColumnSearchProps('id'),
+        //     sorter: (a, b) => a.id - b.id,
+        //     // defaultSortOrder: 'descend',
+        // },
         {
             title: 'Tên rạp',
             dataIndex: 'name',
@@ -208,19 +209,24 @@ const AdminCinema = () => {
             title: 'Trạng thái',
             dataIndex: 'status',
             width: '20%',
-            render: (status) => <span>{status ? 'Hoạt động' : 'Ngừng hoạt động'}</span>,
+            render: (status) => (
+                <Tag style={{ color: status ? 'red' : 'green' }}>
+                    {status ? 'Hoạt động' : 'Ngừng hoạt động'}
+                </Tag>
+            ),
+        
         },
         {
             title: 'Loại rạp',
             dataIndex: 'cinemaType',
-            width: '20%',
+            width: '15%',
             ...getColumnSearchProps('name'),
             render: (cinemaType) => <span>{cinemaType.typeName}</span>,
         },
         {
             title: 'Cụm rạp',
             dataIndex: 'cinemaComplex',
-            width: '50%',
+            width: '30%',
             ...getColumnSearchProps('name'),
             render: (cinemaComplex) => <span>{cinemaComplex.name}</span>,
         },
@@ -452,18 +458,8 @@ const AdminCinema = () => {
                     handleDelete();
                 }}
                 // dataSource={posts}
+                pagination={false}
                 dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <p
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {record.body}
-                        </p>
-                    ),
-                }}
             />
             <div className={cx('wrapp-pagination')}>
                 <Pagination

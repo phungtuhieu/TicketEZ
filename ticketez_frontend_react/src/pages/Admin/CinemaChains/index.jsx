@@ -61,9 +61,7 @@ const AdminCinemaChains = () =>  {
             try {
                 const res = await cinemaChainApi.get();
                 setCinemaChain(res.data);
-                //    const resType = await cinemaTypeApi.getCinemaType();
                 console.log(res);
-                //    console.log(resType);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -182,14 +180,14 @@ const AdminCinemaChains = () =>  {
     });
     const columns = [
         Table.EXPAND_COLUMN,
-        {
-            title: 'id',
-            dataIndex: 'id',
-            width: '10%',
-            // ...getColumnSearchProps('id'),
-            sorter: (a, b) => a.id - b.id,
-            // defaultSortOrder: 'descend',
-        },
+        // {
+        //     title: 'id',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     // ...getColumnSearchProps('id'),
+        //     sorter: (a, b) => a.id - b.id,
+        //     // defaultSortOrder: 'descend',
+        // },
         {
             title: 'Tên loại',
             dataIndex: 'name',
@@ -206,7 +204,7 @@ const AdminCinemaChains = () =>  {
                         height={80}
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
-                        src={`http://localhost:8081/api/upload/${record.avatar}`}
+                        src={`http://localhost:8081/api/upload/${record.image}`}
                     />
                 </Space>
             ),
@@ -214,7 +212,7 @@ const AdminCinemaChains = () =>  {
         {
             title: 'Mô tả',
             dataIndex: 'description',
-            width: '50%',
+            width: '30%',
             ...getColumnSearchProps('description'),
         },
         {
@@ -265,6 +263,12 @@ const AdminCinemaChains = () =>  {
     };
 
     const handleEditData = (record) => {
+        const newUploadFile = {
+            uid: record.id.toString(),
+            name: record.image,
+            url: `http://localhost:8081/api/upload/${record.image}`,
+        };
+        setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -298,7 +302,7 @@ const AdminCinemaChains = () =>  {
                         const resp = await cinemaChainApi.put(putData.id, putData);
                         console.log(resp);
                         if (resp.status === 200) {
-                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                            funcUtils.notify('Cập nhật thành công', 'success');
                         }
                     } catch (error) {
                         if (error.hasOwnProperty('response')) {
@@ -312,20 +316,32 @@ const AdminCinemaChains = () =>  {
                 console.log(values);
                 if (!editData) {
                     try {
-                        console.log(values);
-                        const resp = await cinemaChainApi.post(values);
-                        console.log(resp);
-                        // message.success('Thêm thành công');
-                        funcUtils.notify('Thêm thành công', 'success');
+                        const file = values.image.fileList[0].originFileObj;
+                        const images = await uploadApi.post(file);
+                        const postData = {
+                            ...values,
+                            image: images,
+                        };
+                        console.log(postData);
+                        const resPost = await cinemaChainApi.post(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm thành công', 'success');
+                        }
                     } catch (error) {
-                        console.log(error);
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
                     }
                 }
                 setOpen(false);
                 form.resetFields();
                 setLoading(false);
+                setFileList([]);
                 setWorkSomeThing(!workSomeThing);
-                // getList();
+             
             }
             else {
                 setLoading(false);
@@ -344,6 +360,7 @@ const AdminCinemaChains = () =>  {
     //form
     const handleResetForm = () => {
         form.resetFields();
+        setFileList([]);
         console.log(form);
     };
     const onChange = (e) => {
@@ -419,8 +436,8 @@ const AdminCinemaChains = () =>  {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            label="Ảnh đại diện"
-                            name="avatar"
+                            label="Ảnh cụm rạp"
+                            name="image"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
                         >
                             <Upload
@@ -428,7 +445,7 @@ const AdminCinemaChains = () =>  {
                                 accept=".png, .jpg"
                                 listType="picture-card"
                                 onChange={onChangeUpload}
-                                onPreview={onPreview}
+                                // onPreview={onPreview}
                                 fileList={fileList}
                                 name="image"
                                 maxCount={1}
@@ -466,17 +483,7 @@ const AdminCinemaChains = () =>  {
                 }}
                 // dataSource={posts}
                 dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <p
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {record.body}
-                        </p>
-                    ),
-                }}
+              
             />
         </>
     );

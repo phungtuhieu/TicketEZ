@@ -30,7 +30,7 @@ public class CinemaChainAPI {
 
     @GetMapping
     public ResponseEntity<List<CinemaChain>> findAll() {
-        return ResponseEntity.ok(cinemaChainDao.findAll());
+        return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
     }
 
     @GetMapping("/{id}")
