@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import countriesJson from '~/data/countries.json';
 import {
     Button,
     Col,
@@ -7,6 +9,7 @@ import {
     Form,
     Image,
     Input,
+    Modal,
     Popconfirm,
     Row,
     Select,
@@ -21,7 +24,7 @@ import style from './Movie.module.scss';
 import classNames from 'classnames/bind';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axiosClient from '~/api/global/axiosClient';
+import axiosClient, { getUrlImageByName } from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
@@ -32,17 +35,27 @@ import uploadApi from '~/api/service/uploadApi';
 import httpStatus from '~/api/global/httpStatus';
 import movieProducerApi from '~/api/admin/managementMovie/movieProducerApi';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
+import funcUtils from '~/utils/funcUtils';
+import axios from 'axios';
 
 const cx = classNames.bind(style);
-
+const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
 function AdminMovie() {
-    const [status, setStatus] = useState();
     const formatDate = 'DD-MM-YYYY';
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
     const [fileList, setFileList] = useState([]);
     const [list, setList] = useState([]);
     const [movieStudios, setMovieStudios] = useState([]);
     const [movieProducers, setMovieProducers] = useState([]);
-    const [listMPPA, setListMPPA] = useState([]);
+    const [listMPAA, setListMPAA] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -58,6 +71,15 @@ function AdminMovie() {
         labelCol: { span: 6 },
         wrapperCol: { span: 20 },
     };
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+    };
+    const handleCancelPreview = () => setPreviewOpen(false);
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -65,51 +87,93 @@ function AdminMovie() {
         setLoadingButton(true);
         try {
             const values = await form.validateFields();
-            console.log(values);
-            let movieStudio = movieStudios.find((studio) => studio.id === values.movieStudio);
-            let movieProducer = movieProducers.find((mProducer) => mProducer.id === values.movieProducer);
-            console.log(movieStudio);
+            let movieStudioForm = movieStudios.find((studio) => studio.id === values.movieStudio);
+            let movieProducerForm = movieProducers.find((mProducer) => mProducer.id === values.movieProducer);
+            let mpaaForm = listMPAA.find((mProducer) => mProducer.id === values.movieProducer);
+            let selectsValue = {
+                movieProducer: movieProducerForm,
+                movieStudio: movieStudioForm,
+                mpaaRating: mpaaForm,
+            };
             if (fileList.length > 0) {
                 if (!dataEdit) {
-                    let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
-                    const resp = await movieApi.create({
-                        ...values,
-                        poster: imageName,
-                    });
-                    setLoadingButton(false);
-                    setworkSomething(!workSomething);
-                    form.resetFields();
-                    if (resp.status === httpStatus.OK) {
-                        message.success('thêm thành công');
+                    try {
+                        let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
+                        let dataCreate = {
+                            ...values,
+                            releaseDate: values.releaseDate.format('YYYY-MM-DD'),
+                            duration: values.duration.format('HH:mm:ss'),
+                            ...selectsValue,
+                            rating: 0.0,
+                            poster: imageName,
+                        };
+                        console.log(dataCreate);
+                        const resp = await movieApi.create(dataCreate);
+                        setLoadingButton(false);
+                        handleResetForm();
+                        setworkSomething(!workSomething);
+                        if (resp.status === httpStatus.OK) {
+                            funcUtils.notify('Đã thêm phim thành công', 'success');
+                        }
+                        setIsModalOpen(false);
+                    } catch (error) {
+                        setLoadingButton(false);
+                        if (error.hasOwnProperty('response')) {
+                            funcUtils.notify(error.response.data, 'error');
+                        } else {
+                            funcUtils.notify('thất bại', 'error');
+                            console.log(error);
+                        }
                     }
                 } else {
-                    const resp = await movieApi.update(dataEdit.id, {
-                        ...values,
-                        releaseDate: moment(values.releaseDate).format('YYYY-MM-DD'),
-                        duration: moment(values.duration).format('HH:mm:ss'),
-                        rating: dataEdit.rating,
-                        id: dataEdit.id,
-                    });
-                    setLoadingButton(false);
-                    setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
-                    setworkSomething(!workSomething);
-                    if (resp.status === httpStatus.OK) {
-                        message.success('cập nhật thành công');
+                    console.log('Cập nhật', values);
+                    try {
+                        let imageName = null;
+                        if (fileList[0].hasOwnProperty('originFileObj')) {
+                            console.log('ádfjahsfashjfas', fileList[0].originFileObj);
+                            imageName = await uploadApi.put(dataEdit.poster, fileList[0].originFileObj);
+                            // imageName = 'ss';
+                        }
+                        const dataUpdate = {
+                            ...values,
+                            releaseDate: values.releaseDate.format('YYYY-MM-DD'),
+                            duration: values.duration.format('HH:mm:ss'),
+                            ...selectsValue,
+                            poster: imageName != null ? imageName : values.poster,
+                            rating: dataEdit.rating,
+                            id: dataEdit.id,
+                        };
+                        console.log(dataUpdate);
+                        const resp = await movieApi.update(dataEdit.id, dataUpdate);
+                        setLoadingButton(false);
+                        setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
+                        setworkSomething(!workSomething);
+                        if (resp.status === httpStatus.OK) {
+                            funcUtils.notify('Cập nhật phim thành công', 'success');
+                        }
+                        form.setFieldValue(resp.data);
+                    } catch (error) {
+                        setLoadingButton(false);
+                        if (error.hasOwnProperty('response')) {
+                            funcUtils.notify(error.response.data, 'error');
+                        } else {
+                            funcUtils.notify('Cập nhật phim thất bại', 'error');
+                            console.log(error);
+                            console.log('image', error.values);
+                        }
                     }
-                    form.setFieldValue(resp.data);
                 }
+            } else {
+                funcUtils.notify('Vui lòng chọn ảnh', 'error');
+                setLoadingButton(false);
             }
         } catch (error) {
+            console.log(error);
             setLoadingButton(false);
-            if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
-            } else {
-                message.error('Thêm thất bại');
-                console.log(error);
-            }
         }
     };
     const handleResetForm = () => {
+        setFileList([]);
         form.resetFields();
     };
     const handleCancelModal = () => {
@@ -119,24 +183,24 @@ function AdminMovie() {
             setDataEdit(null);
         }
     };
-    const handleEditData = async (id) => {
-        const resp = await movieApi.getById(id);
-        let data = resp.data;
+    const handleEditData = async (record) => {
         setFileList([
             {
-                uid: data.id.toString(),
-                name: data.poster,
-                url: `http://localhost:8081/api/upload/${data.poster}`,
+                uid: record.id.toString(),
+                name: record.poster,
+                url: uploadApi.get(record.poster),
             },
         ]);
+        setPreviewTitle(`Poster của phim ${record.title}`);
         setIsModalOpen(true);
-        setDataEdit(data);
-        console.log(data);
+        setDataEdit(record);
         form.setFieldsValue({
-            ...data,
-            movieStudio: data.movieStudio.id,
-            releaseDate: moment(data.releaseDate, 'DD-MM-YYYY'),
-            duration: moment(data.duration, 'HH:mm:ss'),
+            ...record,
+            movieStudio: record.movieStudio.id,
+            movieProducer: record.movieProducer.id,
+            mpaaRating: record.mpaaRating.id,
+            releaseDate: dayjs(record.releaseDate, 'DD-MM-YYYY'),
+            duration: dayjs(record.duration, 'HH:mm:ss'),
         });
     };
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -145,41 +209,41 @@ function AdminMovie() {
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
-    const handleDelete = async (record) => {
+    const handleDelete = async (id) => {
         setLoadingButton(true);
         try {
-            const resp = await axiosClient.delete(`movie/${record.id}`);
+            const resp = await axiosClient.delete(`movie/${id}`);
             if (resp.status === 200) {
                 setLoadingButton(false);
-                message.success('Đã xoá thành công!');
+                funcUtils.notify('Đã xoá phim thành công', 'success');
                 setworkSomething(!workSomething);
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
+                funcUtils.notify(error.response.data, 'error');
             } else {
-                message.error('Xoá thất bại');
+                funcUtils.notify('Xảy ra lỗi, không thể xoá', 'error');
                 console.log(error);
             }
+            setLoadingButton(false);
         }
     };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [movieData, movieStudioData, movieProducerData, mppaData] = await Promise.all([
+                const [movieData, movieStudioData, movieProducerData, mpaaData] = await Promise.all([
                     movieApi.getByPage(currentPage, pageSize),
                     movieStudioApi.getByPage(1, 10),
                     movieProducerApi.getByPage(1, 10),
                     mpaaRatingApi.getByPage(1, 10),
                 ]);
-                console.log(movieStudioData);
                 setMovieStudios(movieStudioData.data);
                 setMovieProducers(movieProducerData.data);
-                setListMPPA(mppaData.data);
+                setListMPAA(mpaaData.data);
                 const formatData = movieData.data.map((item) => ({
                     ...item,
-                    releaseDate: moment(item.releaseDate, formatDate).format(formatDate),
+                    releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
                 setList(formatData);
                 setTotalItems(movieData.totalItem);
@@ -292,6 +356,7 @@ function AdminMovie() {
     });
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
+        console.log('newFileList', newFileList);
     };
     const columns = [
         {
@@ -316,7 +381,7 @@ function AdminMovie() {
                         height={80}
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
-                        src={`http://localhost:8081/api/upload/${record.poster}`}
+                        src={uploadApi.get(record.poster)}
                     />
                 </Space>
             ),
@@ -342,6 +407,10 @@ function AdminMovie() {
             dataIndex: 'country',
             key: 'country',
             ...getColumnSearchProps('country'),
+            render: (_, record) => {
+                let i = countriesJson.findIndex((item) => item.code === record.country);
+                return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
+            },
         },
         {
             title: 'Đánh giá',
@@ -353,18 +422,18 @@ function AdminMovie() {
             title: 'Thao tác',
             dataIndex: 'id',
             key: 'id',
-            render: (id) => (
+            render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
                         icon={solidIcons.faPen}
-                        onClick={() => handleEditData(id)}
+                        onClick={() => handleEditData(record)}
                         className={cx('icon-pen')}
                     />
                     <Popconfirm
                         title="Bạn có chắc"
                         description="Muốn xoá hay không?"
                         okText="Yes"
-                        onConfirm={() => handleDelete(id)}
+                        onConfirm={() => handleDelete(record.id)}
                         cancelText="No"
                     >
                         <FontAwesomeIcon icon={solidIcons.faTrash} className={cx('icon-trash')} />
@@ -440,6 +509,15 @@ function AdminMovie() {
                     </Button>
                 </Col>
             </Row>
+            <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancelPreview}>
+                <img
+                    alt="example"
+                    style={{
+                        width: '100%',
+                    }}
+                    src={previewImage}
+                />
+            </Modal>
             <BaseModal
                 forceRender
                 className={cx('modal-form')}
@@ -491,16 +569,16 @@ function AdminMovie() {
                     </Form.Item>
                     <Form.Item
                         {...formItemLayout}
-                        label="Ảnh đại diện"
+                        label="Poster"
                         name="poster"
-                        rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                        rules={[{ required: true, message: 'Vui lòng chọn poster' }]}
                     >
                         <Upload
                             action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
                             accept=".png, .jpg"
                             listType="picture-card"
                             onChange={onChangeUpload}
-                            // onPreview={onPreview}
+                            onPreview={handlePreview}
                             fileList={fileList}
                             name="poster"
                             maxCount={1}
@@ -511,34 +589,50 @@ function AdminMovie() {
                     <Form.Item name="duration" label="Thời lượng" {...config}>
                         <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
                     </Form.Item>
-                    {dataEdit && (
-                        <Form.Item
-                            label="Đánh giá"
-                            name="rating"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập tên phim!',
-                                },
-                            ]}
-                        >
-                            <Input disabled />
-                        </Form.Item>
-                    )}
+                    <Form.Item
+                        label="Đánh giá"
+                        name="rating"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Vui lòng nhập tên phim!',
+                            },
+                        ]}
+                    >
+                        <Input disabled />
+                    </Form.Item>
+                    {/* {dataEdit && (
+                        
+                    )} */}
 
                     <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
                         <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
                     </Form.Item>
                     <Form.Item name="country" label="Quốc gia" rules={[{ required: true }]}>
                         <Select
+                            showSearch
                             placeholder="Chọn quốc gia ở bên dưới"
                             // onChange={onGenderChange}
                             allowClear
-                        >
-                            <Select.Option value="VN">sss Nam</Select.Option>
-                            <Select.Option value="EN">sssAnh</Select.Option>
-                            <Select.Option value="IDA">Ấn Độ</Select.Option>
-                        </Select>
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
+                            options={[
+                                ...countriesJson.map((item) => ({
+                                    value: item.code,
+                                    label: item.name,
+                                })),
+                            ]}
+                        />
+                        {/* {countriesJson.map((item) => {
+                                return (
+                                    <Select.Option key={item.code} value={item.code}>
+                                        {item.name}
+                                    </Select.Option>
+                                );
+                            })} */}
+                        {/* </Select> */}
                     </Form.Item>
                     <Form.Item label="hãng phim" rules={[{ required: true }]} name="movieStudio">
                         <Select placeholder="Chọn hãng phim" allowClear>
@@ -562,9 +656,9 @@ function AdminMovie() {
                             })}
                         </Select>
                     </Form.Item>
-                    <Form.Item label="Loại phim" rules={[{ required: true }]} name="mppaRating">
+                    <Form.Item label="Loại phim" rules={[{ required: true }]} name="mpaaRating">
                         <Select placeholder="Chọn loại phim" allowClear>
-                            {listMPPA.map((item) => {
+                            {listMPAA.map((item) => {
                                 return (
                                     <Select.Option key={item.id} value={item.id}>
                                         {item.ratingCode}

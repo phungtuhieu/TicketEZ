@@ -85,8 +85,15 @@ public class MovieAPI {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        dao.deleteById(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        try {
+            if (!dao.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            dao.deleteById(id);
+            return ResponseEntity.ok(true);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Không thể xoá, dữ liệu đã được sử dụng ở nơi khác", HttpStatus.CONFLICT);
+        }
     }
 }
