@@ -3,10 +3,10 @@ package com.ticketez_backend_springboot.modules.seatChart;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ticketez_backend_springboot.modules.childSeatChart.ChildSeatChart;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.priceService.PriceService;
 import com.ticketez_backend_springboot.modules.seat.Seat;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,8 +37,8 @@ public class SeatChart {
     @OneToMany(mappedBy = "seatChart")
     private List<Seat> Seats;
 
-     @JsonIgnore
+        @JsonIgnore
     @OneToMany(mappedBy = "seatChart")
-    private List<ChildSeatChart> childSeatCharts;
+    private List<Showtime> showtimes;
 
 }
