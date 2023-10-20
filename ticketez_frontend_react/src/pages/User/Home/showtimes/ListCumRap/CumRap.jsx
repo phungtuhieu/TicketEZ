@@ -8,67 +8,115 @@ import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
+import cinemaComplexUserApi from '~/api/user/cinemaComplex/cinemaComplexAPI';
 
 const cx = classNames.bind(style);
 
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
-
-const CumRap = ({ diaVaLoai }) => {
+const CumRap = ({ NameAndProvince }) => {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [totalItems, setTotalItems] = useState(1);
+    const [search, setSearch] = useState('');
+    const so = 5;
+    const [count, setCount] = useState(so);
     const [list, setList] = useState([]);
 
-    console.log("diavaloairoine~:", diaVaLoai);
+    const [cinemaComplex, setCinemaComplex] = useState(null);
+    
+    let newCount = count;
+    let duLieuTraVe = so;
+
     useEffect(() => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                setInitLoading(false);
-                setData(res.results);
-                setList(res.results);
-            });
-    }, []);
+        if (list.length > 0 && cinemaComplex === null) {
+          setCinemaComplex(list[0].id);
+        }
+      }, [list]);
+
+
+
+    useEffect(() => {
+        const geist = async () => {
+            const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
+                so,
+                NameAndProvince.province.id,
+                NameAndProvince.cinemaChainName,
+                search,
+            );
+
+            setInitLoading(false);
+            setData(res.data);
+            setList(res.data);
+            setTotalItems(res.totalItems);
+        };
+        geist();
+    }, [NameAndProvince, search]);
+
+   
+    if (list.length > totalItems) {
+        newCount = totalItems;
+        duLieuTraVe = totalItems % so;
+    }
 
     const onLoadMore = () => {
         setLoading(true);
+        setCount(count + so);
+        console.log('lấy dữ 2', duLieuTraVe);
+
         setList(
             data.concat(
                 [...new Array(count)].map(() => ({
                     loading: true,
-                    name: {},
-                    picture: {},
+                    cinemaChain: {
+                        image: '',
+                    },
                 })),
             ),
         );
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                const newData = data.concat(res.results);
-                setData(newData);
-                setList(newData);
-                setLoading(false);
-                window.dispatchEvent(new Event('resize'));
-            });
-        console.log(count);
-        console.log(list);
     };
-    const loadMore =
-        !initLoading && !loading ? (
-            <div
-                style={{
-                    textAlign: 'center',
-                    marginTop: 12,
-                    height: 32,
-                    lineHeight: '32px',
-                }}
-            >
-                <Button onClick={onLoadMore} className={cx('btn-load')}>
-                    Xem thêm
-                </Button>
-            </div>
-        ) : null;
+
+    useEffect(() => {
+        if (loading) {
+            setTimeout(() => {
+                const abc = async () => {
+                    const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
+                        newCount,
+                        NameAndProvince.province.id,
+                        NameAndProvince.cinemaChainName,
+                        search,
+                    );
+                    const newData = data.concat(res.data.slice(-duLieuTraVe));
+                    setData(newData);
+                    setList(newData);
+                    setLoading(false);
+                    window.dispatchEvent(new Event('resize'));
+                };
+                abc();
+            }, 500);
+        }
+    }, [loading, search, NameAndProvince]);
+
+    const loadMore = list.length < totalItems && (
+        <div
+            style={{
+                textAlign: 'center',
+                marginTop: 12,
+                height: 32,
+                lineHeight: '32px',
+            }}
+        >
+            <Button onClick={onLoadMore} className={cx('btn-load')}>
+                Xem thêm
+            </Button>
+        </div>
+    );
+
+    const handleCinemaComplex = (data) => {
+        setCinemaComplex(data.id);
+    }
+
+
+
     return (
         <>
             <Col
@@ -87,6 +135,7 @@ const CumRap = ({ diaVaLoai }) => {
                                 className={cx('cum-rap-inputSearch')}
                                 suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                                 placeholder="Tìm theo tên rạp ..."
+                                onChange={(e) => setSearch(e.target.value)}
                             />
                         </Col>
                         <Col span={24}>
@@ -96,8 +145,8 @@ const CumRap = ({ diaVaLoai }) => {
                                 itemLayout="horizontal"
                                 loadMore={loadMore}
                                 dataSource={list}
-                                renderItem={(item) => (
-                                    <List.Item className={cx('list-item')}>
+                                renderItem={(item, index) => (
+                                    <List.Item className={cx('list-item' , {active: cinemaComplex === null ? index === 0 : cinemaComplex === item.id} )} defaultValue={[1]} onClick={() => handleCinemaComplex(item)}>
                                         <Skeleton
                                             avatar
                                             title={false}
@@ -105,15 +154,19 @@ const CumRap = ({ diaVaLoai }) => {
                                             loading={item.loading}
                                             active
                                         >
-                                            <div className={cx('sau-list')}>
+                                            <div className={cx('sau-list')} >
                                                 <div className={cx('border-img')}>
                                                     <img
                                                         className={cx('img')}
-                                                        src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
+                                                        src={
+                                                            'http://localhost:8081/api/upload/' + item.cinemaChain.image
+                                                        }
                                                         alt="lỗi"
                                                     />
                                                 </div>
-                                                <span className={cx('title')}>Galaxy Kinh Dương Vương</span>
+                                                <span className={cx('title')}>
+                                                    {item.name}
+                                                </span>
                                             </div>
                                             <FontAwesomeIcon className={cx('icon')} icon={faAngleRight} />
                                         </Skeleton>
@@ -124,8 +177,16 @@ const CumRap = ({ diaVaLoai }) => {
                     </Row>
                 </div>
             </Col>
-            <Col span={16} style={{ width: '100%', minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
-                <ListPhim />
+            <Col
+                span={16}
+                style={{
+                    width: '100%',
+                    minHeight: 550,
+                    maxHeight: 550,
+                    borderTop: '1px solid #e5e5e5',
+                }}
+            >
+                <ListPhim cinemaComplex={cinemaComplex} />
             </Col>
         </>
     );

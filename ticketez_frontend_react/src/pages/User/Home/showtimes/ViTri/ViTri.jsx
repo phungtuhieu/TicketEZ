@@ -44,7 +44,7 @@ function ViTri() {
 
     const handleSetProvince = (province) => {
         setProvinces(province);
-        // setIsModalOpen(false);
+        setIsModalOpen(false);
     };
 
     // console.log(provinces);
@@ -68,7 +68,7 @@ function ViTri() {
                         </span>
                     </Button>
                     <Modal
-                    maskClosable={false}
+                        maskClosable={false}
                         className={cx('modal', 'slideIn')}
                         footer={
                             <Button className={cx('modal-footer-btn-close')} onClick={handleCancel}>
@@ -123,7 +123,7 @@ function ViTri() {
                 </div>
             </Col>
             <Col span={24} style={{ height: 642.8 }}>
-                <LoaiRap diaDiem={provinces} />
+                <LoaiRap province={provinces} />
             </Col>
         </Row>
     );

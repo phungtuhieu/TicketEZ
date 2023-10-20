@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-import com.ticketez_backend_springboot.modules.cinema.Cinema;
-import com.ticketez_backend_springboot.modules.seat.Seat;
 
 @CrossOrigin("*")
 @RestController
@@ -54,7 +52,7 @@ public class CinemaComplexAPI {
         }
     }
 
-      @GetMapping("/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<List<CinemaComplex>> findAll() {
         List<CinemaComplex> seats = cinemaComplexDao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(seats);
@@ -106,5 +104,29 @@ public class CinemaComplexAPI {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
         }
 
+    }
+
+    // ----------------------------------------------------------------
+
+    @GetMapping("/adbc")
+    public ResponseEntity<?> getDuLie(@RequestParam("results") Optional<Integer> results,
+            @RequestParam("provinceId") Optional<Integer> provinceId,
+            @RequestParam("cinemaChainName") Optional<String> cinemaChainName,
+            @RequestParam("searchNameCCX") Optional<String> searchNameCCX) {
+
+        if (cinemaChainName.isPresent() && cinemaChainName.get() == ""
+                || cinemaChainName.get().equalsIgnoreCase("tất cả")) {
+            cinemaChainName = Optional.empty();
+        }
+
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(0, results.orElse(999), sort);
+        Page<CinemaComplex> page = cinemaComplexDao.findDuLieu(pageable, provinceId.orElse(2),
+                cinemaChainName.orElse(""), searchNameCCX.orElse(""));
+        ResponseDTO<CinemaComplex> responseDTO = new ResponseDTO<>();
+        responseDTO.setData(page.getContent());
+        responseDTO.setTotalItems(page.getTotalElements());
+        responseDTO.setTotalPages(page.getTotalPages());
+        return ResponseEntity.ok(responseDTO);
     }
 }

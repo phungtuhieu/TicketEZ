@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col } from 'antd';
 import classNames from 'classnames/bind';
 import style from './LoaiRap.module.scss';
 import CumRap from '../ListCumRap/CumRap';
+import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
 
 const cx = classNames.bind(style);
 
-function LoaiRap({ diaDiem }) {
-    const [a, setA] = useState(true);
-    const [loai, setLoai] = useState('tất cả');
+function LoaiRap({ province }) {
+    const [cinemaChainName, setCinemaChainName] = useState('tất cả');
+    const [dataCinemaChainName, setDataCinemaChainName] = useState([]);
 
-    const diemVaLoai = {
-        diaDiem,
-        loai,
+    const NameAndProvince    = {
+        province,
+        cinemaChainName,
     };
-    console.log('lay duoc dia diem roi', diaDiem);
+
+    useEffect(() => {
+        const getCinemaChain = async () => {
+            const res = await cinemaChainApi.get();
+            // console.log('res', res);
+            setDataCinemaChainName(res.data);
+        };
+        getCinemaChain();
+    }, []);
+
+    // console.log(dataCinemaChainName);
 
     return (
         <Row style={{ height: '100%' }}>
             <Col span={24} className={cx('Loai-rap-col')}>
                 <div className={cx('wrapper')}>
-                    <div className={cx('container', { active: a, titleA: !a })}>
+                    <div
+                        className={cx('container', { active: cinemaChainName === 'tất cả' })}
+                        onClick={() => setCinemaChainName('tất cả')}
+                    >
                         <div className={cx('border')}>
                             <img
                                 className={cx('img')}
@@ -30,50 +44,24 @@ function LoaiRap({ diaDiem }) {
                         </div>
                         <div className={cx('title')}>Tất cả</div>
                     </div>
-                    <div className={cx('container')} onClick={() => setLoai('1')}>
-                        <div className={cx('border')}>
-                            <img
-                                className={cx('img')}
-                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                                alt=""
-                            />
+                    {dataCinemaChainName.map((name) => (
+                        <div
+                            className={cx('container', { active: cinemaChainName === name.name })}
+                            onClick={() => setCinemaChainName(name.name)}
+                        >
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src={'http://localhost:8081/api/upload/' + name.image}
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>{name.name} </div>
                         </div>
-                        <div className={cx('title')}>Lotte Cinnnnn</div>
-                    </div>
-                    <div className={cx('container')} onClick={() => setLoai('2')}>
-                        <div className={cx('border')}>
-                            <img
-                                className={cx('img')}
-                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                                alt=""
-                            />
-                        </div>
-                        <div className={cx('title')}>Beta Cineeeee</div>
-                    </div>
-                    <div className={cx('container')} onClick={() => setLoai('3')}>
-                        <div className={cx('border')}>
-                            <img
-                                className={cx('img')}
-                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                                alt=""
-                            />
-                        </div>
-                        <div className={cx('title')}>Galaxy Cinnn</div>
-                    </div>
-                    <div className={cx('container')} onClick={() => setLoai('2')}>
-                        <div className={cx('border')}>
-                            <img
-                                className={cx('img')}
-                                src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
-                                alt=""
-                            />
-                        </div>
-                        <div className={cx('title')}>Beta Cineeeee</div>
-                    </div>
-                   
+                    ))}
                 </div>
             </Col>
-            <CumRap diaVaLoai={diemVaLoai} />
+            <CumRap NameAndProvince={NameAndProvince} />
         </Row>
     );
 }

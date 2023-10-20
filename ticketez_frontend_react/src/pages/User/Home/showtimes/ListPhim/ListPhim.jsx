@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 
 const cx = classNames.bind(style);
 
-function ListPhim() {
+function ListPhim({cinemaComplex}) {
     const [ngay, setNgay] = useState(1);
 
     const [weekDays, setWeekDays] = useState([]);
@@ -21,7 +21,7 @@ function ListPhim() {
             const currentDay = currentTimeInVietnam.clone().add(i, 'days');
             nextWeekDays.push(currentDay);
         }
-        console.log(nextWeekDays);
+        // console.log(nextWeekDays);
         setWeekDays(nextWeekDays);  
 
     }, []);
@@ -32,6 +32,9 @@ function ListPhim() {
         console.log('Ngày được chọn:', selectedDay.format('YYYY-MM-DD'));
       };
      
+     useEffect(()=>{
+        console.log(cinemaComplex);
+     },[cinemaComplex])
 
     return (
         <>
