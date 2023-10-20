@@ -36,6 +36,26 @@ public class AccountAPI {
     @Autowired
     AccountDAO accountDAO;
 
+
+    // @GetMapping("/getAll")
+    // public ResponseEntity<List<Account>> findAll() {
+    //     List<Account> accounts = accountDAO.findAllByOrderByPhoneDesc();
+    //     return ResponseEntity.ok(accounts);
+    // }
+
+
+    // @GetMapping
+    // public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
+    //         @RequestParam("limit") Optional<Integer> limit,
+    //         @RequestParam("search") Optional<String> search,
+    //         @RequestParam("active") Optional<Boolean> active) {
+    //     try {
+
+    //         if (pageNo.isPresent() && pageNo.get() == 0) {
+    //             return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+    //         }
+    //         Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10));
+    //         Page<AccountDTO> page = accountDAO.getAllRoleUserAndActive(pageable,active.orElse(true),search.orElse(""));
     @GetMapping("/getAll")
     public ResponseEntity<List<Account>> findAll() {
         List<Account> accounts = accountDAO.findAll();
@@ -66,6 +86,91 @@ public class AccountAPI {
         }
     }
 
+    
+
+    // @GetMapping("/{phone}")
+    // public ResponseEntity<?> findById(@PathVariable("phone") String phone) {
+    //     try {
+    //         if (!accountDAO.existsById(phone)) {
+    //             return new ResponseEntity<>("Không tìm thấy người dùng", HttpStatus.NOT_FOUND);
+    //         }
+    //         return ResponseEntity.ok(accountDAO.findById(phone).get());
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
+    // // @PostMapping
+    // // public ResponseEntity<?> post(@RequestBody Account account) {
+    // // try {
+    // // accountDAO.save(account);
+    // // return ResponseEntity.ok(account);
+    // // } catch (Exception e) {
+    // // return new ResponseEntity<>("Server error, vui lòng thử lại sau!",
+    // // HttpStatus.INTERNAL_SERVER_ERROR);
+    // // }
+    // // }
+
+    // @PutMapping("/{phone}")
+    // public ResponseEntity<?> put(@PathVariable("phone") String phone, @RequestBody Account account) {
+    //     try {
+    //         if (!accountDAO.existsById(phone)) {
+    //             return new ResponseEntity<>("Người dùng không tồn tại", HttpStatus.NOT_FOUND);
+    //         }
+    //         accountDAO.save(account);
+    //         return ResponseEntity.ok(account);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
+    // // @PatchMapping("/active/{phone}")
+    // // public ResponseEntity<?> patch(@PathVariable("phone") String phone,
+    // //         @RequestBody Map<String, Boolean> updateAccountActive) {
+    // //     try {
+    // //         if (!accountDAO.existsById(phone)) {
+    // //             return new ResponseEntity<>("Người dùng không tồn tại", HttpStatus.NOT_FOUND);
+    // //         }
+    // //         Account account = accountDAO.findById(phone).orElse(null);
+    // //         if (account != null) {
+    // //             Boolean active = updateAccountActive.get("active");
+    // //             if (active != null) {
+    // //                 account.setActive(active);
+    // //                 accountDAO.save(account);
+    // //             }
+    // //             return ResponseEntity.ok("Sửa thành công");
+    // //         } else {
+    // //             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    // //         }
+    // //     } catch (Exception e) {
+    // //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    // //     }
+    // // }
+
+
+    // @PatchMapping("/infoUser/{phone}")
+    // public ResponseEntity<?> patchInfoUser(@PathVariable("phone") String phone,
+    //         @RequestBody AccountDTO accountDTO) {
+    //     try {
+    //         if (!accountDAO.existsById(phone)) {
+    //             return new ResponseEntity<>("Người dùng không tồn tại", HttpStatus.NOT_FOUND);
+    //         }
+    //         Account account = accountDAO.findById(phone).orElse(null);
+    //         if (account != null) {
+    //             account.setFullname(accountDTO.getFullname());
+    //             account.setBirthday(accountDTO.getBirthday());
+    //             account.setGender(accountDTO.isGender());
+    //             account.setEmail(accountDTO.getEmail());
+    //             account.setImage(accountDTO.getImage());
+    //            accountDAO.save(account);
+    //             return ResponseEntity.ok("Sửa thành công");
+    //         } else {
+    //             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    //         }
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") String id) {
         try {

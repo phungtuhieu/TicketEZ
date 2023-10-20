@@ -18,40 +18,50 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/seatBooking")
 public class SeatBookingAPI {
-         @Autowired
-         SeatBookingDao bookingDao;
+    @Autowired
+    SeatBookingDao bookingDao;
 
-         @GetMapping
-         public ResponseEntity<List<SeatBooking>> findAll() {
-                  return ResponseEntity.ok(bookingDao.findAll());
-         }
+    @GetMapping
+    public ResponseEntity<List<SeatBooking>> findAll() {
+        return ResponseEntity.ok(bookingDao.findAll());
+    }
 
-         @GetMapping("/{id}")
-         public ResponseEntity<SeatBooking> findById(@PathVariable("id") Long id) {
-                  if (!bookingDao.existsById(id)) {
-                           return ResponseEntity.notFound().build();
-                  }
-                  return ResponseEntity.ok(bookingDao.findById(id).get());
-         }
+    @GetMapping("/{id}")
+    public ResponseEntity<SeatBooking> findById(@PathVariable("id") Long id) {
+        if (!bookingDao.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(bookingDao.findById(id).get());
+    }
 
-         @PostMapping
-         public ResponseEntity<SeatBooking> post(@RequestBody SeatBooking seatBooking) {
-                  bookingDao.save(seatBooking);
-                  return ResponseEntity.ok(seatBooking);
-         }
+    @GetMapping("by-booking/{id}")
+    public ResponseEntity<List<SeatBooking>> findByBookingId(@PathVariable("id") String id) {
+        return ResponseEntity.ok(bookingDao.findByBookingId(id));
+    }
 
-         @PutMapping("/{id}")
-         public ResponseEntity<SeatBooking> put(@PathVariable("id") Long id, @RequestBody SeatBooking seatBooking) {
-                  if (!bookingDao.existsById(id)) {
-                           return ResponseEntity.notFound().build();
-                  }
-                  bookingDao.save(seatBooking);
-                  return ResponseEntity.ok(seatBooking);
-         }
+    @GetMapping("name-seat/{id}")
+    public ResponseEntity<List<String>> findByIDseat(@PathVariable("id") String id) {
+        return ResponseEntity.ok(bookingDao.findSeatNamesByBookingId(id));
+    }
 
-         @DeleteMapping("/{id}")
-         public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-                  bookingDao.deleteById(id);
-                  return ResponseEntity.ok(true);
-         }
+    @PostMapping
+    public ResponseEntity<SeatBooking> post(@RequestBody SeatBooking seatBooking) {
+        bookingDao.save(seatBooking);
+        return ResponseEntity.ok(seatBooking);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SeatBooking> put(@PathVariable("id") Long id, @RequestBody SeatBooking seatBooking) {
+        if (!bookingDao.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        bookingDao.save(seatBooking);
+        return ResponseEntity.ok(seatBooking);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
+        bookingDao.deleteById(id);
+        return ResponseEntity.ok(true);
+    }
 }

@@ -22,7 +22,7 @@ public class ChildSeatChart {
     
 	@EmbeddedId
 	ChildSeatChartPK childSeatChartPK;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "seat_chart_id", insertable = false, updatable = false)
 	private SeatChart seatChart;
