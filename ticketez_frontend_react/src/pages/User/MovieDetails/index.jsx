@@ -11,12 +11,12 @@ function MovieDetails() {
                 </Col>
                 <Col
                     span={24}
-                    style={{ display: 'flex', justifyContent: 'center', background: '#ffffff', height: 2000 }}
+                    style={{ display: 'flex', justifyContent: 'center', background: '#ffffff', minHeight: 2000 }}
                 >
                     <Row style={{ width: 1088, height: 1000 }}>
                         <Col span={16}>
                             <Row>
-                                <Col span={24} style={{ backgroundColor: 'red' }}>
+                                <Col span={24} style={{}}>
                                     <ViTri />
                                 </Col>
                                 <Col span={24} style={{ backgroundColor: 'gray',display: 'flex',  marginTop: 50, minHeight: 600 }}>

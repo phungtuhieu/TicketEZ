@@ -20,7 +20,7 @@ const CumRap = ({ diaVaLoai }) => {
     const [data, setData] = useState([]);
     const [list, setList] = useState([]);
 
-    // console.log("diavaloairoine~:", diaVaLoai);
+    console.log("diavaloairoine~:", diaVaLoai);
     useEffect(() => {
         fetch(fakeDataUrl)
             .then((res) => res.json())

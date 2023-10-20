@@ -7,25 +7,27 @@ import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid
 import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
-import axios from 'axios';
+import { provinceApi } from '~/api/admin';
 
 const cx = classNames.bind(style);
 
 function ViTri() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [provinces, setProvinces] = useState('Thành phố Hà Nội');
+    const [provinces, setProvinces] = useState({
+        id: 2,
+        name: 'Hồ Chí Minh',
+    });
     const [dataProvinces, setDataProvinces] = useState([]);
-
 
     useEffect(() => {
         const get = async () => {
-            const res = await axios.get('https://provinces.open-api.vn/api/');
+            const res = await provinceApi.get();
             // console.log(res.data);
             setDataProvinces(res.data);
         };
         get();
-    }, [provinces]);
+    }, []);
     // console.log(dataProvinces);
 
     const showModal = () => {
@@ -40,10 +42,15 @@ function ViTri() {
         setIsModalOpen(false);
     };
 
+    const handleSetProvince = (province) => {
+        setProvinces(province);
+        // setIsModalOpen(false);
+    };
+
     // console.log(provinces);
 
     return (
-        <Row style={{height: '100%'}}>
+        <Row style={{ height: '100%' }}>
             <Col
                 span={24}
                 style={{
@@ -55,12 +62,13 @@ function ViTri() {
                 <div className={cx('wrapper-vitri')}>
                     <span className={cx('title')}>Vị trí </span>
                     <Button className={cx('btn-first')} onClick={showModal} icon={<EnvironmentOutlined />}>
-                        {provinces}
+                        {provinces.name}
                         <span className={cx('btn-first-icon-right')}>
                             <FontAwesomeIcon icon={faAngleDown} />
                         </span>
                     </Button>
                     <Modal
+                    maskClosable={false}
                         className={cx('modal', 'slideIn')}
                         footer={
                             <Button className={cx('modal-footer-btn-close')} onClick={handleCancel}>
@@ -86,22 +94,18 @@ function ViTri() {
                                 />
                             </Col>
                             <Col span={24} className={cx('modal-header-col2')}>
-                                {dataProvinces.map((a, index) => (
+                                {dataProvinces.map((province, index) => (
                                     <Button
                                         key={index}
-                                        type={a.name === provinces ? '' : 'text'}
-                                        // className={a.name === provinces ? 'btn btn-active' : 'btn btn-text'}
+                                        type={province.id === provinces.id ? '' : 'text'}
+                                        // className={province.name === provinces ? 'btn btn-active' : 'btn btn-text'}
                                         className={cx('btn', {
-                                            'btn-active': a.name === provinces,
-                                            'btn-text': a.name !== provinces,
+                                            'btn-active': province.id === provinces.id,
+                                            'btn-text': province.id !== provinces.id,
                                         })}
-                                        onClick={() => {
-                                            // console.log(a.name);
-                                            setProvinces(a.name);
-                                            setIsModalOpen(false);
-                                        }}
+                                        onClick={() => handleSetProvince(province)}
                                     >
-                                        {a.name}
+                                        {province.name}
                                     </Button>
                                 ))}
 
