@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
 // import '~/pages/User/Booking/SeatChart/chart.scss'
 import axiosClient from '~/api/global/axiosClient';
+
 import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
@@ -21,23 +22,20 @@ const radioStyl = {
 };
 
 function SeatChart(props) {
-    const { rows, columns, nameSeat, idSeatChart } = props;
- 
-
+    const { rows, columns, idSeatChart } = props;
 
     const createSeatArray = () => {
         let seatRows = rows; // Số hàng
         let seatColumns = columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
-        console.log(nameSeat);
         const seatState = {
             seat: [],
             seatAvailable: [],
             seatReserved: [],
-            vipSeat: listSeatVip,
-            normalSeat: listSeatNormal,
-            seatUnavailable: nameSeat,
+            vipSeat: [],
+            normalSeat: [],
+            seatUnavailable: [],
         };
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
@@ -57,63 +55,91 @@ function SeatChart(props) {
             seatState.seat.push(row);
         }
 
+
         // Thêm cột chú thích hàng ở bên trái
         seatState.seatHeader = rowHeader;
 
         return seatState;
     };
 
-    const [showSeat, setShowSeat] = useState(false);
+    const [showSeat, setShowSeat] = useState(true);
     const [reload, setReload] = useState(false);
     const [listSeatNormal, setListSeatNormal] = useState([]);
     const [listSeatVip, setListSeatVip] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
-    const [seatState, setSeatState] = useState();
+    const [seatState, setSeatState] = useState(createSeatArray());
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat'); // Mặc định ban đầu là 'normal-seat'
 
     const fetchDataSeat = async () => {
         try {
             const respAll = await axiosClient.get(`seat/by-seatchart/${idSeatChart}`);
             setAllSeats(respAll.data);
-            const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${2}`);
-            const newVipSeats = respVip.data.map((seat) => seat.name);
-            setListSeatVip((prevState) => {
-                for (const newSeat of newVipSeats) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
 
-            const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${1}`);
-            const newNormalSeats = respNormal.data.map((seat) => seat.name);
-            setListSeatNormal((prevState) => {
-                for (const newSeat of newNormalSeats) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
-
-            console.log(listSeatNormal);
-            console.log(listSeatVip);
-
-            if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
-                setSeatState(createSeatArray());
-                setShowSeat(true);
+            console.log(respAll.data);
+            if (allSeats.length > 0) {
                 setReload(false);
             } else {
                 setReload(true);
             }
+            console.log(respAll.data);
         } catch (error) {
             console.error(error);
         }
     };
 
+    const onClickData = (seat) => {
+        const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
+
+        console.log('------------------------------------------------');
+        console.log('Vip', vipSeat);
+
+        console.log('normal', normalSeat);
+
+        console.log('Đã đặt', seatUnavailable);
+        if (selectedSeatType === 'normal-seat') {
+            while (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
+            }
+            setSeatState({
+                ...seatState,
+                normalSeat: [...normalSeat, seat],
+            });
+        }
+        if (selectedSeatType === 'vip-seat') {
+            while (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
+            }
+
+            setSeatState({
+                ...seatState,
+                vipSeat: [...vipSeat, seat],
+            });
+        }
+        if (selectedSeatType === 'unavailable') {
+            while (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
+            while (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+            setSeatState({
+                ...seatState,
+                seatUnavailable: [...seatUnavailable, seat],
+            });
+        }
+    };
+
     const onClickUpdate = () => {
+        console.log(idSeatChart);
+        fetchDataSeat()
+        console.log('------------------------------------');
         const seatVipAndNormal = [
             ...seatState.vipSeat.map((seat) => ({ name: seat, type: 2 })),
             ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
@@ -166,54 +192,6 @@ function SeatChart(props) {
         const respVip = await axiosClient.put(`seat/${idSeat}`, data);
     };
 
-    const onClickData = (seat) => {
-        const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
-
-        console.log('------------------------------------------------');
-        console.log('Vip', vipSeat);
-
-        console.log('normal', normalSeat);
-
-        console.log('Đã đặt', seatUnavailable);
-        if (selectedSeatType === 'normal-seat') {
-            while (vipSeat.indexOf(seat) > -1) {
-                vipSeat.splice(vipSeat.indexOf(seat), 1);
-            }
-            while (seatUnavailable.indexOf(seat) > -1) {
-                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
-            }
-            setSeatState({
-                ...seatState,
-                normalSeat: [...normalSeat, seat],
-            });
-        }
-        if (selectedSeatType === 'vip-seat') {
-            while (normalSeat.indexOf(seat) > -1) {
-                normalSeat.splice(normalSeat.indexOf(seat), 1);
-            }
-            while (seatUnavailable.indexOf(seat) > -1) {
-                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
-            }
-
-            setSeatState({
-                ...seatState,
-                vipSeat: [...vipSeat, seat],
-            });
-        }
-        if (selectedSeatType === 'unavailable') {
-            while (normalSeat.indexOf(seat) > -1) {
-                normalSeat.splice(normalSeat.indexOf(seat), 1);
-            }
-            while (vipSeat.indexOf(seat) > -1) {
-                vipSeat.splice(vipSeat.indexOf(seat), 1);
-            }
-            setSeatState({
-                ...seatState,
-                seatUnavailable: [...seatUnavailable, seat],
-            });
-        }
-    };
-
     // const handelUpdate   = () => {
     //     setShowSeat(false);
     // };
@@ -222,13 +200,21 @@ function SeatChart(props) {
         setSelectedSeatType(e.target.value);
     };
 
+    const [oldIdSeatChart, setOldIdSeatChart] = useState('');
+    const [checkTitle, setTitle] = useState(false);
+
     useEffect(() => {
-        fetchDataSeat();
-    }, [reload]);
+        if (typeof idSeatChart === 'string' && idSeatChart.trim() === '') {
+            setTitle(false);
+        } else {
+            setTitle(true);
+        }
+    }, [idSeatChart]);
 
     return (
         <>
             <Card className={cx('card')}>
+                {checkTitle ? 'Sơ đồ này đã được tạo' : 'đây là sơ đồ xem trước'}
                 <Row>
                     <Col className={cx('div-screen')} span={8} style={{ marginLeft: '140px' }}>
                         <hr className={cx('screen')} />

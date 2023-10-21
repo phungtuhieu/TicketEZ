@@ -32,7 +32,6 @@ public class SeatAPI {
     @GetMapping("/by-seatchart/{seatChartId}")
     public ResponseEntity<List<Seat>> getSeatsBySeatChart(
             @PathVariable("seatChartId") Long seatChartId) {
-        // Sử dụng repository để lấy danh sách rạp theo cụm rạp
         List<Seat> seats = seatDAO.findBySeatChartId(seatChartId);
         return ResponseEntity.ok(seats);
     }
@@ -53,11 +52,11 @@ public class SeatAPI {
     // return ResponseEntity.ok(seatDAO.findById(id).get());
     // }
 
-    // @PostMapping
-    // public ResponseEntity<Seat> post(@RequestBody Seat seat) {
-    // seatDAO.save(seat);
-    // return ResponseEntity.ok(seat);
-    // }
+    @PostMapping
+    public ResponseEntity<Seat> post(@RequestBody Seat seat) {
+        seatDAO.save(seat);
+        return ResponseEntity.ok(seat);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Seat> put(@PathVariable("id") Long id, @RequestBody Seat seat) {
