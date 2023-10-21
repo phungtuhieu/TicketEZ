@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Row, Col, Input } from 'antd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,22 +18,22 @@ const CumRap = ({ NameAndProvince }) => {
     const [data, setData] = useState([]);
     const [totalItems, setTotalItems] = useState(1);
     const [search, setSearch] = useState('');
-    const so = 5;
+    const so = 100;
     const [count, setCount] = useState(so);
     const [list, setList] = useState([]);
 
     const [cinemaComplex, setCinemaComplex] = useState(null);
-    
-    let newCount = count;
-    let duLieuTraVe = so;
+
+    // let newCount = count;
+    // let duLieuTraVe = so;
+    // const newCountRef = useRef(count);
+    // const newDuLieuTraVe = useRef(so);
 
     useEffect(() => {
         if (list.length > 0 && cinemaComplex === null) {
-          setCinemaComplex(list[0].id);
+            setCinemaComplex(list[0].id);
         }
-      }, [list]);
-
-
+    }, [list]);
 
     useEffect(() => {
         const geist = async () => {
@@ -49,73 +49,89 @@ const CumRap = ({ NameAndProvince }) => {
             setList(res.data);
             setTotalItems(res.totalItems);
         };
+
         geist();
     }, [NameAndProvince, search]);
 
-   
-    if (list.length > totalItems) {
-        newCount = totalItems;
-        duLieuTraVe = totalItems % so;
-    }
+    // if (list.length > totalItems) {
+    //     newCountRef.current = totalItems;
+    //     newDuLieuTraVe.current = totalItems % so;
+    //     console.log("ádas", totalItems % so);
+    //     // if (newDuLieuTraVe.current === 0) {
+    //     //     newDuLieuTraVe.current = so;
+    //     // }
+    // }
 
-    const onLoadMore = () => {
-        setLoading(true);
-        setCount(count + so);
-        console.log('lấy dữ 2', duLieuTraVe);
+    // console.log(totalItems);
+    // console.log(list.length);
 
-        setList(
-            data.concat(
-                [...new Array(count)].map(() => ({
-                    loading: true,
-                    cinemaChain: {
-                        image: '',
-                    },
-                })),
-            ),
-        );
-    };
+    // console.log("list",list);
+    // console.log("data",data);
+    // console.log('duLieuTraVe', newDuLieuTraVe);
+    // console.log('newCount', newCountRef);
+    // useEffect(() => {
+    //     //  newCount = count;
+    //     //  duLieuTraVe = so;
+    //     newDuLieuTraVe.current = so;
+    //     newCountRef.current = count;
+    //     alert();
+    // }, [NameAndProvince.cinemaChainName]);
 
-    useEffect(() => {
-        if (loading) {
-            setTimeout(() => {
-                const abc = async () => {
-                    const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
-                        newCount,
-                        NameAndProvince.province.id,
-                        NameAndProvince.cinemaChainName,
-                        search,
-                    );
-                    const newData = data.concat(res.data.slice(-duLieuTraVe));
-                    setData(newData);
-                    setList(newData);
-                    setLoading(false);
-                    window.dispatchEvent(new Event('resize'));
-                };
-                abc();
-            }, 500);
-        }
-    }, [loading, search, NameAndProvince]);
+    // useEffect(() => {
+    //     if (loading) {
+    //         setTimeout(() => {
+    //             const abc = async () => {
+    //                 const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
+    //                     newCountRef.current,
+    //                     NameAndProvince.province.id,
+    //                     NameAndProvince.cinemaChainName,
+    //                     '',
+    //                 );
+    //                 const newData = data.concat(res.data.slice(-newDuLieuTraVe.current));
+    //                 setData(newData);
+    //                 setList(newData);
+    //                 setLoading(false);
+    //                 window.dispatchEvent(new Event('resize'));
+    //             };
+    //             abc();
+    //         }, 500);
+    //     }
+    // }, [loading, search, NameAndProvince]);
 
-    const loadMore = list.length < totalItems && (
-        <div
-            style={{
-                textAlign: 'center',
-                marginTop: 12,
-                height: 32,
-                lineHeight: '32px',
-            }}
-        >
-            <Button onClick={onLoadMore} className={cx('btn-load')}>
-                Xem thêm
-            </Button>
-        </div>
-    );
+    // const onLoadMore = () => {
+    //     setLoading(true);
+    //     setCount(count + so);
+    //     newCountRef.current = count + so;
+
+    //     setList(
+    //         data.concat(
+    //             [...new Array(count)].map(() => ({
+    //                 loading: true,
+    //                 cinemaChain: {
+    //                     image: '',
+    //                 },
+    //             })),
+    //         ),
+    //     );
+    // };
+    // const loadMore = list.length < totalItems && (
+    //     <div
+    //         style={{
+    //             textAlign: 'center',
+    //             marginTop: 12,
+    //             height: 32,
+    //             lineHeight: '32px',
+    //         }}
+    //     >
+    //         <Button onClick={onLoadMore} className={cx('btn-load')}>
+    //             Xem thêm
+    //         </Button>
+    //     </div>
+    // );
 
     const handleCinemaComplex = (data) => {
         setCinemaComplex(data.id);
-    }
-
-
+    };
 
     return (
         <>
@@ -143,10 +159,16 @@ const CumRap = ({ NameAndProvince }) => {
                             <List
                                 loading={initLoading}
                                 itemLayout="horizontal"
-                                loadMore={loadMore}
+                                // loadMore={loadMore}
                                 dataSource={list}
                                 renderItem={(item, index) => (
-                                    <List.Item className={cx('list-item' , {active: cinemaComplex === null ? index === 0 : cinemaComplex === item.id} )} defaultValue={[1]} onClick={() => handleCinemaComplex(item)}>
+                                    <List.Item
+                                        className={cx('list-item', {
+                                            active: cinemaComplex === null ? index === 0 : cinemaComplex === item.id,
+                                        })}
+                                        defaultValue={[1]}
+                                        onClick={() => handleCinemaComplex(item)}
+                                    >
                                         <Skeleton
                                             avatar
                                             title={false}
@@ -154,7 +176,7 @@ const CumRap = ({ NameAndProvince }) => {
                                             loading={item.loading}
                                             active
                                         >
-                                            <div className={cx('sau-list')} >
+                                            <div className={cx('sau-list')}>
                                                 <div className={cx('border-img')}>
                                                     <img
                                                         className={cx('img')}
@@ -164,9 +186,7 @@ const CumRap = ({ NameAndProvince }) => {
                                                         alt="lỗi"
                                                     />
                                                 </div>
-                                                <span className={cx('title')}>
-                                                    {item.name}
-                                                </span>
+                                                <span className={cx('title')}>{item.name}</span>
                                             </div>
                                             <FontAwesomeIcon className={cx('icon')} icon={faAngleRight} />
                                         </Skeleton>
