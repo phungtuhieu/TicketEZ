@@ -1,7 +1,7 @@
 import axiosClient from '~/api/global/axiosClient';
 
 const urlCinemaComplex = 'cinemaComplex';
-export  const cinemaComplexUserApi = {
+export const cinemaComplexUserApi = {
     getByResultsProvinceIdAndCinemaChainNameAndSearchName: async (
         results,
         provinceId,
@@ -14,7 +14,10 @@ export  const cinemaComplexUserApi = {
             cinemaChainName,
             searchNameCCX,
         };
-        const result = await axiosClient.get(urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX', { params });
+        const result = await axiosClient.get(
+            urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX',
+            { params },
+        );
         return result.data;
     },
 };
@@ -52,7 +55,6 @@ export const genreMovieUserApi = {
 
 // ****************************************************************
 
-
 const urlFormatMovie = 'formatMovie';
 export const formatMovieUserApi = {
     getAllFormatMovie: async () => {
@@ -69,7 +71,7 @@ const urlGenre = 'genre';
 export const genreUserApi = {
     getGenreByMovie: async (movie) => {
         try {
-            const result = await axiosClient.post(urlGenre+"/get/genre-by-movie", movie);
+            const result = await axiosClient.post(urlGenre + '/get/genre-by-movie', movie);
             return result.data;
         } catch (error) {
             return error;
@@ -81,7 +83,7 @@ const urlFormat = 'format';
 export const formatUserApi = {
     getFormatByMovie: async (movie) => {
         try {
-            const result = await axiosClient.post(urlFormat+"/get/format-by-movie", movie);
+            const result = await axiosClient.post(urlFormat + '/get/format-by-movie', movie);
             return result.data;
         } catch (error) {
             return error;
@@ -89,4 +91,14 @@ export const formatUserApi = {
     },
 };
 
-
+const urlCinema = 'cinema';
+export const cinemaUserApi = {
+    getCinemaByCinemaComplex: async (movie) => {
+        try {
+            const result = await axiosClient.post(urlCinema + '/get/cinema-by-cinemaComplex', movie);
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};

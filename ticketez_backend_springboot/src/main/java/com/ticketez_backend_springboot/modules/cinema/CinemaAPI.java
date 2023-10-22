@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 
 @CrossOrigin("*")
 @RestController
@@ -116,6 +117,22 @@ public class CinemaAPI {
             return ResponseEntity.ok().body("Xoá rạp thành công");
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
+        }
+
+    }
+
+
+    // ----------------------------------------------------------------
+    @PostMapping("/get/cinema-by-cinemaComplex")
+    public ResponseEntity<?> getDuLie(@RequestBody CinemaComplex cinemaComplex) {
+        try {
+            if(cinemaComplex.getId() == null ){
+                    return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            }
+            List<Cinema> cinema = cinemaDAO.getCinemaByCinemaComplex(cinemaComplex);
+            return ResponseEntity.ok(cinema);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

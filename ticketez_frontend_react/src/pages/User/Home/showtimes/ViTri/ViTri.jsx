@@ -22,7 +22,7 @@ function ViTri() {
     const [dataProvinces, setDataProvinces] = useState([]);
 
     useEffect(() => {
-        const get = async () => {
+        const getProvince = async () => {
            try {
             const res = await provinceApi.get();
             // console.log(res.data);
@@ -31,7 +31,7 @@ function ViTri() {
             funcUtils.notify(error.response.data, "error");
            }
         };
-        get();
+        getProvince();
     }, []);
     // console.log(dataProvinces);
 

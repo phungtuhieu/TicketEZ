@@ -1,1 +1,9 @@
-export { cinemaComplexUserApi, movieUserApi, genreMovieUserApi, formatMovieUserApi, formatUserApi, genreUserApi  } from './writeApi';
+export {
+    cinemaComplexUserApi,
+    movieUserApi,
+    genreMovieUserApi,
+    formatMovieUserApi,
+    formatUserApi,
+    genreUserApi,
+    cinemaUserApi
+} from './writeApi';

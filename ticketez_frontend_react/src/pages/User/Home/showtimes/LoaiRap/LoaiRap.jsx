@@ -13,11 +13,11 @@ function LoaiRap({ province }) {
     const [cinemaChainName, setCinemaChainName] = useState('tất cả');
     const [dataCinemaChainName, setDataCinemaChainName] = useState([]);
 
+    
     const NameAndProvince = {
         province,
         cinemaChainName,
     };
-
     useEffect(() => {
         const getCinemaChain = async () => {
             try {
@@ -30,6 +30,9 @@ function LoaiRap({ province }) {
         };
         getCinemaChain();
     }, []);
+    
+
+   
 
     // console.log(dataCinemaChainName);
 
@@ -50,8 +53,9 @@ function LoaiRap({ province }) {
                         </div>
                         <div className={cx('title')}>Tất cả</div>
                     </div>
-                    {dataCinemaChainName.map((name) => (
+                    {dataCinemaChainName.map((name, index) => (
                         <div
+                            key={index}
                             className={cx('container', { active: cinemaChainName === name.name })}
                             onClick={() => setCinemaChainName(name.name)}
                         >

@@ -10,8 +10,9 @@ import { movieUserApi, genreMovieUserApi, formatMovieUserApi, genreUserApi, form
 
 const cx = classNames.bind(style);
 
-function ListPhim({ cinemaComplex }) {
-    const [ngay, setNgay] = useState(1);
+function ListPhim({ cinemaComplex, cinema }) {
+
+    const [day, setDay] = useState(1);
     const [weekDays, setWeekDays] = useState([]);
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
 
@@ -27,7 +28,7 @@ function ListPhim({ cinemaComplex }) {
     }, []);
 
     const handleDayClick = (index) => {
-        setNgay(index + 1);
+        setDay(index + 1);
         const selectedDay = weekDays[index];
         console.log('Ngày được chọn:', selectedDay.format('YYYY-MM-DD'));
     };
@@ -38,8 +39,10 @@ function ListPhim({ cinemaComplex }) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
+        // console.log(cinemaComplex);
+        console.log(cinema);
         try {
-            if (cinemaComplex !== null) {
+            if (cinemaComplex ?? cinemaComplex) {
                 const getMovie = async () => {
                     const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex);
                     setMovieData(resMovie);
@@ -49,7 +52,7 @@ function ListPhim({ cinemaComplex }) {
         } catch (error) {
             console.log(error);
         }
-    }, [cinemaComplex]);
+    }, [cinemaComplex, cinema]);
 
     const loadGenreByMovie = async (movie) => {
         const resGenre = await genreUserApi.getGenreByMovie(movie);
@@ -80,7 +83,7 @@ function ListPhim({ cinemaComplex }) {
                     };
                 }),
             );
-            console.log('test', data);
+            // console.log('test', data);
             setData(data);
         };
         fetchData();
@@ -127,7 +130,7 @@ function ListPhim({ cinemaComplex }) {
                             {weekDays.map((day, index) => (
                                 <div
                                     key={index}
-                                    className={cx('container-day', { active: ngay === index + 1 })}
+                                    className={cx('container-day', { active: day === index + 1 })}
                                     onClick={() => handleDayClick(index)}
                                 >
                                     <div className={cx('ngay')}>{day.date()}</div>

@@ -9,37 +9,27 @@ import classNames from 'classnames/bind';
 import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
 import funcUtils from '~/utils/funcUtils';
-import { cinemaComplexUserApi } from '~/api/user/showtime';
+import { cinemaComplexUserApi, cinemaUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 
 const CumRap = ({ NameAndProvince }) => {
     const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [totalItems, setTotalItems] = useState(1);
     const [search, setSearch] = useState('');
     const so = 100;
-    const [count, setCount] = useState(so);
     const [list, setList] = useState([]);
 
     const [cinemaComplex, setCinemaComplex] = useState(null);
-
-    // let newCount = count;
-    // let duLieuTraVe = so;
-    // const newCountRef = useRef(count);
-    // const newDuLieuTraVe = useRef(so);
+    const [cinema, setCinema] = useState([0]);
 
     useEffect(() => {
         if (list.length > 0) {
             setCinemaComplex(list[0]);
         }
     }, [list]);
-    // console.log(cinemaComplex);
-    // console.log(list);
 
     useEffect(() => {
-        const geist = async () => {
+        const getCinemaComplexByNameAndProvince = async () => {
             try {
                 const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
                     so,
@@ -48,96 +38,35 @@ const CumRap = ({ NameAndProvince }) => {
                     search,
                 );
                 setInitLoading(false);
-                setData(res.data);
                 setList(res.data);
-                setTotalItems(res.totalItems);
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
             }
         };
 
-        geist();
+        getCinemaComplexByNameAndProvince();
     }, [NameAndProvince, search]);
 
-    // if (list.length > totalItems) {
-    //     newCountRef.current = totalItems;
-    //     newDuLieuTraVe.current = totalItems % so;
-    //     console.log("ádas", totalItems % so);
-    //     // if (newDuLieuTraVe.current === 0) {
-    //     //     newDuLieuTraVe.current = so;
-    //     // }
-    // }
-
-    // console.log(totalItems);
-    // console.log(list.length);
-
-    // console.log("list",list);
-    // console.log("data",data);
-    // console.log('duLieuTraVe', newDuLieuTraVe);
-    // console.log('newCount', newCountRef);
-    // useEffect(() => {
-    //     //  newCount = count;
-    //     //  duLieuTraVe = so;
-    //     newDuLieuTraVe.current = so;
-    //     newCountRef.current = count;
-    //     alert();
-    // }, [NameAndProvince.cinemaChainName]);
-
-    // useEffect(() => {
-    //     if (loading) {
-    //         setTimeout(() => {
-    //             const abc = async () => {
-    //                 const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
-    //                     newCountRef.current,
-    //                     NameAndProvince.province.id,
-    //                     NameAndProvince.cinemaChainName,
-    //                     '',
-    //                 );
-    //                 const newData = data.concat(res.data.slice(-newDuLieuTraVe.current));
-    //                 setData(newData);
-    //                 setList(newData);
-    //                 setLoading(false);
-    //                 window.dispatchEvent(new Event('resize'));
-    //             };
-    //             abc();
-    //         }, 500);
-    //     }
-    // }, [loading, search, NameAndProvince]);
-
-    // const onLoadMore = () => {
-    //     setLoading(true);
-    //     setCount(count + so);
-    //     newCountRef.current = count + so;
-
-    //     setList(
-    //         data.concat(
-    //             [...new Array(count)].map(() => ({
-    //                 loading: true,
-    //                 cinemaChain: {
-    //                     image: '',
-    //                 },
-    //             })),
-    //         ),
-    //     );
-    // };
-    // const loadMore = list.length < totalItems && (
-    //     <div
-    //         style={{
-    //             textAlign: 'center',
-    //             marginTop: 12,
-    //             height: 32,
-    //             lineHeight: '32px',
-    //         }}
-    //     >
-    //         <Button onClick={onLoadMore} className={cx('btn-load')}>
-    //             Xem thêm
-    //         </Button>
-    //     </div>
-    // );
+    useEffect(() => {
+        try {
+            if (cinemaComplex ?? cinemaComplex) {
+                const getCinemaByCinemaComplex = async () => {
+                    const resCinema = await cinemaUserApi.getCinemaByCinemaComplex(cinemaComplex);
+                    setCinema(resCinema);
+                    // console.log('cinema,', resCinema);
+                };
+                getCinemaByCinemaComplex();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [cinemaComplex]);
 
     const handleCinemaComplex = (data) => {
         setCinemaComplex(data);
     };
+  
+
 
     return (
         <>
@@ -212,7 +141,7 @@ const CumRap = ({ NameAndProvince }) => {
                     borderTop: '1px solid #e5e5e5',
                 }}
             >
-                <ListPhim cinemaComplex={cinemaComplex} />
+                <ListPhim cinemaComplex={cinemaComplex} cinema={cinema[0]} />
             </Col>
         </>
     );
