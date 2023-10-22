@@ -8,7 +8,8 @@ import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
-import cinemaComplexUserApi from '~/api/user/cinemaComplex/cinemaComplexAPI';
+import cinemaComplexUserApi from '~/api/user/cinemaComplex/cinemaComplexUserAPI';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -30,24 +31,29 @@ const CumRap = ({ NameAndProvince }) => {
     // const newDuLieuTraVe = useRef(so);
 
     useEffect(() => {
-        if (list.length > 0 && cinemaComplex === null) {
-            setCinemaComplex(list[0].id);
+        if (list.length > 0) {
+            setCinemaComplex(list[0]);
         }
     }, [list]);
+    // console.log(cinemaComplex);
+    // console.log(list);
 
     useEffect(() => {
         const geist = async () => {
-            const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
-                so,
-                NameAndProvince.province.id,
-                NameAndProvince.cinemaChainName,
-                search,
-            );
-
-            setInitLoading(false);
-            setData(res.data);
-            setList(res.data);
-            setTotalItems(res.totalItems);
+            try {
+                const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
+                    so,
+                    NameAndProvince.province.id,
+                    NameAndProvince.cinemaChainName,
+                    search,
+                );
+                setInitLoading(false);
+                setData(res.data);
+                setList(res.data);
+                setTotalItems(res.totalItems);
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         };
 
         geist();
@@ -130,7 +136,7 @@ const CumRap = ({ NameAndProvince }) => {
     // );
 
     const handleCinemaComplex = (data) => {
-        setCinemaComplex(data.id);
+        setCinemaComplex(data);
     };
 
     return (
@@ -164,7 +170,7 @@ const CumRap = ({ NameAndProvince }) => {
                                 renderItem={(item, index) => (
                                     <List.Item
                                         className={cx('list-item', {
-                                            active: cinemaComplex === null ? index === 0 : cinemaComplex === item.id,
+                                            active: cinemaComplex === null ? index === 0 : cinemaComplex.id === item.id,
                                         })}
                                         defaultValue={[1]}
                                         onClick={() => handleCinemaComplex(item)}

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 
 @RestController
 @CrossOrigin("*")
@@ -53,13 +53,11 @@ public class MovieAPI {
         }
     }
 
-
-     @GetMapping("/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<List<Movie>> findAll() {
         List<Movie> movies = dao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(movies);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> findById(@PathVariable("id") Long id) {
@@ -95,5 +93,20 @@ public class MovieAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Không thể xoá, dữ liệu đã được sử dụng ở nơi khác", HttpStatus.CONFLICT);
         }
+    }
+
+    ////////////////////////////////
+    @PostMapping("/get/movie")
+    public ResponseEntity<?> getDuLie(@RequestBody CinemaComplex CinemaComplex) {
+        try {
+            if(CinemaComplex.getId() == null ){
+                    return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            }
+            List<Movie> movie = dao.findMoviesBy(CinemaComplex);
+            return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

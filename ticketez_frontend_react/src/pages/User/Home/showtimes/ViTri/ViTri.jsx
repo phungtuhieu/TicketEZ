@@ -8,6 +8,7 @@ import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
 import { provinceApi } from '~/api/admin';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -22,9 +23,13 @@ function ViTri() {
 
     useEffect(() => {
         const get = async () => {
+           try {
             const res = await provinceApi.get();
             // console.log(res.data);
             setDataProvinces(res.data);
+           } catch (error) {
+            funcUtils.notify(error.response.data, "error");
+           }
         };
         get();
     }, []);

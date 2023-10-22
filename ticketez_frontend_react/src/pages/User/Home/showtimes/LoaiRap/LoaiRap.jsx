@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import style from './LoaiRap.module.scss';
 import CumRap from '../ListCumRap/CumRap';
 import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -11,16 +12,20 @@ function LoaiRap({ province }) {
     const [cinemaChainName, setCinemaChainName] = useState('tất cả');
     const [dataCinemaChainName, setDataCinemaChainName] = useState([]);
 
-    const NameAndProvince    = {
+    const NameAndProvince = {
         province,
         cinemaChainName,
     };
 
     useEffect(() => {
         const getCinemaChain = async () => {
-            const res = await cinemaChainApi.get();
-            // console.log('res', res);
-            setDataCinemaChainName(res.data);
+            try {
+                const res = await cinemaChainApi.get();
+                // console.log('res', res);
+                setDataCinemaChainName(res.data);
+            } catch (error) {
+                funcUtils.notify(error.response.data, "error");
+            }
         };
         getCinemaChain();
     }, []);

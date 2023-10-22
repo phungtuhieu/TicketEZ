@@ -14,7 +14,7 @@ const cinemaComplexUserApi = {
             cinemaChainName,
             searchNameCCX,
         };
-        const result = await axiosClient.get(url + '/adbc', { params });
+        const result = await axiosClient.get(url + '/get/abc', { params });
         return result.data;
     },
 };

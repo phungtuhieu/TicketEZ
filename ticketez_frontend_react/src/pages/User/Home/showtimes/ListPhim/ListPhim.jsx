@@ -5,12 +5,12 @@ import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
 
 import moment from 'moment-timezone';
+import movieUserApi from '~/api/user/cinemaComplex/movieUserAPI';
 
 const cx = classNames.bind(style);
 
-function ListPhim({cinemaComplex}) {
+function ListPhim({ cinemaComplex }) {
     const [ngay, setNgay] = useState(1);
-
     const [weekDays, setWeekDays] = useState([]);
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
 
@@ -22,19 +22,32 @@ function ListPhim({cinemaComplex}) {
             nextWeekDays.push(currentDay);
         }
         // console.log(nextWeekDays);
-        setWeekDays(nextWeekDays);  
-
+        setWeekDays(nextWeekDays);
     }, []);
 
     const handleDayClick = (index) => {
         setNgay(index + 1);
         const selectedDay = weekDays[index];
         console.log('Ngày được chọn:', selectedDay.format('YYYY-MM-DD'));
-      };
-     
-     useEffect(()=>{
+    };
+
+    const [movieData, setMovieData] = useState([])
+
+    useEffect(() => {
         console.log(cinemaComplex);
-     },[cinemaComplex])
+        try {
+            if (cinemaComplex !== null) {
+                const get = async () => {
+                    const res = await movieUserApi.getMovieByCinemaComplex(cinemaComplex);
+                    console.log('resne:', res);
+                    setMovieData(res)
+                };
+                get();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [cinemaComplex]);
 
     return (
         <>
@@ -47,19 +60,25 @@ function ListPhim({cinemaComplex}) {
                                     <div className={cx('border-img')}>
                                         <img
                                             className={cx('img')}
-                                            src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
-                                            alt=""
+                                            // src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
+                                            src={
+                                                'http://localhost:8081/api/upload/' +
+                                                (cinemaComplex?.cinemaChain?.image ?? '')
+                                            }
+                                            alt="l"
                                         />
                                     </div>
                                 </Col>
                                 <Col span={22}>
                                     <Row>
                                         <Col span={24} className={cx('ten-rap')}>
-                                            Lịch chiếu phim Lotte Phú Thọ
+                                            {/* Lịch chiếu phim Lotte Phú Thọ */}
+                                            {'Lịch chiếu phim ' + (cinemaComplex?.name ?? '')}
                                         </Col>
                                         <Col span={24} className={cx('container-info')}>
                                             <div className={cx('chi-tiet-dia-chi')}>
-                                                Tầng 4 Lotte Mart Phú Thọ, Số 968 đường Ba Tháng Hai, P.15, Quận 11
+                                                {/* Tầng 4 Lotte Mart Phú Thọ, Số 968 đường Ba Tháng Hai, P.15, Quận 11 */}
+                                                {cinemaComplex?.address ?? ''}
                                             </div>
                                             <div className={cx('ban-do')}>[Bản đồ]</div>
                                         </Col>
@@ -90,7 +109,8 @@ function ListPhim({cinemaComplex}) {
                     </Row>
                 </Col>
                 <Col span={24} className={cx('col2')}>
-                    <Row className={cx('container-movie')}>
+
+                    {/* <Row className={cx('container-movie')}>
                         <Col span={4} className={cx('col1-movie')}>
                             <div className={cx('border-movie')}>
                                 <img
@@ -104,9 +124,10 @@ function ListPhim({cinemaComplex}) {
                         <Col span={20} className={cx('col2-movie')}>
                             2
                         </Col>
-                    </Row>
+                    </Row> */}
 
-                    <Row className={cx('container-movie')}>
+                    {movieData.map((movie) => (
+                        <Row className={cx('container-movie')}>
                         <Col span={4} className={cx('col1-movie')}>
                             <div className={cx('border-movie')}>
                                 <img
@@ -116,12 +137,11 @@ function ListPhim({cinemaComplex}) {
                                 />
                             </div>
                         </Col>
-
                         <Col span={20} className={cx('col2-movie')}>
                             <Row>
                                 <Col span={24} className={cx('container-thong-tin-phim')}>
-                                    <div className={cx('k')}>K</div>
-                                    <div className={cx('ten-phim')}>Muôn Kiếp Nhân Duyên</div>
+                                    <div className={cx('k')}>{movie.mpaaRating.ratingCode}</div>
+                                    <div className={cx('ten-phim')}>{movie.title}</div>
                                     <div className={cx('the-loai-phim')}>Chính Kịch, Lãng Mạn</div>
                                 </Col>
                                 <Col span={24} className={cx('container-suat-chieu')}>
@@ -162,6 +182,7 @@ function ListPhim({cinemaComplex}) {
                             </Row>
                         </Col>
                     </Row>
+                    ))}
                 </Col>
             </Row>
         </>

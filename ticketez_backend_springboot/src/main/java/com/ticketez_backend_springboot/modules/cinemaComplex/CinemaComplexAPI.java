@@ -108,25 +108,29 @@ public class CinemaComplexAPI {
 
     // ----------------------------------------------------------------
 
-    @GetMapping("/adbc")
+    @GetMapping("/get/abc")
     public ResponseEntity<?> getDuLie(@RequestParam("results") Optional<Integer> results,
             @RequestParam("provinceId") Optional<Integer> provinceId,
             @RequestParam("cinemaChainName") Optional<String> cinemaChainName,
             @RequestParam("searchNameCCX") Optional<String> searchNameCCX) {
 
-        if (cinemaChainName.isPresent() && cinemaChainName.get() == ""
-                || cinemaChainName.get().equalsIgnoreCase("tất cả")) {
-            cinemaChainName = Optional.empty();
-        }
+        try {
+            if (cinemaChainName.isPresent() && cinemaChainName.get() == ""
+                    || cinemaChainName.get().equalsIgnoreCase("tất cả")) {
+                cinemaChainName = Optional.empty();
+            }
 
-        Sort sort = Sort.by(Sort.Order.desc("id"));
-        Pageable pageable = PageRequest.of(0, results.orElse(999), sort);
-        Page<CinemaComplex> page = cinemaComplexDao.findDuLieu(pageable, provinceId.orElse(2),
-                cinemaChainName.orElse(""), searchNameCCX.orElse(""));
-        ResponseDTO<CinemaComplex> responseDTO = new ResponseDTO<>();
-        responseDTO.setData(page.getContent());
-        responseDTO.setTotalItems(page.getTotalElements());
-        responseDTO.setTotalPages(page.getTotalPages());
-        return ResponseEntity.ok(responseDTO);
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(0, results.orElse(999), sort);
+            Page<CinemaComplex> page = cinemaComplexDao.findDuLieu(pageable, provinceId.orElse(2),
+                    cinemaChainName.orElse(""), searchNameCCX.orElse(""));
+            ResponseDTO<CinemaComplex> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(page.getContent());
+            responseDTO.setTotalItems(page.getTotalElements());
+            responseDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
