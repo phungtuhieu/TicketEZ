@@ -5,7 +5,8 @@ import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
 
 import moment from 'moment-timezone';
-import movieUserApi from '~/api/user/cinemaComplex/movieUserAPI';
+
+import { movieUserApi, genreMovieUserApi, formatMovieUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 
@@ -31,23 +32,85 @@ function ListPhim({ cinemaComplex }) {
         console.log('Ngày được chọn:', selectedDay.format('YYYY-MM-DD'));
     };
 
-    const [movieData, setMovieData] = useState([])
+    // -----------------movie by ccx-----------------------------------------------
 
+    const [movieData, setMovieData] = useState([]);
     useEffect(() => {
-        console.log(cinemaComplex);
         try {
             if (cinemaComplex !== null) {
-                const get = async () => {
-                    const res = await movieUserApi.getMovieByCinemaComplex(cinemaComplex);
-                    console.log('resne:', res);
-                    setMovieData(res)
+                const getMovie = async () => {
+                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex);
+                    setMovieData(resMovie);
                 };
-                get();
+                getMovie();
             }
         } catch (error) {
             console.log(error);
         }
     }, [cinemaComplex]);
+
+    // ------------------genre by movie----------------------------------------------
+
+    const [genreMovieData, setGenreMovieData] = useState([]);
+    useEffect(() => {
+        try {
+            const getGenreMovie = async () => {
+                const resGenreMovie = await genreMovieUserApi.getAllGenreMovie();
+                // console.log(resGenreMovie);
+                setGenreMovieData(resGenreMovie);
+            };
+            getGenreMovie();
+        } catch (error) {
+            console.log(error);
+        }
+    }, []);
+
+    // ------------------format by movie----------------------------------------------
+
+    const [formatMovieData, setFormatMovieData] = useState([]);
+
+    useEffect(() => {
+        try {
+            const getFormatMovie = async () => {
+                const resFormatMovie = await formatMovieUserApi.getAllFormatMovie();
+                setFormatMovieData(resFormatMovie);
+                console.log(resFormatMovie);
+            };
+            getFormatMovie();
+        } catch (error) {
+            console.log(error);
+        }
+    },[]);
+
+
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const newGenreData = [];
+
+    //         for (const movie of movieData) {
+    //             try {
+    //                 const resGenre = await genreUserApi.getGenreByMovie(movie);
+    //                 newGenreData.push(resGenre);
+    //             } catch (error) {
+    //                 console.log(error);
+    //             }
+    //         }
+
+    //         setGenreData(newGenreData);
+    //     };
+
+    //     fetchData();
+    // }, [movieData]);
+
+    // const getGenreByMovie = async (movie) => {
+    //     try {
+    //         const resGenre = await genreUserApi.getGenreByMovie(movie);
+    //         setGenreData((prevGenreData) => [...prevGenreData, resGenre]);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
     return (
         <>
@@ -109,7 +172,6 @@ function ListPhim({ cinemaComplex }) {
                     </Row>
                 </Col>
                 <Col span={24} className={cx('col2')}>
-
                     {/* <Row className={cx('container-movie')}>
                         <Col span={4} className={cx('col1-movie')}>
                             <div className={cx('border-movie')}>
@@ -126,62 +188,83 @@ function ListPhim({ cinemaComplex }) {
                         </Col>
                     </Row> */}
 
-                    {movieData.map((movie) => (
-                        <Row className={cx('container-movie')}>
-                        <Col span={4} className={cx('col1-movie')}>
-                            <div className={cx('border-movie')}>
-                                <img
-                                    className={cx('img-movie')}
-                                    src="https://cinema.momocdn.net/img/21556485482318514-poster.jpg"
-                                    alt=""
-                                />
-                            </div>
-                        </Col>
-                        <Col span={20} className={cx('col2-movie')}>
-                            <Row>
-                                <Col span={24} className={cx('container-thong-tin-phim')}>
-                                    <div className={cx('k')}>{movie.mpaaRating.ratingCode}</div>
-                                    <div className={cx('ten-phim')}>{movie.title}</div>
-                                    <div className={cx('the-loai-phim')}>Chính Kịch, Lãng Mạn</div>
-                                </Col>
-                                <Col span={24} className={cx('container-suat-chieu')}>
-                                    <div className={cx('title')}>2D Phụ đề</div>
-                                    <div className={cx('suat-chieu')}>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                    </div>
-                                </Col>
+                    {movieData.map((movie, index) => (
+                        <Row key={index} className={cx('container-movie')}>
+                            <Col span={4} className={cx('col1-movie')}>
+                                <div className={cx('border-movie')}>
+                                    <img
+                                        className={cx('img-movie')}
+                                        src="https://cinema.momocdn.net/img/21556485482318514-poster.jpg"
+                                        alt=""
+                                    />
+                                </div>
+                            </Col>
+                            <Col span={20} className={cx('col2-movie')}>
+                                <Row>
+                                    <Col span={24} className={cx('container-thong-tin-phim')}>
+                                        <div className={cx('k')}>{movie.mpaaRating.ratingCode}</div>
+                                        <div className={cx('ten-phim')}>{movie.title}</div>
+                                        <div className={cx('the-loai-phim')}>
 
-                                <Col span={24} className={cx('container-suat-chieu')}>
-                                    <div className={cx('title')}>2D Phụ đề</div>
-                                    <div className={cx('suat-chieu')}>
-                                        <Button className={cx('btn-suat-chieu')} danger>
-                                            <span className={cx('gio-bat-dau')}>20:45</span>
-                                            <span className={cx('gio-ket-thuc')}>21:45</span>
-                                        </Button>
-                                    </div>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
+                                            {genreMovieData.map((data, index) => {
+                                                if (data.movie.id === movie.id) {
+                                                    return (
+                                                        <span className={cx('span')} key={index}>
+                                                            {data?.genre?.name}
+                                                        </span>
+                                                    );
+                                                }
+                                                return null;
+                                            })}
+                                            
+                                        </div>
+                                    </Col>
+                                    {formatMovieData.map((data, index) => {
+                                        if (data.movie.id === movie.id) {
+                                            return (
+                                                <Col key={index}  span={24} className={cx('container-suat-chieu')}>
+                                                <div className={cx('title')}>{data.format.name}</div>
+                                                <div className={cx('suat-chieu')}>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                </div>
+                                            </Col>
+                                            )
+                                        }
+                                        return null;
+                                    })}
+                                    
+
+                                    {/* <Col span={24} className={cx('container-suat-chieu')}>
+                                        <div className={cx('title')}>2D Phụ đề</div>
+                                        <div className={cx('suat-chieu')}>
+                                            <Button className={cx('btn-suat-chieu')} danger>
+                                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                                            </Button>
+                                        </div>
+                                    </Col> */}
+                                </Row>
+                            </Col>
+                        </Row>
                     ))}
                 </Col>
             </Row>

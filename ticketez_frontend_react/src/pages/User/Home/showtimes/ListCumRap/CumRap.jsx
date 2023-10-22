@@ -8,8 +8,8 @@ import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
-import cinemaComplexUserApi from '~/api/user/cinemaComplex/cinemaComplexUserAPI';
 import funcUtils from '~/utils/funcUtils';
+import { cinemaComplexUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 

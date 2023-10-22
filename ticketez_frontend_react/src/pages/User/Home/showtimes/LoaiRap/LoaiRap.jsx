@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import style from './LoaiRap.module.scss';
 import CumRap from '../ListCumRap/CumRap';
 import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
+
 import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);

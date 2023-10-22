@@ -96,13 +96,13 @@ public class MovieAPI {
     }
 
     ////////////////////////////////
-    @PostMapping("/get/movie")
+    @PostMapping("/get/movies-by-cinemaComplex")
     public ResponseEntity<?> getDuLie(@RequestBody CinemaComplex CinemaComplex) {
         try {
             if(CinemaComplex.getId() == null ){
                     return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
             }
-            List<Movie> movie = dao.findMoviesBy(CinemaComplex);
+            List<Movie> movie = dao.getMoviesByCinemaComplex(CinemaComplex);
             return ResponseEntity.ok(movie);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);

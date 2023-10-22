@@ -16,7 +16,7 @@ public interface CinemaComplexDao extends JpaRepository<CinemaComplex, Long> {
             + "WHERE ccx.province.id = :provinceId AND"
             +" ccx.cinemaChain.name like CONCAT('%', :cinemaChainName, '%') AND "
             +" ccx.name like CONCAT('%', :searchNameCCX, '%') ")
-    Page<CinemaComplex> findDuLieu(Pageable pageable, @Param("provinceId") Integer provinceId,
+    Page<CinemaComplex> getCinemaComplexByProvinceIdAndCinemaChainNameAndSearchNameCCX(Pageable pageable, @Param("provinceId") Integer provinceId,
             @Param("cinemaChainName") String cinemaChainName,
             @Param("searchNameCCX") String searchNameCCX);
 

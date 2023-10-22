@@ -14,7 +14,7 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM Movie m WHERE EXISTS "
     + "(SELECT st FROM Showtime st WHERE m.id = st.movie.id AND st.cinema.cinemaComplex = :CinemaComplex )")
-    List<Movie> findMoviesBy(@Param("CinemaComplex") CinemaComplex CinemaComplex);
+    List<Movie> getMoviesByCinemaComplex(@Param("CinemaComplex") CinemaComplex CinemaComplex);
 
     // @Query("SELECT m FROM Movie m WHERE EXISTS (SELECT st FROM Showtime st JOIN st.cinema c JOIN c.cinemaComplex ccx WHERE m = st.movie AND ccx.id = 2 )")
     // List<Movie> findMoviesBy();

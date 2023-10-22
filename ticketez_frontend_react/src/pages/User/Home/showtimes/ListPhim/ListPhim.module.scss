@@ -211,7 +211,14 @@
                 .the-loai-phim {
                     font-size: 12px;
                     color: #b7b7b7;
-                    line-height: 13px;
+                    line-height: 13px; 
+                    
+                    .span:last-child {
+
+                        &::before {
+                            content: ", ";
+                        }
+                    }
                 }
             }
 
