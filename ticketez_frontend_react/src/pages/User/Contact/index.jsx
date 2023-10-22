@@ -1,7 +1,8 @@
 import { Row, Col } from 'antd';
 import React from 'react';
 import { style } from '~/pages/Admin/Seat/SeatChart/SearChart.module.scss';
-import Binhluan from './binhluan/binhluan';
+import ProductSlider from '../MovieDetails/Comment/Carousel/ShowActor';
+
 
 function Contact() {
     return (
@@ -14,7 +15,8 @@ function Contact() {
                     2
                 </Col>
                 <Col span={24}  style={{ width: '1080px', backgroundColor: 'white' }}>3
-                <Binhluan/>
+                {/* <Binhluan/> */}
+                <ProductSlider/>
                 </Col>
             </Row>
         </div>
