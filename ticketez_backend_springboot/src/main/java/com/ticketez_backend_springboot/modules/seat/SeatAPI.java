@@ -53,9 +53,9 @@ public class SeatAPI {
     // }
 
     @PostMapping
-    public ResponseEntity<Seat> post(@RequestBody Seat seat) {
-        seatDAO.save(seat);
-        return ResponseEntity.ok(seat);
+    public ResponseEntity<List<Seat>> post(@RequestBody List<Seat> seats) {
+        seatDAO.saveAll(seats);
+        return ResponseEntity.ok(seats);
     }
 
     @PutMapping("/{id}")
@@ -65,6 +65,19 @@ public class SeatAPI {
         }
         seatDAO.save(seat);
         return ResponseEntity.ok(seat);
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<List<Seat>> put(@RequestBody List<Seat> seats) {
+        // Kiểm tra xem có tồn tại tất cả các id trong danh sách seats
+        boolean allExist = seats.stream().allMatch(seat -> seatDAO.existsById(seat.getId()));
+
+        if (!allExist) {
+            return ResponseEntity.notFound().build();
+        }
+
+        seatDAO.saveAll(seats);
+        return ResponseEntity.ok(seats);
     }
 
     // @DeleteMapping("/{id}")

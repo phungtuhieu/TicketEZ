@@ -134,21 +134,28 @@ function SeatChart(props) {
             }
             return allSeat;
         });
-        try {
-            updatedSeat.forEach((seat) => {
-                handelUpdate(seat.id, seat);
-                setShowInfo('success');
-                setTimeout(() => {
-                    setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
-                }, 1000);
-            });
-        } catch (error) {
-            setShowInfo('error');
-            setTimeout(() => {
-                setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
-            }, 1000);
-        }
         console.log(updatedSeat);
+      
+        const flattenedArray = [].concat(...updatedSeat); 
+         console.log(flattenedArray);
+
+        handelUpdate(flattenedArray);
+        setShowInfo('success');
+        // try {
+        //     updatedSeat.forEach((seat) => {
+        //         handelUpdate(seat.id, seat);
+        //         setShowInfo('success');
+        //         setTimeout(() => {
+        //             setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
+        //         }, 1000);
+        //     });
+        // } catch (error) {
+        //     setShowInfo('error');
+        //     setTimeout(() => {
+        //         setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
+        //     }, 1000);
+        // }
+        
     };
     const [showInfo, setShowInfo] = useState('');
     useEffect(() => {
@@ -160,10 +167,10 @@ function SeatChart(props) {
         }
     }, [showInfo]);
 
-    const handelUpdate = async (idSeat, dataSeat) => {
+    const handelUpdate = async (dataSeat) => {
         let data = dataSeat;
 
-        const respVip = await axiosClient.put(`seat/${idSeat}`, data);
+        const respVip = await axiosClient.put(`seat/update`, data);
     };
 
     const onClickData = (seat) => {

@@ -79,7 +79,6 @@ export default function SeatGenerator() {
         const rowHeader = rowLabels.map((label) => label + ' ');
 
         for (let i = 0; i < seatRows; i++) {
-            console.log(i);
             const row = [];
             const rowAvailable = [];
             const rowLabel = rowLabels[i];
@@ -105,24 +104,23 @@ export default function SeatGenerator() {
 
     // Create Seat
     const createSeatDB = async (idChart) => {
-        setSeatState(createSeatArray());
         try {
-            seatState.seatHeader.map((header, rowIndex) =>
-                seatState.seat[rowIndex].map(async (seat_no) => {
-                    const data = {
-                        name: seat_no,
-                        status: 1,
-                        description: 'ghế thông thường',
-                        seatType: {
-                            id: 1,
-                        },
-                        seatChart: {
-                            id: idChart,
-                        },
-                    };
-                    const resp = await axiosClient.post(`seat`, data);
-                }),
+            const dataArray = seatState.seatHeader.map((header, rowIndex) =>
+                seatState.seat[rowIndex].map((seat_no) => ({
+                    name: seat_no,
+                    status: 1,
+                    description: 'ghế thông thường',
+                    seatType: {
+                        id: 1,
+                    },
+                    seatChart: {
+                        id: idChart,
+                    },
+                })),
             );
+            const flattenedArray = [].concat(...dataArray);
+
+             const resp = await axiosClient.post(`seat`, flattenedArray);
         } catch (error) {
             console.error(error);
         }
@@ -146,7 +144,7 @@ export default function SeatGenerator() {
 
             const resp = await axiosClient.post(`seatchart`, data);
             setIdSeatChart(resp.data.id);
-            createSeatDB( resp.data.id);
+            createSeatDB(resp.data.id);
             setShowInfo('success');
         } catch (error) {
             console.error(error);
@@ -166,7 +164,8 @@ export default function SeatGenerator() {
     }, []);
 
     useEffect(() => {
-        createSeatArray();
+        setSeatState(createSeatArray());
+        // createSeatArray();
         setFirstChartDataChanged(!firstChartDataChanged);
     }, [row, col, idSeatChart]);
 
