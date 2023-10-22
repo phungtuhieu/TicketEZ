@@ -10,10 +10,10 @@
         border-color: var(--ViTri--color-and-border-color);
         font-size: 14px !important;
         font-weight: 500;
-        min-width: 160px !important;
+        min-width: 50px !important;
         max-width: 360px !important;
         height: 36px !important;
-        padding: 0 5px !important;
+        padding: 0 10px !important;
         border-radius: 0.3rem !important;
 
         &:hover {
@@ -68,14 +68,7 @@
     width: 768px !important;
     margin-top: -30px !important;
 
-    // @keyframes slideIn {
-    //     0% {
-    //         transform: translateY(100%) !important;
-    //     }
-    //     100% {
-    //         transform: translateY(0) !important;
-    //     }
-    // }
+
 }
 
 .icon-close {

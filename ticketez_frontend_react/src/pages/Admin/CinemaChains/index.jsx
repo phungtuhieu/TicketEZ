@@ -10,26 +10,23 @@ import {
     Popconfirm,
     Table,
     Card,
-    Breadcrumb,
-    Switch,
-    Select,
-    Pagination,
-    Tag
+    Image,
+    Upload,
 } from 'antd';
-import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
-import style from './Cinema.module.scss';
+import style from './CinemaChains.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
-import moment from 'moment';
 import { faL, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { cinemaApi, cinemaComplexApi } from '~/api/admin';
-import { cinemaTypeApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
-import axiosClient from '~/api/global/axiosClient';
+import uploadApi from '~/api/service/uploadApi';
+import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
+
+const { TextArea } = Input;
+
 
 const cx = classNames.bind(style);
 
@@ -38,7 +35,8 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminCinema = () => {
+
+const AdminCinemaChains = () =>  {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -53,22 +51,17 @@ const AdminCinema = () => {
 
     const [workSomeThing, setWorkSomeThing] = useState(false);
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
-    const [cinemaType, setCinemaType] = useState([]);
-    const [cinemaComplex, setCinemaComplex] = useState([]);
+    const [cinemaChain, setCinemaChain] = useState([]);
+    const [fileList, setFileList] = useState([]);
+
     //api
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await cinemaApi.getPage(currentPage, pageSize);
-                const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
-                setCinemaType(cinemaType.data);
-                setCinemaComplex(cinemaComplex.data.data);
-                //    const resType = await cinemaTypeApi.getCinemaType();
+                const res = await cinemaChainApi.get();
+                setCinemaChain(res.data);
                 console.log(res);
-                //    console.log(resType);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -81,8 +74,7 @@ const AdminCinema = () => {
             }
         };
         getList();
-    }, [currentPage, pageSize, workSomeThing]);
-
+    }, [workSomeThing]);
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
@@ -93,7 +85,6 @@ const AdminCinema = () => {
         clearFilters();
         setSearchText('');
     };
-
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div
@@ -187,7 +178,6 @@ const AdminCinema = () => {
                 text
             ),
     });
-
     const columns = [
         Table.EXPAND_COLUMN,
         // {
@@ -199,36 +189,31 @@ const AdminCinema = () => {
         //     // defaultSortOrder: 'descend',
         // },
         {
-            title: 'Tên rạp',
+            title: 'Tên loại',
             dataIndex: 'name',
             width: '20%',
             ...getColumnSearchProps('name'),
         },
-
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            width: '20%',
-            render: (status) => (
-                <Tag style={{ color: status ? 'red' : 'green' }}>
-                    {status ? 'Hoạt động' : 'Ngừng hoạt động'}
-                </Tag>
+            title: 'Ảnh đại diện',
+            dataIndex: 'avatar',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.image}`}
+                    />
+                </Space>
             ),
-        
         },
         {
-            title: 'Loại rạp',
-            dataIndex: 'cinemaType',
-            width: '15%',
-            ...getColumnSearchProps('name'),
-            render: (cinemaType) => <span>{cinemaType.typeName}</span>,
-        },
-        {
-            title: 'Cụm rạp',
-            dataIndex: 'cinemaComplex',
+            title: 'Mô tả',
+            dataIndex: 'description',
             width: '30%',
-            ...getColumnSearchProps('name'),
-            render: (cinemaComplex) => <span>{cinemaComplex.name}</span>,
+            ...getColumnSearchProps('description'),
         },
         {
             title: 'Action',
@@ -263,7 +248,7 @@ const AdminCinema = () => {
 
     const handleDelete = async (record) => {
         try {
-            const res = await cinemaApi.delete(record.id);
+            const res = await cinemaChainApi.delete(record.id);
             console.log(res);
             if (res.status === 200) {
                 funcUtils.notify(res.data, 'success');
@@ -278,43 +263,91 @@ const AdminCinema = () => {
     };
 
     const handleEditData = (record) => {
+        const newUploadFile = {
+            uid: record.id.toString(),
+            name: record.image,
+            url: `http://localhost:8081/api/upload/${record.image}`,
+        };
+        setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
         console.log(record);
-        form.setFieldsValue({ ...record, cinemaType: record.cinemaType.id, cinemaComplex: record.cinemaComplex.id });
+        form.setFieldsValue({ 
+            ...record,
+        });
     };
 
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            if (values.status === undefined) {
-                values = { ...values, status: true };
-            }
-            console.log(values.cinemaType);
-            console.log(values.cinemaComplex);
-            if (editData) {
-                const resp = await cinemaApi.put(editData.id, values, values.cinemaType, values.cinemaComplex);
-                console.log(resp);
-                funcUtils.notify('Cập nhật thành công', 'success');
-            }
-            console.log(values);
-            if (!editData) {
-                try {
-                    console.log(values);
-                    const resp = await cinemaApi.post(values, values.cinemaType, values.cinemaComplex);
-                    // message.success('Thêm thành công');
-                    funcUtils.notify('Thêm thành công', 'success');
-                } catch (error) {
-                    console.log(error);
+            if(fileList.length > 0){
+                if (editData) {
+                    let putData = {
+                        id: editData.id,
+                        ...values,
+                    };
+                    if(putData.image.file){
+                        console.log(putData);
+
+                        const file = putData.image.fileList[0].originFileObj;
+                        const images = await uploadApi.put(editData.image, file);
+                        putData = {
+                            ...putData,
+                            image: images,
+                        };
+                    }
+                    try {
+                        const resp = await cinemaChainApi.put(putData.id, putData);
+                        console.log(resp);
+                        if (resp.status === 200) {
+                            funcUtils.notify('Cập nhật thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
+                    }                  
+                    
                 }
+                console.log(values);
+                if (!editData) {
+                    try {
+                        const file = values.image.fileList[0].originFileObj;
+                        const images = await uploadApi.post(file);
+                        const postData = {
+                            ...values,
+                            image: images,
+                        };
+                        console.log(postData);
+                        const resPost = await cinemaChainApi.post(postData);
+                        console.log('resPost', resPost);
+                        if (resPost.status === 200) {
+                            funcUtils.notify('Thêm thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
+                    }
+                }
+                setOpen(false);
+                form.resetFields();
+                setLoading(false);
+                setFileList([]);
+                setWorkSomeThing(!workSomeThing);
+             
             }
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setWorkSomeThing(!workSomeThing);
-            // getList();
+            else {
+                setLoading(false);
+                message.error('vui lòng chọn ảnh');
+            }
+            
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -327,21 +360,36 @@ const AdminCinema = () => {
     //form
     const handleResetForm = () => {
         form.resetFields();
+        setFileList([]);
         console.log(form);
     };
-    const onChange = (checked) => {
-        console.log(`switch to ${checked}`);
+    const onChange = (e) => {
+        console.log('Change:', e.target.value);
+      };
+
+      const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
     };
-    const handlePageChange = (page, pageSize) => {
-        setCurrentPage(page);
-        setPageSize(pageSize);
+    const onPreview = async (file) => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+        const image = new Image();
+        image.src = src;
+        const imgWindow = window.open(src);
+        imgWindow?.document.write(image.outerHTML);
     };
 
     return (
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu Rạp</h1>
+                    <h1 className={cx('title')}>Bảng dữ liệu Loại cụm Rạp</h1>
                 </Col>
                 <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
@@ -381,73 +429,49 @@ const AdminCinema = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="name"
-                            label="Tên rạp"
+                            label="Tên loại rạp"
                             rules={[{ required: true, message: 'Vui lòng nhập rạp' }]}
                         >
                             <Input placeholder="Please input your name" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="status"
-                            label="Trạng thái"
+                            label="Ảnh cụm rạp"
+                            name="image"
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                        >
+                            <Upload
+                                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                accept=".png, .jpg"
+                                listType="picture-card"
+                                onChange={onChangeUpload}
+                                // onPreview={onPreview}
+                                fileList={fileList}
+                                name="image"
+                                maxCount={1}
+                            >
+                                {fileList.length < 2 && '+ Upload'}
+                            </Upload>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Mô tả chi tiết"
                             rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
                         >
-                            <Switch defaultChecked onChange={onChange} />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="cinemaType"
-                            label="Loại rạp"
-                            rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
-                        >
-                            <Select
-                                style={{ width: '100%' }}
-                                showSearch
-                                placeholder="Chọn loại"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={[
-                                    {
-                                        value: editData?.cinemaType?.id, // Sử dụng cinemaType từ record khi có
-                                        label: editData?.cinemaType?.typeName,
-                                    },
-                                    ...cinemaType.map((typeName) => ({
-                                        value: typeName.id,
-                                        label: typeName.typeName,
-                                    })),
-                                ]}
-                                allowClear
+                           <TextArea
+                            showCount
+                            maxLength={100}
+                            style={{
+                                height: 120,
+                                marginBottom: 24,
+                            }}
+                            onChange={onChange}
+                            placeholder="can resize"
                             />
                         </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="cinemaComplex"
-                            label="Cụm rạp"
-                            rules={[{ required: true, message: 'Vui lòng chọn cụm rạp' }]}
-                        >
-                            <Select
-                                style={{ width: '100%' }}
-                                showSearch
-                                placeholder="Chọn loại"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={[
-                                    {
-                                        value: editData?.cinemaComplex?.id, // Sử dụng cinemaType từ record khi có
-                                        label: editData?.cinemaComplex?.name,
-                                    },
-                                    ...cinemaComplex.map((name) => ({
-                                        value: name.id,
-                                        label: name.name,
-                                    })),
-                                ]}
-                                allowClear
-                            />
-                        </Form.Item>
+    
+                       
                     </Form>
                 </BaseModal>
             </Row>
@@ -458,20 +482,12 @@ const AdminCinema = () => {
                     handleDelete();
                 }}
                 // dataSource={posts}
-                pagination={false}
                 dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+              
             />
-            <div className={cx('wrapp-pagination')}>
-                <Pagination
-                    showSizeChanger={false}
-                    current={currentPage}
-                    pageSize={pageSize}
-                    total={totalItems}
-                    onChange={handlePageChange}
-                />
-            </div>
         </>
     );
+
 };
 
-export default AdminCinema;
+export default AdminCinemaChains;

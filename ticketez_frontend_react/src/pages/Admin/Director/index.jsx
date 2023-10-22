@@ -317,7 +317,7 @@ const AdminDirector = () => {
                                 accept=".png, .jpg"
                                 listType="picture-card"
                                 onChange={onChangeUpload}
-                                onPreview={onPreview}
+                                // onPreview={onPreview}
                                 fileList={fileList}
                                 name="avatar"
                                 maxCount={1}

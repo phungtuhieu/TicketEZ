@@ -276,7 +276,6 @@ const AdminActor = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
@@ -440,7 +439,7 @@ const AdminActor = () => {
                                 accept=".png, .jpg"
                                 listType="picture-card"
                                 onChange={onChangeUpload}
-                                onPreview={onPreview}
+                                // onPreview={onPreview}
                                 fileList={fileList}
                                 name="avatar"
                                 maxCount={1}
