@@ -65,3 +65,28 @@ export const formatMovieUserApi = {
     },
 };
 
+const urlGenre = 'genre';
+export const genreUserApi = {
+    getGenreByMovie: async (movie) => {
+        try {
+            const result = await axiosClient.post(urlGenre+"/get/genre-by-movie", movie);
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
+
+const urlFormat = 'format';
+export const formatUserApi = {
+    getFormatByMovie: async (movie) => {
+        try {
+            const result = await axiosClient.post(urlFormat+"/get/format-by-movie", movie);
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
+
+

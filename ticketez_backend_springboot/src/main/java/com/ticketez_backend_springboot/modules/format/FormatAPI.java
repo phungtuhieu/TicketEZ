@@ -1,6 +1,8 @@
 package com.ticketez_backend_springboot.modules.format;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ticketez_backend_springboot.modules.movie.Movie;
 
 
 @CrossOrigin("*")
@@ -58,6 +62,22 @@ public class FormatAPI {
             return ResponseEntity.ok().build();
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xóa diễn viên do tài liệu tham khảo hiện có", HttpStatus.CONFLICT);
+        }
+
+    }
+
+    // --------------------------------
+
+    @PostMapping("/get/format-by-movie")
+    public ResponseEntity<?> getDuLie(@RequestBody Movie movie) {
+        try {
+            if(movie.getId() == null ){
+                    return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            }
+            List<Format> format = dao.getFormatByMovie(movie);
+            return ResponseEntity.ok(format);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

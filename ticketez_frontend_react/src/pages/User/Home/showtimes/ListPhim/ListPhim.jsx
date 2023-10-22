@@ -6,7 +6,7 @@ import style from './ListPhim.module.scss';
 
 import moment from 'moment-timezone';
 
-import { movieUserApi, genreMovieUserApi, formatMovieUserApi } from '~/api/user/showtime';
+import { movieUserApi, genreMovieUserApi, formatMovieUserApi, genreUserApi, formatUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 
@@ -35,6 +35,8 @@ function ListPhim({ cinemaComplex }) {
     // -----------------movie by ccx-----------------------------------------------
 
     const [movieData, setMovieData] = useState([]);
+    const [data, setData] = useState([]);
+
     useEffect(() => {
         try {
             if (cinemaComplex !== null) {
@@ -49,68 +51,40 @@ function ListPhim({ cinemaComplex }) {
         }
     }, [cinemaComplex]);
 
-    // ------------------genre by movie----------------------------------------------
+    const loadGenreByMovie = async (movie) => {
+        const resGenre = await genreUserApi.getGenreByMovie(movie);
+        return resGenre;
+    };
 
-    const [genreMovieData, setGenreMovieData] = useState([]);
-    useEffect(() => {
-        try {
-            const getGenreMovie = async () => {
-                const resGenreMovie = await genreMovieUserApi.getAllGenreMovie();
-                // console.log(resGenreMovie);
-                setGenreMovieData(resGenreMovie);
-            };
-            getGenreMovie();
-        } catch (error) {
-            console.log(error);
-        }
-    }, []);
-
-    // ------------------format by movie----------------------------------------------
-
-    const [formatMovieData, setFormatMovieData] = useState([]);
+    const loadFormatByMovie = async (movie) => {
+    const resFormat = await formatUserApi.getFormatByMovie(movie);
+    return resFormat.map((valueFormat) => {
+        return {
+            format: valueFormat,
+            showtime: valueFormat.name,
+        };
+    });
+};
 
     useEffect(() => {
-        try {
-            const getFormatMovie = async () => {
-                const resFormatMovie = await formatMovieUserApi.getAllFormatMovie();
-                setFormatMovieData(resFormatMovie);
-                console.log(resFormatMovie);
-            };
-            getFormatMovie();
-        } catch (error) {
-            console.log(error);
-        }
-    },[]);
-
-
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const newGenreData = [];
-
-    //         for (const movie of movieData) {
-    //             try {
-    //                 const resGenre = await genreUserApi.getGenreByMovie(movie);
-    //                 newGenreData.push(resGenre);
-    //             } catch (error) {
-    //                 console.log(error);
-    //             }
-    //         }
-
-    //         setGenreData(newGenreData);
-    //     };
-
-    //     fetchData();
-    // }, [movieData]);
-
-    // const getGenreByMovie = async (movie) => {
-    //     try {
-    //         const resGenre = await genreUserApi.getGenreByMovie(movie);
-    //         setGenreData((prevGenreData) => [...prevGenreData, resGenre]);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
+        const fetchData = async () => {
+            const data = await Promise.all(
+                movieData.map(async (valueMovie) => {
+                    const movie = valueMovie;
+                    const genre = await loadGenreByMovie(valueMovie);
+                    const formatShowTime = await loadFormatByMovie(valueMovie);
+                    return {
+                        movie,
+                        genre,
+                        formatShowTime,
+                    };
+                }),
+            );
+            console.log('test', data);
+            setData(data);
+        };
+        fetchData();
+    }, [movieData]);
 
     return (
         <>
@@ -188,7 +162,7 @@ function ListPhim({ cinemaComplex }) {
                         </Col>
                     </Row> */}
 
-                    {movieData.map((movie, index) => (
+                    {data.map((data, index) => (
                         <Row key={index} className={cx('container-movie')}>
                             <Col span={4} className={cx('col1-movie')}>
                                 <div className={cx('border-movie')}>
@@ -202,56 +176,44 @@ function ListPhim({ cinemaComplex }) {
                             <Col span={20} className={cx('col2-movie')}>
                                 <Row>
                                     <Col span={24} className={cx('container-thong-tin-phim')}>
-                                        <div className={cx('k')}>{movie.mpaaRating.ratingCode}</div>
-                                        <div className={cx('ten-phim')}>{movie.title}</div>
+                                        <div className={cx('k')}>{data.movie.mpaaRating.ratingCode}</div>
+                                        <div className={cx('ten-phim')}>{data.movie.title}</div>
                                         <div className={cx('the-loai-phim')}>
-
-                                            {genreMovieData.map((data, index) => {
-                                                if (data.movie.id === movie.id) {
-                                                    return (
-                                                        <span className={cx('span')} key={index}>
-                                                            {data?.genre?.name}
-                                                        </span>
-                                                    );
-                                                }
-                                                return null;
-                                            })}
-                                            
+                                            {data.genre.map((valueGenre, index) => (
+                                                <span className={cx('span')} key={index}>
+                                                    {valueGenre.name}
+                                                </span>
+                                            ))}
                                         </div>
                                     </Col>
-                                    {formatMovieData.map((data, index) => {
-                                        if (data.movie.id === movie.id) {
-                                            return (
-                                                <Col key={index}  span={24} className={cx('container-suat-chieu')}>
-                                                <div className={cx('title')}>{data.format.name}</div>
-                                                <div className={cx('suat-chieu')}>
-                                                    <Button className={cx('btn-suat-chieu')} danger>
-                                                        <span className={cx('gio-bat-dau')}>20:45</span>
-                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                    </Button>
-                                                    <Button className={cx('btn-suat-chieu')} danger>
-                                                        <span className={cx('gio-bat-dau')}>20:45</span>
-                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                    </Button>
-                                                    <Button className={cx('btn-suat-chieu')} danger>
-                                                        <span className={cx('gio-bat-dau')}>20:45</span>
-                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                    </Button>
-                                                    <Button className={cx('btn-suat-chieu')} danger>
-                                                        <span className={cx('gio-bat-dau')}>20:45</span>
-                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                    </Button>
-                                                    <Button className={cx('btn-suat-chieu')} danger>
-                                                        <span className={cx('gio-bat-dau')}>20:45</span>
-                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                    </Button>
-                                                </div>
-                                            </Col>
-                                            )
-                                        }
-                                        return null;
-                                    })}
-                                    
+
+                                    {data.formatShowTime.map((valueFormat, index) => (
+                                        <Col key={index} span={24} className={cx('container-suat-chieu')}>
+                                            <div className={cx('title')}>{valueFormat.format.name}</div>
+                                            <div className={cx('suat-chieu')}>
+                                                <Button className={cx('btn-suat-chieu')} danger>
+                                                    <span className={cx('gio-bat-dau')}>20:45</span>
+                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                </Button>
+                                                <Button className={cx('btn-suat-chieu')} danger>
+                                                    <span className={cx('gio-bat-dau')}>20:45</span>
+                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                </Button>
+                                                <Button className={cx('btn-suat-chieu')} danger>
+                                                    <span className={cx('gio-bat-dau')}>20:45</span>
+                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                </Button>
+                                                <Button className={cx('btn-suat-chieu')} danger>
+                                                    <span className={cx('gio-bat-dau')}>20:45</span>
+                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                </Button>
+                                                <Button className={cx('btn-suat-chieu')} danger>
+                                                    <span className={cx('gio-bat-dau')}>20:45</span>
+                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                </Button>
+                                            </div>
+                                        </Col>
+                                    ))}
 
                                     {/* <Col span={24} className={cx('container-suat-chieu')}>
                                         <div className={cx('title')}>2D Phụ đề</div>

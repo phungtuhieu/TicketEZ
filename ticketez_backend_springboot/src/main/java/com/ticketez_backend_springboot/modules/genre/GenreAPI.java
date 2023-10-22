@@ -67,13 +67,13 @@ public class GenreAPI {
     }
     // ----------------------------------------------------------------
 
-    @PostMapping("/get/genre")
+    @PostMapping("/get/genre-by-movie")
     public ResponseEntity<?> getDuLie(@RequestBody Movie movie) {
         try {
             if(movie.getId() == null ){
                     return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
             }
-            List<Genre> genre = dao.getGenres(movie);
+            List<Genre> genre = dao.getGenreByMovie(movie);
             return ResponseEntity.ok(genre);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);

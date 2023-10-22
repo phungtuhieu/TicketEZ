@@ -14,6 +14,6 @@ public interface GenreDAO extends JpaRepository<Genre, Long>{
 
 
     @Query("SELECT g FROM Genre g JOIN g.genresMovies gm JOIN gm.movie m WHERE m = :movie")
-    List<Genre> getGenres(@Param("movie") Movie movie);
+    List<Genre> getGenreByMovie(@Param("movie") Movie movie);
     
 }

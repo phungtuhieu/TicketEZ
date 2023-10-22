@@ -12,7 +12,7 @@ import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 @Repository
 public interface MovieDAO extends JpaRepository<Movie, Long> {
 
-    @Query("SELECT m FROM Movie m WHERE EXISTS "
+    @Query("SELECT m FROM Movie m WHERE EXISTS"
     + "(SELECT st FROM Showtime st WHERE m.id = st.movie.id AND st.cinema.cinemaComplex = :CinemaComplex )")
     List<Movie> getMoviesByCinemaComplex(@Param("CinemaComplex") CinemaComplex CinemaComplex);
 
