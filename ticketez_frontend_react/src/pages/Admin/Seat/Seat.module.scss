@@ -6,6 +6,16 @@
     align-items: center;
 }
 .select {
+    margin-bottom: 15px;
     width: 100%;
 }
 
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-height: 80vh; /* Điều này giúp hạn chế chiều cao tối đa của modal */
+    overflow-y: auto; /* Kích hoạt thanh cuộn nếu nội dung quá dài */
+    width: auto;
+    max-width: 100%;
+  }
