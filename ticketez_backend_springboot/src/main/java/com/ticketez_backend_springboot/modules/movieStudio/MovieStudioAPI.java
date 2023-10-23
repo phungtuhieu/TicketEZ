@@ -39,9 +39,16 @@ public class MovieStudioAPI {
             if (pageNo.isPresent() && pageNo.get() == 0) {
                 return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
             }
+
             Sort sort = Sort.by(Sort.Order.desc("id"));
+            
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<MovieStudio> page = dao.findAll(pageable);
+             Page<MovieStudio> page = null;
+            // if(search.isPresent()) {
+                page = dao.findByKeyword(search.orElse(""),pageable);
+            // }  else {
+            //     page = dao.findAll(pageable);
+            // }
             ResponseDTO<MovieStudio> responeDTO = new ResponseDTO<>();
             responeDTO.setData(page.getContent());
             responeDTO.setTotalItems(page.getTotalElements());
