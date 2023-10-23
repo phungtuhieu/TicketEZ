@@ -3,10 +3,11 @@ import classNames from 'classnames/bind';
 import style from './Seat.module.scss';
 import { useState, useEffect } from 'react';
 import SeatChart from '~/pages/Admin/Seat/SeatChart';
-import { Card, Breadcrumb, Select, Col, Row, Button } from 'antd';
+import { Card, Breadcrumb, Select, Col, Row, Button, Modal } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import BaseApi from '~/api/global/baseApi';
 import axiosClient from '~/api/global/axiosClient';
+import SeatGenerator from './SeatGenerator';
 
 const cx = classNames.bind(style);
 
@@ -18,7 +19,7 @@ function AdminSeat() {
     // Dữ liệu bảng đồ
     const [seatChartDaTa, setSeatChartDaTa] = useState([]);
     // Dữ liệu xuất chiếu
-    const [seatChildrenSeatChartDaTa, setSeatChildrenSeatChartDaTa] = useState([]);
+    const [showTimeBySeatChartID, setShowTimeBySeatChartID] = useState([]);
     // Dữ liệu booking
     const [bookingData, setBookingData] = useState([]);
     // Dữ liệu seatBooking
@@ -26,9 +27,9 @@ function AdminSeat() {
     const [row, setRow] = useState();
     const [col, setCol] = useState();
     const [idSeatChart, setIdSeatChart] = useState();
-
     // Dữ liệu tên ghế đã đặt
     const [nameSeat, setNameSeat] = useState([]);
+
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
     const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
@@ -42,6 +43,19 @@ function AdminSeat() {
     // Sử dụng một biến state để theo dõi sự thay đổi của row và col
     const [seatChartDataChanged, setSeatChartDataChanged] = useState(false);
 
+    // MOdal setting
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    // Lấy cụm rạp
     const fetchDataCinemaComplex = async () => {
         const cinemaComplexApi = new BaseApi('cinemaComplex');
 
@@ -54,7 +68,7 @@ function AdminSeat() {
             console.error(error);
         }
     };
-
+    // Lấy rạp
     const fetchDataCinema = async (idCInemacomplex) => {
         try {
             const resp = await axiosClient.get(`cinema/by-cinema-complex/${idCInemacomplex}`);
@@ -67,6 +81,7 @@ function AdminSeat() {
             console.error(error);
         }
     };
+    // Lấy sơ đồ
 
     const fetchDataSeatChart = async (idCInema) => {
         try {
@@ -81,12 +96,14 @@ function AdminSeat() {
         }
     };
 
-    const fetchDataChildSeatChart = async (value) => {
+    // Lấy xuất chiếu
+
+    const fetchDataShowTimeBySeatChart = async (value) => {
         try {
             const resp = await axiosClient.get(`showtime/get-showtime-by-seatchart/${value}`);
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataChildSeatChart = resp.data;
-            setSeatChildrenSeatChartDaTa(dataChildSeatChart);
+            setShowTimeBySeatChartID(dataChildSeatChart);
 
             setSelectedOption(true);
         } catch (error) {
@@ -154,7 +171,7 @@ function AdminSeat() {
     // Gọi lại ghế khi có thay đổi để cập nhật lại ghế
     useEffect(() => {
         setSeatChartDataChanged(!seatChartDataChanged);
-    }, [row, col, seatBookingData]);
+    }, [row, col, seatBookingData, idSeatChart]);
 
     // Cụm rạp----------------------------------------------------------
 
@@ -202,7 +219,7 @@ function AdminSeat() {
 
     // Xuất chiếu-------------------------------------------
 
-    const optionsChildShowTime = seatChildrenSeatChartDaTa.map((showTime) => ({
+    const optionsChildShowTime = showTimeBySeatChartID.map((showTime) => ({
         value: showTime.id,
         label: showTime.startTime + showTime.endTime,
     }));
@@ -233,7 +250,7 @@ function AdminSeat() {
     // hành động khi chọn sơ đồ
     const onChange = (value) => {
         fetchDataSeat(value);
-        fetchDataChildSeatChart(value);
+        fetchDataShowTimeBySeatChart(value);
 
         setSelectedOption(false);
 
@@ -286,6 +303,21 @@ function AdminSeat() {
                         {selectedOptionCinema && (
                             <>
                                 <h3>Chọn sơ đồ</h3>
+                                <Button type="primary" onClick={showModal}>
+                                    Thêm sơ đồ
+                                </Button>
+                                <Modal
+                                    title="Thêm sơ đồ rạp"
+                                    open={isModalOpen}
+                                    onOk={handleOk}
+                                    onCancel={handleCancel}
+                                    width={1000}
+                                >
+                                    <div className={cx('modal-content')}>
+                                        <SeatGenerator />
+                                    </div>
+                                </Modal>
+
                                 <Select
                                     className={cx('select')}
                                     showSearch
@@ -316,7 +348,7 @@ function AdminSeat() {
                                 />
                             </>
                         )}
-                        <button onClick={check}>checl</button>
+                        <button onClick={check}>check</button>
                     </Card>
                 </Col>
                 <Col span={16}>

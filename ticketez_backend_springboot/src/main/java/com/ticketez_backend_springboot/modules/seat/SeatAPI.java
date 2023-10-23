@@ -32,7 +32,6 @@ public class SeatAPI {
     @GetMapping("/by-seatchart/{seatChartId}")
     public ResponseEntity<List<Seat>> getSeatsBySeatChart(
             @PathVariable("seatChartId") Long seatChartId) {
-        // Sử dụng repository để lấy danh sách rạp theo cụm rạp
         List<Seat> seats = seatDAO.findBySeatChartId(seatChartId);
         return ResponseEntity.ok(seats);
     }
@@ -53,11 +52,11 @@ public class SeatAPI {
     // return ResponseEntity.ok(seatDAO.findById(id).get());
     // }
 
-    // @PostMapping
-    // public ResponseEntity<Seat> post(@RequestBody Seat seat) {
-    // seatDAO.save(seat);
-    // return ResponseEntity.ok(seat);
-    // }
+    @PostMapping
+    public ResponseEntity<List<Seat>> post(@RequestBody List<Seat> seats) {
+        seatDAO.saveAll(seats);
+        return ResponseEntity.ok(seats);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Seat> put(@PathVariable("id") Long id, @RequestBody Seat seat) {
@@ -66,6 +65,19 @@ public class SeatAPI {
         }
         seatDAO.save(seat);
         return ResponseEntity.ok(seat);
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<List<Seat>> put(@RequestBody List<Seat> seats) {
+        // Kiểm tra xem có tồn tại tất cả các id trong danh sách seats
+        boolean allExist = seats.stream().allMatch(seat -> seatDAO.existsById(seat.getId()));
+
+        if (!allExist) {
+            return ResponseEntity.notFound().build();
+        }
+
+        seatDAO.saveAll(seats);
+        return ResponseEntity.ok(seats);
     }
 
     // @DeleteMapping("/{id}")
