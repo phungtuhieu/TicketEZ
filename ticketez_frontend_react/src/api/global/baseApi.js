@@ -10,9 +10,9 @@ class BaseApi {
     }
 
     async getAll() {
-        return axiosClient.get(this.uri + '/getAll');
+        return axiosClient.get(this.uri + '/get/all');
     }
-    
+
     async create(data) {
         return axiosClient.post(this.uri, data);
     }
