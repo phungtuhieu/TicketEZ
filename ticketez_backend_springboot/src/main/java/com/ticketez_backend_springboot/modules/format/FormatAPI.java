@@ -1,6 +1,5 @@
 package com.ticketez_backend_springboot.modules.format;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.modules.movie.Movie;
-
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -26,7 +25,9 @@ import com.ticketez_backend_springboot.modules.movie.Movie;
 public class FormatAPI {
     @Autowired
     FormatDAO dao;
-    
+    @Autowired
+    MovieDAO daoMovie;
+
     @GetMapping
     public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(dao.getAll());
@@ -55,7 +56,7 @@ public class FormatAPI {
         return ResponseEntity.ok(format);
     }
 
-   @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             dao.deleteById(id);
@@ -68,14 +69,20 @@ public class FormatAPI {
 
     // --------------------------------
 
-    @PostMapping("/get/format-by-movie")
-    public ResponseEntity<?> getDuLie(@RequestBody Movie movie) {
+    @GetMapping("/get/format-by-movie/{movieId}")
+    public ResponseEntity<?> getFormatByMovie(@PathVariable("movieId") Long movieId) {
         try {
-            if(movie.getId() == null ){
-                    return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            if (movieId.equals("")) {
+                return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
             }
-            List<Format> format = dao.getFormatByMovie(movie);
-            return ResponseEntity.ok(format);
+            Movie movie = daoMovie.findById(movieId).get();
+            
+            if (movie != null) {
+                List<Format> format = dao.getFormatByMovie(movie);
+                return ResponseEntity.ok(format);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }

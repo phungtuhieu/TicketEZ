@@ -11,7 +11,6 @@ import { movieUserApi, genreMovieUserApi, formatMovieUserApi, genreUserApi, form
 const cx = classNames.bind(style);
 
 function ListPhim({ cinemaComplex, cinema }) {
-
     const [day, setDay] = useState(1);
     const [weekDays, setWeekDays] = useState([]);
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
@@ -39,12 +38,12 @@ function ListPhim({ cinemaComplex, cinema }) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        // console.log(cinemaComplex);
-        console.log(cinema);
+        console.log(cinemaComplex?.id);
+        // console.log(cinema);
         try {
             if (cinemaComplex ?? cinemaComplex) {
                 const getMovie = async () => {
-                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex);
+                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id);
                     setMovieData(resMovie);
                 };
                 getMovie();
@@ -55,19 +54,23 @@ function ListPhim({ cinemaComplex, cinema }) {
     }, [cinemaComplex, cinema]);
 
     const loadGenreByMovie = async (movie) => {
-        const resGenre = await genreUserApi.getGenreByMovie(movie);
-        return resGenre;
+        if (movie ?? movie) {
+            const resGenre = await genreUserApi.getGenreByMovie(movie.id);
+            return resGenre;
+        }
     };
 
     const loadFormatByMovie = async (movie) => {
-    const resFormat = await formatUserApi.getFormatByMovie(movie);
-    return resFormat.map((valueFormat) => {
-        return {
-            format: valueFormat,
-            showtime: valueFormat.name,
-        };
-    });
-};
+        if (movie ?? movie) {
+            const resFormat = await formatUserApi.getFormatByMovie(movie.id);
+            return resFormat.map((valueFormat) => {
+                return {
+                    format: valueFormat,
+                    showtime: valueFormat.name,
+                };
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {

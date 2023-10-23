@@ -1,4 +1,5 @@
 import axiosClient from '~/api/global/axiosClient';
+import funcUtils from '~/utils/funcUtils';
 
 const urlCinemaComplex = 'cinemaComplex';
 export const cinemaComplexUserApi = {
@@ -26,10 +27,13 @@ export const cinemaComplexUserApi = {
 
 const urlMovie = 'movie';
 export const movieUserApi = {
-    getMovieByCinemaComplex: async (data) => {
+    getMovieByCinemaComplex: async (cinemaComplexId) => {
         try {
-            const result = await axiosClient.post(urlMovie + '/get/movies-by-cinemaComplex', data);
-            return result.data;
+            if (cinemaComplexId ?? cinemaComplexId) {
+                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId);
+                return result.data;
+            }
+            return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
         } catch (error) {
             console.log(error);
             return error;
@@ -39,40 +43,43 @@ export const movieUserApi = {
 
 // ****************************************************************
 
-const urlGenreMovie = 'genreMovie';
-export const genreMovieUserApi = {
-    getAllGenreMovie: async () => {
-        try {
-            // console.log(data);
-            const result = await axiosClient.get(urlGenreMovie);
-            return result.data;
-        } catch (error) {
-            // console.log(error);
-            return error;
-        }
-    },
-};
+// const urlGenreMovie = 'genreMovie';
+// export const genreMovieUserApi = {
+//     getAllGenreMovie: async () => {
+//         try {
+//             // console.log(data);
+//             const result = await axiosClient.get(urlGenreMovie);
+//             return result.data;
+//         } catch (error) {
+//             // console.log(error);
+//             return error;
+//         }
+//     },
+// };
 
 // ****************************************************************
 
-const urlFormatMovie = 'formatMovie';
-export const formatMovieUserApi = {
-    getAllFormatMovie: async () => {
-        try {
-            const result = await axiosClient.get(urlFormatMovie);
-            return result.data;
-        } catch (error) {
-            return error;
-        }
-    },
-};
+// const urlFormatMovie = 'formatMovie';
+// export const formatMovieUserApi = {
+//     getAllFormatMovie: async () => {
+//         try {
+//             const result = await axiosClient.get(urlFormatMovie);
+//             return result.data;
+//         } catch (error) {
+//             return error;
+//         }
+//     },
+// };
 
 const urlGenre = 'genre';
 export const genreUserApi = {
-    getGenreByMovie: async (movie) => {
+    getGenreByMovie: async (movieId) => {
         try {
-            const result = await axiosClient.post(urlGenre + '/get/genre-by-movie', movie);
-            return result.data;
+            if (movieId ?? movieId) {
+                const result = await axiosClient.get(urlGenre + '/get/genre-by-movie/' + movieId);
+                return result.data;
+            }
+            return funcUtils.notify('MovieId không tồn tại', 'error');
         } catch (error) {
             return error;
         }
@@ -81,10 +88,13 @@ export const genreUserApi = {
 
 const urlFormat = 'format';
 export const formatUserApi = {
-    getFormatByMovie: async (movie) => {
+    getFormatByMovie: async (movieId) => {
         try {
-            const result = await axiosClient.post(urlFormat + '/get/format-by-movie', movie);
-            return result.data;
+            if (movieId ?? movieId) {
+                const result = await axiosClient.get(urlFormat + '/get/format-by-movie/' + movieId);
+                return result.data;
+            }
+            return funcUtils.notify('MovieId không tồn tại', 'error');
         } catch (error) {
             return error;
         }

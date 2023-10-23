@@ -1,8 +1,8 @@
 export {
     cinemaComplexUserApi,
     movieUserApi,
-    genreMovieUserApi,
-    formatMovieUserApi,
+    // genreMovieUserApi,
+    // formatMovieUserApi,
     formatUserApi,
     genreUserApi,
     cinemaUserApi
