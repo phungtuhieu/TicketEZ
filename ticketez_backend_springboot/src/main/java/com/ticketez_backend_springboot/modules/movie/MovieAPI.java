@@ -22,14 +22,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplexDao;
 
 
-@RestController
 @CrossOrigin("*")
+@RestController
 @RequestMapping("/api/movie")
 public class MovieAPI {
     @Autowired
     MovieDAO dao;
+    @Autowired
+    CinemaComplexDao daoComplexDao;
 
     @GetMapping
     public ResponseEntity<?> findByPage(
@@ -54,12 +58,11 @@ public class MovieAPI {
     }
 
 
-     @GetMapping("/getAll")
+     @GetMapping("/get/all")
     public ResponseEntity<List<Movie>> findAll() {
         List<Movie> movies = dao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(movies);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> findById(@PathVariable("id") Long id) {
@@ -96,4 +99,27 @@ public class MovieAPI {
             return new ResponseEntity<>("Không thể xoá, dữ liệu đã được sử dụng ở nơi khác", HttpStatus.CONFLICT);
         }
     }
+
+    ////////////////////////////////
+    // @GetMapping("/get/movies-by-cinemaComplex/{CinemaComplexId}")
+    // public ResponseEntity<?> getDuLie(
+    //         @PathVariable("CinemaComplexId") Long CinemaComplexId) {
+    //     try {
+
+
+    //         if (CinemaComplexId.equals("") ) {
+    //             return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //         }
+
+    //         CinemaComplex cinemaComplex = daoComplexDao.findById(CinemaComplexId).get();
+    //         if (cinemaComplex != null) {
+    //             List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex);
+    //             return ResponseEntity.ok(movie);
+    //         }
+    //         return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+
+    // }
 }

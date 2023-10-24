@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Row, Col, Input } from 'antd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,67 +8,66 @@ import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
+import funcUtils from '~/utils/funcUtils';
+import { cinemaComplexUserApi, cinemaUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
-
-const CumRap = ({ diaVaLoai }) => {
+const CumRap = ({ NameAndProvince }) => {
     const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
+    const [search, setSearch] = useState('');
+    const so = 100;
     const [list, setList] = useState([]);
 
-    console.log("diavaloairoine~:", diaVaLoai);
-    useEffect(() => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                setInitLoading(false);
-                setData(res.results);
-                setList(res.results);
-            });
-    }, []);
+    const [cinemaComplex, setCinemaComplex] = useState(null);
+    const [cinema, setCinema] = useState([0]);
 
-    const onLoadMore = () => {
-        setLoading(true);
-        setList(
-            data.concat(
-                [...new Array(count)].map(() => ({
-                    loading: true,
-                    name: {},
-                    picture: {},
-                })),
-            ),
-        );
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                const newData = data.concat(res.results);
-                setData(newData);
-                setList(newData);
-                setLoading(false);
-                window.dispatchEvent(new Event('resize'));
-            });
-        console.log(count);
-        console.log(list);
+    useEffect(() => {
+        if (list.length > 0) {
+            setCinemaComplex(list[0]);
+        }
+    }, [list]);
+
+    useEffect(() => {
+        const getCinemaComplexByNameAndProvince = async () => {
+            try {
+                const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
+                    so,
+                    NameAndProvince.province.id,
+                    NameAndProvince.cinemaChainName,
+                    search,
+                );
+                setInitLoading(false);
+                setList(res.data);
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            }
+        };
+
+        getCinemaComplexByNameAndProvince();
+    }, [NameAndProvince, search]);
+
+    useEffect(() => {
+        try {
+            if (cinemaComplex ?? cinemaComplex) {
+                const getCinemaByCinemaComplex = async () => {
+                    const resCinema = await cinemaUserApi.getCinemaByCinemaComplex(cinemaComplex);
+                    setCinema(resCinema);
+                    // console.log('cinema,', resCinema);
+                };
+                getCinemaByCinemaComplex();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [cinemaComplex]);
+
+    const handleCinemaComplex = (data) => {
+        setCinemaComplex(data);
     };
-    const loadMore =
-        !initLoading && !loading ? (
-            <div
-                style={{
-                    textAlign: 'center',
-                    marginTop: 12,
-                    height: 32,
-                    lineHeight: '32px',
-                }}
-            >
-                <Button onClick={onLoadMore} className={cx('btn-load')}>
-                    Xem thêm
-                </Button>
-            </div>
-        ) : null;
+  
+
+
     return (
         <>
             <Col
@@ -87,6 +86,7 @@ const CumRap = ({ diaVaLoai }) => {
                                 className={cx('cum-rap-inputSearch')}
                                 suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                                 placeholder="Tìm theo tên rạp ..."
+                                onChange={(e) => setSearch(e.target.value)}
                             />
                         </Col>
                         <Col span={24}>
@@ -94,10 +94,16 @@ const CumRap = ({ diaVaLoai }) => {
                             <List
                                 loading={initLoading}
                                 itemLayout="horizontal"
-                                loadMore={loadMore}
+                                // loadMore={loadMore}
                                 dataSource={list}
-                                renderItem={(item) => (
-                                    <List.Item className={cx('list-item')}>
+                                renderItem={(item, index) => (
+                                    <List.Item
+                                        className={cx('list-item', {
+                                            active: cinemaComplex === null ? index === 0 : cinemaComplex.id === item.id,
+                                        })}
+                                        defaultValue={[1]}
+                                        onClick={() => handleCinemaComplex(item)}
+                                    >
                                         <Skeleton
                                             avatar
                                             title={false}
@@ -109,11 +115,13 @@ const CumRap = ({ diaVaLoai }) => {
                                                 <div className={cx('border-img')}>
                                                     <img
                                                         className={cx('img')}
-                                                        src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
+                                                        src={
+                                                            'http://localhost:8081/api/upload/' + item.cinemaChain.image
+                                                        }
                                                         alt="lỗi"
                                                     />
                                                 </div>
-                                                <span className={cx('title')}>Galaxy Kinh Dương Vương</span>
+                                                <span className={cx('title')}>{item.name}</span>
                                             </div>
                                             <FontAwesomeIcon className={cx('icon')} icon={faAngleRight} />
                                         </Skeleton>
@@ -124,8 +132,16 @@ const CumRap = ({ diaVaLoai }) => {
                     </Row>
                 </div>
             </Col>
-            <Col span={16} style={{ width: '100%', minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
-                <ListPhim />
+            <Col
+                span={16}
+                style={{
+                    width: '100%',
+                    minHeight: 550,
+                    maxHeight: 550,
+                    borderTop: '1px solid #e5e5e5',
+                }}
+            >
+                <ListPhim cinemaComplex={cinemaComplex} cinema={cinema[0]} />
             </Col>
         </>
     );

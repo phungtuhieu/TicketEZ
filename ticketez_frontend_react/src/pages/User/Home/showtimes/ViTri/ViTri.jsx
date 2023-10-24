@@ -8,6 +8,7 @@ import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
 import { provinceApi } from '~/api/admin';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -21,12 +22,16 @@ function ViTri() {
     const [dataProvinces, setDataProvinces] = useState([]);
 
     useEffect(() => {
-        const get = async () => {
+        const getProvince = async () => {
+           try {
             const res = await provinceApi.get();
             // console.log(res.data);
             setDataProvinces(res.data);
+           } catch (error) {
+            funcUtils.notify(error.response.data, "error");
+           }
         };
-        get();
+        getProvince();
     }, []);
     // console.log(dataProvinces);
 
@@ -44,7 +49,7 @@ function ViTri() {
 
     const handleSetProvince = (province) => {
         setProvinces(province);
-        // setIsModalOpen(false);
+        setIsModalOpen(false);
     };
 
     // console.log(provinces);
@@ -68,7 +73,7 @@ function ViTri() {
                         </span>
                     </Button>
                     <Modal
-                    maskClosable={false}
+                        maskClosable={false}
                         className={cx('modal', 'slideIn')}
                         footer={
                             <Button className={cx('modal-footer-btn-close')} onClick={handleCancel}>
@@ -123,7 +128,7 @@ function ViTri() {
                 </div>
             </Col>
             <Col span={24} style={{ height: 642.8 }}>
-                <LoaiRap diaDiem={provinces} />
+                <LoaiRap province={provinces} />
             </Col>
         </Row>
     );

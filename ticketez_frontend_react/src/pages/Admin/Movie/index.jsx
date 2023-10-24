@@ -24,7 +24,7 @@ import style from './Movie.module.scss';
 import classNames from 'classnames/bind';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axiosClient, { getUrlImageByName } from '~/api/global/axiosClient';
+import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
@@ -36,9 +36,8 @@ import httpStatus from '~/api/global/httpStatus';
 import movieProducerApi from '~/api/admin/managementMovie/movieProducerApi';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import funcUtils from '~/utils/funcUtils';
-import axios from 'axios';
 import genreApi from '~/api/admin/managementMovie/genreApi';
-import { useDebounce } from '~/hooks';
+import { useSearchSelectEffect } from '~/hooks';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -58,12 +57,15 @@ function AdminMovie() {
     const [movieStudios, setMovieStudios] = useState([]);
     const [movieProducers, setMovieProducers] = useState([]);
     const [genreOptions, setGenreOptions] = useState([]);
-    const [listGenreData, setListGenreData] = useState([]);
     const [searchValue, setSearchValue] = useState({
         searchMovieStudio: '',
+        searchGenre: '',
+        searchMovieProducer: '',
     });
     const [initialOptions, setInitialOptions] = useState({
         movieStudios: [],
+        genres: [],
+        movieProducers: [],
     });
     const [listMPAA, setListMPAA] = useState([]);
     const [form] = Form.useForm();
@@ -77,9 +79,9 @@ function AdminMovie() {
     const [pageSize, setPageSize] = useState(10);
     const [workSomething, setworkSomething] = useState(10);
     const [loadingButton, setLoadingButton] = useState(false);
-    const [loadingStates, setLoadingStates] = useState({ movieStudio: false });
+    const [loadingStates, setLoadingStates] = useState({ movieStudio: false, genre: false, movieProducer: false });
     const [isSearch, setIsSearch] = useState(false);
-    const searchValueDebounce = useDebounce(searchValue.searchMovieStudio, 500);
+
     const formItemLayout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 20 },
@@ -245,24 +247,27 @@ function AdminMovie() {
 
     // Load table
     useEffect(() => {
+        const pageNoDefault = 1;
+        const pageSizeDefault = 20;
         const fetchData = async () => {
             try {
                 const [movieResp, movieStudioResp, movieProducerResp, mpaaResp, genreResp] = await Promise.all([
                     movieApi.getByPage(currentPage, pageSize),
-                    movieStudioApi.getByPage(1, 10),
-                    movieProducerApi.getByPage(1, 10),
-                    mpaaRatingApi.getByPage(1, 10),
-                    genreApi.getByPage(1, 10),
+                    movieStudioApi.getByPage(pageNoDefault, pageSizeDefault),
+                    movieProducerApi.getByPage(pageNoDefault, pageSizeDefault),
+                    mpaaRatingApi.getByPage(pageNoDefault, pageSizeDefault),
+                    genreApi.getByPage(pageNoDefault, pageSizeDefault),
                 ]);
                 console.log(genreResp.data);
-                const genreData = genreResp.data.map((item) => ({
-                    value: item.id,
-                    label: item.name,
-                }));
-                setInitialOptions((prev) => ({ ...prev, movieStudios: movieStudioResp.data }));
+                const movieStudioOptions = movieStudioResp.data;
+                const genreData = genreResp.data;
+                const movieProducerData = movieProducerResp.data;
+                setInitialOptions((prev) => ({ ...prev, movieStudios: movieStudioOptions }));
+                setInitialOptions((prev) => ({ ...prev, genres: genreData }));
+                setInitialOptions((prev) => ({ ...prev, movieProducers: movieProducerData }));
                 setGenreOptions(genreData);
-                setMovieStudios(movieStudioResp.data);
-                setMovieProducers(movieProducerResp.data);
+                setMovieStudios(movieStudioOptions);
+                setMovieProducers(movieProducerData);
                 setListMPAA(mpaaResp.data);
                 const formatData = movieResp.data.map((item) => ({
                     ...item,
@@ -281,26 +286,30 @@ function AdminMovie() {
         fetchData();
     }, [currentPage, pageSize, workSomething]);
 
-    //Search hãng phim
-    useEffect(() => {
-        const fetchSearchResults = async () => {
-            try {
-                const response = await movieStudioApi.getByPage(1, 10, searchValueDebounce);
-                setMovieStudios(response.data);
-            } catch (error) {
-                setLoadingStates((prev) => ({ ...prev, movieStudio: false }));
-                console.error('Error fetching search results:', error);
-            } finally {
-                setLoadingStates((prev) => ({ ...prev, movieStudio: false }));
-            }
-        };
-        if (isSearch && searchValueDebounce.trim() !== '') {
-            fetchSearchResults();
-        } else if (isSearch && searchValueDebounce.trim() === '') {
-            setMovieStudios(initialOptions.movieStudios);
-        }
-        setIsSearch(false);
-    }, [searchValueDebounce]);
+    useSearchSelectEffect(
+        searchValue.searchMovieStudio,
+        movieStudioApi,
+        { setOptions: setMovieStudios, field: 'movieStudio' },
+        initialOptions.movieStudios,
+        { loadingStates, setLoadingStates },
+        isSearch,
+    );
+    useSearchSelectEffect(
+        searchValue.searchGenre,
+        genreApi,
+        { setOptions: setGenreOptions, field: 'genre' },
+        initialOptions.genres,
+        { loadingStates, setLoadingStates },
+        isSearch,
+    );
+    useSearchSelectEffect(
+        searchValue.searchMovieProducer,
+        movieProducerApi,
+        { setOptions: setMovieProducers, field: 'movieProducer' },
+        initialOptions.movieProducers,
+        { loadingStates, setLoadingStates },
+        isSearch,
+    );
 
     const handleReset = (clearFilters) => {
         clearFilters();
@@ -404,9 +413,6 @@ function AdminMovie() {
         console.log('newFileList', newFileList);
     };
 
-    const handleChangeSelectGenres = (value) => {
-        setListGenreData(value);
-    };
     const columns = [
         {
             title: 'Tên phim',
@@ -543,11 +549,15 @@ function AdminMovie() {
 
     const handleSearchInput = (value, type) => {
         setIsSearch(true);
-        setLoadingStates((prev) => ({ ...prev, movieStudio: true }));
         switch (type) {
             case 'movie-studio':
                 setSearchValue((prev) => ({ ...prev, searchMovieStudio: value }));
-
+                break;
+            case 'genre':
+                setSearchValue((prev) => ({ ...prev, searchGenre: value }));
+                break;
+            case 'movie-producer':
+                setSearchValue((prev) => ({ ...prev, searchMovieProducer: value }));
                 break;
             default:
                 console.log('Error: Không tìm thấy type của search');
@@ -662,11 +672,8 @@ function AdminMovie() {
                             },
                         ]}
                     >
-                        <Input disabled />
+                        <Input disabled defaultValue={0.0} />
                     </Form.Item>
-                    {/* {dataEdit && (
-                        
-                    )} */}
 
                     <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
                         <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
@@ -674,7 +681,7 @@ function AdminMovie() {
                     <Form.Item name="country" label="Quốc gia" rules={[{ required: true }]}>
                         <Select
                             showSearch
-                            placeholder="Chọn quốc gia ở bên dưới"
+                            placeholder="Tìm kiếm và chọn quốc gia"
                             // onChange={onGenderChange}
                             allowClear
                             filterOption={(input, option) => (option?.label ?? '').includes(input)}
@@ -697,12 +704,29 @@ function AdminMovie() {
                             })} */}
                         {/* </Select> */}
                     </Form.Item>
-                    <Form.Item name="movieStudio" label="hãng phim" rules={[{ required: true }]}>
+                    <Form.Item label="Hãng sản xuất" rules={[{ required: true }]} name="movieProducer">
                         <Select
-                            mode="multiple"
-                            showSearch
-                            placeholder="Chọn hãng phim ở bên dướis"
+                            // mode=""
                             allowClear
+                            showSearch
+                            placeholder="Tìm kiếm và chọn hãng sản xuât"
+                            filterOption={false}
+                            onSearch={(value) => handleSearchInput(value, 'movie-producer')}
+                            loading={loadingStates.movieProducer}
+                            options={[
+                                ...movieProducers.map((item) => ({
+                                    value: item.id,
+                                    label: item.name,
+                                })),
+                            ]}
+                        />
+                    </Form.Item>
+                    <Form.Item name="movieStudio" label="Hãng phim" rules={[{ required: true }]}>
+                        <Select
+                            // mode=""
+                            allowClear
+                            showSearch
+                            placeholder="Tìm kiếm và chọn hãng phim"
                             filterOption={false}
                             onSearch={(value) => handleSearchInput(value, 'movie-studio')}
                             loading={loadingStates.movieStudio}
@@ -714,67 +738,40 @@ function AdminMovie() {
                             ]}
                         />
                     </Form.Item>
-                    {/* <Form.Item label="hãng phim" rules={[{ required: true }]} name="movieStudio">
-                        <Select placeholder="Chọn hãng phim" allowClear>
-                            {movieStudios.map((item) => {
-                                return (
-                                    <Select.Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
-                    </Form.Item> */}
-                    {/* <Form.Item label="Loại phim (mpaa)" rules={[{ required: true }]} name="ap">
-                        <>
-                            <Select
-                                style={{ width: '100%' }}
-                                placeholder="Please select"
-                                onChange={handleChangeSelectGenres}
-                                options={genreOptions}
-                                allowClear
-                                filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                                filterSort={(optionA, optionB) =>
-                                    (optionA?.label ?? '')
-                                        .toLowerCase()
-                                        .localeCompare((optionB?.label ?? '').toLowerCase())
-                                }
-                            />
-                        </>
-                    </Form.Item> */}
-                    <Form.Item name="gerne" label="Phân loại phim" rules={[{ required: true }]}>
+                    <Form.Item name="genre" label="Thể loại phim" rules={[{ required: true }]}>
                         <Select
                             mode="multiple"
                             showSearch
-                            placeholder="Chọn loại phim ở bên dưới"
+                            placeholder="Tìm kiếm và chọn loại phim"
                             allowClear
                             filterOption={false}
-                            onSearch={(value) => handleSearchInput(value, 'gerne')}
-                            loading={loadingStates.movieStudio}
-                            options={genreOptions}
+                            onSearch={(value) => handleSearchInput(value, 'genre')}
+                            loading={loadingStates.genre}
+                            options={[
+                                ...genreOptions.map((item) => ({
+                                    value: item.id,
+                                    label: item.name,
+                                })),
+                            ]}
                         />
                     </Form.Item>
-                    <Form.Item label="Hãng sản xuất" rules={[{ required: true }]} name="movieProducer">
-                        <Select placeholder="Chọn hãng sản xuất phim" allowClear>
-                            {movieProducers.map((item) => {
-                                return (
-                                    <Select.Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
-                    </Form.Item>
+
                     <Form.Item label="Loại phim" rules={[{ required: true }]} name="mpaaRating">
-                        <Select placeholder="Chọn loại phim" allowClear>
-                            {listMPAA.map((item) => {
-                                return (
-                                    <Select.Option key={item.id} value={item.id}>
-                                        {item.ratingCode}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
+                        <Select
+                            showSearch
+                            placeholder="Tìm kiếm và chọn loại phim"
+                            allowClear
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
+                            options={[
+                                ...listMPAA.map((item) => ({
+                                    value: item.id,
+                                    label: item.ratingCode,
+                                })),
+                            ]}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Link trailer video"
