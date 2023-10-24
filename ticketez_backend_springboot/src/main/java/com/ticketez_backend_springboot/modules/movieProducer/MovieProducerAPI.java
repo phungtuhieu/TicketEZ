@@ -30,27 +30,26 @@ public class MovieProducerAPI {
     MovieProducerDAO dao;
     
     @GetMapping
-    public ResponseEntity<?> findAll(
-            @RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit,
-            @RequestParam("search") Optional<String> search) {
-        try {
-            if (pageNo.isPresent() && pageNo.get() == 0) {
-                return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
+        public ResponseEntity<?> findByPage(
+                @RequestParam("page") Optional<Integer> pageNo,
+                @RequestParam("limit") Optional<Integer> limit,
+                @RequestParam("search") Optional<String> search) {
+            try {
+                if (pageNo.isPresent() && pageNo.get() == 0) {
+                    return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
+                }
+                Sort sort = Sort.by(Sort.Order.desc("id"));
+                Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+                Page<MovieProducer> page = dao.findByKeyword(search.orElse(""),pageable);
+                ResponseDTO<MovieProducer> responeDTO = new ResponseDTO<>();
+                responeDTO.setData(page.getContent());
+                responeDTO.setTotalItems(page.getTotalElements());
+                responeDTO.setTotalPages(page.getTotalPages());
+                return ResponseEntity.ok(responeDTO);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            Sort sort = Sort.by(Sort.Order.desc("id"));
-            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<MovieProducer> page = dao.findAll(pageable);
-            ResponseDTO<MovieProducer> responeDTO = new ResponseDTO<>();
-            responeDTO.setData(page.getContent());
-            responeDTO.setTotalItems(page.getTotalElements());
-            responeDTO.setTotalPages(page.getTotalPages());
-            return ResponseEntity.ok(responeDTO);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {

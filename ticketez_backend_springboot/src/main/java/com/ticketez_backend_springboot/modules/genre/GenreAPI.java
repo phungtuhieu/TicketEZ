@@ -53,7 +53,7 @@ public class GenreAPI {
                 }
                 Sort sort = Sort.by(Sort.Order.desc("id"));
                 Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-                Page<Genre> page = dao.findAll(pageable);
+                Page<Genre> page = dao.findByKeyword(search.orElse(""),pageable);
                 ResponseDTO<Genre> responeDTO = new ResponseDTO<>();
                 responeDTO.setData(page.getContent());
                 responeDTO.setTotalItems(page.getTotalElements());

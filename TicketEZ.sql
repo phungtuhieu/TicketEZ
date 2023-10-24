@@ -123,6 +123,7 @@ GO
     )
 GO
     CREATE TABLE Formats_Movies (
+        id BIGINT NOT NULL,
         movie_id BIGINT NOT NULL,
         format_id BIGINT NOT NULL
     )
@@ -191,11 +192,11 @@ GO
     )
 GO
 
-CREATE TABLE Child_Seat_Chart (
-	seat_chart_id BIGINT NOT NULL,
-	showtime_id  BIGINT NOT NULL
-)
-GO
+-- CREATE TABLE Child_Seat_Chart (
+-- 	seat_chart_id BIGINT NOT NULL,
+-- 	showtime_id  BIGINT NOT NULL
+-- )
+-- GO
 
     CREATE TABLE Seats_Booking (
         seat_id BIGINT NOT NULL,
@@ -289,7 +290,9 @@ GO
         end_time DATETIME NOT NULL,
         [status] BIGINT NOT NULL,
         movie_id BIGINT NOT NULL,
-        cinema_id BIGINT NOT NULL
+        cinema_id BIGINT NOT NULL,
+        format_movie_id BIGINT NOT NULL,
+        seat_chart_id BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Booking (
@@ -298,6 +301,7 @@ GO
         account_id NVARCHAR(20) NOT NULL,
         create_date DATETIME NOT NULL,
         showtime_id BIGINT NOT NULL,
+        
     )
 GO
     CREATE TABLE Payment_Info (
@@ -329,9 +333,9 @@ ALTER TABLE Activity_Logs
 ADD CONSTRAINT PK_Activity_Logs PRIMARY KEY(id)
 GO
 
-ALTER TABLE Child_Seat_Chart
-ADD CONSTRAINT PK_Child_Seat_Chart PRIMARY KEY(seat_chart_id,showtime_id)
-GO
+-- ALTER TABLE Child_Seat_Chart
+-- ADD CONSTRAINT PK_Child_Seat_Chart PRIMARY KEY(seat_chart_id,showtime_id)
+-- GO
 
 ALTER TABLE
     Accounts
@@ -416,7 +420,7 @@ GO
 ALTER TABLE
     Formats_Movies
 ADD
-    CONSTRAINT PK_Formats_Movies PRIMARY KEY (format_id, movie_id);
+    CONSTRAINT PK_Formats_Movies PRIMARY KEY (id);
 
 GO
 ALTER TABLE
@@ -558,19 +562,28 @@ ADD
     CONSTRAINT FK_Activity_Logs_Accounts FOREIGN KEY (account_id) REFERENCES Accounts(id)
 GO
 
+-- ALTER TABLE
+--     Child_Seat_Chart
+-- ADD
+--     CONSTRAINT FK_Child_Seat_Chart_Seat_Chart FOREIGN KEY (seat_chart_id) REFERENCES Seat_Chart(id)
+-- GO
+
+
+-- ALTER TABLE
+--     Child_Seat_Chart
+-- ADD
+--     CONSTRAINT FK_Child_Seat_Chart_Showtimes FOREIGN KEY (seat_chart_id) REFERENCES Showtimes(id)
+-- GO
 ALTER TABLE
-    Child_Seat_Chart
+    Formats_Movies
 ADD
-    CONSTRAINT FK_Child_Seat_Chart_Seat_Chart FOREIGN KEY (seat_chart_id) REFERENCES Seat_Chart(id)
-GO
-
-
+    CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+GO  
 ALTER TABLE
-    Child_Seat_Chart
+    Formats_Movies
 ADD
-    CONSTRAINT FK_Child_Seat_Chart_Showtimes FOREIGN KEY (seat_chart_id) REFERENCES Showtimes(id)
+    CONSTRAINT FK_FormatsMovies_Formats FOREIGN KEY (format_id) REFERENCES Formats(id)
 GO
-
 ALTER TABLE
     Accounts_Roles
 ADD
@@ -597,7 +610,7 @@ GO
 ALTER TABLE
     Showtimes
 ADD
-    CONSTRAINT FK_Showtimes_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+    CONSTRAINT FK_Showtimes_FormatMovies FOREIGN KEY (format_movie_id) REFERENCES Formats_Movies(id)
 GO
     -- /Showtimes
     -- Price
@@ -630,16 +643,9 @@ ADD
 GO
     -- /Directors_Movies
     -- Formats_Movies
-ALTER TABLE
-    Formats_Movies
-ADD
-    CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
-GO
-ALTER TABLE
-    Formats_Movies
-ADD
-    CONSTRAINT FK_FormatsMovies_Formats FOREIGN KEY (format_id) REFERENCES Formats(id)
-GO
+
+
+
     -- /Formats_Movies
     -- Genres_Movies
 ALTER TABLE
@@ -1011,11 +1017,11 @@ VALUES
 GO
 INSERT INTO Cinema_Chains ([name],[image],[description])
 VALUES
-(N'CGV',N'img', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'img',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'img',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'img', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'img', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time], [cinema_chain_id],[province_id])
@@ -1309,7 +1315,6 @@ INSERT INTO Accounts_Roles (account_id, role_id)
 VALUES
 ('admin', 1), -- Tài khoản 1 có vai trò "Super Admin"
 ('user2', 2) -- Tài khoản 2 có vai trò "Movie Management Admin"
-
 GO
 -- 18. thêm dữ liệu bảng actor
 
@@ -1365,12 +1370,20 @@ VALUES ('2D', N'Phim 2D thường được chiếu trên màn hình phẳng.'),
   ('HDR', N'Phim HDR (High Dynamic Range) có độ tương phản và màu sắc tốt hơn.');
 GO
 
--- 23. thêm dữ liệu bảng Showtimes
- INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status], [movie_id], [cinema_id])
+-- Thêm dữ liệu mẫu cho bảng Formats_Movies
+INSERT INTO Formats_Movies (id, movie_id, format_id)
 VALUES
-  ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1),
-  ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2),
-  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1);
+    (1, 1, 1),
+    (2, 1, 2),
+    (3, 2, 1),
+    (4, 2, 2);
+
+-- 23. thêm dữ liệu bảng Showtimes
+ INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
+VALUES
+  ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1,1),
+  ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
+  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1);
 GO
 
 --25. thêm dữ liệu bảng Directors
@@ -1388,6 +1401,7 @@ VALUES
   (2, 1),
   (3, 2);
 GO
+
 
 SELECT * FROM Accounts
 SELECT * FROM Verification

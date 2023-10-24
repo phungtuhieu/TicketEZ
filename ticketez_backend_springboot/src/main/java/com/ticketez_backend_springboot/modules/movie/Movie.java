@@ -65,9 +65,6 @@ public class Movie implements Serializable {
 	@JoinColumn(name = "MPAA_rating_id")
 	private MPAARating mpaaRating;
 
-	@JsonIgnore	
-	@OneToMany(mappedBy = "movie")
-	private List<Showtime> showtimes;
 
 	@JsonIgnore		
 	@OneToMany(mappedBy = "movie")
