@@ -22,16 +22,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+
 import com.ticketez_backend_springboot.modules.movie.Movie;
-
-
-
-@RestController
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
 @CrossOrigin("*")
+@RestController
 @RequestMapping("/api/genre")
 public class GenreAPI {
-@Autowired
+    @Autowired
     GenreDAO dao;
+    @Autowired
+    MovieDAO daoMovie;
 
     // @GetMapping("/get/all")
     // public ResponseEntity<?> findAll() {
@@ -91,5 +92,24 @@ public class GenreAPI {
         dao.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    // ----------------------------------------------------------------
 
+    @GetMapping("/get/genre-by-movie/{movieId}")
+    public ResponseEntity<?> getGenreByMovie(@PathVariable("movieId") Long movieId) {
+        try {
+
+            if (movieId.equals("")) {
+                return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            }
+            Movie movie = daoMovie.findById(movieId).get();
+            if (movie != null) {
+                List<Genre> genre = dao.getGenreByMovie(movie);
+                return ResponseEntity.ok(genre);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }
