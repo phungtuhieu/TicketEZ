@@ -4,7 +4,8 @@
 .t16,
 .t18,
 .dat-truoc {
-    width: 25px;
+    min-width: 25px;
+    max-width: 55px;
     color: #ffffff;
     display: flex;
     align-items: center;

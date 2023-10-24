@@ -1011,11 +1011,11 @@ VALUES
 GO
 INSERT INTO Cinema_Chains ([name],[image],[description])
 VALUES
-(N'CGV',N'img', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'img',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'img',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'img', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'img', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time], [cinema_chain_id],[province_id])
