@@ -289,7 +289,6 @@ GO
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
         [status] BIGINT NOT NULL,
-        movie_id BIGINT NOT NULL,
         cinema_id BIGINT NOT NULL,
         format_movie_id BIGINT NOT NULL,
         seat_chart_id BIGINT NOT NULL,
