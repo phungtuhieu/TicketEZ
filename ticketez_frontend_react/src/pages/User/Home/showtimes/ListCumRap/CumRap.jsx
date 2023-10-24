@@ -20,7 +20,6 @@ const CumRap = ({ NameAndProvince }) => {
     const [list, setList] = useState([]);
 
     const [cinemaComplex, setCinemaComplex] = useState(null);
-    const [cinema, setCinema] = useState([0]);
 
     useEffect(() => {
         if (list.length > 0) {
@@ -47,20 +46,7 @@ const CumRap = ({ NameAndProvince }) => {
         getCinemaComplexByNameAndProvince();
     }, [NameAndProvince, search]);
 
-    useEffect(() => {
-        try {
-            if (cinemaComplex ?? cinemaComplex) {
-                const getCinemaByCinemaComplex = async () => {
-                    const resCinema = await cinemaUserApi.getCinemaByCinemaComplex(cinemaComplex);
-                    setCinema(resCinema);
-                    // console.log('cinema,', resCinema);
-                };
-                getCinemaByCinemaComplex();
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }, [cinemaComplex]);
+    
 
     const handleCinemaComplex = (data) => {
         setCinemaComplex(data);
@@ -141,7 +127,7 @@ const CumRap = ({ NameAndProvince }) => {
                     borderTop: '1px solid #e5e5e5',
                 }}
             >
-                <ListPhim cinemaComplex={cinemaComplex} cinema={cinema[0]} />
+                <ListPhim cinemaComplex={cinemaComplex}  />
             </Col>
         </>
     );

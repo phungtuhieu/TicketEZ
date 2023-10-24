@@ -13,6 +13,6 @@ public interface CinemaDAO extends JpaRepository<Cinema, Long> {
   List<Cinema> findByCinemaComplexId(Long cinemaComplexId);
 
 
-  @Query("SELECT  c FROM Cinema c WHERE c.cinemaComplex = :cinemaComplex")
-  List<Cinema> getCinemaByCinemaComplex(@Param("cinemaComplex") CinemaComplex cinemaComplex);
+  // @Query("SELECT  c FROM Cinema c WHERE c.cinemaComplex = :cinemaComplex")
+  // List<Cinema> getCinemaByCinemaComplex(@Param("cinemaComplex") CinemaComplex cinemaComplex);
 }

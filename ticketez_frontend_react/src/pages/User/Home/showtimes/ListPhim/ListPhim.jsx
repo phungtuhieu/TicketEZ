@@ -6,11 +6,11 @@ import style from './ListPhim.module.scss';
 
 import moment from 'moment-timezone';
 
-import { movieUserApi, genreMovieUserApi, formatMovieUserApi, genreUserApi, formatUserApi } from '~/api/user/showtime';
+import { movieUserApi, genreUserApi, formatUserApi, showtimeUserApi } from '~/api/user/showtime';
 
 const cx = classNames.bind(style);
 
-function ListPhim({ cinemaComplex, cinema }) {
+function ListPhim({ cinemaComplex }) {
     const [day, setDay] = useState(1);
     const [weekDays, setWeekDays] = useState([]);
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
@@ -26,10 +26,15 @@ function ListPhim({ cinemaComplex, cinema }) {
         setWeekDays(nextWeekDays);
     }, []);
 
+    const [chooseDay, setChooseDay] = useState(moment().format('YYYY-MM-DD'));
+
+    // console.log(chooseDay);
     const handleDayClick = (index) => {
         setDay(index + 1);
         const selectedDay = weekDays[index];
-        console.log('Ngày được chọn:', selectedDay.format('YYYY-MM-DD'));
+        const formatSelectedDay = selectedDay.format('YYYY-MM-DD');
+        setChooseDay(formatSelectedDay);
+        // console.log('Ngày được chọn:', selectedDay.format('DD-MM-YYYY'));
     };
 
     // -----------------movie by ccx-----------------------------------------------
@@ -38,20 +43,21 @@ function ListPhim({ cinemaComplex, cinema }) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        console.log(cinemaComplex?.id);
+        // console.log(cinemaComplex?.id);
         // console.log(cinema);
         try {
             if (cinemaComplex ?? cinemaComplex) {
                 const getMovie = async () => {
-                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id);
+                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id, chooseDay);
                     setMovieData(resMovie);
+                    // setMovieData([]);
                 };
                 getMovie();
             }
         } catch (error) {
             console.log(error);
         }
-    }, [cinemaComplex, cinema]);
+    }, [cinemaComplex, chooseDay]);
 
     const loadGenreByMovie = async (movie) => {
         if (movie ?? movie) {
@@ -61,14 +67,23 @@ function ListPhim({ cinemaComplex, cinema }) {
     };
 
     const loadFormatByMovie = async (movie) => {
-        if (movie ?? movie) {
+        if (movie ?? cinemaComplex) {
             const resFormat = await formatUserApi.getFormatByMovie(movie.id);
-            return resFormat.map((valueFormat) => {
-                return {
-                    format: valueFormat,
-                    showtime: valueFormat.name,
-                };
-            });
+            return Promise.all(
+                resFormat.map(async (valueFormat) => {
+                    const showtime = await showtimeUserApi.getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate(
+                        cinemaComplex.id,
+                        movie.id,
+                        valueFormat.id,
+                        chooseDay,
+                    );
+                    return {
+                        format: valueFormat,
+                        // showtime: valueFormat.name,
+                        showtime,
+                    };
+                }),
+            );
         }
     };
 
@@ -86,15 +101,20 @@ function ListPhim({ cinemaComplex, cinema }) {
                     };
                 }),
             );
-            // console.log('test', data);
+            console.log('test', data);
             setData(data);
         };
         fetchData();
     }, [movieData]);
-
+    // style={{overflow: data.length === 0 ? 'none' : "auto"}}
     return (
         <>
-            <Row className={cx('wrapper')}>
+            <Row
+                className={cx({
+                    wrapper: data.length > 0,
+                    wrapperCheck: data.length === 0,
+                })}
+            >
                 <Col span={24} className={cx('col1')}>
                     <Row>
                         <Col span={24} className={cx('col1-dia-chi')}>
@@ -130,15 +150,15 @@ function ListPhim({ cinemaComplex, cinema }) {
                             </Row>
                         </Col>
                         <Col span={24} className={cx('col1-chon-ngay')}>
-                            {weekDays.map((day, index) => (
+                            {weekDays.map((days, index) => (
                                 <div
                                     key={index}
                                     className={cx('container-day', { active: day === index + 1 })}
                                     onClick={() => handleDayClick(index)}
                                 >
-                                    <div className={cx('ngay')}>{day.date()}</div>
+                                    <div className={cx('ngay')}>{days.date()}</div>
                                     <div className={cx('thu')}>
-                                        {index === 0 ? 'Hôm nay' : daysOfWeekInVietnamese[day.day()]}
+                                        {index === 0 ? 'Hôm nay' : daysOfWeekInVietnamese[days.day()]}
                                     </div>
                                 </div>
                             ))}
@@ -167,7 +187,6 @@ function ListPhim({ cinemaComplex, cinema }) {
                             2
                         </Col>
                     </Row> */}
-
                     {data.map((data, index) => (
                         <Row key={index} className={cx('container-movie')}>
                             <Col span={4} className={cx('col1-movie')}>
@@ -197,43 +216,35 @@ function ListPhim({ cinemaComplex, cinema }) {
                                         <Col key={index} span={24} className={cx('container-suat-chieu')}>
                                             <div className={cx('title')}>{valueFormat.format.name}</div>
                                             <div className={cx('suat-chieu')}>
-                                                <Button className={cx('btn-suat-chieu')} danger>
-                                                    <span className={cx('gio-bat-dau')}>20:45</span>
-                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                </Button>
-                                                <Button className={cx('btn-suat-chieu')} danger>
-                                                    <span className={cx('gio-bat-dau')}>20:45</span>
-                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                </Button>
-                                                <Button className={cx('btn-suat-chieu')} danger>
-                                                    <span className={cx('gio-bat-dau')}>20:45</span>
-                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                </Button>
-                                                <Button className={cx('btn-suat-chieu')} danger>
-                                                    <span className={cx('gio-bat-dau')}>20:45</span>
-                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                </Button>
-                                                <Button className={cx('btn-suat-chieu')} danger>
-                                                    <span className={cx('gio-bat-dau')}>20:45</span>
-                                                    <span className={cx('gio-ket-thuc')}>21:45</span>
-                                                </Button>
+                                                {valueFormat.showtime.map((valueShowtime, index) => (
+                                                    <Button key={index} className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>
+                                                            {moment(valueShowtime.startTime).format('HH:mm')}
+                                                        </span>
+                                                        <span className={cx('gio-ket-thuc')}>
+                                                            {moment(valueShowtime.endTime).format('HH:mm')}
+                                                        </span>
+                                                    </Button>
+                                                    // <h1></h1>
+                                                ))}
                                             </div>
                                         </Col>
                                     ))}
 
                                     {/* <Col span={24} className={cx('container-suat-chieu')}>
-                                        <div className={cx('title')}>2D Phụ đề</div>
-                                        <div className={cx('suat-chieu')}>
-                                            <Button className={cx('btn-suat-chieu')} danger>
-                                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                                            </Button>
-                                        </div>
-                                    </Col> */}
+                                                <div className={cx('title')}>2D Phụ đề</div>
+                                                <div className={cx('suat-chieu')}>
+                                                    <Button className={cx('btn-suat-chieu')} danger>
+                                                        <span className={cx('gio-bat-dau')}>20:45</span>
+                                                        <span className={cx('gio-ket-thuc')}>21:45</span>
+                                                    </Button>
+                                                </div>
+                                            </Col> */}
                                 </Row>
                             </Col>
                         </Row>
                     ))}
+                    {data.length === 0 && <h1>không tìm thây</h1>}
                 </Col>
             </Row>
         </>

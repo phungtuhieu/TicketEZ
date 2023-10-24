@@ -123,18 +123,18 @@ public class CinemaAPI {
 
 
     // ----------------------------------------------------------------
-    @PostMapping("/get/cinema-by-cinemaComplex")
-    public ResponseEntity<?> getDuLie(@RequestBody CinemaComplex cinemaComplex) {
-        try {
-            if(cinemaComplex.getId() == null ){
-                    return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
-            }
-            List<Cinema> cinema = cinemaDAO.getCinemaByCinemaComplex(cinemaComplex);
-            return ResponseEntity.ok(cinema);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    // @PostMapping("/get/cinema-by-cinemaComplex")
+    // public ResponseEntity<?> getDuLie(@RequestBody CinemaComplex cinemaComplex) {
+    //     try {
+    //         if(cinemaComplex.getId() == null ){
+    //                 return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+    //         }
+    //         List<Cinema> cinema = cinemaDAO.getCinemaByCinemaComplex(cinemaComplex);
+    //         return ResponseEntity.ok(cinema);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
 
-    }
+    // }
 
 }

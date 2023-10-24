@@ -1,9 +1,8 @@
 export {
     cinemaComplexUserApi,
     movieUserApi,
-    // genreMovieUserApi,
-    // formatMovieUserApi,
     formatUserApi,
     genreUserApi,
-    cinemaUserApi
+    cinemaUserApi,
+    showtimeUserApi
 } from './writeApi';

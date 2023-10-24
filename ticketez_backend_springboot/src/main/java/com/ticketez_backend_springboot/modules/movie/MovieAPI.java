@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.movie;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class MovieAPI {
     @Autowired
     MovieDAO dao;
     @Autowired
-    CinemaComplexDao daoComplexDao;
+    CinemaComplexDao cinemaComplexDao;
 
     @GetMapping
     public ResponseEntity<?> findByPage(
@@ -101,25 +102,26 @@ public class MovieAPI {
     }
 
     ////////////////////////////////
-    // @GetMapping("/get/movies-by-cinemaComplex/{CinemaComplexId}")
-    // public ResponseEntity<?> getDuLie(
-    //         @PathVariable("CinemaComplexId") Long CinemaComplexId) {
-    //     try {
+    @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
+    public ResponseEntity<?> getDuLie(
+            @PathVariable("cinemaComplexId") Long CinemaComplexId,
+             @PathVariable("date") LocalDate date) {
+        try {
+            if (CinemaComplexId.equals("") ) {
+                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            }
+            if (date == null || date.equals("")) {
+                date = LocalDate.now();
+            }
+            CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
+            if (cinemaComplex != null) {
+                List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex,date);
+                return ResponseEntity.ok(movie);
+            }
+            return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-
-    //         if (CinemaComplexId.equals("") ) {
-    //             return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-    //         }
-
-    //         CinemaComplex cinemaComplex = daoComplexDao.findById(CinemaComplexId).get();
-    //         if (cinemaComplex != null) {
-    //             List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex);
-    //             return ResponseEntity.ok(movie);
-    //         }
-    //         return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-    //     } catch (Exception e) {
-    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-
-    // }
+    }
 }
