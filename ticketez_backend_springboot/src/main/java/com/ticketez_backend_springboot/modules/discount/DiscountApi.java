@@ -1,4 +1,4 @@
-package com.ticketez_backend_springboot.modules.cinemaChain;
+package com.ticketez_backend_springboot.modules.discount;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,20 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 
+
+
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/cinemaChain")
-public class CinemaChainAPI {
+@RequestMapping("/api/discount")
+public class DiscountApi {
+
     @Autowired
-    CinemaChainDao dao;
+    DiscountDao dao;
+
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CinemaChain>> findAll() {
-        List<CinemaChain> cinemaChains = dao.findAllByOrderByIdDesc();
-        return ResponseEntity.ok(cinemaChains);
+    public ResponseEntity<List<Discount>> findAll() {
+        List<Discount> discounts = dao.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(discounts);
     }
 
-    
         @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
@@ -42,8 +46,8 @@ public class CinemaChainAPI {
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<CinemaChain> page = dao.findAll(pageable);
-            ResponseDTO<CinemaChain> responseDTO = new ResponseDTO<>();
+            Page<Discount> page = dao.findAll(pageable);
+            ResponseDTO<Discount> responseDTO = new ResponseDTO<>();
             responseDTO.setData(page.getContent());
             responseDTO.setTotalItems(page.getTotalElements());
             responseDTO.setTotalPages(page.getTotalPages());
@@ -52,5 +56,6 @@ public class CinemaChainAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }
