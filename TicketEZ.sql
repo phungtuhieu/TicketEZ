@@ -123,7 +123,7 @@ GO
     )
 GO
     CREATE TABLE Formats_Movies (
-        id BIGINT NOT NULL,
+        id BIGINT IDENTITY(1, 1) NOT NULL,
         movie_id BIGINT NOT NULL,
         format_id BIGINT NOT NULL
     )
@@ -1370,12 +1370,12 @@ VALUES ('2D', N'Phim 2D thường được chiếu trên màn hình phẳng.'),
 GO
 
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
-INSERT INTO Formats_Movies (id, movie_id, format_id)
+INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    (1, 1, 1),
-    (2, 1, 2),
-    (3, 2, 1),
-    (4, 2, 2);
+    ( 1, 1),
+    ( 1, 2),
+    ( 2, 1),
+    ( 2, 2);
 
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
