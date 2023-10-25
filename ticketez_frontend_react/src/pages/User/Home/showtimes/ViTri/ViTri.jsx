@@ -7,8 +7,8 @@ import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid
 import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
-import { provinceApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
+import { provinceUserApi } from '~/api/user/showtime/writeApi';
 
 const cx = classNames.bind(style);
 
@@ -19,24 +19,27 @@ function ViTri() {
         id: 2,
         name: 'Hồ Chí Minh',
     });
+    const [searchName, setSearchName] = useState('');
     const [dataProvinces, setDataProvinces] = useState([]);
 
     useEffect(() => {
         const getProvince = async () => {
-           try {
-            const res = await provinceApi.get();
-            // console.log(res.data);
-            setDataProvinces(res.data);
-           } catch (error) {
-            funcUtils.notify(error.response.data, "error");
-           }
+            try {
+                const res = await provinceUserApi.getAllProvinceByName(searchName);
+                // console.log(res);
+                setDataProvinces(res);
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         };
         getProvince();
-    }, []);
+    }, [searchName]);
     // console.log(dataProvinces);
+    console.log(searchName);
 
     const showModal = () => {
         setIsModalOpen(true);
+        setSearchName('');
     };
 
     const handleOk = () => {
@@ -96,6 +99,8 @@ function ViTri() {
                                     className={cx('modal-header-col1-inputSearch')}
                                     suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                                     placeholder="Tìm địa điểm ..."
+                                    onChange={(e) => setSearchName(e.target.value)}
+                                    value={searchName}
                                 />
                             </Col>
                             <Col span={24} className={cx('modal-header-col2')}>

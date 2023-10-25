@@ -67,8 +67,6 @@
     position: relative;
     width: 768px !important;
     margin-top: -30px !important;
-
-
 }
 
 .icon-close {
@@ -141,7 +139,7 @@
     .modal-header-col2 {
         width: 100%;
         display: flex;
-        max-height: 430px;
+        height: 430px;
         flex-wrap: wrap;
         gap: 10px;
         margin-top: 20px;

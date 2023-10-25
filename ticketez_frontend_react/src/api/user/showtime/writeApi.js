@@ -30,7 +30,9 @@ export const movieUserApi = {
     getMovieByCinemaComplex: async (cinemaComplexId, date) => {
         try {
             if (cinemaComplexId ?? cinemaComplexId) {
-                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId + "/"+date);
+                const result = await axiosClient.get(
+                    urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId + '/' + date,
+                );
                 return result.data;
             }
             return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
@@ -102,17 +104,36 @@ export const formatUserApi = {
 };
 
 const urlCinema = 'cinema';
-export const cinemaUserApi = {
-    
-};
+export const cinemaUserApi = {};
 
 const urlShowtime = 'showtime';
 export const showtimeUserApi = {
     getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (ccxId, movieId, formatId, date) => {
         try {
             const result = await axiosClient.get(
-                urlShowtime + '/get/showtime-by-ccx-movie-format-date/' + ccxId + '/' + movieId + '/' + formatId + '/' + date,
+                urlShowtime +
+                    '/get/showtime-by-ccx-movie-format-date/' +
+                    ccxId +
+                    '/' +
+                    movieId +
+                    '/' +
+                    formatId +
+                    '/' +
+                    date,
             );
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
+
+const urlProvince = 'province';
+export const provinceUserApi = {
+    getAllProvinceByName: async (name) => {
+        const params = { name };
+        try {
+            const result = await axiosClient.get(urlProvince + '/get/province-by-name', { params });
             return result.data;
         } catch (error) {
             return error;
