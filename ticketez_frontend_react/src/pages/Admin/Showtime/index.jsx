@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useRef, useState, useEffect } from 'react';
 import {
     Button,
@@ -23,16 +24,20 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Showtime.module.scss';
 import moment from 'moment';
-import { showtimeApi, cinemaApi, movieApi } from '~/api/admin';
+import { showtimeApi, cinemaApi, movieApi, cinemaComplexApi, formatApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
+import { cinemaUserApi } from '~/api/user/showtime';
+import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-dayjs.extend(customParseFormat);
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+
 
 const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
-
+const { Option } = Select;
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
@@ -52,6 +57,8 @@ const AdminShowtime = () => {
     //lưu dữ liệu Movie, Cinema
     const [selectMovie, setSelectMovie] = useState();
     const [selectCinema, setSelectCinema] = useState();
+    const [selectCinemaComplex, setSelectCinemaComplex] = useState();
+    const [selectFormatMovie, setSelectFormatMovie] = useState();
     //set dữ liệu khi người dùng chọn
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
@@ -86,13 +93,18 @@ const AdminShowtime = () => {
     //load dữ liệu của selectAPi từ Cinema và Movie
     useEffect(() => {
         const selectMovie = async () => {
-            const [movie, cinema] = await Promise.all([movieApi.getAll(), cinemaApi.get()]);
-            console.log('movie', movie);
-            console.log('cinema', cinema);
+            const [movie, cinema, cinemaComplex, formatMovie] = await Promise.all([
+                movieApi.getAll(),
+                cinemaApi.get(),
+                cinemaComplexApi.getAll(),
+                formatMovieApi.getDistinctMovieIds(),
+            ]);
             setSelectMovie(movie.data);
             setSelectCinema(cinema.data.data);
+            setSelectCinemaComplex(cinemaComplex.data);
+            setSelectFormatMovie(formatMovie.data);
+            console.log(formatMovie.data);
         };
-
         selectMovie();
     }, []);
 
@@ -103,9 +115,13 @@ const AdminShowtime = () => {
         setSearchedColumn(dataIndex);
     };
 
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText('');
+    const handleReset = () => {
+        form.resetFields();
+        setSelectedOption1(null);
+        setSelectedOption2(null);
+        setSelectedOption3(null);
+        setSelectedOption4(null);
+        setSelectedOption5(null);
     };
 
     const getColumnSearchProps = (dataIndex) => ({
@@ -195,11 +211,13 @@ const AdminShowtime = () => {
             dataIndex: 'id',
             width: '10%',
             defaultSortOrder: 'sorting',
+            align: 'center',
             sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Giờ bắt đầu',
             dataIndex: 'startTime',
+            align: 'center',
             render: (startTime) => {
                 return startTime ? moment(startTime).format('DD-MM-YYYY HH:mm:ss') : '';
             },
@@ -207,6 +225,7 @@ const AdminShowtime = () => {
         {
             title: 'Giờ kết thúc',
             dataIndex: 'endTime',
+            align: 'center',
             render: (endTime) => {
                 return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
             },
@@ -214,29 +233,41 @@ const AdminShowtime = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'status',
+            key: 'status',
+            align: 'center',
             render: (_, record) => {
-                const statusText = record.status === 1 ? 'Hoạt động' : 'Kết thúc';
-                const tagColor = record.status === 1 ? 'green' : 'red';
+                const statusText =
+                    record.status === 1 ? 'Công chiếu' : record.status === 0 ? 'Sắp chiếu' : 'Kết thúc chiếu';
+                const tagColor = record.status === 1 ? 'green' : record.status === 0 ? 'blue' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
-            onFilter: (value, record) => record.status.toString().indexOf(value) === 0, // Assuming 'value' is a string like 'true' or 'false'
             filters: [
-                { text: 'Hoạt động', value: 1 },
-                { text: 'Kết thúc', value: 0 },
+                { text: 'Công chiếu', value: 1 },
+                { text: 'Sắp chiếu', value: 0 },
+                { text: 'Kết thúc chiếu', value: 2 },
             ],
+            onFilter: (value, record) => record.status === value,
             filterMultiple: false,
         },
 
         {
-            title: 'Tiêu đề phim',
-            dataIndex: 'movie',
-            render: (movie) => (movie ? movie.title : ''),
-        },
-        {
             title: 'Tên rạp chiếu',
             dataIndex: 'cinema',
+            align: 'center',
             render: (cinema) => (cinema ? cinema.name : ''),
+        },
+        {
+            title: 'Định dạng phim',
+            dataIndex: 'formatMovie',
+            align: 'center',
+            render: (formatMovie) => (formatMovie ? formatMovie.format.name : ''),
+        },
+        {
+            title: 'Sơ đồ ghế',
+            dataIndex: 'seatChart',
+            align: 'center',
+            render: (seatChart) => (seatChart ? seatChart.name : ''),
         },
         {
             title: 'Action',
@@ -269,7 +300,11 @@ const AdminShowtime = () => {
         setEditData(null);
         setOpen(true);
         setResetForm(true);
-
+        setSelectedOption1(null);
+        setSelectedOption2(null);
+        setSelectedOption3(null);
+        setSelectedOption4(null);
+        setSelectedOption5(null);
         form.setFieldsValue({
             'range-time-picker': [],
         });
@@ -292,24 +327,31 @@ const AdminShowtime = () => {
         setWorkSomeThing(!workSomeThing);
     };
 
-    const handleEditData = (record) => {
-        const formattedStartTime = dayjs(record.startTime, 'YYYY-MM-DD HH:mm:ss');
-        const formattedEndTime = dayjs(record.endTime, 'YYYY-MM-DD HH:mm:ss');
+  const handleEditData = (record) => {
+      dayjs.locale('vi');
 
-        form.setFieldsValue({
-            status: record.status === 1,
-            movie: record.movie?.id,
-            cinema: record.cinema?.id,
-            'range-time-picker': [formattedStartTime, formattedEndTime],
-        });
+      const formattedStartTime = dayjs(record.startTime);
+      const formattedEndTime = dayjs(record.endTime);
 
-        setDataStartTime(formattedStartTime);
-        setDataEndTime(formattedEndTime);
-        setStatusValue(record.status);
-        setOpen(true);
-        setResetForm(false);
-        setEditData(record);
-    };
+      form.setFieldsValue({
+          status: record.status === 1,
+          movie: record.movie?.id,
+          cinema: record.cinema?.id,
+          'range-time-picker': [formattedStartTime, formattedEndTime],
+      });
+
+      setSelectedOption1(record.cinemaComplex ? record.cinemaComplex.id : null);
+      setSelectedOption2(record.movie ? record.movie.id : null);
+      setSelectedOption3(record.formatMovie ? record.formatMovie.id : null);
+      setSelectedOption4(record.cinema ? record.cinema.id : null);
+      setSelectedOption5(record.seatChart ? record.seatChart.id : null);
+      setDataStartTime(formattedStartTime);
+      setDataEndTime(formattedEndTime);
+      setStatusValue(record.status);
+      setOpen(true);
+      setResetForm(false);
+      setEditData(record);
+  };
 
     const handleOk = async () => {
         setLoading(true);
@@ -360,7 +402,7 @@ const AdminShowtime = () => {
             {
                 type: 'array',
                 required: true,
-                message: 'Please select time!',
+                message: 'Vui lòng chọn ngày và giờ',
             },
         ],
     };
@@ -377,6 +419,12 @@ const AdminShowtime = () => {
             setDataEndTime(dates[1]);
         }
     };
+
+    const [selectedOption1, setSelectedOption1] = useState(null);
+    const [selectedOption2, setSelectedOption2] = useState(null);
+    const [selectedOption3, setSelectedOption3] = useState(null);
+    const [selectedOption4, setSelectedOption4] = useState(null);
+    const [selectedOption5, setSelectedOption5] = useState(null);
 
     return (
         <div>
@@ -403,7 +451,7 @@ const AdminShowtime = () => {
                             <Button
                                 key="reset"
                                 onClick={() => {
-                                    form.resetFields();
+                                    handleReset();
                                 }}
                             >
                                 Làm mới
@@ -415,61 +463,161 @@ const AdminShowtime = () => {
                     ]}
                 >
                     <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
-                        <Form.Item label="Trạng thái" name="status">
-                            <Switch
-                                checked={statusValue === 1}
-                                onChange={(checked) => setStatusValue(checked ? 1 : 0)}
-                                checkedChildren={'Đang hoạt động'}
-                                unCheckedChildren={'Kết Thúc'}
-                                defaultChecked
-                            />
-                        </Form.Item>
-                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
-                            <RangePicker
-                                showTime
-                                format="DD-MM-YYYY HH:mm:ss"
-                                value={[dataStartTime, dataEndTime]}
-                                onChange={onChangeDate}
-                            />
-                        </Form.Item>
-
+                        {/* Select Cụm rạp */}
                         <Form.Item
                             {...formItemLayout}
-                            name="movie"
-                            label="Chọn phim"
-                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                            name="cinemaComplex"
+                            label="Chọn cụm rạp"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn cụm rạp' }]}
                         >
                             <Select
                                 style={{ width: '100%' }}
                                 showSearch
-                                placeholder="Chọn loại"
+                                placeholder="Tìm kiếm hoặc chọn cụm rạp"
+                                optionFilterProp="children"
+                                optionLabelProp="label"
+                                value={selectedOption1}
+                                onChange={(value) => setSelectedOption1(value)}
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                            >
+                                {selectCinemaComplex && selectCinemaComplex.length > 0
+                                    ? selectCinemaComplex.map((cinemaComplex) => (
+                                          <Option
+                                              key={cinemaComplex.id}
+                                              value={cinemaComplex.id}
+                                              label={cinemaComplex.name}
+                                          >
+                                              <Space>
+                                                  <span role="img" aria-label="China" className={cx('border-img')}>
+                                                      <img
+                                                          className={cx('img')}
+                                                          src={`http://localhost:8081/api/upload/${cinemaComplex.cinemaChain.image}`}
+                                                      />
+                                                  </span>
+                                                  {cinemaComplex.name}
+                                              </Space>
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="movie"
+                            label="Chọn rạp"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn rạp' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                value={selectedOption2}
+                                onChange={(value) => setSelectedOption2(value)}
+                                disabled={!selectedOption1}
+                                placeholder="Tìm kiếm hoặc chọn rạp"
                                 optionFilterProp="children"
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
-                                options={selectMovie?.map((movie) => ({
-                                    value: movie.id,
-                                    label: movie.title,
-                                }))}
-                            />
+                            >
+                                {selectCinema && selectCinema.length > 0
+                                    ? selectCinema.map((cinema) => (
+                                          <Option key={cinema.id} value={cinema.id}>
+                                              {cinema.name}
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="format"
+                            label="Chọn phim"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phân loại phim' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                value={selectedOption3}
+                                onChange={(value) => setSelectedOption3(value)}
+                                disabled={!selectedOption2}
+                                showSearch
+                                placeholder="Tìm kiếm hoặc chọn phân loại phim"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                            >
+                                {selectFormatMovie && selectFormatMovie.length > 0
+                                    ? selectFormatMovie.map((formatMovie) => (
+                                          <Option key={formatMovie.id} value={formatMovie.id}>
+                                              {formatMovie.title}
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="cinema"
-                            label="Chọn rạp"
-                            rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
+                            label="Chọn phụ đề"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phụ đề' }]}
                         >
                             <Select
+                                value={selectedOption4}
+                                onChange={(value) => setSelectedOption4(value)}
+                                disabled={!selectedOption3}
                                 showSearch
-                                placeholder="Chọn loại"
+                                placeholder="Tìm kiếm hoặc chọn phụ đề"
                                 optionFilterProp="children"
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
-                                options={selectCinema?.map((cinema) => ({
-                                    value: cinema.id,
-                                    label: cinema.name,
-                                }))}
+                            >
+                                {' '}
+                                {selectMovie && selectMovie.length > 0
+                                    ? selectMovie.map((movie) => (
+                                          <Option key={movie.id} value={movie.id}>
+                                              {movie.title}
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="cinema"
+                            label="Chọn sơ đồ"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn sơ đồ' }]}
+                        >
+                            <Select
+                                value={selectedOption5}
+                                onChange={(value) => setSelectedOption5(value)}
+                                disabled={!selectedOption4}
+                                showSearch
+                                placeholder="Tìm kiếm hoặc chọn sơ đồ"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                            >
+                                {selectCinema && selectCinema.length > 0
+                                    ? selectCinema.map((cinema) => (
+                                          <Option key={cinema.id} value={cinema.id}>
+                                              {cinema.name}
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
+                        </Form.Item>
+
+                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
+                            <RangePicker
+                                disabled={!selectedOption5}
+                                showTime
+                                format="DD-MM-YYYY HH:mm:ss"
+                                value={[dataStartTime, dataEndTime]}
+                                onChange={onChangeDate}
                             />
                         </Form.Item>
                     </Form>
@@ -477,7 +625,9 @@ const AdminShowtime = () => {
             </Row>
             <BaseTable
                 pagination={false}
+                loading={loading}
                 columns={columns}
+                className={cx('table-cell-center')}
                 onClick={() => {
                     handleDelete();
                 }}

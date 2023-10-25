@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.modules.movie.Movie;
+
 
 @CrossOrigin("*")
 @RestController
@@ -22,6 +24,12 @@ public class FormatMovieAPI {
     public ResponseEntity<?> getAll() {
         List<FormatMovie> genreMovie = dao.findAll();
         return  ResponseEntity.ok(genreMovie);
+    }
+
+    @GetMapping("/getDistinctFormatMovie")
+    public ResponseEntity<?> getDistinctFormatMovie() {
+        List<Movie> distinctMovieIds = dao.getDistinctFormats();
+        return ResponseEntity.ok(distinctMovieIds);
     }
     
 }

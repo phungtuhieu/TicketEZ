@@ -8,6 +8,10 @@ const cinemaComplexApi = {
     getId: async (cinemaComplexId) => {
         return axiosClient.get(url + '/' + cinemaComplexId);
     },
+
+    getAll: async () => {
+        return axiosClient.get(url + '/getAll');
+    },
     getPage: async (page, limit) => {
         const params = {
             page: page,
@@ -17,9 +21,6 @@ const cinemaComplexApi = {
         return res.data;
     },
 
-    get: async () => {
-        return axiosClient.get(url);
-    },
     post: async (data, provinceId, cinemaChainId) => {
         const [province, cinemaChain] = await Promise.all([
             provinceApi.getId(provinceId),

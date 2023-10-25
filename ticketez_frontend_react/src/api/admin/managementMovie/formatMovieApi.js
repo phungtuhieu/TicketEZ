@@ -1,13 +1,16 @@
 import axiosClient from '../../global/axiosClient';
 
-const url = 'format';
+const url = 'formatMovie';
 
-const formatApi = {
+const formatMovieApi = {
     getId: async (formatId) => {
         return axiosClient.get(url + '/' + formatId);
     },
     get: async () => {
         return axiosClient.get(url);
+    },
+    getDistinctMovieIds: async () => {
+        return axiosClient.get(url + '/getDistinctFormatMovie');
     },
     post: async (data) => {
         return axiosClient.post(url, data);
@@ -20,4 +23,4 @@ const formatApi = {
     },
 };
 
-export default formatApi;
+export default formatMovieApi;
