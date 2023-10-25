@@ -116,19 +116,26 @@ export const cinemaUserApi = {
 
 const urlShowtime = 'showtime';
 export const showtimeUserApi = {
-    getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (ccxId, movieId, formatId, date) => {
+    getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (cinemaComplexId, movieId, formatId, date) => {
+        const params = {
+            cinemaComplexId,
+            movieId,
+            formatId,
+            date,
+        };
         try {
-            const result = await axiosClient.get(
-                urlShowtime +
-                    '/get/showtime-by-ccx-movie-format-date/' +
-                    ccxId +
-                    '/' +
-                    movieId +
-                    '/' +
-                    formatId +
-                    '/' +
-                    date,
-            );
+            // const result = await axiosClient.get(
+            //     urlShowtime +
+            //         '/get/showtime-by-ccx-movie-format-date/' +
+            //         cinemaComplexId +
+            //         '/' +
+            //         movieId +
+            //         '/' +
+            //         formatId +
+            //         '/' +
+            //         date,
+            // );
+            const result = await axiosClient.get(urlShowtime + '/get/showtime-by-ccx-movie-format-date', { params });
             return result.data;
         } catch (error) {
             return error;

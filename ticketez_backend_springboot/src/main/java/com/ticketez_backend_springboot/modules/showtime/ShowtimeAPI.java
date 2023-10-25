@@ -111,26 +111,24 @@ public class ShowtimeAPI {
 
     //
 
-    @GetMapping("/get/showtime-by-ccx-movie-format-date/{cinemaComplexId}/{movieId}/{formatId}/{date}")
+    // @GetMapping("/get/showtime-by-ccx-movie-format-date/{cinemaComplexId}/{movieId}/{formatId}/{date}")
+    @GetMapping("/get/showtime-by-ccx-movie-format-date")
     public ResponseEntity<?> getDuLie(
-            @PathVariable("cinemaComplexId") Long CinemaComplexId,
-            @PathVariable("movieId") Long movieId,
-            @PathVariable("formatId") Long formatId,
-            @PathVariable("date") LocalDate date) {
+            @RequestParam("cinemaComplexId") Long CinemaComplexId,
+            @RequestParam("movieId") Long movieId,
+            @RequestParam("formatId") Long formatId,
+            @RequestParam("date") Optional<LocalDate> date) {
         try {
             if (CinemaComplexId.equals("") && movieId.equals("") && formatId.equals("")) {
                 return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-            }
-            if (date == null || date.equals("")) {
-                date = LocalDate.now();
             }
             CinemaComplex cinemaComplex = cinemaComplexDAO.findById(CinemaComplexId).get();
             Movie movie = movieDAO.findById(movieId).get();
             Format format = formatDAO.findById(formatId).get();
             if (cinemaComplex != null && movie != null && format != null) {
-                List<Showtime> showtimes = showtimeDAO.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
-                        movie, format, date);
-                return ResponseEntity.ok(showtimes);
+                List<Showtime> showTimes = showtimeDAO.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
+                        movie, format, date.orElse(LocalDate.now()));
+                return ResponseEntity.ok(showTimes);
             }
             return null;
         } catch (Exception e) {
