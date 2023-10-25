@@ -27,10 +27,12 @@ export const cinemaComplexUserApi = {
 
 const urlMovie = 'movie';
 export const movieUserApi = {
-    getMovieByCinemaComplex: async (cinemaComplexId) => {
+    getMovieByCinemaComplex: async (cinemaComplexId, date) => {
         try {
             if (cinemaComplexId ?? cinemaComplexId) {
-                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId);
+                const result = await axiosClient.get(
+                    urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId + '/' + date,
+                );
                 return result.data;
             }
             return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
@@ -40,7 +42,6 @@ export const movieUserApi = {
         }
     },
 };
-
 // ****************************************************************
 
 // const urlGenreMovie = 'genreMovie';
@@ -103,9 +104,44 @@ export const formatUserApi = {
 
 const urlCinema = 'cinema';
 export const cinemaUserApi = {
-    getCinemaByCinemaComplex: async (movie) => {
+    getCinemaByCinemaComplex: async (cinemaComplexId) => {
         try {
-            const result = await axiosClient.post(urlCinema + '/get/cinema-by-cinemaComplex', movie);
+            const result = await axiosClient.get(urlCinema + '/get/cinema-by-cinemaComplex/' + cinemaComplexId);
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
+
+const urlShowtime = 'showtime';
+export const showtimeUserApi = {
+    getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (ccxId, movieId, formatId, date) => {
+        try {
+            const result = await axiosClient.get(
+                urlShowtime +
+                    '/get/showtime-by-ccx-movie-format-date/' +
+                    ccxId +
+                    '/' +
+                    movieId +
+                    '/' +
+                    formatId +
+                    '/' +
+                    date,
+            );
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
+
+const urlProvince = 'province';
+export const provinceUserApi = {
+    getAllProvinceByName: async (name) => {
+        const params = { name };
+        try {
+            const result = await axiosClient.get(urlProvince + '/get/province-by-name', { params });
             return result.data;
         } catch (error) {
             return error;

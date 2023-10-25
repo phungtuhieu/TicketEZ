@@ -10,6 +10,8 @@ import style from './CumRap.module.scss';
 import ListPhim from '../ListPhim/ListPhim';
 import funcUtils from '~/utils/funcUtils';
 import { cinemaComplexUserApi, cinemaUserApi } from '~/api/user/showtime';
+import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
+import { LoadingOutlined } from '@ant-design/icons';
 
 const cx = classNames.bind(style);
 
@@ -20,15 +22,19 @@ const CumRap = ({ NameAndProvince }) => {
     const [list, setList] = useState([]);
 
     const [cinemaComplex, setCinemaComplex] = useState(null);
-    const [cinema, setCinema] = useState([0]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (list.length > 0) {
             setCinemaComplex(list[0]);
+        } else {
+            setCinemaComplex(null);
         }
     }, [list]);
 
     useEffect(() => {
+        setLoading(true);
+
         const getCinemaComplexByNameAndProvince = async () => {
             try {
                 const res = await cinemaComplexUserApi.getByResultsProvinceIdAndCinemaChainNameAndSearchName(
@@ -37,36 +43,21 @@ const CumRap = ({ NameAndProvince }) => {
                     NameAndProvince.cinemaChainName,
                     search,
                 );
-                setInitLoading(false);
                 setList(res.data);
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
+            } finally {
+                setLoading(false);
+                setInitLoading(false);
             }
         };
 
         getCinemaComplexByNameAndProvince();
     }, [NameAndProvince, search]);
 
-    useEffect(() => {
-        try {
-            if (cinemaComplex ?? cinemaComplex) {
-                const getCinemaByCinemaComplex = async () => {
-                    const resCinema = await cinemaUserApi.getCinemaByCinemaComplex(cinemaComplex);
-                    setCinema(resCinema);
-                    // console.log('cinema,', resCinema);
-                };
-                getCinemaByCinemaComplex();
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }, [cinemaComplex]);
-
     const handleCinemaComplex = (data) => {
         setCinemaComplex(data);
     };
-  
-
 
     return (
         <>
@@ -80,6 +71,11 @@ const CumRap = ({ NameAndProvince }) => {
                 }}
             >
                 <div className={cx('khung')}>
+                    {loading && (
+                        <div className={cx('loading')}>
+                            <LoadingOutlined className={cx('imgL')} />
+                        </div>
+                    )}
                     <Row>
                         <Col span={24} style={{ padding: 10 }}>
                             <Input
@@ -128,6 +124,12 @@ const CumRap = ({ NameAndProvince }) => {
                                     </List.Item>
                                 )}
                             />
+                            {list.length === 0 && (
+                                <NotFountShowtime
+                                    titleFirst={'Không tìm thấy cụm rạp nào.'}
+                                    titleLast={'Bạn hãy thử lại với phim khác hoặc rạp khác nha!'}
+                                />
+                            )}
                         </Col>
                     </Row>
                 </div>
@@ -141,7 +143,7 @@ const CumRap = ({ NameAndProvince }) => {
                     borderTop: '1px solid #e5e5e5',
                 }}
             >
-                <ListPhim cinemaComplex={cinemaComplex} cinema={cinema[0]} />
+                <ListPhim cinemaComplex={cinemaComplex} />
             </Col>
         </>
     );

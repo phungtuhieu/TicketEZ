@@ -1,6 +1,7 @@
 package com.ticketez_backend_springboot.modules.province;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin("*")
@@ -53,5 +55,12 @@ public class ProvinceAPI {
     public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
         provinceDao.deleteById(id);
         return ResponseEntity.ok(true);
+    }
+    // 
+    @GetMapping("/get/province-by-name")
+    public ResponseEntity<List<Province>> findAllByNameLike( @RequestParam("name") Optional<String> name) {
+
+        return ResponseEntity.ok(provinceDao.findAllByNameLike(name.orElse("")));
+
     }
 }
