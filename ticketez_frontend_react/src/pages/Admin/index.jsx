@@ -9,6 +9,7 @@ export { default as AdminProvince } from './Province';
 export { default as AdminShowtime } from './Showtime';
 export { default as AdminSeat } from './Seat';
 export { default as AdminSeatType } from './SeatType';
+export { default as AdminSeatChart } from './SeatChart';
 export { default as AdminCombo } from './Combo';
 export { default as AdminDiscount } from './Discount';
 export { default as AdminMovieStudio } from './MovieStudio';

@@ -22,8 +22,6 @@ const radioStyl = {
 
 function SeatChart(props) {
     const { rows, columns, nameSeat, idSeatChart } = props;
- 
-
 
     const createSeatArray = () => {
         let seatRows = rows; // Số hàng
@@ -33,6 +31,7 @@ function SeatChart(props) {
         console.log(nameSeat);
         const seatState = {
             seat: [],
+            way: listWay,
             seatAvailable: [],
             seatReserved: [],
             vipSeat: listSeatVip,
@@ -67,12 +66,14 @@ function SeatChart(props) {
     const [reload, setReload] = useState(false);
     const [listSeatNormal, setListSeatNormal] = useState([]);
     const [listSeatVip, setListSeatVip] = useState([]);
+    const [listWay, setListWay] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat'); // Mặc định ban đầu là 'normal-seat'
 
     const fetchDataSeat = async () => {
+        console.log(idSeatChart);
         try {
             const respAll = await axiosClient.get(`seat/by-seatchart/${idSeatChart}`);
             setAllSeats(respAll.data);
@@ -98,6 +99,18 @@ function SeatChart(props) {
                 return prevState;
             });
 
+            const respWay = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${7}`);
+            const newWay = respWay.data.map((seat) => seat.name);
+            setListWay((prevState) => {
+                for (const newSeat of newWay) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
+            });
+
+            console.log(listWay);
             console.log(listSeatNormal);
             console.log(listSeatVip);
 
@@ -135,9 +148,9 @@ function SeatChart(props) {
             return allSeat;
         });
         console.log(updatedSeat);
-      
-        const flattenedArray = [].concat(...updatedSeat); 
-         console.log(flattenedArray);
+
+        const flattenedArray = [].concat(...updatedSeat);
+        console.log(flattenedArray);
 
         handelUpdate(flattenedArray);
         setShowInfo('success');
@@ -155,7 +168,6 @@ function SeatChart(props) {
         //         setShowInfo(''); // Đặt lại showInfo sau một khoảng thời gian
         //     }, 1000);
         // }
-        
     };
     const [showInfo, setShowInfo] = useState('');
     useEffect(() => {
@@ -253,7 +265,9 @@ function SeatChart(props) {
                                                     {seatState.seat[rowIndex].map((seat_no) => {
                                                         const seatClassName = `
                                                 ${
-                                                    seatState.seatUnavailable.indexOf(seat_no) > -1
+                                                    seatState.way.indexOf(seat_no) > -1
+                                                        ? 'way'
+                                                        : seatState.seatUnavailable.indexOf(seat_no) > -1
                                                         ? 'unavailable'
                                                         : seatState.normalSeat.indexOf(seat_no) > -1
                                                         ? 'normal-seat'

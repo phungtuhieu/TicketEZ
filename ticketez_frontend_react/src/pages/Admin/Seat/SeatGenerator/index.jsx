@@ -120,7 +120,7 @@ export default function SeatGenerator() {
             );
             const flattenedArray = [].concat(...dataArray);
 
-             const resp = await axiosClient.post(`seat`, flattenedArray);
+            const resp = await axiosClient.post(`seat`, flattenedArray);
         } catch (error) {
             console.error(error);
         }
