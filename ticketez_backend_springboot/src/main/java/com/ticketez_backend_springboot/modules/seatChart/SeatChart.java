@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.seatChart;
 
+import java.util.BitSet;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

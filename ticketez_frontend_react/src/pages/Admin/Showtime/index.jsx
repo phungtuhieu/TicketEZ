@@ -24,15 +24,15 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Showtime.module.scss';
 import moment from 'moment';
-import { showtimeApi, cinemaApi, movieApi, cinemaComplexApi, formatApi } from '~/api/admin';
+import { showtimeApi, cinemaApi, movieApi, cinemaComplexApi, formatApi, seatChart } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import seatChartApi from '~/api/admin/managementSeat/seatChart';
 
 dayjs.extend(utc);
-
 
 const { RangePicker } = DatePicker;
 
@@ -54,20 +54,32 @@ const AdminShowtime = () => {
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [posts, setPosts] = useState([]);
+
     //lưu dữ liệu Movie, Cinema
-    const [selectMovie, setSelectMovie] = useState();
     const [selectCinema, setSelectCinema] = useState();
     const [selectCinemaComplex, setSelectCinemaComplex] = useState();
-    const [selectFormatMovie, setSelectFormatMovie] = useState();
+    const [selectMovie, setSelectMovie] = useState();
+    const [selectFormat, setSelectFormat] = useState();
+
     //set dữ liệu khi người dùng chọn
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
-    const [statusValue, setStatusValue] = useState(1);
+    const [valueSelectCinemaComplex, setValueSelectCinemaComplex] = useState(null);
+    const [dataCinemaToComplex, setDataCinemaToComplex] = useState(null);
+    const [selectSeatChart, setSelectSeatChart] = useState(null);
+
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomeThing, setWorkSomeThing] = useState(false);
+
+    //set disable theo thứ tự khi thêm
+    const [selectedOption1, setSelectedOption1] = useState(null);
+    const [selectedOption2, setSelectedOption2] = useState(null);
+    const [selectedOption3, setSelectedOption3] = useState(null);
+    const [selectedOption4, setSelectedOption4] = useState(null);
+    const [selectedOption5, setSelectedOption5] = useState(null);
 
     //load dữ liệu và phân trang
     useEffect(() => {
@@ -75,7 +87,6 @@ const AdminShowtime = () => {
             setLoading(true);
             try {
                 const res = await showtimeApi.getShowtime(currentPage, pageSize);
-                console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -93,20 +104,41 @@ const AdminShowtime = () => {
     //load dữ liệu của selectAPi từ Cinema và Movie
     useEffect(() => {
         const selectMovie = async () => {
-            const [movie, cinema, cinemaComplex, formatMovie] = await Promise.all([
-                movieApi.getAll(),
+            const [cinema, cinemaComplex, format, movie, seatChart] = await Promise.all([
                 cinemaApi.get(),
                 cinemaComplexApi.getAll(),
+                formatMovieApi.getDistinctFormarIds(),
                 formatMovieApi.getDistinctMovieIds(),
+                seatChartApi.getStatusSeatChart(),
             ]);
             setSelectMovie(movie.data);
             setSelectCinema(cinema.data.data);
             setSelectCinemaComplex(cinemaComplex.data);
-            setSelectFormatMovie(formatMovie.data);
-            console.log(formatMovie.data);
+            setSelectMovie(movie.data);
+            setSelectFormat(format.data);
+            setSelectSeatChart(seatChart.data);
+            console.log('1111', format.data);
         };
         selectMovie();
     }, []);
+
+    //hiển thị dữ liệu của cinema theo cinemacomplex
+    useEffect(() => {
+        setLoading(true);
+        const getCinemaComplexByNameAndProvince = async () => {
+            try {
+                const res = await cinemaUserApi.getCinemaByCinemaComplex(valueSelectCinemaComplex);
+                setDataCinemaToComplex(res);
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
+        getCinemaComplexByNameAndProvince();
+    }, [valueSelectCinemaComplex]);
 
     // xử lý tìm kiếm
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -327,42 +359,41 @@ const AdminShowtime = () => {
         setWorkSomeThing(!workSomeThing);
     };
 
-  const handleEditData = (record) => {
-      dayjs.locale('vi');
+    const handleEditData = (record) => {
+        dayjs.locale('vi');
 
-      const formattedStartTime = dayjs(record.startTime);
-      const formattedEndTime = dayjs(record.endTime);
+        const formattedStartTime = dayjs(record.startTime);
+        const formattedEndTime = dayjs(record.endTime);
 
-      form.setFieldsValue({
-          status: record.status === 1,
-          movie: record.movie?.id,
-          cinema: record.cinema?.id,
-          'range-time-picker': [formattedStartTime, formattedEndTime],
-      });
+        form.setFieldsValue({
+            status: record.status === 1,
+            movie: record.movie?.id,
+            cinema: record.cinema?.id,
+            'range-time-picker': [formattedStartTime, formattedEndTime],
+        });
 
-      setSelectedOption1(record.cinemaComplex ? record.cinemaComplex.id : null);
-      setSelectedOption2(record.movie ? record.movie.id : null);
-      setSelectedOption3(record.formatMovie ? record.formatMovie.id : null);
-      setSelectedOption4(record.cinema ? record.cinema.id : null);
-      setSelectedOption5(record.seatChart ? record.seatChart.id : null);
-      setDataStartTime(formattedStartTime);
-      setDataEndTime(formattedEndTime);
-      setStatusValue(record.status);
-      setOpen(true);
-      setResetForm(false);
-      setEditData(record);
-  };
+        setSelectedOption1(record.cinemaComplex ? record.cinemaComplex.id : null);
+        setSelectedOption2(record.movie ? record.movie.id : null);
+        setSelectedOption3(record.formatMovie ? record.formatMovie.id : null);
+        setSelectedOption4(record.cinema ? record.cinema.id : null);
+        setSelectedOption5(record.seatChart ? record.seatChart.id : null);
+        setDataStartTime(formattedStartTime);
+        setDataEndTime(formattedEndTime)
+        setOpen(true);
+        setResetForm(false);
+        setEditData(record);
+    };
 
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values.movie);
+            console.log(values);
             values = {
                 ...values,
                 startTime: new Date(dataStartTime),
                 endTime: new Date(dataEndTime),
-                status: statusValue,
+                status: 1,
             };
             console.log(values);
             if (editData) {
@@ -374,7 +405,7 @@ const AdminShowtime = () => {
             if (!editData) {
                 try {
                     console.log(values);
-                    const resp = await showtimeApi.post(values, values.movie, values.cinema);
+                    const resp = await showtimeApi.post(values, values.cinema, values.formatMovie, values.seatChart);
                     if (resp.status === 200) {
                         funcUtils.notify('Thêm thành công', 'success');
                     }
@@ -420,11 +451,15 @@ const AdminShowtime = () => {
         }
     };
 
-    const [selectedOption1, setSelectedOption1] = useState(null);
-    const [selectedOption2, setSelectedOption2] = useState(null);
-    const [selectedOption3, setSelectedOption3] = useState(null);
-    const [selectedOption4, setSelectedOption4] = useState(null);
-    const [selectedOption5, setSelectedOption5] = useState(null);
+
+    const onChangSelectCinemaConplex = (value) => {
+        setValueSelectCinemaComplex(value);
+        setSelectedOption1(value);
+        setSelectedOption2(null);
+        form.setFieldsValue({
+            cinema: null,
+        });
+    };
 
     return (
         <div>
@@ -477,7 +512,7 @@ const AdminShowtime = () => {
                                 optionFilterProp="children"
                                 optionLabelProp="label"
                                 value={selectedOption1}
-                                onChange={(value) => setSelectedOption1(value)}
+                                onChange={(value) => onChangSelectCinemaConplex(value)}
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
@@ -505,7 +540,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="movie"
+                            name="cinema"
                             label="Chọn rạp"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn rạp' }]}
                         >
@@ -521,8 +556,8 @@ const AdminShowtime = () => {
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
                             >
-                                {selectCinema && selectCinema.length > 0
-                                    ? selectCinema.map((cinema) => (
+                                {dataCinemaToComplex && dataCinemaToComplex.length > 0
+                                    ? dataCinemaToComplex.map((cinema) => (
                                           <Option key={cinema.id} value={cinema.id}>
                                               {cinema.name}
                                           </Option>
@@ -532,7 +567,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="format"
+                            name="movie"
                             label="Chọn phim"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phân loại phim' }]}
                         >
@@ -548,8 +583,8 @@ const AdminShowtime = () => {
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
                             >
-                                {selectFormatMovie && selectFormatMovie.length > 0
-                                    ? selectFormatMovie.map((formatMovie) => (
+                                {selectMovie && selectMovie.length > 0
+                                    ? selectMovie.map((formatMovie) => (
                                           <Option key={formatMovie.id} value={formatMovie.id}>
                                               {formatMovie.title}
                                           </Option>
@@ -559,7 +594,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="cinema"
+                            name="formatMovie"
                             label="Chọn phụ đề"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phụ đề' }]}
                         >
@@ -575,10 +610,10 @@ const AdminShowtime = () => {
                                 }
                             >
                                 {' '}
-                                {selectMovie && selectMovie.length > 0
-                                    ? selectMovie.map((movie) => (
+                                {selectFormat && selectFormat.length > 0
+                                    ? selectFormat.map((movie) => (
                                           <Option key={movie.id} value={movie.id}>
-                                              {movie.title}
+                                              {movie.name}
                                           </Option>
                                       ))
                                     : null}
@@ -586,7 +621,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="cinema"
+                            name="seatChart"
                             label="Chọn sơ đồ"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn sơ đồ' }]}
                         >
@@ -601,8 +636,8 @@ const AdminShowtime = () => {
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
                             >
-                                {selectCinema && selectCinema.length > 0
-                                    ? selectCinema.map((cinema) => (
+                                {selectSeatChart && selectSeatChart.length > 0
+                                    ? selectSeatChart.map((cinema) => (
                                           <Option key={cinema.id} value={cinema.id}>
                                               {cinema.name}
                                           </Option>
