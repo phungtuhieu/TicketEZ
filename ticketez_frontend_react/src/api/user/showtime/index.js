@@ -4,5 +4,5 @@ export {
     formatUserApi,
     genreUserApi,
     cinemaUserApi,
-    showtimeUserApi
+    showtimeUserApi,
 } from './writeApi';

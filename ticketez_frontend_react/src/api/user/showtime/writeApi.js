@@ -42,7 +42,6 @@ export const movieUserApi = {
         }
     },
 };
-
 // ****************************************************************
 
 // const urlGenreMovie = 'genreMovie';
@@ -104,7 +103,16 @@ export const formatUserApi = {
 };
 
 const urlCinema = 'cinema';
-export const cinemaUserApi = {};
+export const cinemaUserApi = {
+    getCinemaByCinemaComplex: async (cinemaComplexId) => {
+        try {
+            const result = await axiosClient.get(urlCinema + '/get/cinema-by-cinemaComplex/' + cinemaComplexId);
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
+};
 
 const urlShowtime = 'showtime';
 export const showtimeUserApi = {
