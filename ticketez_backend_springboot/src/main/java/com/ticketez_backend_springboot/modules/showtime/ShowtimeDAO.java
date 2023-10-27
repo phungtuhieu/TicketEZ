@@ -12,19 +12,22 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ShowtimeDAO extends JpaRepository<Showtime, Long> {
-    @Query("SELECT s FROM Showtime s WHERE s.seatChart.id = :seatChartId")
-    List<Showtime> findShowtimesBySeatChartId(@Param("seatChartId") Long seatChartId);
 
-    @Query("SELECT st FROM Showtime st WHERE "
-            + "st.cinema.cinemaComplex = :cinemaComplex "
-            + "AND st.formatMovie.movie = :movie "
-            + "AND st.formatMovie.format = :format "
-            + "AND CAST(st.startTime AS DATE) = :date "
-            + "AND st.startTime >= CURRENT_TIMESTAMP "
-            + "ORDER BY st.startTime")
-    List<Showtime> getShowtimesByCCXAndMovieAndFormatAndDate(@Param("cinemaComplex") CinemaComplex cinemaComplex,
-            @Param("movie") Movie movie,
-            @Param("format") Format format,
-            @Param("date") LocalDate date);
-    //
+        List<Showtime> findAllByOrderByIdDesc();
+
+        @Query("SELECT s FROM Showtime s WHERE s.seatChart.id = :seatChartId")
+        List<Showtime> findShowtimesBySeatChartId(@Param("seatChartId") Long seatChartId);
+
+        @Query("SELECT st FROM Showtime st WHERE "
+                        + "st.cinema.cinemaComplex = :cinemaComplex "
+                        + "AND st.formatMovie.movie = :movie "
+                        + "AND st.formatMovie.format = :format "
+                        + "AND CAST(st.startTime AS DATE) = :date "
+                        + "AND st.startTime >= CURRENT_TIMESTAMP "
+                        + "ORDER BY st.startTime")
+        List<Showtime> getShowtimesByCCXAndMovieAndFormatAndDate(@Param("cinemaComplex") CinemaComplex cinemaComplex,
+                        @Param("movie") Movie movie,
+                        @Param("format") Format format,
+                        @Param("date") LocalDate date);
+        //
 }

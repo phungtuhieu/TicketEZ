@@ -68,6 +68,12 @@ public class ShowtimeAPI {
         }
     }
 
+    @GetMapping("/get/all")
+    public ResponseEntity<List<Showtime>> getfindAll() {
+        List<Showtime> showtime = showtimeDAO.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(showtime);
+    }
+
     // Lấy show time theo seatchart
 
     @GetMapping("get-showtime-by-seatchart/{id}")

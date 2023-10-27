@@ -12,6 +12,7 @@ const cinemaComplexApi = {
     getAll: async () => {
         return axiosClient.get(url + '/getAll');
     },
+
     getPage: async (page, limit) => {
         const params = {
             page: page,
@@ -25,9 +26,8 @@ const cinemaComplexApi = {
         const [province, cinemaChain] = await Promise.all([
             provinceApi.getId(provinceId),
             cinemaChainApi.getId(cinemaChainId),
-           
         ]);
-        const values = { ...data, province: province.data, cinemaChain: cinemaChain.data};
+        const values = { ...data, province: province.data, cinemaChain: cinemaChain.data };
         console.log('values', values);
         return axiosClient.post(url, values);
     },
@@ -36,11 +36,21 @@ const cinemaComplexApi = {
             provinceApi.getId(provinceId),
             cinemaChainApi.getId(cinemaChainId),
         ]);
-        const values = { id: id, ...data, province:  province.data, cinemaChain: cinemaChain.data};
+        const values = { id: id, ...data, province: province.data, cinemaChain: cinemaChain.data };
         return axiosClient.put(url + '/' + id, values);
     },
     delete: async (cinemaComplexId) => {
         return axiosClient.delete(url + '/' + cinemaComplexId);
+    },
+
+    //hiển thị số lượng cinema theo cinemacomplex
+    getTotalCinemaToCinemaComplex: async () => {
+        return axiosClient.get(url + '/getTotalCinemaToCinemaComplex');
+    },
+
+    //hiển thị số lượng cinema theo cinemacomplex
+    getComplexByProvince: async (id) => {
+        return axiosClient.get(url + '/get/cinemaComplex-by-province/'+ id);
     },
 };
 
