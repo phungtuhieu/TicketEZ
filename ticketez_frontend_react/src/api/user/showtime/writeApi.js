@@ -15,11 +15,15 @@ export const cinemaComplexUserApi = {
             cinemaChainName,
             searchNameCCX,
         };
-        const result = await axiosClient.get(
-            urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX',
-            { params },
-        );
-        return result.data;
+        try {
+            const result = await axiosClient.get(
+                urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX',
+                { params },
+            );
+            return result.data;
+        } catch (error) {
+            return error;
+        }
     },
 };
 

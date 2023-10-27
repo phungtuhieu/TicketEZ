@@ -26,8 +26,12 @@ function ViTri() {
         const getProvince = async () => {
             try {
                 const res = await provinceUserApi.getAllProvinceByName(searchName);
-                // console.log(res);
-                setDataProvinces(res);
+                if (res) {
+                    setDataProvinces(res);
+                } else {
+                    setDataProvinces([]);
+                    funcUtils.notify('Không nhận được dữ liệu từ API', 'error');
+                }
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
             }
@@ -35,7 +39,7 @@ function ViTri() {
         getProvince();
     }, [searchName]);
     // console.log(dataProvinces);
-    console.log(searchName);
+    // console.log(searchName);
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -104,25 +108,23 @@ function ViTri() {
                                 />
                             </Col>
                             <Col span={24} className={cx('modal-header-col2')}>
-                                {dataProvinces.map((province, index) => (
-                                    <Button
-                                        key={index}
-                                        type={province.id === provinces.id ? '' : 'text'}
-                                        // className={province.name === provinces ? 'btn btn-active' : 'btn btn-text'}
-                                        className={cx('btn', {
-                                            'btn-active': province.id === provinces.id,
-                                            'btn-text': province.id !== provinces.id,
-                                        })}
-                                        onClick={() => handleSetProvince(province)}
-                                    >
-                                        {province.name}
-                                    </Button>
-                                ))}
-
-                                {/* <Button className="btn btn-active">{provinces}</Button>
-                        <Button type="text" className="btn btn-text">
-                            Hà Nội
-                        </Button> */}
+                                {Array.isArray(dataProvinces) ? (
+                                    dataProvinces.map((province, index) => (
+                                        <Button
+                                            key={index}
+                                            type={province.id === provinces.id ? '' : 'text'}
+                                            className={cx('btn', {
+                                                'btn-active': province.id === provinces.id,
+                                                'btn-text': province.id !== provinces.id,
+                                            })}
+                                            onClick={() => handleSetProvince(province)}
+                                        >
+                                            {province.name}
+                                        </Button>
+                                    ))
+                                ) : (
+                                    <div>Loading...</div>
+                                )}
                             </Col>
                         </Row>
                     </Modal>

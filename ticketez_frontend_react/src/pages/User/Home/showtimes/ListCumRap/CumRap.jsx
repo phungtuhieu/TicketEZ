@@ -25,7 +25,7 @@ const CumRap = ({ NameAndProvince }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (list.length > 0) {
+        if (list?.length > 0) {
             setCinemaComplex(list[0]);
         } else {
             setCinemaComplex(null);
@@ -124,7 +124,7 @@ const CumRap = ({ NameAndProvince }) => {
                                     </List.Item>
                                 )}
                             />
-                            {list.length === 0 && (
+                            {list?.length === 0 && (
                                 <NotFountShowtime
                                     titleFirst={'Không tìm thấy cụm rạp nào.'}
                                     titleLast={'Bạn hãy thử lại với phim khác hoặc rạp khác nha!'}

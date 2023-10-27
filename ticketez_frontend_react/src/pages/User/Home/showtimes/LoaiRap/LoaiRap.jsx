@@ -13,7 +13,6 @@ function LoaiRap({ province }) {
     const [cinemaChainName, setCinemaChainName] = useState('tất cả');
     const [dataCinemaChainName, setDataCinemaChainName] = useState([]);
 
-    
     const NameAndProvince = {
         province,
         cinemaChainName,
@@ -22,17 +21,17 @@ function LoaiRap({ province }) {
         const getCinemaChain = async () => {
             try {
                 const res = await cinemaChainApi.get();
-                // console.log('res', res);
-                setDataCinemaChainName(res.data);
+                if (res && res.data) {
+                    setDataCinemaChainName(res.data);
+                } else {
+                    funcUtils.notify('Không nhận được dữ liệu từ API', 'error');
+                }
             } catch (error) {
-                funcUtils.notify(error.response.data, "error");
+                funcUtils.notify(error.response ? error.response.data : 'An error occurred', 'error');
             }
         };
         getCinemaChain();
     }, []);
-    
-
-   
 
     // console.log(dataCinemaChainName);
 
