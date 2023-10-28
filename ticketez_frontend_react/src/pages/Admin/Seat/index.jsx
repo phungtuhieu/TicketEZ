@@ -249,6 +249,7 @@ function AdminSeat() {
 
     // hành động khi chọn sơ đồ
     const onChange = (value) => {
+        setSeatBookingData([])
         fetchDataSeat(value);
         fetchDataShowTimeBySeatChart(value);
 

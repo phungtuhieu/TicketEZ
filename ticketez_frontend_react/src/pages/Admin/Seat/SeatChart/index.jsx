@@ -47,7 +47,6 @@ function SeatChart(props) {
         for (var i = 0; i < seatRows; i++) {
             mangHaiChieu[i] = new Array(seatColumns);
         }
-
         var index = 0;
         for (var i = 0; i < seatRows; i++) {
             for (var j = 0; j < seatColumns; j++) {
