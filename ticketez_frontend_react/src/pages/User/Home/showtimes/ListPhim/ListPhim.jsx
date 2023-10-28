@@ -18,6 +18,8 @@ function ListPhim({ cinemaComplex }) {
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
     const [loading, setLoading] = useState(false);
 
+    const [showtime, setShowtime] = useState(null);
+
     useEffect(() => {
         const currentTimeInVietnam = moment.tz('Asia/Ho_Chi_Minh');
         const nextWeekDays = [];
@@ -28,9 +30,7 @@ function ListPhim({ cinemaComplex }) {
         // console.log(nextWeekDays);
         setWeekDays(nextWeekDays);
     }, []);
-
     const [chooseDay, setChooseDay] = useState(moment().format('YYYY-MM-DD'));
-
     // console.log(chooseDay);
     const handleDayClick = (index) => {
         setDay(index + 1);
@@ -39,7 +39,6 @@ function ListPhim({ cinemaComplex }) {
         setChooseDay(formatSelectedDay);
         // console.log('Ngày được chọn:', selectedDay.format('DD-MM-YYYY'));
     };
-
     // -----------------movie by ccx-----------------------------------------------
 
     const [movieData, setMovieData] = useState([]);
@@ -61,10 +60,9 @@ function ListPhim({ cinemaComplex }) {
                 setLoading(false);
             }
         };
-    
+
         getMovie();
     }, [cinemaComplex, chooseDay]);
-    
 
     const loadGenreByMovie = async (movie) => {
         if (movie ?? movie) {
@@ -113,7 +111,10 @@ function ListPhim({ cinemaComplex }) {
         };
         fetchData();
     }, [movieData]);
-    // style={{overflow: data.length === 0 ? 'none' : "auto"}}
+
+    const handShowtime = (value) => {
+        setShowtime(value);
+    };
 
     return (
         <>
@@ -216,7 +217,12 @@ function ListPhim({ cinemaComplex }) {
                                                     <div className={cx('title')}>{valueFormat.format.name}</div>
                                                     <div className={cx('suat-chieu')}>
                                                         {valueFormat.showtime.map((valueShowtime, index) => (
-                                                            <Button key={index} className={cx('btn-suat-chieu')} danger>
+                                                            <Button
+                                                                key={index}
+                                                                className={cx('btn-suat-chieu')}
+                                                                danger
+                                                                onClick={() => handShowtime(valueShowtime)}
+                                                            >
                                                                 <span className={cx('gio-bat-dau')}>
                                                                     {moment(valueShowtime.startTime).format('HH:mm')}
                                                                 </span>
