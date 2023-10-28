@@ -14,6 +14,7 @@ import {
     Row,
     Select,
     Space,
+    Tag,
     TimePicker,
     Upload,
     message,
@@ -28,7 +29,7 @@ import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
-import { movieApi, movieStudioApi } from '~/api/admin';
+import { actorApi, formatApi, movieApi, movieStudioApi } from '~/api/admin';
 import '~/scss/_global.scss';
 import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
@@ -38,6 +39,7 @@ import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import funcUtils from '~/utils/funcUtils';
 import genreApi from '~/api/admin/managementMovie/genreApi';
 import { useSearchSelectEffect } from '~/hooks';
+import { Option } from 'antd/es/mentions';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -55,17 +57,23 @@ function AdminMovie() {
     const [fileList, setFileList] = useState([]);
     const [list, setList] = useState([]);
     const [movieStudios, setMovieStudios] = useState([]);
+    const [formatOptions, setFormatOptions] = useState([]);
     const [movieProducers, setMovieProducers] = useState([]);
     const [genreOptions, setGenreOptions] = useState([]);
+    const [actorOptions, setActorOptions] = useState([]);
     const [searchValue, setSearchValue] = useState({
         searchMovieStudio: '',
         searchGenre: '',
         searchMovieProducer: '',
+        searchFormat: '',
+        searchActor: '',
     });
     const [initialOptions, setInitialOptions] = useState({
         movieStudios: [],
         genres: [],
         movieProducers: [],
+        formats: [],
+        actors: [],
     });
     const [listMPAA, setListMPAA] = useState([]);
     const [form] = Form.useForm();
@@ -79,7 +87,13 @@ function AdminMovie() {
     const [pageSize, setPageSize] = useState(10);
     const [workSomething, setworkSomething] = useState(10);
     const [loadingButton, setLoadingButton] = useState(false);
-    const [loadingStates, setLoadingStates] = useState({ movieStudio: false, genre: false, movieProducer: false });
+    const [loadingStates, setLoadingStates] = useState({
+        movieStudio: false,
+        genre: false,
+        movieProducer: false,
+        format: false,
+        actor: false,
+    });
     const [isSearch, setIsSearch] = useState(false);
 
     const formItemLayout = {
@@ -251,29 +265,41 @@ function AdminMovie() {
         const pageSizeDefault = 20;
         const fetchData = async () => {
             try {
-                const [movieResp, movieStudioResp, movieProducerResp, mpaaResp, genreResp] = await Promise.all([
-                    movieApi.getByPage(currentPage, pageSize),
-                    movieStudioApi.getByPage(pageNoDefault, pageSizeDefault),
-                    movieProducerApi.getByPage(pageNoDefault, pageSizeDefault),
-                    mpaaRatingApi.getByPage(pageNoDefault, pageSizeDefault),
-                    genreApi.getByPage(pageNoDefault, pageSizeDefault),
-                ]);
-                console.log(genreResp.data);
+                const [movieResp, movieStudioResp, movieProducerResp, mpaaResp, genreResp, formatResp, actorResp] =
+                    await Promise.all([
+                        movieApi.getByPage(currentPage, pageSize),
+                        movieStudioApi.getByPage(pageNoDefault, pageSizeDefault),
+                        movieProducerApi.getByPage(pageNoDefault, pageSizeDefault),
+                        mpaaRatingApi.getByPage(pageNoDefault, pageSizeDefault),
+                        genreApi.getByPage(pageNoDefault, pageSizeDefault),
+                        formatApi.getByPage(pageNoDefault, pageSizeDefault),
+                        actorApi.getByPage(pageNoDefault, pageSizeDefault),
+                    ]);
+                // console.log(genreResp.data);
                 const movieStudioOptions = movieStudioResp.data;
                 const genreData = genreResp.data;
                 const movieProducerData = movieProducerResp.data;
+                const formatData = formatResp.data;
+                const actorData = actorResp.data;
+
                 setInitialOptions((prev) => ({ ...prev, movieStudios: movieStudioOptions }));
+                setInitialOptions((prev) => ({ ...prev, formats: formatData }));
                 setInitialOptions((prev) => ({ ...prev, genres: genreData }));
                 setInitialOptions((prev) => ({ ...prev, movieProducers: movieProducerData }));
+                setInitialOptions((prev) => ({ ...prev, actors: actorData }));
+
                 setGenreOptions(genreData);
                 setMovieStudios(movieStudioOptions);
                 setMovieProducers(movieProducerData);
+                setFormatOptions(formatData);
+                setActorOptions(actorData);
                 setListMPAA(mpaaResp.data);
-                const formatData = movieResp.data.map((item) => ({
+
+                const dataFormat = movieResp.data.map((item) => ({
                     ...item,
                     releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
-                setList(formatData);
+                setList(dataFormat);
                 setTotalItems(movieResp.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
@@ -307,6 +333,14 @@ function AdminMovie() {
         movieProducerApi,
         { setOptions: setMovieProducers, field: 'movieProducer' },
         initialOptions.movieProducers,
+        { loadingStates, setLoadingStates },
+        isSearch,
+    );
+    useSearchSelectEffect(
+        searchValue.searchFormat,
+        formatApi,
+        { setOptions: setFormatOptions, field: 'format' },
+        initialOptions.formats,
         { loadingStates, setLoadingStates },
         isSearch,
     );
@@ -559,12 +593,42 @@ function AdminMovie() {
             case 'movie-producer':
                 setSearchValue((prev) => ({ ...prev, searchMovieProducer: value }));
                 break;
+            case 'format':
+                setSearchValue((prev) => ({ ...prev, searchFormat: value }));
+                break;
             default:
                 console.log('Error: Không tìm thấy type của search');
                 break;
         }
     };
-
+    const tagRender = (props) => {
+        const { label, value, closable, onClose } = props;
+        const onPreventMouseDown = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        return (
+            <Space wrap>
+                <Tag
+                    // color={value}
+                    onMouseDown={onPreventMouseDown}
+                    closable={closable}
+                    onClose={onClose}
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        height: 'auto',
+                        minWidth: 200,
+                        border: 'none',
+                        marginRight: 3,
+                        backgroundColor: '#f0f0f0',
+                    }}
+                >
+                    {label}
+                </Tag>
+            </Space>
+        );
+    };
     return (
         <>
             <Row>
@@ -754,6 +818,47 @@ function AdminMovie() {
                                 })),
                             ]}
                         />
+                    </Form.Item>
+                    <Form.Item name="format" label="Định dạng phim" rules={[{ required: true }]}>
+                        <Select
+                            mode="multiple"
+                            showSearch
+                            placeholder="Tìm kiếm và chọn định dạng phim"
+                            allowClear
+                            filterOption={false}
+                            onSearch={(value) => handleSearchInput(value, 'format')}
+                            loading={loadingStates.format}
+                            options={[
+                                ...formatOptions.map((item) => ({
+                                    value: item.id,
+                                    label: item.name,
+                                })),
+                            ]}
+                        />
+                    </Form.Item>
+                    <Form.Item name="actor" label="Diễn viên" rules={[{ required: true }]}>
+                        <Select
+                            mode="multiple"
+                            showSearch
+                            placeholder="Tìm kiếm và chọn diễn viên"
+                            allowClear
+                            filterOption={false}
+                            tagRender={tagRender}
+                            onSearch={(value) => handleSearchInput(value, 'actor')}
+                            loading={loadingStates.actor}
+                            optionLabelProp="children"
+                        >
+                            {actorOptions.map((item) => (
+                                <Select.Option key={item.id} value={item.id} label={item.fullname}>
+                                    <div className={cx('wrap-option-image')}>
+                                        <div className={cx('box-img')}>
+                                            <img className={cx('img-avatar')} src={uploadApi.get(item.avatar)} />
+                                        </div>
+                                        <span className={cx('label')}>{item.fullname}</span>
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
 
                     <Form.Item label="Loại phim" rules={[{ required: true }]} name="mpaaRating">
