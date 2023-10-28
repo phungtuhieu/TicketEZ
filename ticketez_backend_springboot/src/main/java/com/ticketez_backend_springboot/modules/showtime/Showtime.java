@@ -6,7 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
-import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 
 import jakarta.persistence.Column;
@@ -41,8 +41,8 @@ public class Showtime {
 	private int status;
 
 	@ManyToOne
-	@JoinColumn(name = "movie_id")
-	private Movie movie;
+	@JoinColumn(name = "format_movie_id")
+	private FormatMovie formatMovie;
 
 	@ManyToOne
 	@JoinColumn(name = "cinema_id")

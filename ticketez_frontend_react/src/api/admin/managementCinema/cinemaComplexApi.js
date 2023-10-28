@@ -1,4 +1,5 @@
 import axiosClient from '../../global/axiosClient';
+import cinemaChainApi from './cinemaChainApi';
 import provinceApi from './provinceApi';
 
 const url = 'cinemaComplex';
@@ -19,20 +20,22 @@ const cinemaComplexApi = {
     get: async () => {
         return axiosClient.get(url);
     },
-    post: async (data, provinceId) => {
-        const [province] = await Promise.all([
+    post: async (data, provinceId, cinemaChainId) => {
+        const [province, cinemaChain] = await Promise.all([
             provinceApi.getId(provinceId),
+            cinemaChainApi.getId(cinemaChainId),
            
         ]);
-        const values = { ...data, province: province.data};
+        const values = { ...data, province: province.data, cinemaChain: cinemaChain.data};
         console.log('values', values);
         return axiosClient.post(url, values);
     },
-    put: async (id, data, provinceId) => {
-        const [province] = await Promise.all([
+    put: async (id, data, provinceId, cinemaChainId) => {
+        const [province, cinemaChain] = await Promise.all([
             provinceApi.getId(provinceId),
+            cinemaChainApi.getId(cinemaChainId),
         ]);
-        const values = { id: id, ...data, province:  province.data};
+        const values = { id: id, ...data, province:  province.data, cinemaChain: cinemaChain.data};
         return axiosClient.put(url + '/' + id, values);
     },
     delete: async (cinemaComplexId) => {

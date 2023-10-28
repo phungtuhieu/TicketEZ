@@ -1,5 +1,7 @@
 import { Col, Row, Card } from 'antd';
 import ViTri from './showtimesDetails/ViTri/ViTri';
+import Binhluan from './Comment/binhluan';
+import ActorSlider from './Comment/Carousel/ShowActor';
 
 function MovieDetails() {
     return (
@@ -11,16 +13,20 @@ function MovieDetails() {
                 </Col>
                 <Col
                     span={24}
-                    style={{ display: 'flex', justifyContent: 'center', background: '#ffffff', height: 2000 }}
+                    style={{ display: 'flex', justifyContent: 'center', background: '#ffffff', minHeight: 2000 }}
                 >
                     <Row style={{ width: 1088, height: 1000 }}>
                         <Col span={16}>
                             <Row>
-                                <Col span={24} style={{ backgroundColor: 'red' }}>
+                                <Col span={24} style={{}}>
                                     <ViTri />
                                 </Col>
-                                <Col span={24} style={{ backgroundColor: 'gray',display: 'flex',  marginTop: 50, minHeight: 600 }}>
-                                    minhkhoi
+                                <Col span={24} style={{ backgroundColor: '#ffffff',display: 'flex',  marginTop: 50, minHeight: 600, }}>
+                                  <Binhluan/>
+                                </Col>
+                                <Col span={24} style={{ backgroundColor: '#ffffff',display: 'flex',  marginTop: 50, minHeight: 100,  }}> 
+                                {/* overflowY: 'auto' */}
+                                <ActorSlider/>
                                 </Col>
                             </Row>
                         </Col>

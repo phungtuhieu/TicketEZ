@@ -5,7 +5,7 @@ import ViTri from './ViTri/ViTri';
 function ShowTimes() {
     return (
         <div className="wrapper">
-            <Card bordered={false} style={{ width: 1088, height: 694.8 }}>
+            <Card bordered={false} style={{ width: 1088, height: 694.8, overflow: 'hidden' }}>
                 <Row>
                     <Col span={24} className="bo" style={{ backgroundColor: '#ffffff' }}>
                         <ViTri />

@@ -37,7 +37,7 @@ public class SeatChart {
     @OneToMany(mappedBy = "seatChart")
     private List<Seat> Seats;
 
-        @JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "seatChart")
     private List<Showtime> showtimes;
 
