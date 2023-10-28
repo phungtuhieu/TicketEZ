@@ -30,7 +30,7 @@ public class DiscountApi {
     DiscountDao dao;
 
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<List<Discount>> findAll() {
         List<Discount> discounts = dao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(discounts);
