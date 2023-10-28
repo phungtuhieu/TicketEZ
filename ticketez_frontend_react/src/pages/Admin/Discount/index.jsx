@@ -92,11 +92,11 @@ const AdminDiscount = () => {
 
     useEffect(() => {
         const selectPrice = async () => {
-            const [cinemaChain, cinemaComplex] = await Promise.all([cinemaChainApi.getAll(), cinemaComplexApi.get()]);
+            const [cinemaChain, cinemaComplex] = await Promise.all([cinemaChainApi.getAll(), cinemaComplexApi.getPage()]);
             console.log('cinemaChain', cinemaChain);
             console.log('cinemaComplex', cinemaComplex);
             setCinemaChain(cinemaChain.data);
-            setSelectCinemaComplex(cinemaComplex.data.data);
+            setSelectCinemaComplex(cinemaComplex.data);
         };
 
         selectPrice();
@@ -123,10 +123,9 @@ const AdminDiscount = () => {
         },
         {
             title: 'Rạp phim',
-            dataIndex: 'cinemaComplex',
-            render: (cinemaComplex) => (cinemaComplex ? cinemaComplex.name : ''),
+            dataIndex: 'nameCinemaComplex',
             // width: '30%',
-            // ...getColumnSearchProps('cinemaComplex'),
+ 
         },
         {
             title: 'Rạp chiếu phim',
@@ -209,10 +208,10 @@ const AdminDiscount = () => {
 
         form.setFieldsValue({
             ...record,
-            status: !!record.status, // Chuyển đổi record.status thành boolean
+            status: !!record.status, 
             discountType: !!record.discountType,
-            service: record.service?.id,
-            // cinemaComplex: record.service.cinemaComplex?.id,
+            cinemaComplex: record.cinemaComplex?.name,
+            cinemaChain: record.cinemaComplex.cinemaChain?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
 
@@ -355,24 +354,24 @@ const AdminDiscount = () => {
                         <Form.Item name="id" style={{ display: 'none' }}></Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="Tên Ưu đãi"
-                            label="title"
+                            name="title"
+                            label="Tên Khuyến mãi"
                             rules={[{ required: true, message: 'Vui lòng nhập tên ưu đãi' }]}
                         >
                             <Input placeholder="title" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="Mã Giảm Giá"
-                            label="couponCode"
+                            name="couponCode"
+                            label="Mã giảm giá"
                             rules={[{ required: true, message: 'Vui lòng nhập Mã giảm giá' }]}
                         >
                             <Input placeholder="couponCode" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="Số Lượng"
-                            label="amount"
+                            name="amount"
+                            label="Số lượng"
                             rules={[{ required: true, message: 'Vui lòng nhập Số lượng' }]}
                         >
                             <Input placeholder="amount" />
@@ -380,7 +379,7 @@ const AdminDiscount = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="cinemaComplex"
-                            label="Chọn "
+                            label="Rap chiếu phim "
                             rules={[{ required: true, message: 'Vui lòng chọn' }]}
                         >
                             <Select
@@ -400,7 +399,7 @@ const AdminDiscount = () => {
                         <Form.Item
                         {...formItemLayout}
                         name="cinemaChain"
-                        label="Rạp chiếu phim "
+                        label="Cụm Rạp chiếu phim "
                         rules={[{ required: true, message: 'Vui lòng chọn' }]}
                     >
 
@@ -462,7 +461,7 @@ const AdminDiscount = () => {
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
-                    // nameCinemaComplex: post.cinemaComplex.name,
+                  nameCinemaComplex: post.cinemaComplex.name,
                     // cinemaChain: post.cinemaComplex.cinemaComplex.name,
                     birthday: `${('0' + new Date(post.birthday).getDate()).slice(-2)}-${(
                         '0' +
