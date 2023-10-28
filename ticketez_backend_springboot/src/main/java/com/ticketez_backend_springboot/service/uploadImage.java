@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@CrossOrigin("*")
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/upload")
 public class uploadImage {
 
@@ -100,11 +100,11 @@ public class uploadImage {
     }
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<?> updateImage(@PathVariable String id, @RequestParam("file_to_upload") MultipartFile file) throws IOException {
+  @PutMapping("/{imageName}")
+  public ResponseEntity<?> updateImage(@PathVariable String imageName, @RequestParam("file_to_upload") MultipartFile file) throws IOException {
       Map<String, String> response = new HashMap<>();
   
-      String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/images/" + id).toString();
+      String path = Paths.get(System.getProperty("user.dir"), "src/main/resources/static/images/" + imageName).toString();
   
       File imageFile = new File(path);
   

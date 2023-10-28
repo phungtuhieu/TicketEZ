@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
-import LoaiRap from '../LoaiRap/LoaiRap';
 import axios from 'axios';
 import Ngay from '../Ngay/Ngay';
 
@@ -120,7 +119,8 @@ function ViTri() {
                     </div>
                 </div>
             </Col>
-            <Col span={24} style={{}}>
+                    
+            <Col span={24} style={{marginTop: 5}}>
                <Ngay/>
             </Col>
         </Row>

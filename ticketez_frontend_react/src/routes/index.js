@@ -15,6 +15,7 @@ const publicRoutes = [
     { path: '/admin/showtime', component: PageAdmin.AdminShowtime, layout: AdminLayout },
     { path: '/admin/seat', component: PageAdmin.AdminSeat, layout: AdminLayout },
     { path: '/admin/seat-type', component: PageAdmin.AdminSeatType, layout: AdminLayout },
+    { path: '/admin/seat-chart', component: PageAdmin.AdminSeatChart, layout: AdminLayout },
     { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
     { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
     { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
@@ -26,6 +27,7 @@ const publicRoutes = [
     { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
     { path: '/admin/service', component: PageAdmin.AdminService, layout: AdminLayout },
     { path: '/admin/priceservice', component: PageAdmin.AdminPriceService, layout: AdminLayout },
+    { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout },
 
     // User
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },

@@ -8,16 +8,21 @@ import { faAngleDown, faAngleRight, faMagnifyingGlass } from '@fortawesome/free-
 import { Avatar, List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './Ngay.module.scss';
+import ListPhim from '../ListPhim/ListPhim';
 
 const cx = classNames.bind(style);
 
 function Ngay() {
     const [ngay, setNgay] = useState(1);
+    const [a, setA] = useState(true);
+    const [loai, setLoai] = useState(0);
+
+    console.log(loai, ngay);
 
     return (
         <>
             <Row className={cx('wrapper')}>
-                <Col span={24} className={cx('col1-chon-ngay')}>
+                <Col span={24} className={cx('col1')}>
                     <div className={cx('container-day', { active: ngay === 1 })} onClick={() => setNgay(1)}>
                         <div className={cx('ngay')}>17</div>
                         <div className={cx('thu')}>Hôm nay</div>
@@ -47,9 +52,63 @@ function Ngay() {
                         <div className={cx('thu')}>Thứ 3</div>
                     </div>
                 </Col>
-                <Col span={24} className={cx('col2')}>2</Col>
-                <Col span={24} className={cx('col3')}>3</Col>
-
+                <Col span={24} className={cx('col2')}>
+                    <div className={cx('wrapper-loai-rap')}>
+                        <div className={cx('container',{ active: loai === 0 })} onClick={() => setLoai(0)}>
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>Tất cả</div>
+                        </div>
+                        <div className={cx('container', { active: loai === 1 }, { active: loai === 1 })} onClick={() => setLoai(1)}>
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>Lotte Cinnnnn</div>
+                        </div>
+                        <div className={cx('container', { active: loai === 2 })} onClick={() => setLoai(2)}>
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>Beta Cineeeee</div>
+                        </div>
+                        <div className={cx('container', { active: loai === 3 })} onClick={() => setLoai(3)}>
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>Galaxy Cinnn</div>
+                        </div>
+                        <div className={cx('container', { active: loai === 4 })} onClick={() => setLoai(4)}>
+                            <div className={cx('border')}>
+                                <img
+                                    className={cx('img')}
+                                    src="https://homepage.momocdn.net/next-js/_next/static/public/cinema/dexuat-icon.svg"
+                                    alt=""
+                                />
+                            </div>
+                            <div className={cx('title')}>Beta Cineeeee</div>
+                        </div>
+                    </div>
+                </Col>
+                <Col span={24} className={cx('col3')}>
+                    <ListPhim/>
+                </Col>
             </Row>
         </>
     );

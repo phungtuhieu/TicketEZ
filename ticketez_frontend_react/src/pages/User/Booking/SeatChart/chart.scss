@@ -17,8 +17,8 @@ table.grid {
     white-space: nowrap; /* Ngăn các dòng văn bản bị ngắt khi cuộn ngang */
     table-layout: fixed; /* Cố định độ rộng cột để tránh sự thay đổi đột ngột */
 }
-  
-.ca{
+
+.ca {
     padding: 20px;
     border: 1px solid rgb(241, 241, 241);
     margin: 20px;
@@ -34,7 +34,6 @@ ul.mar li {
     margin: 0;
     box-sizing: border-box;
 }
-
 
 .container {
     width: 100%;
@@ -111,6 +110,18 @@ ul.mar li {
     color: white; /* Màu chữ cho ghế VIP */
 }
 
+.way {
+    
+    background-color: #221e1e;
+    // text-indent: -9999px;
+}
+.way-user {
+   
+  visibility: hidden;
+    text-indent: -9999px;
+}
+
+
 .available {
     color: white;
 }
@@ -147,10 +158,8 @@ li {
     ::-webkit-scrollbar {
         width: 0;
     }
-    
-    
+
     ::-webkit-scrollbar-thumb {
         background-color: transparent;
     }
-    
 }

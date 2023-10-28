@@ -3,7 +3,9 @@
     border-radius: 3px;
 }
 
-.col1-chon-ngay {
+// ----------------------------------------------------------------
+
+.col1 {
     display: flex;
     height: 71px;
     background-color: #ffffff;
@@ -69,12 +71,99 @@
     }
 }
 
+// ----------------------------------------------------------------
+
 .col2 {
+    // background-color: #d4d4d4;
     height: 92px;
-    background-color: #d4d4d4;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow: auto;
+    cursor: pointer;
+    // margin: 2px 0;
+    border-top: 2px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+        cursor: pointer;
+    }
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        cursor: pointer;
+
+        background: #555;
+    }
+
+    .wrapper-loai-rap {
+        // background-color: aqua;
+        display: flex;
+        align-items: center;
+        height: 72px;
+        margin: 0 10px 0 10px;
+        gap: 5px;
+    }
+
+    .container {
+        width: 64px;
+        height: 100%;
+        // background-color: red;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        cursor: pointer;
+    }
+
+    .border {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.5rem;
+        border: 1px solid #eaeaea;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 0.8em;
+        margin-top: 10px;
+        line-height: 1rem;
+        --tw-text-opacity: 1;
+        color: rgb(115 115 115 / var(--tw-text-opacity));
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 62px;
+    }
+
+    .active {
+        cursor: default;
+        .border {
+            border-color: #eb2f96 !important;
+        }
+
+        .title {
+            font-weight: 600;
+            --tw-text-opacity: 1;
+            color: rgb(235 47 150 / var(--tw-text-opacity));
+        }
+    }
 }
 
+// ----------------------------------------------------------------
+
 .col3 {
-    min-height: 1000px;
-    
+    // min-height: 1000px;
+    // background-color: #555;
+    display: flex;
 }

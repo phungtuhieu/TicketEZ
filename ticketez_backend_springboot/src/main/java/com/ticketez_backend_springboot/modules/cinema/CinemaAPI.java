@@ -22,8 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplexDao;
 
 @CrossOrigin("*")
 @RestController
@@ -32,6 +33,9 @@ public class CinemaAPI {
 
     @Autowired
     CinemaDAO cinemaDAO;
+
+    @Autowired
+    CinemaComplexDao cinemaComplexDAO;
 
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -54,9 +58,6 @@ public class CinemaAPI {
         }
     }
 
-
-
-
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {
@@ -70,7 +71,6 @@ public class CinemaAPI {
 
     }
 
-    
     @GetMapping("by-cinema-complex/{idCinemacomplex}")
     public ResponseEntity<?> findCinemaByCinemaComplex(@PathVariable("idCinemacomplex") Long id) {
         try {
@@ -83,7 +83,6 @@ public class CinemaAPI {
         }
 
     }
-
 
     @PostMapping
     public ResponseEntity<?> post(@RequestBody Cinema cinema) {
@@ -116,6 +115,26 @@ public class CinemaAPI {
             return ResponseEntity.ok().body("Xoá rạp thành công");
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
+        }
+
+    }
+
+    // ----------------------------------------------------------------
+    @GetMapping("/get/cinema-by-cinemaComplex/{cinemaComplexId}")
+    public ResponseEntity<?> getDuLie(@PathVariable("cinemaComplexId") long cinemaComplexId) {
+        try {
+            // if (cinemaComplexId) {
+            //     return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            // }
+            CinemaComplex complex = cinemaComplexDAO.findById(cinemaComplexId).get();
+            if (complex != null) {
+                List<Cinema> cinema = cinemaDAO.getCinemaByCinemaComplex(complex);
+                return ResponseEntity.ok(cinema);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

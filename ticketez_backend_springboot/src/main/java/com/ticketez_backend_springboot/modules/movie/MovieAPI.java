@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.movie;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,14 +23,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplexDao;
 
 
-@RestController
 @CrossOrigin("*")
+@RestController
 @RequestMapping("/api/movie")
 public class MovieAPI {
     @Autowired
     MovieDAO dao;
+    @Autowired
+    CinemaComplexDao cinemaComplexDao;
 
     @GetMapping
     public ResponseEntity<?> findByPage(
@@ -54,12 +59,11 @@ public class MovieAPI {
     }
 
 
-     @GetMapping("/getAll")
+     @GetMapping("/get/all")
     public ResponseEntity<List<Movie>> findAll() {
         List<Movie> movies = dao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(movies);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> findById(@PathVariable("id") Long id) {
@@ -85,8 +89,39 @@ public class MovieAPI {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        dao.deleteById(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        try {
+            if (!dao.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            dao.deleteById(id);
+            return ResponseEntity.ok(true);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Không thể xoá, dữ liệu đã được sử dụng ở nơi khác", HttpStatus.CONFLICT);
+        }
+    }
+
+    ////////////////////////////////
+    @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
+    public ResponseEntity<?> getDuLie(
+            @PathVariable("cinemaComplexId") Long CinemaComplexId,
+             @PathVariable("date") LocalDate date) {
+        try {
+            if (CinemaComplexId.equals("") ) {
+                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            }
+            if (date == null || date.equals("")) {
+                date = LocalDate.now();
+            }
+            CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
+            if (cinemaComplex != null) {
+                List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex,date);
+                return ResponseEntity.ok(movie);
+            }
+            return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

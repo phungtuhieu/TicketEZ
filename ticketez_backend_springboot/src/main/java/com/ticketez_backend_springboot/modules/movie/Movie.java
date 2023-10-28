@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
@@ -25,6 +26,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -41,6 +44,7 @@ public class Movie implements Serializable {
 	// private String poster;
 	private Time duration;
 	@Column(name = "release_date")
+	@Temporal(TemporalType.DATE)
 	private Date releaseDate;
 	private String country;
 	private Float rating;
@@ -61,9 +65,6 @@ public class Movie implements Serializable {
 	@JoinColumn(name = "MPAA_rating_id")
 	private MPAARating mpaaRating;
 
-	@JsonIgnore	
-	@OneToMany(mappedBy = "movie")
-	private List<Showtime> showtimes;
 
 	@JsonIgnore		
 	@OneToMany(mappedBy = "movie")

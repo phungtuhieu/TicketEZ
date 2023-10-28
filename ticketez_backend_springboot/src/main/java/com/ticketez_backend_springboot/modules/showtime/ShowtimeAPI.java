@@ -1,5 +1,8 @@
 package com.ticketez_backend_springboot.modules.showtime;
 
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplexDao;
+import com.ticketez_backend_springboot.modules.format.Format;
+import com.ticketez_backend_springboot.modules.format.FormatDAO;
+import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -30,6 +39,13 @@ public class ShowtimeAPI {
 
     @Autowired
     ShowtimeDAO showtimeDAO;
+
+    @Autowired
+    MovieDAO movieDAO;
+    @Autowired
+    FormatDAO formatDAO;
+    @Autowired
+    CinemaComplexDao cinemaComplexDAO;
 
     @GetMapping
     public ResponseEntity<ResponseDTO<Showtime>> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -50,6 +66,13 @@ public class ShowtimeAPI {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    // Lấy show time theo seatchart
+
+    @GetMapping("get-showtime-by-seatchart/{id}")
+    public ResponseEntity<List<Showtime>> findShowtimeBySeatChart(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(showtimeDAO.findShowtimesBySeatChartId(id));
     }
 
     @GetMapping("/{id}")
@@ -85,4 +108,32 @@ public class ShowtimeAPI {
         }
 
     }
+
+    //
+
+    // @GetMapping("/get/showtime-by-ccx-movie-format-date/{cinemaComplexId}/{movieId}/{formatId}/{date}")
+    @GetMapping("/get/showtime-by-ccx-movie-format-date")
+    public ResponseEntity<?> getDuLie(
+            @RequestParam("cinemaComplexId") Long CinemaComplexId,
+            @RequestParam("movieId") Long movieId,
+            @RequestParam("formatId") Long formatId,
+            @RequestParam("date") Optional<LocalDate> date) {
+        try {
+            if (CinemaComplexId.equals("") && movieId.equals("") && formatId.equals("")) {
+                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            }
+            CinemaComplex cinemaComplex = cinemaComplexDAO.findById(CinemaComplexId).get();
+            Movie movie = movieDAO.findById(movieId).get();
+            Format format = formatDAO.findById(formatId).get();
+            if (cinemaComplex != null && movie != null && format != null) {
+                List<Showtime> showTimes = showtimeDAO.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
+                        movie, format, date.orElse(LocalDate.now()));
+                return ResponseEntity.ok(showTimes);
+            }
+            return null;
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

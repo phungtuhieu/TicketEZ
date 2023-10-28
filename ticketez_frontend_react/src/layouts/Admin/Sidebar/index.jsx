@@ -22,6 +22,7 @@ const items = [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
         getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
         getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
+        getItem(<Link to="/admin/cinema-chains">Loại Cụm rạp</Link>, 'cinemaChains'),
     ]),
 
     // Quản lý rạp phim
@@ -39,6 +40,7 @@ const items = [
     getItem('Ghế', 'grSeat', <FontAwesomeIcon icon={solidIcons.faCouch} />, [
         getItem(<Link to="/admin/seat">Ghế</Link>, 'seat', null),
         getItem(<Link to="/admin/seat-type">Loại ghế</Link>, 'seatType', null),
+        getItem(<Link to="/admin/seat-chart">Sơ đồ ghế</Link>, 'seatChart', null),
     ]),
 
     // Quản lý dịch vụ, sự kiện

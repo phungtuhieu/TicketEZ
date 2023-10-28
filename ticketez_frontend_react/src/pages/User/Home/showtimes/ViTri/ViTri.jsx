@@ -7,29 +7,43 @@ import { faAngleDown, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid
 import classNames from 'classnames/bind';
 import style from './ViTri.module.scss';
 import LoaiRap from '../LoaiRap/LoaiRap';
-import axios from 'axios';
+import funcUtils from '~/utils/funcUtils';
+import { provinceUserApi } from '~/api/user/showtime/writeApi';
 
 const cx = classNames.bind(style);
 
 function ViTri() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [provinces, setProvinces] = useState('Thành phố Hà Nội');
+    const [provinces, setProvinces] = useState({
+        id: 2,
+        name: 'Hồ Chí Minh',
+    });
+    const [searchName, setSearchName] = useState('');
     const [dataProvinces, setDataProvinces] = useState([]);
 
-
     useEffect(() => {
-        const get = async () => {
-            const res = await axios.get('https://provinces.open-api.vn/api/');
-            // console.log(res.data);
-            setDataProvinces(res.data);
+        const getProvince = async () => {
+            try {
+                const res = await provinceUserApi.getAllProvinceByName(searchName);
+                if (res) {
+                    setDataProvinces(res);
+                } else {
+                    setDataProvinces([]);
+                    funcUtils.notify('Không nhận được dữ liệu từ API', 'error');
+                }
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            }
         };
-        get();
-    }, [provinces]);
+        getProvince();
+    }, [searchName]);
     // console.log(dataProvinces);
+    // console.log(searchName);
 
     const showModal = () => {
         setIsModalOpen(true);
+        setSearchName('');
     };
 
     const handleOk = () => {
@@ -40,10 +54,15 @@ function ViTri() {
         setIsModalOpen(false);
     };
 
+    const handleSetProvince = (province) => {
+        setProvinces(province);
+        setIsModalOpen(false);
+    };
+
     // console.log(provinces);
 
     return (
-        <Row style={{height: '100%'}}>
+        <Row style={{ height: '100%' }}>
             <Col
                 span={24}
                 style={{
@@ -55,12 +74,13 @@ function ViTri() {
                 <div className={cx('wrapper-vitri')}>
                     <span className={cx('title')}>Vị trí </span>
                     <Button className={cx('btn-first')} onClick={showModal} icon={<EnvironmentOutlined />}>
-                        {provinces}
+                        {provinces.name}
                         <span className={cx('btn-first-icon-right')}>
                             <FontAwesomeIcon icon={faAngleDown} />
                         </span>
                     </Button>
                     <Modal
+                        maskClosable={false}
                         className={cx('modal', 'slideIn')}
                         footer={
                             <Button className={cx('modal-footer-btn-close')} onClick={handleCancel}>
@@ -83,32 +103,28 @@ function ViTri() {
                                     className={cx('modal-header-col1-inputSearch')}
                                     suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                                     placeholder="Tìm địa điểm ..."
+                                    onChange={(e) => setSearchName(e.target.value)}
+                                    value={searchName}
                                 />
                             </Col>
                             <Col span={24} className={cx('modal-header-col2')}>
-                                {dataProvinces.map((a, index) => (
-                                    <Button
-                                        key={index}
-                                        type={a.name === provinces ? '' : 'text'}
-                                        // className={a.name === provinces ? 'btn btn-active' : 'btn btn-text'}
-                                        className={cx('btn', {
-                                            'btn-active': a.name === provinces,
-                                            'btn-text': a.name !== provinces,
-                                        })}
-                                        onClick={() => {
-                                            // console.log(a.name);
-                                            setProvinces(a.name);
-                                            setIsModalOpen(false);
-                                        }}
-                                    >
-                                        {a.name}
-                                    </Button>
-                                ))}
-
-                                {/* <Button className="btn btn-active">{provinces}</Button>
-                        <Button type="text" className="btn btn-text">
-                            Hà Nội
-                        </Button> */}
+                                {Array.isArray(dataProvinces) ? (
+                                    dataProvinces.map((province, index) => (
+                                        <Button
+                                            key={index}
+                                            type={province.id === provinces.id ? '' : 'text'}
+                                            className={cx('btn', {
+                                                'btn-active': province.id === provinces.id,
+                                                'btn-text': province.id !== provinces.id,
+                                            })}
+                                            onClick={() => handleSetProvince(province)}
+                                        >
+                                            {province.name}
+                                        </Button>
+                                    ))
+                                ) : (
+                                    <div>Loading...</div>
+                                )}
                             </Col>
                         </Row>
                     </Modal>
@@ -119,7 +135,7 @@ function ViTri() {
                 </div>
             </Col>
             <Col span={24} style={{ height: 642.8 }}>
-                <LoaiRap diaDiem={provinces} />
+                <LoaiRap province={provinces} />
             </Col>
         </Row>
     );
