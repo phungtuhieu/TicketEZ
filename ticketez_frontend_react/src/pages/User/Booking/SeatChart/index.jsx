@@ -24,36 +24,61 @@ function SeatChart(props) {
         setIsModalOpen(false);
     };
     const createSeatArray = () => {
-        let seatRows = 10;
-        let seatColumns = 7;
+        let seatRows =7; // Số hàng
+        let seatColumns = 5; // Số cột
+        // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
-
         const seatState = {
             seat: [],
+            way: ['A2'],
             seatAvailable: [],
             seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
             seatUnavailable: [],
         };
-
+        // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
+        console.log(allSeats);
+        var mangHaiChieu = new Array(seatRows);
+        for (var i = 0; i < seatRows; i++) {
+            mangHaiChieu[i] = new Array(seatColumns);
+        }
 
-        for (let i = 0; i < seatRows; i++) {
+        var index = 0;
+        for (var i = 0; i < seatRows; i++) {
+            for (var j = 0; j < seatColumns; j++) {
+                if (index < allSeats.length) {
+                    mangHaiChieu[i][j] = allSeats[index];
+                    index++;
+                }
+            }
+        }
+        for (var i = 0; i < seatRows; i++) {
+            console.log(mangHaiChieu[i]);
             const row = [];
             const rowAvailable = [];
             const rowLabel = rowLabels[i];
-            for (let j = 1; j <= seatColumns; j++) {
-                const seatNumber = `${rowLabel}${j}`;
+            for (let j = 0; j < seatColumns; j++) {
+                const seatNumber = `${mangHaiChieu[i][j].name}`;
                 row.push(seatNumber);
-                if (!seatState.seatUnavailable.includes(seatNumber)) {
-                    rowAvailable.push(seatNumber);
-                }
             }
-
             seatState.seat.push(row);
         }
+        
+        // for (let i = 0; i < seatRows; i++) {
+        //     const row = [];
+        //     const rowAvailable = [];
+        //     const rowLabel = rowLabels[i];
+        //     for (let j = 1; j <= seatColumns; j++) {
+        //         const seatNumber = `${rowLabel}${j}`;
+        //         row.push(seatNumber);
+        //     }
 
+        //     seatState.seat.push(row);
+        // }
+
+        // Thêm cột chú thích hàng ở bên trái
         seatState.seatHeader = rowHeader;
 
         return seatState;
@@ -64,6 +89,7 @@ function SeatChart(props) {
     const [listSeatNormal, setListSeatNormal] = useState([]);
     const [listSeatVip, setListSeatVip] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
+    const [listWay, setListWay] = useState([]);
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
@@ -94,13 +120,29 @@ function SeatChart(props) {
                 return prevState;
             });
 
+            const respWay = await axiosClient.get(`seat/by-seatchart-and-seattype/${1}/${7}`);
+            const newWay = respWay.data.map((seat) => seat.name);
+            setListWay((prevState) => {
+                for (const newSeat of newWay) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
+            });
+
+            console.log(listWay);
             console.log(listSeatNormal);
             console.log(listSeatVip);
-
-            if (listSeatVip.length > 0 && listSeatNormal.length > 0) {
-                setSeatState(createSeatArray());
-                setShowSeat(true);
-                setReload(false);
+            console.log(allSeats);
+            if (allSeats.length > 0) {
+                if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
+                    setSeatState(createSeatArray());
+                    setShowSeat(true);
+                    setReload(false);
+                } else {
+                    setReload(true);
+                }
             } else {
                 setReload(true);
             }
@@ -206,15 +248,15 @@ function SeatChart(props) {
                                             {seatState.seat[rowIndex].map((seat_no) => {
                                                 const seatClassName = `
                                                 ${
-                                                    seatState.normalSeat.indexOf(seat_no) > -1
-                                                        ? 'normal-seat'
+                                                    seatState.way.indexOf(seat_no) > -1
+                                                        ? 'way-user'
                                                         : seatState.seatUnavailable.indexOf(seat_no) > -1
                                                         ? 'unavailable'
+                                                        : seatState.normalSeat.indexOf(seat_no) > -1
+                                                        ? 'normal-seat'
                                                         : seatState.vipSeat.indexOf(seat_no) > -1
                                                         ? 'vip-seat'
-                                                        : seatState.seatReserved.indexOf(seat_no) > -1
-                                                        ? 'reserved'
-                                                        : 'reservedd'
+                                                        : 'normal-seat'
                                                 } protected-element`;
                                                 return (
                                                     <td

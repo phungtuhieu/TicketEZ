@@ -111,9 +111,16 @@ ul.mar li {
 }
 
 .way {
+    
     background-color: #221e1e;
     // text-indent: -9999px;
 }
+.way-user {
+   
+  visibility: hidden;
+    text-indent: -9999px;
+}
+
 
 .available {
     color: white;

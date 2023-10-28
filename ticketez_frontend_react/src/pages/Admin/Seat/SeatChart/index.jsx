@@ -24,8 +24,10 @@ function SeatChart(props) {
     const { rows, columns, nameSeat, idSeatChart } = props;
 
     const createSeatArray = () => {
-        let seatRows = rows; // Số hàng
+        let seatRows =rows; // Số hàng
         let seatColumns = columns; // Số cột
+        console.log(seatRows);
+        console.log(seatColumns);
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
         console.log(nameSeat);
@@ -40,21 +42,44 @@ function SeatChart(props) {
         };
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
+        console.log(allSeats);
+        var mangHaiChieu = new Array(seatRows);
+        for (var i = 0; i < seatRows; i++) {
+            mangHaiChieu[i] = new Array(seatColumns);
+        }
 
-        for (let i = 0; i < seatRows; i++) {
+        var index = 0;
+        for (var i = 0; i < seatRows; i++) {
+            for (var j = 0; j < seatColumns; j++) {
+                if (index < allSeats.length) {
+                    mangHaiChieu[i][j] = allSeats[index];
+                    index++;
+                }
+            }
+        }
+        for (var i = 0; i < seatRows; i++) {
+            console.log(mangHaiChieu[i]);
             const row = [];
             const rowAvailable = [];
             const rowLabel = rowLabels[i];
-            for (let j = 1; j <= seatColumns; j++) {
-                const seatNumber = `${rowLabel}${j}`;
+            for (let j = 0; j < seatColumns; j++) {
+                const seatNumber = `${mangHaiChieu[i][j].name}`;
                 row.push(seatNumber);
-                if (!seatState.seatUnavailable.includes(seatNumber)) {
-                    rowAvailable.push(seatNumber);
-                }
             }
-
             seatState.seat.push(row);
         }
+        
+        // for (let i = 0; i < seatRows; i++) {
+        //     const row = [];
+        //     const rowAvailable = [];
+        //     const rowLabel = rowLabels[i];
+        //     for (let j = 1; j <= seatColumns; j++) {
+        //         const seatNumber = `${rowLabel}${j}`;
+        //         row.push(seatNumber);
+        //     }
+
+        //     seatState.seat.push(row);
+        // }
 
         // Thêm cột chú thích hàng ở bên trái
         seatState.seatHeader = rowHeader;
@@ -77,6 +102,7 @@ function SeatChart(props) {
         try {
             const respAll = await axiosClient.get(`seat/by-seatchart/${idSeatChart}`);
             setAllSeats(respAll.data);
+
             const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${2}`);
             const newVipSeats = respVip.data.map((seat) => seat.name);
             setListSeatVip((prevState) => {
@@ -113,11 +139,15 @@ function SeatChart(props) {
             console.log(listWay);
             console.log(listSeatNormal);
             console.log(listSeatVip);
-
-            if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
-                setSeatState(createSeatArray());
-                setShowSeat(true);
-                setReload(false);
+            console.log(allSeats);
+            if (allSeats.length > 0) {
+                if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
+                    setSeatState(createSeatArray());
+                    setShowSeat(true);
+                    setReload(false);
+                } else {
+                    setReload(true);
+                }
             } else {
                 setReload(true);
             }
@@ -266,7 +296,7 @@ function SeatChart(props) {
                                                         const seatClassName = `
                                                 ${
                                                     seatState.way.indexOf(seat_no) > -1
-                                                        ? 'way'
+                                                        ? 'way-user'
                                                         : seatState.seatUnavailable.indexOf(seat_no) > -1
                                                         ? 'unavailable'
                                                         : seatState.normalSeat.indexOf(seat_no) > -1

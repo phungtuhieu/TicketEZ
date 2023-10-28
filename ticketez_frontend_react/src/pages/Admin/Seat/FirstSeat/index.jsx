@@ -66,27 +66,6 @@ function SeatChart(props) {
 
     const [selectedSeatType, setSelectedSeatType] = useState('way'); // Mặc định ban đầu là 'normal-seat'
 
-    const fetchDataSeat = async () => {
-        try {
-            if (idSeatChart === undefined) {
-                return;
-            }
-            const respAll = await axiosClient.get(`seat/by-seatchart/${idSeatChart}`);
-            setAllSeats(respAll.data);
-            if (allSeats.length > 0) {
-                setReload(false);
-            } else {
-                setReload(true);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => {
-        fetchDataSeat();
-    }, [reload, idSeatChart]);
-
     const reSeting = () => {
         setSeatState(createSeatArray());
     };
@@ -112,25 +91,25 @@ function SeatChart(props) {
 
             if (seatState.seat[row] && seatState.seat[row][column]) {
                 let currentSeatName = seat;
-                seatState.seat[row][column] = seat;
+                seatState.seat[row][column] = `way${choseWay}`;
                 // seatState.seat[row][column] = choseWay + 1;
                 setSeatState({
                     ...seatState,
-                    way: [...way, seat],
+                    way: [...way, `way${choseWay}`],
                 });
 
                 setChoseWay(choseWay + 1);
                 // Đổi tên
-                // for (let i = column + 1; i < seatState.seat[row].length; i++) {
-                //     const temp = seatState.seat[row][i];
-                //     seatState.seat[row][i] = currentSeatName;
-                //     const updatedSeat = currentSeatName;
-                //     const indexToChange = seatState.normalSeat.indexOf(temp);
-                //     if (indexToChange !== -1) {
-                //         seatState.normalSeat[indexToChange] = updatedSeat;
-                //     }
-                //     currentSeatName = temp;
-                // }
+                for (let i = column + 1; i < seatState.seat[row].length; i++) {
+                    const temp = seatState.seat[row][i];
+                    seatState.seat[row][i] = currentSeatName;
+                    const updatedSeat = currentSeatName;
+                    const indexToChange = seatState.normalSeat.indexOf(temp);
+                    if (indexToChange !== -1) {
+                        seatState.normalSeat[indexToChange] = updatedSeat;
+                    }
+                    currentSeatName = temp;
+                }
                 console.log(seatState.seat);
             }
             console.log(seatState.way);
@@ -140,40 +119,34 @@ function SeatChart(props) {
 
     const onClickUpdate = async () => {
         console.log(idSeatChart);
-        await fetchDataSeat();
         console.log(allSeats);
         console.log('------------------------------------');
-        const seatVipAndNormal = [
-            ...seatState.way.map((seat) => ({ name: seat, type: 7 })),
-            ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
-        ];
 
-        const updatedSeat = allSeats.map((allSeat) => {
-            const matchingItem = seatVipAndNormal.find((seat) => allSeat.name === seat.name);
+        let check = 0;
 
-            if (matchingItem) {
-                return {
-                    ...allSeat,
-                    seatType: {
-                        id: matchingItem.type,
-                    },
-                    seatChart: {
-                        id: idSeatChart,
-                    },
-                };
-            }
-            return allSeat;
-        });
+        const dataArray = seatState.seatHeader.map((header, rowIndex) =>
+            seatState.seat[rowIndex].map((seat_no) => ({
+                name: seat_no,
+                status: 1,
+                description: 'ghế thông thường',
+                seatType: {
+                    id: seat_no.includes('way') ? 7 : 1,
+                },
+                seatChart: {
+                    id: idSeatChart,
+                },
+            })),
+        );
+        const flattenedArray = [].concat(...dataArray);
+
+        console.log(dataArray);
+        console.log(flattenedArray);
 
         await new Promise((resolve) => {
-            // Sử dụng một Promise để chờ cho đến khi tất cả công việc trong updatedSeat và flattenedArray hoàn thành
             resolve();
         });
-        console.log(seatVipAndNormal);
-
-        const flattenedArray = [].concat(...updatedSeat);
-        console.log(flattenedArray);
-        handelUpdate(flattenedArray);
+        const resp = await axiosClient.post(`seat`, flattenedArray);
+        // handelUpdate(flattenedArray);
         setShowInfo('success');
     };
 
@@ -241,7 +214,7 @@ function SeatChart(props) {
                                 </table>
                             </Col>
                             <Col span={6} className={cx('col-right-radioBox-btn')}>
-                                { idSeatChart &&
+                                {idSeatChart && (
                                     <Row>
                                         <Col span={24}>
                                             <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
@@ -261,7 +234,7 @@ function SeatChart(props) {
                                             </div>
                                         </Col>
                                     </Row>
-                                }
+                                )}
                             </Col>
                         </Row>
                     </Col>
