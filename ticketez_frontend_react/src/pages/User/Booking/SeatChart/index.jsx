@@ -99,6 +99,9 @@ function SeatChart(props) {
         try {
             const resp = await axiosClient.get(`seatBooking/status-seatchart/${1}/${2}`);
             const data = resp.data;
+            if(data.length <= 0) {
+                setSeatBookingData([])
+            }
             console.log(data);
             data.forEach((newItem) => {
                 // Kiểm tra xem newItem đã tồn tại trong mảng hay chưa
@@ -119,7 +122,8 @@ function SeatChart(props) {
             console.log('====================================');
             console.log(seatBookingData);
             console.log('====================================');
-        }, 5000); // 3 giây
+        }, 5000);
+         
 
         // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
         return () => {
