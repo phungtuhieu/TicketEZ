@@ -100,7 +100,6 @@ public class MovieAPI {
             
             return new ResponseEntity<>("Không tìm thấy phim", HttpStatus.NOT_FOUND);
         }
-        Map<String, Object> resp = new HashMap<String, Object>();
 
         Movie movie = dao.findById(id).get();
 
@@ -121,11 +120,13 @@ public class MovieAPI {
         for (GenreMovie genreMovie : movie.getGenresMovies()) {
             genres.add(genreMovie.getGenre());
         }
-        resp.put("movie", movie);
-        resp.put("actors", actors);
-        resp.put("directors", directors);
-        resp.put("formats", formats);
-        resp.put("genres", genres);
+      
+        MovieDTO resp = new MovieDTO();
+        resp.setActors(actors);
+        resp.setDirectors(directors);
+        resp.setFormats(formats);
+        resp.setGenres(genres);
+        resp.setMovie(movie);
         return ResponseEntity.ok(resp);
     }
 
