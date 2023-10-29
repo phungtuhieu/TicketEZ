@@ -242,7 +242,7 @@ const AdminFormat = () => {
                         const resPut = await formatApi.put(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
-                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                            funcUtils.notify('Cập nhật Dạng phim thành công', 'success');
                         }
                     } catch (error) {
                         funcUtils.notify(error.response.data, 'error');
@@ -258,7 +258,7 @@ const AdminFormat = () => {
                         const resPost = await formatApi.post(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
-                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                            funcUtils.notify('Thêm Dạng phim thành công', 'success');
                         }
                     } catch (error) {
                         funcUtils.notify(error.response.data, 'error');
