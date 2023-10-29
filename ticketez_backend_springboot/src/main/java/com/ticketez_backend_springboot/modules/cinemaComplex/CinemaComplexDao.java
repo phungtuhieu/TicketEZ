@@ -30,6 +30,7 @@ public interface CinemaComplexDao extends JpaRepository<CinemaComplex, Long> {
         
         +"(SELECT st FROM Showtime st JOIN st.cinema.cinemaComplex ccxs WHERE "
         +"ccx.id = ccxs.id "
+        +"AND st.startTime >= CURRENT_TIMESTAMP "
         +"AND CAST(st.startTime AS DATE) = :date "
         +"AND ccxs.province.id = :provinceId "
         +"AND ccxs.cinemaChain.name like CONCAT('%', :cinemaChainName, '%') "

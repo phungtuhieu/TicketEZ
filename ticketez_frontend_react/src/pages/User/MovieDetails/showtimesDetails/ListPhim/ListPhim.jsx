@@ -3,25 +3,15 @@ import { Button, Row, Col, Collapse } from 'antd';
 import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
+import { cinemaComplexUserApi } from '~/api/user/showtime';
+import moment from 'moment-timezone';
+import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
 
 const cx = classNames.bind(style);
 
-function ListPhim({propsValue}) {
-
-
-
-    useEffect(() => {
-        console.log("propsValue",propsValue);
-    },[propsValue])
-
-    const [ngay, setNgay] = useState(1);
-
-    const count = 3;
-    const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
-    const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
+function ListPhim({ propsValue }) {
     const [list, setList] = useState([]);
+    const [showtime, setShowtime] = useState(null);
 
     const [activeKey, setActiveKey] = useState(null);
     const handleCollapseChange = (key) => {
@@ -29,151 +19,121 @@ function ListPhim({propsValue}) {
     };
 
     useEffect(() => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                setInitLoading(false);
-                setData(res.results);
-                setList(res.results);
-            });
-    }, []);
+        const get = async () => {
+            const res = await cinemaComplexUserApi.getCcxFormatShowtimeByMovie(
+                1,
+                propsValue.provinces.id,
+                propsValue.cinemaChainName,
+                propsValue.chooseDay,
+            );
+            setList(res);
+            // console.log('res nênnf', res);
+        };
+        get();
+    }, [propsValue]);
 
-    const onLoadMore = () => {
-        setLoading(true);
-        setList(
-            data.concat(
-                [...new Array(count)].map(() => ({
-                    loading: true,
-                    name: {},
-                    picture: {},
-                })),
-            ),
-        );
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                const newData = data.concat(res.results);
-                setData(newData);
-                setList(newData);
-                setLoading(false);
-                window.dispatchEvent(new Event('resize'));
-            });
+    const handShowtime = (value) => {
+        setShowtime(value);
     };
 
-    const loadMore =
-        !initLoading && !loading ? (
-            <div
-                style={{
-                    textAlign: 'center',
-                    marginTop: 17,
-                    marginBottom: 20,
-                    height: 32,
-                    lineHeight: '32px',
-                }}
-            >
-                <Button onClick={onLoadMore} className={cx('btn-load')}>
-                    Xem thêm
-                </Button>
-            </div>
-        ) : null;
-
-    const newList = list.map((item, index) => {
+    const newList = list?.cinemaComplexObjResps?.map((item, index) => {
         return {
             ...item,
             key: index,
-            children: (
-                <Row className={cx('col2-movie')}>
-                    
-                    <Col span={24} className={cx('container-suat-chieu')}>
-                        <div className={cx('title')}>2D Phụ đề</div>
-                        <div className={cx('suat-chieu')}>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
+            label: (
+                <Row className={cx('wrapper-a')}>
+                    <Col span={2} style={{}}>
+                        <div className={cx('border-img')}>
+                            <img
+                                className={cx('img')}
+                                src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
+                                alt=""
+                            />
                         </div>
                     </Col>
-
-                    <Col span={24} className={cx('container-suat-chieu')}>
-                        <div className={cx('title')}>2D Phụ đề</div>
-                        <div className={cx('suat-chieu')}>
-                            <Button className={cx('btn-suat-chieu')} danger>
-                                <span className={cx('gio-bat-dau')}>20:45</span>
-                                <span className={cx('gio-ket-thuc')}>21:45</span>
-                            </Button>
-                        </div>
+                    <Col span={22} style={{ width: '100%' }}>
+                        <Row style={{ width: '100%' }}>
+                            <Col ol span={24} className={cx('ten-rap')} onClick={() => console.log('item', item)}>
+                                {item.cinemaComplex.name}
+                            </Col>
+                            <Col span={24} className={cx('container-info')}>
+                                <div className={cx('chi-tiet-dia-chi')}>{item.cinemaComplex.address}</div>
+                                <div className={cx('ban-do')}>[Bản đồ]</div>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
             ),
-            label: (
-              
-                    <Row className={cx('wrapper-a')}>
-                        <Col span={2} style={{}}>
-                            <div className={cx('border-img')}>
-                                <img
-                                    className={cx('img')}
-                                    src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
-                                    alt=""
-                                />
-                            </div>
-                        </Col>
-                        <Col span={22} style={{ width:'100%'}}>
-                            <Row style={{ width:'100%'}}>
-                                <Col  ol span={24} className={cx('ten-rap')} onClick={() => console.log('item', item)}>
-                                    {item.email}
-                                </Col>
-                                <Col span={24} className={cx('container-info')}>
-                                    <div className={cx('chi-tiet-dia-chi')}>
-                                        Tầng 4 Lotte Mart Phú Thọ, Số 968 đường Ba Tháng Hai, P.15, Quận 11 Tháng Hai, P.15, Quận 11 Tháng Hai, P.15, Quận 11
+            children: (
+                <Row className={cx('col2-movie')}>
+                    {item.listFormatAndShowtimes.map((valueFormat, index) => {
+                        if (valueFormat.name ?? valueFormat.showtimes.length > 0) {
+                            return (
+                                <Col key={index} span={24} className={cx('container-suat-chieu')}>
+                                    <div className={cx('title')}>{valueFormat.format.name}</div>
+                                    <div className={cx('suat-chieu')}>
+                                        {valueFormat.showtimes.map((valueShowtime, index) => (
+                                            <Button
+                                                key={index}
+                                                className={cx('btn-suat-chieu')}
+                                                danger
+                                                onClick={() => handShowtime(valueShowtime)}
+                                            >
+                                                <span className={cx('gio-bat-dau')}>
+                                                    {moment(valueShowtime.startTime).format('HH:mm')}
+                                                </span>
+                                                <span className={cx('gio-ket-thuc')}>
+                                                    {moment(valueShowtime.endTime).format('HH:mm')}
+                                                </span>
+                                            </Button>
+                                        ))}
                                     </div>
-                                    <div className={cx('ban-do')}>[Bản đồ]</div>
                                 </Col>
-                            </Row>
-                        </Col>
-                    </Row>
-              
+                            );
+                        }
+                        return null;
+                    })}
+
+                    {/* <Col span={24} className={cx('container-suat-chieu')}>
+                        <div className={cx('title')}>2D Phụ đề</div>
+                        <div className={cx('suat-chieu')}>
+                            <Button className={cx('btn-suat-chieu')} danger>
+                                <span className={cx('gio-bat-dau')}>20:45</span>
+                                <span className={cx('gio-ket-thuc')}>21:45</span>
+                            </Button>
+                        </div>
+                    </Col> */}
+                </Row>
             ),
         };
     });
+    console.log(newList);
+    // console.log('list', list);
 
     return (
         <>
-            <List
-                loading={initLoading}
-                itemLayout="horizontal"
-                loadMore={loadMore}
-                dataSource={newList}
-                renderItem={(item) => (
-                    <List.Item className={cx('list-item')}>
-                        <Skeleton avatar title={false} paragraph={{ rows: 1 }} loading={item.loading} active>
-                            <Collapse
-                                activeKey={activeKey}
-                                accordion
-                                onChange={handleCollapseChange}
-                                key={item.key}
-                                bordered={false}
-                                items={[item]}
-                            />
-                        </Skeleton>
-                    </List.Item>
-                )}
-            />
+            {list.length !== 0 && (
+                <List
+                    dataSource={newList}
+                    renderItem={(item) => {
+                        return (
+                            <List.Item className={cx('list-item')}>
+                                <Skeleton avatar title={false} paragraph={{ rows: 1 }} loading={item.loading} active>
+                                    <Collapse
+                                        activeKey={activeKey}
+                                        accordion
+                                        onChange={handleCollapseChange}
+                                        key={item.key}
+                                        bordered={false}
+                                        items={[item]}
+                                    />
+                                </Skeleton>
+                            </List.Item>
+                        );
+                    }}
+                />
+            )}
+            {newList === undefined && <NotFountShowtime />}
         </>
     );
 }
