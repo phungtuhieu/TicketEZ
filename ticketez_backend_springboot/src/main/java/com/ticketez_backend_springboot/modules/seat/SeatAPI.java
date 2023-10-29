@@ -36,6 +36,13 @@ public class SeatAPI {
         return ResponseEntity.ok(seats);
     }
 
+    @GetMapping("/by-seatchart-name/{seatChartId}/{name}")
+    public ResponseEntity<Seat> getSeatsBySeatChartNameSeat(
+            @PathVariable("seatChartId") Long seatChartId, @PathVariable("name") String name) {
+        Seat seats = seatDAO.findBySeatChartIdAndName(seatChartId, name);
+        return ResponseEntity.ok(seats);
+    }
+
     @GetMapping("/by-seatchart-and-seattype/{seatChartId}/{seatTypeId}")
     public ResponseEntity<List<Seat>> getSeatsBySeatChartAndSeatType(
             @PathVariable("seatChartId") Long seatChartId,

@@ -24,18 +24,18 @@ function SeatChart(props) {
         setIsModalOpen(false);
     };
     const createSeatArray = () => {
-        let seatRows =7; // Số hàng
-        let seatColumns = 5; // Số cột
+        let seatRows = 10; // Số hàng
+        let seatColumns = 7; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
         const seatState = {
             seat: [],
             way: ['A2'],
             seatAvailable: [],
-            seatReserved: [],
+            seatReserved: ['A4'],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-            seatUnavailable: [],
+            seatUnavailable: seatBookingData,
         };
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
@@ -65,7 +65,7 @@ function SeatChart(props) {
             }
             seatState.seat.push(row);
         }
-        
+
         // for (let i = 0; i < seatRows; i++) {
         //     const row = [];
         //     const rowAvailable = [];
@@ -93,6 +93,45 @@ function SeatChart(props) {
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
+    const [seatBookingData, setSeatBookingData] = useState(['H1']);
+
+    const fetchDataSeatBooking = async () => {
+        try {
+            const resp = await axiosClient.get(`seatBooking/status-seatchart/${1}/${2}`);
+            const data = resp.data;
+            console.log(data);
+            data.forEach((newItem) => {
+                // Kiểm tra xem newItem đã tồn tại trong mảng hay chưa
+                if (!seatBookingData.includes(newItem)) {
+                    // Nếu chưa tồn tại, thì thêm vào mảng
+                    setSeatBookingData((prev) => [...prev, newItem]);
+                }
+            });
+            console.log('----------------------------------------------------------------');
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchDataInterval = setInterval(() => {
+            fetchDataSeatBooking();
+            console.log('====================================');
+            console.log(seatBookingData);
+            console.log('====================================');
+        }, 5000); // 3 giây
+
+        // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
+        return () => {
+            clearInterval(fetchDataInterval);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (allSeats.length > 0) {
+            setSeatState(createSeatArray());
+        }
+    }, [seatBookingData]);
 
     const fetchDataSeat = async () => {
         try {
@@ -135,6 +174,9 @@ function SeatChart(props) {
             console.log(listSeatNormal);
             console.log(listSeatVip);
             console.log(allSeats);
+            if (seatBookingData.length > 0) {
+                setReload(true);
+            }
             if (allSeats.length > 0) {
                 if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
                     setSeatState(createSeatArray());
@@ -204,7 +246,7 @@ function SeatChart(props) {
         const respVip = await axiosClient.put(`seat/${idSeat}`, data);
     };
 
-    const onClickData = (seat) => {
+    const onClickData = async (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
 
         console.log('------------------------------------------------');
@@ -215,10 +257,48 @@ function SeatChart(props) {
         while (vipSeat.indexOf(seat) > -1) {
             vipSeat.splice(vipSeat.indexOf(seat), 1);
         }
+        while (seatReserved.indexOf(seat) > -1) {
+            seatReserved.splice(seatReserved.indexOf(seat), 1);
+        }
         setSeatState({
             ...seatState,
             seatReserved: [...seatReserved, seat],
         });
+
+        const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${1}/${seat}`);
+        console.log('====================================');
+        console.log(respSeatChose.data);
+        console.log('====================================');
+
+        const currentTime = new Date(); // Lấy thời gian hiện tại
+        const vietnamTimezoneOffset = 7 * 60; // Độ chênh múi giờ của Việt Nam (7 giờ)
+
+        // Chuyển múi giờ hiện tại thành múi giờ Việt Nam
+        currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
+
+        const formattedTime = currentTime.toISOString(); // Định dạng thời gian thành chuỗi ISO 8601
+
+        const data = {
+            seat: respSeatChose.data,
+
+            booking: {
+                id: '1',
+                seatChart: {
+                    id: 1,
+                },
+            },
+            status: 2,
+            lastSelectedTime: formattedTime,
+        };
+
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
+
+        const resp = await axiosClient.post(`seatBooking`, data);
+        console.log('succcessful');
+        console.log(resp);
+        console.log('====================================');
     };
 
     const onChange = (e) => {
@@ -252,6 +332,8 @@ function SeatChart(props) {
                                                         ? 'way-user'
                                                         : seatState.seatUnavailable.indexOf(seat_no) > -1
                                                         ? 'unavailable'
+                                                        : seatState.seatReserved.indexOf(seat_no) > -1
+                                                        ? 'reserved'
                                                         : seatState.normalSeat.indexOf(seat_no) > -1
                                                         ? 'normal-seat'
                                                         : seatState.vipSeat.indexOf(seat_no) > -1
