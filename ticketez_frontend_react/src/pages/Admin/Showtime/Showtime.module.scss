@@ -1,0 +1,26 @@
+.table-cell-center tbody tr td {
+    text-align: center;
+    vertical-align: middle;
+}
+.border-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    border: 1px solid #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.border-img > .img {
+    width: 32px !important;
+}
+.img-Movie {
+    width: 45px !important;
+    height: 50px !important;
+    border-radius: 3px;
+}
+.text-end {
+  float: right;
+  color: gray;
+}
+

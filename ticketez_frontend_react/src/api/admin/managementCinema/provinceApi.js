@@ -18,6 +18,9 @@ const provinceApi= {
     },
     delete: async (provinceId) => {
         return axiosClient.delete(url + '/' + provinceId);
-    }
+    },
+    getTotalCinemaComplexToPrivince: async () => {
+        return axiosClient.get(url + '/getTotalCinemaComplexToPrivince');
+    },
 };
 export default provinceApi;

@@ -22,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.CinemaToCinemaComplexDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.ticketez_backend_springboot.modules.province.Province;
+import com.ticketez_backend_springboot.modules.province.ProvinceDao;
 
 @CrossOrigin("*")
 @RestController
@@ -30,6 +34,8 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 public class CinemaComplexAPI {
     @Autowired
     CinemaComplexDao cinemaComplexDao;
+    @Autowired
+    ProvinceDao provinceDao;
 
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -132,5 +138,30 @@ public class CinemaComplexAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    //hiển thị tổng cinema theo cinemacomplex
+    @GetMapping("/getTotalCinemaToCinemaComplex")
+    public ResponseEntity<?> getTotalCinemaToCinemaComplex() {
+        List<CinemaToCinemaComplexDTO> distinctMovieIds = cinemaComplexDao.getTotalCinemaToCinemaComplex();
+        return ResponseEntity.ok(distinctMovieIds);
+    }
+
+    //
+    @GetMapping("/get/cinemaComplex-by-province/{provinceID}")
+    public ResponseEntity<?> getDuLie(@PathVariable("provinceID") long provinceID) {
+        try {
+            Province province = provinceDao.findById(provinceID).get();
+            if (province != null) {
+                List<CinemaComplex> provinceDAO = cinemaComplexDao.getCinemaComplexByProvince(province);
+                return ResponseEntity.ok(provinceDAO);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

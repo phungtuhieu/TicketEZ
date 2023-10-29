@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.modules.cinema.Cinema;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,5 +78,11 @@ public class SeatChartAPI {
         }
         dao.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/getStatusSeatChart")
+    public ResponseEntity<List<SeatChart>> getStatusSeatChart() {
+        List<SeatChart> seatCharts = dao.getStatusSeatChart();
+        return ResponseEntity.ok(seatCharts);
     }
 }

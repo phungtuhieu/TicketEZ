@@ -1,5 +1,7 @@
 import axiosClient from '../../global/axiosClient';
 import cinemaApi from '../managementCinema/cinemaApi';
+import seatChartApi from '../managementSeat/seatChart';
+import formatMovieApi from './formatMovieApi';
 import movieApi from './movieApi';
 
 const url = 'showtime';
@@ -7,6 +9,10 @@ const url = 'showtime';
 const showtimeApi = {
     getActorId: async (actorId) => {
         return axiosClient.get(url + '/' + actorId);
+    },
+
+    getAll() {
+        return axiosClient.get(url + '/get/all');
     },
     getShowtime: async (page, limit) => {
         const params = {
@@ -16,16 +22,22 @@ const showtimeApi = {
         const res = await axiosClient.get(url, { params });
         return res.data;
     },
-    post: async (data, movieId, cinemaId) => {
-        const [movie, cinema] = await Promise.all([movieApi.getById(movieId), cinemaApi.getId(cinemaId)]);
-        const values = { ...data, movie: movie.data, cinema: cinema.data };
-        console.log('values', values);
+    post: async (data, cinemaId, formatId, seatChartId) => {
+        const [cinema, formatMovie, seatChart] = await Promise.all([
+            cinemaApi.getId(cinemaId),
+            formatMovieApi.getId(formatId),
+            seatChartApi.getId(seatChartId),
+        ]);
+        const values = { ...data, cinema: cinema.data, formatMovie: formatMovie.data, seatChart: seatChart.data };
         return axiosClient.post(url, values);
     },
-    put: async (id, data, movieId, cinemaId) => {
-        const [movie, cinema] = await Promise.all([movieApi.getById(movieId), cinemaApi.getId(cinemaId)]);
-        const values = {id: id, ...data, movie: movie.data, cinema: cinema.data };
-
+    put: async (id, data, cinemaId, formatId, seatChartId) => {
+        const [cinema, formatMovie, seatChart] = await Promise.all([
+            cinemaApi.getId(cinemaId),
+            formatMovieApi.getId(formatId),
+            seatChartApi.getId(seatChartId),
+        ]);
+        const values = { ...data, cinema: cinema.data, formatMovie: formatMovie.data, seatChart: seatChart.data };
         return axiosClient.put(url + '/' + id, values);
     },
     delete: async (actorId) => {

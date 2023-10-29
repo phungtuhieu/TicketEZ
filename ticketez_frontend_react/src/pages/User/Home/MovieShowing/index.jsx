@@ -33,7 +33,7 @@ const SamplePrevArrow = (props) => {
 const MovieShowing = () => {
     const slides = [];
 
-    for (let i = 0; i <= 20; i++) {
+    for (let i = 1; i <= 20; i++) {
         slides.push({
             id: i,
             img: img.datrungphuongnam,
