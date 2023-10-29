@@ -111,28 +111,28 @@ public class MovieAPI {
     }
 
     ////////////////////////////////
-    @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
-    public ResponseEntity<?> getDuLie(
-            @PathVariable("cinemaComplexId") Long CinemaComplexId,
-            @PathVariable("date") LocalDate date) {
-        try {
-            if (CinemaComplexId.equals("")) {
-                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-            }
-            if (date == null || date.equals("")) {
-                date = LocalDate.now();
-            }
-            CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
-            if (cinemaComplex != null) {
-                List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
-                return ResponseEntity.ok(movie);
-            }
-            return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    // @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
+    // public ResponseEntity<?> getDuLie(
+    //         @PathVariable("cinemaComplexId") Long CinemaComplexId,
+    //         @PathVariable("date") LocalDate date) {
+    //     try {
+    //         if (CinemaComplexId.equals("")) {
+    //             return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //         }
+    //         if (date == null || date.equals("")) {
+    //             date = LocalDate.now();
+    //         }
+    //         CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
+    //         if (cinemaComplex != null) {
+    //             List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
+    //             return ResponseEntity.ok(movie);
+    //         }
+    //         return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
 
-    }
+    // }
 
     @GetMapping("/get/movies-by-cinemaComplexTest")
     public ResponseEntity<?> gettest(
@@ -193,5 +193,7 @@ public class MovieAPI {
         }
 
     }
+
+    
 
 }

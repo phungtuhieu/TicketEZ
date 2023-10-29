@@ -7,7 +7,7 @@ import style from './ListPhim.module.scss';
 
 import moment from 'moment-timezone';
 
-import { movieUserApi, genreUserApi, formatUserApi, showtimeUserApi } from '~/api/user/showtime';
+import { movieUserApi } from '~/api/user/showtime';
 import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
 
 const cx = classNames.bind(style);
@@ -19,7 +19,6 @@ function ListPhim({ cinemaComplex }) {
     const [loading, setLoading] = useState(false);
 
     const [showtime, setShowtime] = useState(null);
-    // console.log(cinemaComplex);
     useEffect(() => {
         const currentTimeInVietnam = moment.tz('Asia/Ho_Chi_Minh');
         const nextWeekDays = [];
@@ -27,7 +26,6 @@ function ListPhim({ cinemaComplex }) {
             const currentDay = currentTimeInVietnam.clone().add(i, 'days');
             nextWeekDays.push(currentDay);
         }
-        // console.log(nextWeekDays);
         setWeekDays(nextWeekDays);
     }, []);
     const [chooseDay, setChooseDay] = useState(moment().format('YYYY-MM-DD'));
@@ -64,73 +62,6 @@ function ListPhim({ cinemaComplex }) {
     
     console.log('data', data);
    
-    // useEffect(() => {
-    //     setLoading(true);
-    //     const getMovie = async () => {
-    //         try {
-    //             if (cinemaComplex) {
-    //                 const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id, chooseDay);
-    //                 setMovieData(resMovie);
-    //             } else {
-    //                 setMovieData([]);
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     getMovie();
-    // }, [cinemaComplex, chooseDay]);
-
-    // const loadGenreByMovie = async (movie) => {
-    //     if (movie ?? movie) {
-    //         const resGenre = await genreUserApi.getGenreByMovie(movie.id);
-    //         return resGenre;
-    //     }
-    // };
-
-    // const loadFormatByMovie = async (movie) => {
-    //     if (movie ?? cinemaComplex) {
-    //         const resFormat = await formatUserApi.getFormatByMovie(movie.id);
-    //         return Promise.all(
-    //             resFormat.map(async (valueFormat) => {
-    //                 const showtime = await showtimeUserApi.getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate(
-    //                     cinemaComplex.id,
-    //                     movie.id,
-    //                     valueFormat.id,
-    //                     chooseDay,
-    //                 );
-    //                 return {
-    //                     format: valueFormat,
-    //                     // showtime: valueFormat.name,
-    //                     showtime,
-    //                 };
-    //             }),
-    //         );
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const data = await Promise.all(
-    //             movieData.map(async (valueMovie) => {
-    //                 const movie = valueMovie;
-    //                 const genre = await loadGenreByMovie(valueMovie);
-    //                 const formatShowTime = await loadFormatByMovie(valueMovie);
-    //                 return {
-    //                     movie,
-    //                     genre,
-    //                     formatShowTime,
-    //                 };
-    //             }),
-    //         );
-    //         console.log('test', data);
-    //         setData(data);
-    //     };
-    //     fetchData();
-    // }, [movieData]);
 
     const handShowtime = (value) => {
         setShowtime(value);
