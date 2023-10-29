@@ -45,6 +45,22 @@ export const movieUserApi = {
             return error;
         }
     },
+    getMovieAllByCinemaComplexAndDate: async (cinemaComplexId, date) => {
+        try {
+            if (cinemaComplexId ?? cinemaComplexId) {
+                const params = {
+                    cinemaComplexId,
+                    date,
+                };
+                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplexTest', { params });
+                return result.data;
+            }
+            return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    },
 };
 // ****************************************************************
 

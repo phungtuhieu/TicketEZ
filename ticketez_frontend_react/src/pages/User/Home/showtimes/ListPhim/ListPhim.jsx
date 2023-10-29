@@ -19,7 +19,7 @@ function ListPhim({ cinemaComplex }) {
     const [loading, setLoading] = useState(false);
 
     const [showtime, setShowtime] = useState(null);
-
+    // console.log(cinemaComplex);
     useEffect(() => {
         const currentTimeInVietnam = moment.tz('Asia/Ho_Chi_Minh');
         const nextWeekDays = [];
@@ -46,13 +46,11 @@ function ListPhim({ cinemaComplex }) {
 
     useEffect(() => {
         setLoading(true);
-        const getMovie = async () => {
+        const getMovies = async () => {
             try {
                 if (cinemaComplex) {
-                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id, chooseDay);
-                    setMovieData(resMovie);
-                } else {
-                    setMovieData([]);
+                    const resMovie = await movieUserApi.getMovieAllByCinemaComplexAndDate(cinemaComplex.id, chooseDay);
+                    setData(resMovie);
                 }
             } catch (error) {
                 console.log(error);
@@ -60,57 +58,79 @@ function ListPhim({ cinemaComplex }) {
                 setLoading(false);
             }
         };
-
-        getMovie();
+        
+        getMovies();
     }, [cinemaComplex, chooseDay]);
+    
+    console.log('data', data);
+   
+    // useEffect(() => {
+    //     setLoading(true);
+    //     const getMovie = async () => {
+    //         try {
+    //             if (cinemaComplex) {
+    //                 const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id, chooseDay);
+    //                 setMovieData(resMovie);
+    //             } else {
+    //                 setMovieData([]);
+    //             }
+    //         } catch (error) {
+    //             console.log(error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
 
-    const loadGenreByMovie = async (movie) => {
-        if (movie ?? movie) {
-            const resGenre = await genreUserApi.getGenreByMovie(movie.id);
-            return resGenre;
-        }
-    };
+    //     getMovie();
+    // }, [cinemaComplex, chooseDay]);
 
-    const loadFormatByMovie = async (movie) => {
-        if (movie ?? cinemaComplex) {
-            const resFormat = await formatUserApi.getFormatByMovie(movie.id);
-            return Promise.all(
-                resFormat.map(async (valueFormat) => {
-                    const showtime = await showtimeUserApi.getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate(
-                        cinemaComplex.id,
-                        movie.id,
-                        valueFormat.id,
-                        chooseDay,
-                    );
-                    return {
-                        format: valueFormat,
-                        // showtime: valueFormat.name,
-                        showtime,
-                    };
-                }),
-            );
-        }
-    };
+    // const loadGenreByMovie = async (movie) => {
+    //     if (movie ?? movie) {
+    //         const resGenre = await genreUserApi.getGenreByMovie(movie.id);
+    //         return resGenre;
+    //     }
+    // };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await Promise.all(
-                movieData.map(async (valueMovie) => {
-                    const movie = valueMovie;
-                    const genre = await loadGenreByMovie(valueMovie);
-                    const formatShowTime = await loadFormatByMovie(valueMovie);
-                    return {
-                        movie,
-                        genre,
-                        formatShowTime,
-                    };
-                }),
-            );
-            // console.log('test', data);
-            setData(data);
-        };
-        fetchData();
-    }, [movieData]);
+    // const loadFormatByMovie = async (movie) => {
+    //     if (movie ?? cinemaComplex) {
+    //         const resFormat = await formatUserApi.getFormatByMovie(movie.id);
+    //         return Promise.all(
+    //             resFormat.map(async (valueFormat) => {
+    //                 const showtime = await showtimeUserApi.getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate(
+    //                     cinemaComplex.id,
+    //                     movie.id,
+    //                     valueFormat.id,
+    //                     chooseDay,
+    //                 );
+    //                 return {
+    //                     format: valueFormat,
+    //                     // showtime: valueFormat.name,
+    //                     showtime,
+    //                 };
+    //             }),
+    //         );
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const data = await Promise.all(
+    //             movieData.map(async (valueMovie) => {
+    //                 const movie = valueMovie;
+    //                 const genre = await loadGenreByMovie(valueMovie);
+    //                 const formatShowTime = await loadFormatByMovie(valueMovie);
+    //                 return {
+    //                     movie,
+    //                     genre,
+    //                     formatShowTime,
+    //                 };
+    //             }),
+    //         );
+    //         console.log('test', data);
+    //         setData(data);
+    //     };
+    //     fetchData();
+    // }, [movieData]);
 
     const handShowtime = (value) => {
         setShowtime(value);
@@ -120,7 +140,7 @@ function ListPhim({ cinemaComplex }) {
         <>
             <Row
                 className={cx({
-                    wrapper: data.length > 0,
+                    wrapper: data.length > 0 ,
                     wrapperCheck: data.length === 0,
                 })}
             >
@@ -185,7 +205,7 @@ function ListPhim({ cinemaComplex }) {
                     </Row>
                 </Col>
                 <Col span={24} className={cx('col2')}>
-                    {data.map((data, index) => (
+                    {data.listMovieObjResp?.map((data, index) => (
                         <Row key={index} className={cx('container-movie')}>
                             <Col span={4} className={cx('col1-movie')}>
                                 <div className={cx('border-movie')}>
@@ -202,7 +222,7 @@ function ListPhim({ cinemaComplex }) {
                                         <div className={cx('k')}>{data.movie.mpaaRating.ratingCode}</div>
                                         <div className={cx('ten-phim')}>{data.movie.title}</div>
                                         <div className={cx('the-loai-phim')}>
-                                            {data.genre.map((valueGenre, index) => (
+                                            {data.genres.map((valueGenre, index) => (
                                                 <span className={cx('span')} key={index}>
                                                     {valueGenre.name}
                                                 </span>
@@ -210,13 +230,13 @@ function ListPhim({ cinemaComplex }) {
                                         </div>
                                     </Col>
 
-                                    {data.formatShowTime.map((valueFormat, index) => {
-                                        if (valueFormat.name ?? valueFormat.showtime.length > 0) {
+                                    {data.listFormatAndShowtimes.map((valueFormat, index) => {
+                                        if (valueFormat.name ?? valueFormat.showtimes.length > 0) {
                                             return (
                                                 <Col key={index} span={24} className={cx('container-suat-chieu')}>
                                                     <div className={cx('title')}>{valueFormat.format.name}</div>
                                                     <div className={cx('suat-chieu')}>
-                                                        {valueFormat.showtime.map((valueShowtime, index) => (
+                                                        {valueFormat.showtimes.map((valueShowtime, index) => (
                                                             <Button
                                                                 key={index}
                                                                 className={cx('btn-suat-chieu')}
