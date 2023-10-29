@@ -28,7 +28,7 @@ import java.util.UUID;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/api/upload")
-public class uploadImage {
+public class UploadImageController {
 
   // Xem ảnh
   @GetMapping("/{id}")
