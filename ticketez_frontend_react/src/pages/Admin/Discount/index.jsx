@@ -92,10 +92,8 @@ const AdminDiscount = () => {
 
     useEffect(() => {
         const selectPrice = async () => {
-            const [cinemaChain, cinemaComplex] = await Promise.all([cinemaChainApi.getAll(), cinemaComplexApi.getPage()]);
-            console.log('cinemaChain', cinemaChain);
+            const [cinemaComplex] = await Promise.all([ cinemaComplexApi.getPage()]);
             console.log('cinemaComplex', cinemaComplex);
-            setCinemaChain(cinemaChain.data);
             setSelectCinemaComplex(cinemaComplex.data);
         };
 
@@ -122,16 +120,16 @@ const AdminDiscount = () => {
             dataIndex: 'amount',
         },
         {
-            title: 'Rạp phim',
-            dataIndex: 'nameCinemaComplex',
-            // width: '30%',
+            title: 'Rạp phim phim',
+            dataIndex: 'cinemaComplex',
+            render: (cinemaComplex) => (cinemaComplex ? cinemaComplex.name : ''),
  
         },
-        {
-            title: 'Rạp chiếu phim',
-            dataIndex: 'cinemaComplex',
-            render: (cinemaComplex) => (cinemaComplex ? cinemaComplex.cinemaChain.name : ''),
-        },
+        // {
+        //     title: 'Rạp chiếu phim',
+        //     dataIndex: 'cinemaComplex',
+        //     render: (cinemaComplex) => (cinemaComplex ? cinemaComplex.cinemaChain.name : ''),
+        // },
         {
             title: 'Thời Gian bắt đầu',
             dataIndex: 'startDate',
@@ -189,7 +187,7 @@ const AdminDiscount = () => {
                         description="Muốn xoá hay không?"
                         okText="Đồng ý"
                         cancelText="Huỷ"
-                    // onConfirm={() => handleDelete(record)}
+                     onConfirm={() => handleDelete(record)}
                     >
                         <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
                     </Popconfirm>
@@ -210,8 +208,7 @@ const AdminDiscount = () => {
             ...record,
             status: !!record.status, 
             discountType: !!record.discountType,
-            cinemaComplex: record.cinemaComplex?.name,
-            cinemaChain: record.cinemaComplex.cinemaChain?.id,
+            cinemaComplex: record.cinemaComplex?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
 
@@ -227,35 +224,63 @@ const AdminDiscount = () => {
     const handleOk = async () => {
         setLoading(true);
         try {
-            const values = await form.validateFields();
-            console.log('values:::::', values);
-            if (fileList.length > 0) {
-                if (editData) {
-                    let upl = {
-                        ...values,
-                    };
-                    console.log(upl);
-                    await discountApi.patchInfoUser(values.id, upl);
-                    funcUtils.notify('Cập nhật thành công', 'success');
-                }
-                setOpen(false);
-                form.resetFields();
-                setLoading(false);
-                setFileList([]);
-                setWorkSomeThing(!workSomeThing);
+            let values = await form.validateFields();
+            console.log(values.cinemaComplex);
+            let putData = {
+                ...values,
+                startDate: new Date(dataStartTime),
+                endDate: new Date(dataEndTime),
+            };
+            console.log(values);
+            if (editData) {
+                const resp = await discountApi.put(editData.id, putData , putData.cinemaComplex);
+                console.log(resp);
+                funcUtils.notify("Cập nhật thành công", 'success');
             }
+            if (!editData) {
+                try {
+                    console.log(values);
+                    const resp = await discountApi.post(putData, putData.cinemaComplex);
+                    if (resp.status === 200) {
+                        funcUtils.notify('Thêm khuyến mãi thành công', 'success');
+                    }
+                } catch (error) {
+                    console.log(error);
+                    funcUtils.notify(error.response.data, 'error');
+                }
+            }
+            setOpen(false);
+            form.resetFields();
+            setLoading(false);
+            setWorkSomeThing([!workSomeThing]);
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
         }
     };
+
+
+    const handleDelete = async (record) => {
+        try {
+            const res = await discountApi.delete(record.id);
+            console.log(res);
+            if (res.status === 200) {
+                funcUtils.notify('Xoá thành công', 'success');
+            }
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
+            }
+        }
+
+        setWorkSomeThing(!workSomeThing);
+    };
+    
     const handleCancel = () => {
         setOpen(false);
     };
-
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
 
     //form
     const handleResetForm = () => {
@@ -397,30 +422,6 @@ const AdminDiscount = () => {
                             />
                         </Form.Item>
                         <Form.Item
-                        {...formItemLayout}
-                        name="cinemaChain"
-                        label="Cụm Rạp chiếu phim "
-                        rules={[{ required: true, message: 'Vui lòng chọn' }]}
-                    >
-
-
-                        <Select
-                            style={{ width: '100%' }}
-                            showSearch
-                            placeholder="Chọn Rap"
-                            optionFilterProp="children"
-                            filterOption={(input, option) =>
-                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            }
-                            options={selectCinemachain?.map((cinemaChain) => ({
-                                value: cinemaChain.id,
-                                label: cinemaChain.name,
-
-                            }))}
-
-                        />
-                    </Form.Item>
-                        <Form.Item
                             name="range-time-picker"
                             label="Ngày giờ" {...rangeConfig} >
 
@@ -461,8 +462,7 @@ const AdminDiscount = () => {
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
-                  nameCinemaComplex: post.cinemaComplex.name,
-                    // cinemaChain: post.cinemaComplex.cinemaComplex.name,
+                //   nameCinemaComplex: post.cinemaComplex.name,
                     birthday: `${('0' + new Date(post.birthday).getDate()).slice(-2)}-${(
                         '0' +
                         (new Date(post.birthday).getMonth() + 1)
