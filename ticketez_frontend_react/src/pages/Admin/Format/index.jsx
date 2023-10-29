@@ -37,6 +37,20 @@ const AdminFormat = () => {
     const [posts, setPosts] = useState([]);
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
+    useEffect(() => {
+        const getList = async () => {
+            try {
+                const res = await formatApi.getAll()
+                setPosts(res.data);
+                console.log(res);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [workSomeThing]);
+
+
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
@@ -290,18 +304,6 @@ const AdminFormat = () => {
 
 
   
-    useEffect(() => {
-        const getList = async () => {
-            try {
-                const res = await formatApi.get()
-                setPosts(res.data);
-                console.log(res);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getList();
-    }, [workSomeThing]);
 
     //form
     const handleResetForm = () => {
