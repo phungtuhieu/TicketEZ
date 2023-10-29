@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.modules.cinemaType.CinemaType;
+import com.ticketez_backend_springboot.modules.discount.Discount;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
 @RestController
@@ -28,10 +27,10 @@ public class CinemaChainAPI {
     @Autowired
     CinemaChainDao cinemaChainDao;
 
-    @GetMapping
-    public ResponseEntity<List<CinemaChain>> findAll() {
-        return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
-    }
+    // @GetMapping
+    // public ResponseEntity<List<CinemaChain>> findAll() {
+    //     return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
+    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
@@ -44,6 +43,12 @@ public class CinemaChainAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+      @GetMapping("/get/all")
+    public ResponseEntity<List<CinemaChain>> findAll() {
+        List<CinemaChain> cinemaChains = cinemaChainDao.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(cinemaChains);
     }
 
     @PostMapping
