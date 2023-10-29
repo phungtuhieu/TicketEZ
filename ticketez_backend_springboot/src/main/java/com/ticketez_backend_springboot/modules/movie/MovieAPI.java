@@ -2,7 +2,6 @@ package com.ticketez_backend_springboot.modules.movie;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.MovieDTO;
+import com.ticketez_backend_springboot.dto.MovieShowtimeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.actor.Actor;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
@@ -37,7 +37,6 @@ import com.ticketez_backend_springboot.modules.director.Director;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovieDAO;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMoviePK;
-import com.ticketez_backend_springboot.modules.format.Format;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovieDAO;
 import com.ticketez_backend_springboot.modules.genre.Genre;
@@ -45,6 +44,9 @@ import com.ticketez_backend_springboot.modules.genreMovie.GenreMovie;
 import com.ticketez_backend_springboot.modules.genreMovie.GenreMovieDAO;
 import com.ticketez_backend_springboot.modules.genreMovie.GenreMoviePK;
 import com.ticketez_backend_springboot.service.UploadImageService;
+import com.ticketez_backend_springboot.modules.format.Format;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
+import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -64,6 +66,9 @@ public class MovieAPI {
 
     @Autowired
     CinemaComplexDao cinemaComplexDao;
+
+    @Autowired
+    ShowtimeDAO showtimeDao;
 
     @GetMapping
     public ResponseEntity<?> findByPage(
@@ -228,26 +233,89 @@ public class MovieAPI {
     }
 
     ////////////////////////////////
-    @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
-    public ResponseEntity<?> getDuLie(
-            @PathVariable("cinemaComplexId") Long CinemaComplexId,
-            @PathVariable("date") LocalDate date) {
+    // @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
+    // public ResponseEntity<?> getDuLie(
+    //         @PathVariable("cinemaComplexId") Long CinemaComplexId,
+    //         @PathVariable("date") LocalDate date) {
+    //     try {
+    //         if (CinemaComplexId.equals("")) {
+    //             return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //         }
+    //         if (date == null || date.equals("")) {
+    //             date = LocalDate.now();
+    //         }
+    //         CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
+    //         if (cinemaComplex != null) {
+    //             List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
+    //             return ResponseEntity.ok(movie);
+    //         }
+    //         return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+
+    // }
+
+    @GetMapping("/get/movies-by-cinemaComplexTest")
+    public ResponseEntity<?> gettest(
+            @RequestParam("cinemaComplexId") Long cinemaComplexId,
+            @RequestParam("date") Optional<LocalDate> date) {
         try {
-            if (CinemaComplexId.equals("")) {
-                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            if (cinemaComplexId.equals("")) {
+                return new ResponseEntity<>("Không tìm thấy phim cụm rạp", HttpStatus.NOT_FOUND);
             }
-            if (date == null || date.equals("")) {
-                date = LocalDate.now();
+
+            CinemaComplex cinemaComplex = cinemaComplexDao.findById(cinemaComplexId).get();
+            List<Movie> movies = dao.getMoviesByCinemaComplex(cinemaComplex, date.orElse(LocalDate.now()));
+            
+            if(movies.isEmpty()) {
+               return ResponseEntity.ok(new ArrayList<>());
             }
-            CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
-            if (cinemaComplex != null) {
-                List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
-                return ResponseEntity.ok(movie);
+
+            MovieShowtimeDTO movieShowtimeDTO = new MovieShowtimeDTO();
+
+            List<MovieShowtimeDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+
+            for (Movie movie : movies) {
+
+                MovieShowtimeDTO.MovieObjResp movieObjResp = movieShowtimeDTO.new MovieObjResp();
+
+                List<MovieShowtimeDTO.MovieObjResp.FormatAndShowtimes> listFormatAndShowtimes = new ArrayList<>();
+
+                List<Genre> genres = new ArrayList<>();
+                for (GenreMovie genreMovie : movie.getGenresMovies()) {
+                    genres.add(genreMovie.getGenre());
+                }
+
+                for (FormatMovie formatMovie : movie.getFormatsMovies()) {
+
+                    MovieShowtimeDTO.MovieObjResp.FormatAndShowtimes formatAndShowtimes = movieObjResp.new FormatAndShowtimes();
+
+                    formatAndShowtimes.setFormat(formatMovie.getFormat());
+
+                    List<Showtime> showtime = showtimeDao.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
+                            movie, formatMovie.getFormat(), date.orElse(LocalDate.now()));
+                    formatAndShowtimes.setShowtimes(showtime);
+                    listFormatAndShowtimes.add(formatAndShowtimes);
+
+                }
+                
+                movieObjResp.setMovie(movie);
+                movieObjResp.setGenres(genres);
+                movieObjResp.setListFormatAndShowtimes(listFormatAndShowtimes);
+
+                listMovieObjResp.add(movieObjResp);
+                movieShowtimeDTO.setListMovieObjResp(listMovieObjResp);
             }
-            return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+
+            return ResponseEntity.ok(movieShowtimeDTO);
+
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
+
+    
+
 }
