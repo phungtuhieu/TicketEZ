@@ -41,7 +41,7 @@ public class Movie implements Serializable {
 	private String title;
 	private String description;
 
-	// private String poster;
+	private String poster;
 	private Time duration;
 	@Column(name = "release_date")
 	@Temporal(TemporalType.DATE)

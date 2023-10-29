@@ -32,16 +32,17 @@ public class DirectorAPI {
     @Autowired
     DirectorDAO directorDAO;
 
-     @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<List<Director>> findAll() {
         List<Director> directors = directorDAO.findAllByOrderByIdDesc();
         return ResponseEntity.ok(directors);
     }
 
-    
     @GetMapping
-    public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit) {
+    public ResponseEntity<?> findByPage(
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<String> search) {
         try {
 
             if (pageNo.isPresent() && pageNo.get() == 0) {
@@ -49,7 +50,7 @@ public class DirectorAPI {
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<Director> page = directorDAO.findAll(pageable);
+            Page<Director> page = directorDAO.findByKeyword(search.orElse(""),pageable);
             ResponseDTO<Director> responseDTO = new ResponseDTO<>();
             responseDTO.setData(page.getContent());
             responseDTO.setTotalItems(page.getTotalElements());
@@ -59,7 +60,6 @@ public class DirectorAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {

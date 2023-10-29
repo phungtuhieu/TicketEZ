@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,8 +32,10 @@ public class ActorAPI {
     ActorDAO actorDAO;
 
     @GetMapping
-    public ResponseEntity<?> findByPage(@RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit) {
+    public ResponseEntity<?> findByPage(
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<String> search) {
         try {
 
             if (pageNo.isPresent() && pageNo.get() == 0) {
@@ -42,7 +43,7 @@ public class ActorAPI {
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<Actor> page = actorDAO.findAll(pageable);
+            Page<Actor> page = actorDAO.findByKeyword(search.orElse(""),pageable);
             ResponseDTO<Actor> responseDTO = new ResponseDTO<>();
             responseDTO.setData(page.getContent());
             responseDTO.setTotalItems(page.getTotalElements());
