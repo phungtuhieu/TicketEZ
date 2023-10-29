@@ -12,6 +12,7 @@ import { provinceUserApi } from '~/api/user/showtime/writeApi';
 import ListPhim from '../ListPhim/ListPhim';
 
 import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 
@@ -222,7 +223,7 @@ function ViTri() {
                                     <div className={cx('border')}>
                                         <img
                                             className={cx('img')}
-                                            src={'http://localhost:8081/api/upload/' + name.image}
+                                            src={uploadApi.get(name.image)}
                                             alt=""
                                         />
                                     </div>

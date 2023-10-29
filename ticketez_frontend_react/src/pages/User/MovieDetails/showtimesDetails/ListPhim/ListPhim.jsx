@@ -6,6 +6,7 @@ import style from './ListPhim.module.scss';
 import { cinemaComplexUserApi } from '~/api/user/showtime';
 import moment from 'moment-timezone';
 import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 
@@ -27,7 +28,6 @@ function ListPhim({ propsValue }) {
                 propsValue.chooseDay,
             );
             setList(res);
-            // console.log('res nênnf', res);
         };
         get();
     }, [propsValue]);
@@ -46,7 +46,7 @@ function ListPhim({ propsValue }) {
                         <div className={cx('border-img')}>
                             <img
                                 className={cx('img')}
-                                src="https://homepage.momocdn.net/blogscontents/momo-upload-api-210604170617-637584231772974269.png"
+                                src={uploadApi.get(item.cinemaComplex.cinemaChain.image)}
                                 alt=""
                             />
                         </div>
@@ -108,8 +108,6 @@ function ListPhim({ propsValue }) {
         };
     });
     console.log(newList);
-    // console.log('list', list);
-
     return (
         <>
             {list.length !== 0 && (

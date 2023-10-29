@@ -9,6 +9,7 @@ import moment from 'moment-timezone';
 
 import { movieUserApi } from '~/api/user/showtime';
 import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 
@@ -56,12 +57,11 @@ function ListPhim({ cinemaComplex }) {
                 setLoading(false);
             }
         };
-        
+
         getMovies();
     }, [cinemaComplex, chooseDay]);
-    
+
     console.log('data', data);
-   
 
     const handShowtime = (value) => {
         setShowtime(value);
@@ -71,7 +71,7 @@ function ListPhim({ cinemaComplex }) {
         <>
             <Row
                 className={cx({
-                    wrapper: data.length > 0 ,
+                    wrapper: data.length > 0,
                     wrapperCheck: data.length === 0,
                 })}
             >
@@ -89,10 +89,7 @@ function ListPhim({ cinemaComplex }) {
                                         <div className={cx('border-img')}>
                                             <img
                                                 className={cx('img')}
-                                                src={
-                                                    'http://localhost:8081/api/upload/' +
-                                                    (cinemaComplex?.cinemaChain?.image ?? '')
-                                                }
+                                                src={uploadApi.get(cinemaComplex?.cinemaChain?.image ?? '')}
                                                 alt="l"
                                             />
                                         </div>
