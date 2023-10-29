@@ -63,7 +63,6 @@ const AdminShowtime = () => {
     const [selectMovie, setSelectMovie] = useState();
     const [selectFormat, setSelectFormat] = useState();
     const [selectProvice, setSelectProvice] = useState();
-    console.log('!!', selectCinemaComplex);
     //set dữ liệu khi người dùng chọn
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
@@ -372,7 +371,6 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-
             const currentTime = new Date(); // Lấy ngày hiện tại
             const startTime = new Date(dataStartTime);
             const endTime = new Date(dataEndTime);
@@ -464,6 +462,7 @@ const AdminShowtime = () => {
     };
 
     const onChangSelectFormatMovie = (value) => {
+        console.log("valuye",value);
         setSelectedOption4(value);
         setValueTimeMovie(value);
     };

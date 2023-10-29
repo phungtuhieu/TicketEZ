@@ -124,4 +124,15 @@ public class MovieAPI {
         }
 
     }
+
+    @GetMapping("/get/movie-showing")
+    public ResponseEntity<?> getMovieShowing() {
+        try {
+            List<Movie> movie = dao.getMoviesExistsMovieIdShowtimes();
+            return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

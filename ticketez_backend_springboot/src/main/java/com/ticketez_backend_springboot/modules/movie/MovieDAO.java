@@ -21,10 +21,12 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
             + ")")
     List<Movie> getMoviesByCinemaComplex(@Param("CinemaComplex") CinemaComplex CinemaComplex, @Param("date") LocalDate date);
 
-    // @Query("SELECT m FROM Movie m WHERE EXISTS (SELECT st FROM Showtime st JOIN
-    // st.cinema c JOIN c.cinemaComplex ccx WHERE m = st.movie AND ccx.id = 2 )")
-    // List<Movie> findMoviesBy();
 
     List<Movie> findAllByOrderByIdDesc();
+
+    @Query("SELECT m FROM Movie m WHERE EXISTS "
+            + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id AND st.status = 2 "
+            + "AND CAST(CURRENT_TIMESTAMP AS DATE) BETWEEN  CAST(st.startTime AS DATE) AND  CAST(st.endTime AS DATE)  )")
+    List<Movie> getMoviesExistsMovieIdShowtimes();
 
 }
