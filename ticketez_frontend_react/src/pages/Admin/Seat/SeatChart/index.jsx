@@ -24,7 +24,7 @@ function SeatChart(props) {
     const { rows, columns, nameSeat, idSeatChart } = props;
 
     const createSeatArray = () => {
-        let seatRows =rows; // Số hàng
+        let seatRows = rows; // Số hàng
         let seatColumns = columns; // Số cột
         console.log(seatRows);
         console.log(seatColumns);
@@ -67,7 +67,7 @@ function SeatChart(props) {
             }
             seatState.seat.push(row);
         }
-        
+
         // for (let i = 0; i < seatRows; i++) {
         //     const row = [];
         //     const rowAvailable = [];
@@ -230,6 +230,9 @@ function SeatChart(props) {
             while (seatUnavailable.indexOf(seat) > -1) {
                 seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
             }
+            while (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
             setSeatState({
                 ...seatState,
                 normalSeat: [...normalSeat, seat],
@@ -241,6 +244,9 @@ function SeatChart(props) {
             }
             while (seatUnavailable.indexOf(seat) > -1) {
                 seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
+            }
+            while (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
             }
 
             setSeatState({
@@ -254,6 +260,9 @@ function SeatChart(props) {
             }
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
             }
             setSeatState({
                 ...seatState,

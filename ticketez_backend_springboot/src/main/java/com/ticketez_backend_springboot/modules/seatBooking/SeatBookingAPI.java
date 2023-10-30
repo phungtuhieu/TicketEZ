@@ -35,11 +35,11 @@ public class SeatBookingAPI {
         return ResponseEntity.ok(bookingDao.findAll());
     }
 
-    @GetMapping("status-seatchart/{seatChartID}/{status}")
-    public ResponseEntity<List<String>> findByStatus(@PathVariable("seatChartID") long id,
-            @PathVariable("status") Integer status) {
-        return ResponseEntity.ok(bookingDao.findSeatNamesBySeatChartIdAndStatus(id, status));
-    }
+    // @GetMapping("status-seatchart/{seatChartID}/{status}")
+    // public ResponseEntity<List<String>> findByStatus(@PathVariable("seatChartID") long id,
+    //         @PathVariable("status") Integer status) {
+    //     return ResponseEntity.ok(bookingDao.findSeatNamesBySeatChartIdAndStatus(id, status));
+    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<SeatBooking> findById(@PathVariable("id") Long id) {
@@ -65,20 +65,20 @@ public class SeatBookingAPI {
         return ResponseEntity.ok(seatBooking);
     }
 
-    @Scheduled(fixedDelay = 60000)
-    public void checkAndDeleteBookedSeats() {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<SeatBooking> bookedSeats = bookingDao.findByStatus(2);
-        for (SeatBooking seat : bookedSeats) {
-            if (seat.getLastSelectedTime() != null) {
-                Duration duration = Duration.between(seat.getLastSelectedTime(), currentTime);
-                if (duration.toMinutes() >= 1) {
-                    bookingDao.deleteById(seat.getId());
-                    ;
-                }
-            }
-        }
-    }
+    // @Scheduled(fixedDelay = 60000)
+    // public void checkAndDeleteBookedSeats() {
+    //     LocalDateTime currentTime = LocalDateTime.now();
+    //     List<SeatBooking> bookedSeats = bookingDao.findByStatus(2);
+    //     for (SeatBooking seat : bookedSeats) {
+    //         if (seat.getLastSelectedTime() != null) {
+    //             Duration duration = Duration.between(seat.getLastSelectedTime(), currentTime);
+    //             if (duration.toMinutes() >= 1) {
+    //                 bookingDao.deleteById(seat.getId());
+    //                 ;
+    //             }
+    //         }
+    //     }
+    // }
 
     @PutMapping("/{id}")
     public ResponseEntity<SeatBooking> put(@PathVariable("id") Long id, @RequestBody SeatBooking seatBooking) {
