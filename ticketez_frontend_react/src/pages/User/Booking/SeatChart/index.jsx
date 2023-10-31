@@ -32,14 +32,13 @@ function SeatChart(props) {
             seat: [],
             way: ['A2'],
             seatAvailable: [],
-            seatReserved: ['A4'],
+            seatReserved: [],
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
             seatUnavailable: seatBookingData,
         };
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
-        console.log(allSeats);
         var mangHaiChieu = new Array(seatRows);
         for (var i = 0; i < seatRows; i++) {
             mangHaiChieu[i] = new Array(seatColumns);
@@ -55,7 +54,6 @@ function SeatChart(props) {
             }
         }
         for (var i = 0; i < seatRows; i++) {
-            console.log(mangHaiChieu[i]);
             const row = [];
             const rowAvailable = [];
             const rowLabel = rowLabels[i];
@@ -93,14 +91,14 @@ function SeatChart(props) {
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
-    const [seatBookingData, setSeatBookingData] = useState(['H1']);
+    const [seatBookingData, setSeatBookingData] = useState([]);
 
     const fetchDataSeatBooking = async () => {
         try {
-            const resp = await axiosClient.get(`seatBooking/status-seatchart/${1}/${2}`);
+            const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${1}`);
             const data = resp.data;
-            if(data.length <= 0) {
-                setSeatBookingData([])
+            if (data.length <= 0) {
+                setSeatBookingData([]);
             }
             console.log(data);
             data.forEach((newItem) => {
@@ -110,7 +108,6 @@ function SeatChart(props) {
                     setSeatBookingData((prev) => [...prev, newItem]);
                 }
             });
-            console.log('----------------------------------------------------------------');
         } catch (error) {
             console.error(error);
         }
@@ -119,11 +116,7 @@ function SeatChart(props) {
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatBooking();
-            console.log('====================================');
-            console.log(seatBookingData);
-            console.log('====================================');
         }, 5000);
-         
 
         // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
         return () => {
@@ -132,8 +125,9 @@ function SeatChart(props) {
     }, []);
 
     useEffect(() => {
-        if (allSeats.length > 0) {
+        if (allSeats.length > 0 && seatBookingData.length > 0 && !seatState.seatReserved.length > 0) {
             setSeatState(createSeatArray());
+            console.log('useEffect reload createSeatArray run');
         }
     }, [seatBookingData]);
 
@@ -196,44 +190,6 @@ function SeatChart(props) {
             console.error(error);
         }
     };
-
-    const onClickUpdate = () => {
-        const seatVipAndNormal = [
-            ...seatState.vipSeat.map((seat) => ({ name: seat, type: 2 })),
-            ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
-        ];
-
-        const updatedSeat = allSeats.map((allSeat) => {
-            const matchingItem = seatVipAndNormal.find((seat) => allSeat.name === seat.name);
-            if (matchingItem) {
-                return {
-                    ...allSeat,
-                    seatType: {
-                        id: matchingItem.type,
-                    },
-                    seatChart: {
-                        id: 1,
-                    },
-                };
-            }
-            return allSeat;
-        });
-        try {
-            updatedSeat.forEach((seat) => {
-                handelUpdate(seat.id, seat);
-                setShowInfo('success');
-                setTimeout(() => {
-                    setShowInfo('');
-                }, 1000);
-            });
-        } catch (error) {
-            setShowInfo('error');
-            setTimeout(() => {
-                setShowInfo('');
-            }, 1000);
-        }
-        console.log(updatedSeat);
-    };
     const [showInfo, setShowInfo] = useState('');
     useEffect(() => {
         if (showInfo === 'success') {
@@ -252,9 +208,6 @@ function SeatChart(props) {
 
     const onClickData = async (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
-
-        console.log('------------------------------------------------');
-        console.log(seatState.seatReserved);
         while (normalSeat.indexOf(seat) > -1) {
             normalSeat.splice(normalSeat.indexOf(seat), 1);
         }
@@ -268,41 +221,43 @@ function SeatChart(props) {
             ...seatState,
             seatReserved: [...seatReserved, seat],
         });
+    };
+    const [duplicateSeat, setDuplicateSeat] = useState([]);
 
-        const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${1}/${seat}`);
-        console.log('====================================');
-        console.log(respSeatChose.data);
-        console.log('====================================');
+    const onCreateDaTaSeatChoose = async () => {
+        try {
+            const responses = await Promise.all(
+                seatState.seatReserved.map(async (seat) => {
+                    const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${1}/${seat}`);
+                    return respSeatChose.data;
+                }),
+            );
+            const newData = responses.flatMap((data) => data);
+            const uniqueData = [...new Set(newData)];
+            setDuplicateSeat((prev) => [...prev, ...uniqueData]);
 
-        const currentTime = new Date(); // Lấy thời gian hiện tại
-        const vietnamTimezoneOffset = 7 * 60; // Độ chênh múi giờ của Việt Nam (7 giờ)
+            console.log(duplicateSeat);
 
-        // Chuyển múi giờ hiện tại thành múi giờ Việt Nam
-        currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
+            const currentTime = new Date();
+            const vietnamTimezoneOffset = 7 * 60;
 
-        const formattedTime = currentTime.toISOString(); // Định dạng thời gian thành chuỗi ISO 8601
+            // Chuyển múi giờ hiện tại thành múi giờ Việt Nam
+            currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
 
-        const data = {
-            seat: respSeatChose.data,
-
-            booking: {
-                id: '1',
-                seatChart: {
-                    id: 1,
-                },
-            },
-            status: 2,
-            lastSelectedTime: formattedTime,
-        };
-
-        console.log('====================================');
-        console.log(data);
-        console.log('====================================');
-
-        const resp = await axiosClient.post(`seatBooking`, data);
-        console.log('succcessful');
-        console.log(resp);
-        console.log('====================================');
+            const formattedTime = currentTime.toISOString();
+            const data = duplicateSeat.map((s) => ({
+                lastSelectedTime: formattedTime,
+                seat: s,
+            }));
+            try {
+                const resp = await axiosClient.post(`seat-choose`, data);
+                console.log(data);
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu từ server', error);
+            }
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu từ server', error);
+        }
     };
 
     const onChange = (e) => {
@@ -313,6 +268,11 @@ function SeatChart(props) {
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
+
+    const handleButtonClick = () => {
+        onCreateDaTaSeatChoose();
+        showModal();
+    };
 
     return (
         <>
@@ -392,12 +352,8 @@ function SeatChart(props) {
                                 }}
                                 className={cx('btn')}
                                 type="primary"
-                                onClick={showModal}
-                                icon={
-                                    <ShoppingOutlined
-                                        style={{ fontSize: '32px' }} // Đổi kích thước và màu sắc
-                                    />
-                                }
+                                onClick={handleButtonClick}
+                                icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
                             >
                                 Mua vé
                             </Button>

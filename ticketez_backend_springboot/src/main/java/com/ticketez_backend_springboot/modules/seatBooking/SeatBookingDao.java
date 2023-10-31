@@ -14,8 +14,8 @@ public interface SeatBookingDao extends JpaRepository<SeatBooking, Long> {
     @Query("SELECT sb.seat.name FROM SeatBooking sb WHERE sb.booking.id = :bookingId")
     List<String> findSeatNamesByBookingId(@Param("bookingId") String bookingId);
 
-    @Query("SELECT sb.seat.name FROM SeatBooking sb WHERE sb.seat.seatChart.id = :seatChartId AND sb.status = :status")
-    List<String> findSeatNamesBySeatChartIdAndStatus(@Param("seatChartId") Long seatChartId, @Param("status") int status);
+    // @Query("SELECT sb.seat.name FROM SeatBooking sb WHERE sb.seat.seatChart.id = :seatChartId AND sb.status = :status")
+    // List<String> findSeatNamesBySeatChartIdAndStatus(@Param("seatChartId") Long seatChartId, @Param("status") int status);
     
 
 }

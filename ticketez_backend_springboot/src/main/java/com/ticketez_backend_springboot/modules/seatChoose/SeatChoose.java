@@ -1,4 +1,5 @@
-package com.ticketez_backend_springboot.modules.seatBooking;
+package com.ticketez_backend_springboot.modules.seatChoose;
+
 
 import java.time.LocalDateTime;
 
@@ -15,21 +16,15 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "Seats_Booking")
+@Table(name = "Seats_Choose")
 @Data
-public class SeatBooking {
-	@Id
+public class SeatChoose {
+    @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	private LocalDateTime lastSelectedTime;
+    @ManyToOne
 	@JoinColumn(name = "seat_id")
 	private Seat seat;
-
-	@ManyToOne
-	@JoinColumn(name = "booking_id")
-	private Booking booking;
-
-	private int status; // Đã đặt, đang chọn, đã chọn
-
 }
