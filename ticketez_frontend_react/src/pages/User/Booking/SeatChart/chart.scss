@@ -46,8 +46,8 @@ ul.mar li {
     }
 
     .grid td {
-        height: 25px; /* Giảm chiều cao */
-        width: 25px; /* Giảm chiều rộng */
+        height: 25px;
+        width: 25px;
         padding: 5px 5px;
     }
 }
@@ -62,9 +62,9 @@ ul.mar li {
 }
 
 .grid td {
-    height: 50px;
-    width: 50px;
-    padding: 15px 10px;
+    height: 40px;
+    width: 40px;
+    padding: 8px;
     border: 2px solid rgb(249, 249, 249, 0.5);
     text-align: center;
     float: left;
@@ -111,16 +111,13 @@ ul.mar li {
 }
 
 .way {
-    
     background-color: #221e1e;
     // text-indent: -9999px;
 }
 .way-user {
-   
-  visibility: hidden;
+    visibility: hidden;
     text-indent: -9999px;
 }
-
 
 .available {
     color: white;
@@ -150,8 +147,17 @@ li {
 .screen {
     border-radius: 10px 10px 0px 0px;
     background-color: white;
-    width: 100%;
+    width: 200px;
     height: 10px;
+}
+.screen-title {
+    border-radius: 10px 10px 0px 0px;
+    background-color: white;
+    width: 200px;
+    height: 10px;
+}
+.ant-modal-content {
+    margin-bottom: 20px; /* Thay đổi giá trị 20px theo mong muốn của bạn */
 }
 
 .baoBoc {
@@ -163,3 +169,17 @@ li {
         background-color: transparent;
     }
 }
+
+/* Tạo thanh trượt ngang cho phần "ca" */
+.ca {
+    max-height: 300px; /* Giới hạn chiều cao của phần "ca" để hiển thị thanh trượt dọc */
+    overflow-y: auto; /* Tạo thanh trượt dọc khi nội dung vượt quá kích thước */
+}
+
+/* Tạo thanh trượt dọc cho bảng */
+.grid {
+    width: 100%; /* Đảm bảo chiều rộng của bảng là 100% */
+    overflow-x: auto; /* Tạo thanh trượt ngang khi bảng vượt quá kích thước */
+}
+
+/* Các lớp CSS khác (reserved, normal-seat, vip-seat, ...) */
