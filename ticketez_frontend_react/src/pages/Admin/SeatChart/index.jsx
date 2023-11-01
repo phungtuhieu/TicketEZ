@@ -7,7 +7,6 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
-
 import { seatChartApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 

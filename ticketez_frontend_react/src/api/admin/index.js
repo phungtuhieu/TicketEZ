@@ -19,7 +19,7 @@ export { default as formatApi } from './managementMovie/formatApi';
 // seat
 export { default as seatApi } from './managementSeat/seatApi';
 export { default as seatTypeApi } from './managementSeat/seatTypeApi';
-export { default as seatChart } from './managementSeat/seatChart';
+export { default as seatChartApi } from './managementSeat/seatChartApi';
 
 // combo & event
 export { default as comboApi } from './ManageCombosAndEvents/comboApi';
