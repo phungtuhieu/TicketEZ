@@ -202,8 +202,14 @@ GO
 		id BIGINT IDENTITY(1, 1) NOT NULL,
         [seat_id] BIGINT NOT NULL,
         [booking_id] NVARCHAR(30) NOT NULL,
-        [status] INT NOT NULL, -- ĐÃ ĐẶT, ĐANG CHỌN, ĐÃ CHỌN
-		last_selected_time DATETIME
+        [status] INT NOT NULL, 
+    )
+	go 
+	
+    CREATE TABLE Seats_Choose (
+		id BIGINT IDENTITY(1, 1) NOT NULL,
+		last_selected_time DATETIME,
+		[seat_id] BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Price (
@@ -545,6 +551,11 @@ ADD
     CONSTRAINT PK_MPAA_Rating PRIMARY KEY (id);
 
 GO
+ALTER TABLE
+    Seat_Choose
+ADD
+    CONSTRAINT PK_Seat_Choose PRIMARY KEY (id);
+	go
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
     Verification
@@ -803,6 +814,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_PaymentInfo_Booking FOREIGN KEY (booking_id) REFERENCES Booking(id)
 GO
+ALTER TABLE
+    [Seat_Choose]
+ADD
+    CONSTRAINT FK_Seat_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seat(id)
+	go
     -- /Payment_Info
 
 

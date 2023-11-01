@@ -80,9 +80,10 @@ function SeatChart(props) {
         const { normalSeat, way } = seatState;
         if (selectedSeatType === 'way') {
             while (normalSeat.indexOf(seat) > -1) {
-                console.log(seat);
                 normalSeat.splice(normalSeat.indexOf(seat), 1);
-                console.log(normalSeat);
+            }
+            while (way.indexOf(seat) > -1) {
+                way.splice(way.indexOf(seat), 1);
             }
             const row = seat.charCodeAt(0) - 'A'.charCodeAt(0);
             const column = seatState.seat[row].indexOf(seat);
