@@ -24,9 +24,9 @@ function SeatChart(props) {
         setIsModalOpen(false);
     };
     const createSeatArray = () => {
-        console.log("222222222222222222222222222222222222222222222222");
+        console.log('222222222222222222222222222222222222222222222222');
         console.log(showtime);
-        let seatRows =showtime.seatChart.rows; // Số hàng
+        let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
@@ -230,7 +230,9 @@ function SeatChart(props) {
         try {
             const responses = await Promise.all(
                 seatState.seatReserved.map(async (seat) => {
-                    const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${showtime.seatChart.id}/${seat}`);
+                    const respSeatChose = await axiosClient.get(
+                        `seat/by-seatchart-name/${showtime.seatChart.id}/${seat}`,
+                    );
                     return respSeatChose.data;
                 }),
             );
@@ -251,6 +253,10 @@ function SeatChart(props) {
                 lastSelectedTime: formattedTime,
                 seat: s,
             }));
+            await Promise.all([
+                // Add other asynchronous operations here if needed
+            ]);
+
             try {
                 const resp = await axiosClient.post(`seat-choose`, data);
                 console.log(data);
