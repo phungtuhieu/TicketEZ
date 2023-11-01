@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Modal } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
 
+import SeatChart from '../../../Booking/SeatChart';
 import moment from 'moment-timezone';
 
 import { movieUserApi } from '~/api/user/showtime';
@@ -19,6 +20,15 @@ function ListPhim({ cinemaComplex }) {
     const [loading, setLoading] = useState(false);
 
     const [showtime, setShowtime] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleOk = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút OK
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút Hủy
+    };
     useEffect(() => {
         const currentTimeInVietnam = moment.tz('Asia/Ho_Chi_Minh');
         const nextWeekDays = [];
@@ -56,22 +66,23 @@ function ListPhim({ cinemaComplex }) {
                 setLoading(false);
             }
         };
-        
+
         getMovies();
     }, [cinemaComplex, chooseDay]);
-    
+
     console.log('data', data);
-   
 
     const handShowtime = (value) => {
         setShowtime(value);
+        console.log(showtime);
+        setIsModalVisible(true);
     };
 
     return (
         <>
             <Row
                 className={cx({
-                    wrapper: data.length > 0 ,
+                    wrapper: data.length > 0,
                     wrapperCheck: data.length === 0,
                 })}
             >
@@ -200,6 +211,17 @@ function ListPhim({ cinemaComplex }) {
                     )}
                 </Col>
             </Row>
+            <Modal
+                title="Sơ đồ rạp phim"
+                visible={isModalVisible}
+                footer={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={800}
+                style={{ marginBottom: '20px' }}
+            >
+                <SeatChart showtime={showtime}></SeatChart>
+            </Modal>
         </>
     );
 }

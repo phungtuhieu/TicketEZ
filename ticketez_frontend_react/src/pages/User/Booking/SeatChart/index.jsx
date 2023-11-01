@@ -10,7 +10,7 @@ import { BookingDetail } from '../..';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
-    const { rows, columns, idSeatChart } = props;
+    const { showtime } = props;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,8 +24,10 @@ function SeatChart(props) {
         setIsModalOpen(false);
     };
     const createSeatArray = () => {
-        let seatRows = 10; // Số hàng
-        let seatColumns = 7; // Số cột
+        console.log("222222222222222222222222222222222222222222222222");
+        console.log(showtime);
+        let seatRows =showtime.seatChart.rows; // Số hàng
+        let seatColumns = showtime.seatChart.columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
         const seatState = {
@@ -95,7 +97,7 @@ function SeatChart(props) {
 
     const fetchDataSeatBooking = async () => {
         try {
-            const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${1}`);
+            const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${showtime.seatChart.id}`);
             const data = resp.data;
             if (data.length <= 0) {
                 setSeatBookingData([]);
@@ -135,7 +137,7 @@ function SeatChart(props) {
         try {
             const respAll = await axiosClient.get(`seat/getAll`);
             setAllSeats(respAll.data);
-            const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${1}/${2}`);
+            const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${2}`);
             const newVipSeats = respVip.data.map((seat) => seat.name);
             setListSeatVip((prevState) => {
                 for (const newSeat of newVipSeats) {
@@ -146,7 +148,7 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${1}/${1}`);
+            const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${1}`);
             const newNormalSeats = respNormal.data.map((seat) => seat.name);
             setListSeatNormal((prevState) => {
                 for (const newSeat of newNormalSeats) {
@@ -157,7 +159,7 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            const respWay = await axiosClient.get(`seat/by-seatchart-and-seattype/${1}/${7}`);
+            const respWay = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${7}`);
             const newWay = respWay.data.map((seat) => seat.name);
             setListWay((prevState) => {
                 for (const newSeat of newWay) {
@@ -228,7 +230,7 @@ function SeatChart(props) {
         try {
             const responses = await Promise.all(
                 seatState.seatReserved.map(async (seat) => {
-                    const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${1}/${seat}`);
+                    const respSeatChose = await axiosClient.get(`seat/by-seatchart-name/${showtime.seatChart.id}/${seat}`);
                     return respSeatChose.data;
                 }),
             );
@@ -279,8 +281,22 @@ function SeatChart(props) {
             <Card className="card" style={{ display: 'flex' }}>
                 <Row className="ca">
                     <Col span={24}>
-                        <hr className={cx('screen')} />
-                        <h6 className={cx('screen-title')}>Màn hình</h6>
+                        <Row>
+                            {' '}
+                            <Col span={7}></Col>
+                            <Col span={10}>
+                                <hr className={cx('screen')} />
+                            </Col>
+                            <Col span={7}></Col>
+                        </Row>
+                        <Row>
+                            {' '}
+                            <Col span={11}></Col>
+                            <Col span={2}>
+                                <h6 className={cx('screen-title')}>Màn hình</h6>
+                            </Col>
+                            <Col span={11}></Col>
+                        </Row>
                     </Col>
                     <Col span={24}>
                         <table className="grid">
@@ -291,19 +307,19 @@ function SeatChart(props) {
                                             <td className="header-cell">{header}</td>
                                             {seatState.seat[rowIndex].map((seat_no) => {
                                                 const seatClassName = `
-                                                ${
-                                                    seatState.way.indexOf(seat_no) > -1
-                                                        ? 'way-user'
-                                                        : seatState.seatUnavailable.indexOf(seat_no) > -1
-                                                        ? 'unavailable'
-                                                        : seatState.seatReserved.indexOf(seat_no) > -1
-                                                        ? 'reserved'
-                                                        : seatState.normalSeat.indexOf(seat_no) > -1
-                                                        ? 'normal-seat'
-                                                        : seatState.vipSeat.indexOf(seat_no) > -1
-                                                        ? 'vip-seat'
-                                                        : 'normal-seat'
-                                                } protected-element`;
+                  ${
+                      seatState.way.indexOf(seat_no) > -1
+                          ? 'way-user'
+                          : seatState.seatUnavailable.indexOf(seat_no) > -1
+                          ? 'unavailable'
+                          : seatState.seatReserved.indexOf(seat_no) > -1
+                          ? 'reserved'
+                          : seatState.normalSeat.indexOf(seat_no) > -1
+                          ? 'normal-seat'
+                          : seatState.vipSeat.indexOf(seat_no) > -1
+                          ? 'vip-seat'
+                          : 'normal-seat'
+                  } protected-element`;
                                                 return (
                                                     <td
                                                         className={seatClassName}
