@@ -12,9 +12,6 @@ const seatChartApi = {
     getCinemaByCinemaComplexAndSeatChartTrue: async (cinemaComplexId) => {
         return axiosClient.get(url + '/get/cinema-by-cinemaComplex-by-seatchartTrue/' + cinemaComplexId);
     },
-    getStatusSeatChart: async () => {
-        return axiosClient.get(url + '/getStatusSeatChart');
-    },
     getSeatChartByCinema: async (cinemaId) => {
         return axiosClient.get(url + '/get/seatChart-by-cinema/' + cinemaId);
     },

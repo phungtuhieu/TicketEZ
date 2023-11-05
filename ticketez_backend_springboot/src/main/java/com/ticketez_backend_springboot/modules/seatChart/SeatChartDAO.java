@@ -14,10 +14,6 @@ public interface  SeatChartDAO extends JpaRepository<SeatChart,Long> {
 
     List <SeatChart> findByCinemaId(Long CinemaID);
 
-
-    @Query("SELECT s FROM SeatChart s WHERE s.status = true")
-    List<SeatChart> getStatusSeatChart();
-
     
     @Query("SELECT s FROM SeatChart s JOIN s.cinema c WHERE s.cinema = :cinema AND s.status = true")
     List<SeatChart> getSeatChartsByCinema(@Param("cinema") Cinema cinema);

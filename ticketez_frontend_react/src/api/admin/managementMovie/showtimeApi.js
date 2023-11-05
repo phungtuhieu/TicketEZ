@@ -2,7 +2,6 @@ import axiosClient from '../../global/axiosClient';
 import cinemaApi from '../managementCinema/cinemaApi';
 import seatChartApi from '../managementSeat/seatChart';
 import formatMovieApi from './formatMovieApi';
-import movieApi from './movieApi';
 
 const url = 'showtime';
 
