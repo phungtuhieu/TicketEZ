@@ -4,8 +4,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
     Button,
-    Input,
-    Space,
     Col,
     Row,
     Form,
@@ -15,17 +13,18 @@ import {
     Select,
     Pagination,
     Typography,
+    Space,
 } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
-import Highlighter from 'react-highlight-words';
+// import Highlighter from 'react-highlight-words';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Showtime.module.scss';
 import moment from 'moment';
-import { showtimeApi, cinemaApi, movieApi, cinemaComplexApi, provinceApi } from '~/api/admin';
+import { showtimeApi, movieApi, cinemaComplexApi, provinceApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
@@ -46,9 +45,9 @@ const formItemLayout = {
 };
 
 const AdminShowtime = () => {
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+    // const [searchText, setSearchText] = useState('');
+    // const [searchedColumn, setSearchedColumn] = useState('');
+    // const searchInput = useRef(null);
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -58,7 +57,6 @@ const AdminShowtime = () => {
     const [posts, setPosts] = useState([]);
 
     //lưu dữ liệu Movie, Cinema
-    const [selectCinema, setSelectCinema] = useState();
     const [selectCinemaComplex, setSelectCinemaComplex] = useState();
     const [selectMovie, setSelectMovie] = useState();
     const [selectFormat, setSelectFormat] = useState();
@@ -67,9 +65,12 @@ const AdminShowtime = () => {
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
     const [valueSelectCinemaComplex, setValueSelectCinemaComplex] = useState(null);
+    const [valueFormat, setValueFormat] = useState(null);
     const [valueSelectProvince, setValueSelectProvince] = useState(null);
+    const [valueSeatChartByCinema, setValueSeatChartByCinema] = useState(null);
+    const [valueCinema, setValueCinema] = useState(null);
     const [dataCinemaToComplex, setDataCinemaToComplex] = useState(null);
-    const [selectSeatChart, setSelectSeatChart] = useState(null);
+    const [dataFormatMovieByFormatAndMovie, setDataFormatMovieByFormatAndMovie] = useState(null);
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
     const [vaLidationTime, setVaLidationTime] = useState(null);
@@ -85,8 +86,6 @@ const AdminShowtime = () => {
     const [selectedOption3, setSelectedOption3] = useState(null);
     const [selectedOption4, setSelectedOption4] = useState(null);
     const [selectedOption5, setSelectedOption5] = useState(null);
-    const [selectedOption6, setSelectedOption6] = useState(null);
-
     //load dữ liệu và phân trang
     useEffect(() => {
         const getList = async () => {
@@ -107,89 +106,122 @@ const AdminShowtime = () => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
 
-    //load dữ liệu của selectAPi từ Cinema và Movie
-    useEffect(() => {
-        const selectMovie = async () => {
-            const [cinema, format, movie, seatChart, province] = await Promise.all([
-                cinemaApi.get(),
-                formatMovieApi.getDistinctFormarIds(),
-                formatMovieApi.getDistinctMovieIds(),
-                seatChartApi.getStatusSeatChart(),
-                provinceApi.getTotalCinemaComplexToPrivince(),
-            ]);
-            setSelectCinema(cinema.data.data);
-            setSelectMovie(movie.data);
-            setSelectFormat(format.data);
-            setSelectSeatChart(seatChart.data);
-            setSelectProvice(province.data);
-            console.log('province', province.data);
-        };
-        selectMovie();
-    }, []);
-
-    //hiển thị dữ liệu của cinema theo cinemacomplex
     useEffect(() => {
         setLoading(true);
-        const getCinemaComplexByNameAndProvince = async () => {
+
+        //đổ dữ liệu
+        const fetchCinemaData = async () => {
             try {
-                const res = await cinemaUserApi.getCinemaByCinemaComplex(valueSelectCinemaComplex);
-                setDataCinemaToComplex(res);
+                const [ format, movie, province] = await Promise.all([
+                    formatMovieApi.getDistinctFormarIds(),
+                    formatMovieApi.getDistinctMovieIds(),
+                    provinceApi.getTotalCinemaComplexToPrivince(),
+                ]);
+                setSelectMovie(movie.data);
+                setSelectFormat(format.data);
+                setSelectProvice(province.data);
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
             }
         };
+        fetchCinemaData();
 
-        getCinemaComplexByNameAndProvince();
-    }, [valueSelectCinemaComplex]);
-
-    //hiển thị dữ liệu của cinemacomplex theo province
-    useEffect(() => {
-        setLoading(true);
-        const getComplexByProvince = async () => {
-            try {
-                const res = await cinemaComplexApi.getComplexByProvince(valueSelectProvince);
-                setSelectCinemaComplex(res.data);
-            } catch (error) {
-                funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getComplexByProvince();
-    }, [valueSelectProvince]);
-
-    //hiển thị giờ của movie
-    useEffect(() => {
-        setLoading(true);
-        const getMovie = async () => {
-            try {
-                const res = await movieApi.getById(valueTimeMovie);
-                const durationInSeconds = res.data.duration;
-
-                const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
-
-                //lưu  giờ và phút
-                if (timeParts.length === 3) {
-                    const hours = parseInt(timeParts[0]);
-                    const minutes = parseInt(timeParts[1]);
-
-                    const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                    setDataTimeMovie(formattedDuration);
-                } else {
-                    console.log('Invalid duration value:', durationInSeconds);
+        //hiển thị dữ liệu của cinema theo cinemacomplex
+        if (valueSelectCinemaComplex) {
+            const getCinemaComplexByNameAndProvince = async () => {
+                try {
+                    const res = await cinemaUserApi.getCinemaByCinemaComplex(valueSelectCinemaComplex);
+                    setDataCinemaToComplex(res);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
+            };
 
-        getMovie();
-    }, [valueTimeMovie]);
+            getCinemaComplexByNameAndProvince();
+        }
+        if (valueSelectProvince) {
+            const getComplexByProvince = async () => {
+                try {
+                    const res = await cinemaComplexApi.getComplexByProvince(valueSelectProvince);
+                    setSelectCinemaComplex(res.data);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getComplexByProvince();
+        } else {
+            setLoading(false);
+        }
+
+        // lấy dữ liệu seatchart theo cinema
+        if (valueCinema) {
+            const getSeatChartByCinema = async () => {
+                try {
+                    const res = await seatChartApi.getSeatChartByCinema(valueCinema);
+                    setValueSeatChartByCinema(res.data[0].id);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getSeatChartByCinema();
+        } else {
+            setLoading(false);
+        }
+        //lấy giờ của movie
+        if (valueTimeMovie) {
+            const getMovie = async () => {
+                try {
+                    const res = await movieApi.getById(valueTimeMovie);
+                    const durationInSeconds = res.data.duration;
+
+                    const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
+
+                    //lưu  giờ và phút
+                    if (timeParts.length === 3) {
+                        const hours = parseInt(timeParts[0]);
+                        const minutes = parseInt(timeParts[1]);
+
+                        const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+                            2,
+                            '0',
+                        )}`;
+                        setDataTimeMovie(formattedDuration);
+                    } else {
+                        console.log('Invalid duration value:', durationInSeconds);
+                    }
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getMovie();
+            //lấy id của formatmovie theo movie vầ format
+            const getIdFormatMovieByFormatAndMovie = async () => {
+                try {
+                    const res = await formatMovieApi.getIdFormatMovieByFormatAndMovie(valueTimeMovie, valueFormat);
+                    setDataFormatMovieByFormatAndMovie(res.data[0].id);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getIdFormatMovieByFormatAndMovie();
+        } else {
+            setLoading(false);
+        }
+    }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema]);
 
     const handleReset = () => {
         form.resetFields();
@@ -198,7 +230,6 @@ const AdminShowtime = () => {
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
-        setSelectedOption6(null);
         setDataTimeMovie(null);
         setValueSelectProvince(null);
     };
@@ -349,7 +380,7 @@ const AdminShowtime = () => {
             cinemaComplex: record.cinema.cinemaComplex.id,
             cinema: record.cinema.id,
             movie: record.formatMovie.movie.id,
-            formatMovie: record.formatMovie.format.id,
+            format: record.formatMovie.format.id,
             seatChart: record.seatChart.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
@@ -358,8 +389,7 @@ const AdminShowtime = () => {
         setSelectedOption2(record.cinema.cinemaComplex ? record.cinema.cinemaComplex.id : null);
         setSelectedOption3(record.cinema ? record.cinema.id : null);
         setSelectedOption4(record.formatMovie.movie ? record.formatMovie.movie.id : null);
-        setSelectedOption5(record.formatMovie.format ? record.formatMovie.format.id : null);
-        setSelectedOption6(record.startTime ? record.startTime : null);
+        setSelectedOption5(record.startTime ? record.startTime : null);
         setDataStartTime(formattedStartTime);
         setDataEndTime(formattedEndTime);
         setOpen(true);
@@ -371,6 +401,7 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
+            // getIdFormatMovieByFormatAndMovie(values.movie, values.format);
             const currentTime = new Date(); // Lấy ngày hiện tại
             const startTime = new Date(dataStartTime);
             const endTime = new Date(dataEndTime);
@@ -419,7 +450,12 @@ const AdminShowtime = () => {
                 funcUtils.notify('Cập nhật thành công', 'success');
             } else {
                 try {
-                    const resp = await showtimeApi.post(values, values.cinema, values.formatMovie, values.seatChart);
+                    const resp = await showtimeApi.post(
+                        values,
+                        values.cinema,
+                        dataFormatMovieByFormatAndMovie,
+                        valueSeatChartByCinema,
+                    );
                     if (resp.status === 200) {
                         funcUtils.notify('Thêm thành công', 'success');
                     }
@@ -462,9 +498,18 @@ const AdminShowtime = () => {
     };
 
     const onChangSelectFormatMovie = (value) => {
-        console.log("valuye",value);
         setSelectedOption4(value);
         setValueTimeMovie(value);
+    };
+
+    const onChangSelectFormat = (value) => {
+        setSelectedOption5(value);
+        setValueFormat(value);
+    };
+
+    const onChangSelectCinema = (value) => {
+        setSelectedOption3(value);
+        setValueCinema(value);
     };
 
     const onChangSelectProvince = (value) => {
@@ -474,7 +519,6 @@ const AdminShowtime = () => {
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
-        setSelectedOption6(null);
         setDataTimeMovie(null);
         form.setFieldsValue({
             cinemaComplex: null,
@@ -665,7 +709,7 @@ const AdminShowtime = () => {
                                 style={{ width: '100%' }}
                                 showSearch
                                 value={selectedOption3}
-                                onChange={(value) => setSelectedOption3(value)}
+                                onChange={(value) => onChangSelectCinema(value)}
                                 disabled={!selectedOption2}
                                 placeholder="Tìm kiếm hoặc chọn rạp"
                                 optionFilterProp="children"
@@ -721,13 +765,13 @@ const AdminShowtime = () => {
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name="formatMovie"
+                            name="format"
                             label="Chọn phụ đề"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phụ đề' }]}
                         >
                             <Select
                                 value={selectedOption5}
-                                onChange={(value) => setSelectedOption5(value)}
+                                onChange={(value) => onChangSelectFormat(value)}
                                 disabled={!selectedOption4}
                                 showSearch
                                 placeholder="Tìm kiếm hoặc chọn phụ đề"
@@ -745,35 +789,11 @@ const AdminShowtime = () => {
                                     : null}
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            name="seatChart"
-                            label="Chọn sơ đồ"
-                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn sơ đồ' }]}
-                        >
-                            <Select
-                                value={selectedOption6}
-                                onChange={(value) => setSelectedOption6(value)}
-                                disabled={!selectedOption5}
-                                showSearch
-                                placeholder="Tìm kiếm hoặc chọn sơ đồ"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                            >
-                                {selectSeatChart && selectSeatChart.length > 0
-                                    ? selectSeatChart.map((cinema) => (
-                                          <Option key={cinema.id} value={cinema.id}>
-                                              {cinema.name}
-                                          </Option>
-                                      ))
-                                    : null}
-                            </Select>
-                        </Form.Item>
+                   
 
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
-                                disabled={!selectedOption6}
+                                disabled={!selectedOption5}
                                 showTime
                                 format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}

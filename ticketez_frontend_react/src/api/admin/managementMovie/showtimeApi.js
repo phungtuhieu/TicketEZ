@@ -29,7 +29,8 @@ const showtimeApi = {
             seatChartApi.getId(seatChartId),
         ]);
         const values = { ...data, cinema: cinema.data, formatMovie: formatMovie.data, seatChart: seatChart.data };
-        console.log("valyue",values);
+        console.log('valyue', values);
+
         return axiosClient.post(url, values);
     },
     put: async (id, data, cinemaId, formatId, seatChartId) => {
