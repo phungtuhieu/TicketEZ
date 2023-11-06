@@ -14,6 +14,7 @@ import {
     Pagination,
     Typography,
     Space,
+    TimePicker,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
@@ -62,8 +63,6 @@ const AdminShowtime = () => {
     const [selectFormat, setSelectFormat] = useState();
     const [selectProvice, setSelectProvice] = useState();
     //set dữ liệu khi người dùng chọn
-    const [dataStartTime, setDataStartTime] = useState();
-    const [dataEndTime, setDataEndTime] = useState();
     const [valueSelectCinemaComplex, setValueSelectCinemaComplex] = useState(null);
     const [valueFormat, setValueFormat] = useState(null);
     const [valueSelectProvince, setValueSelectProvince] = useState(null);
@@ -73,7 +72,6 @@ const AdminShowtime = () => {
     const [dataFormatMovieByFormatAndMovie, setDataFormatMovieByFormatAndMovie] = useState(null);
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
-    const [vaLidationTime, setVaLidationTime] = useState(null);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -112,7 +110,7 @@ const AdminShowtime = () => {
         //đổ dữ liệu
         const fetchCinemaData = async () => {
             try {
-                const [ format, movie, province] = await Promise.all([
+                const [format, movie, province] = await Promise.all([
                     formatMovieApi.getDistinctFormarIds(),
                     formatMovieApi.getDistinctMovieIds(),
                     provinceApi.getTotalCinemaComplexToPrivince(),
@@ -184,15 +182,16 @@ const AdminShowtime = () => {
 
                     const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
 
-                    //lưu  giờ và phút
+                    // Lưu giờ, phút và giây
                     if (timeParts.length === 3) {
                         const hours = parseInt(timeParts[0]);
                         const minutes = parseInt(timeParts[1]);
+                        const seconds = parseInt(timeParts[2]);
 
                         const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
                             2,
                             '0',
-                        )}`;
+                        )}:${String(seconds).padStart(2, '0')}`;
                         setDataTimeMovie(formattedDuration);
                     } else {
                         console.log('Invalid duration value:', durationInSeconds);
@@ -205,11 +204,17 @@ const AdminShowtime = () => {
             };
 
             getMovie();
-            //lấy id của formatmovie theo movie vầ format
+
+            // Lấy id của format movie theo movie và format
             const getIdFormatMovieByFormatAndMovie = async () => {
                 try {
-                    const res = await formatMovieApi.getIdFormatMovieByFormatAndMovie(valueTimeMovie, valueFormat);
-                    setDataFormatMovieByFormatAndMovie(res.data[0].id);
+                    if(valueTimeMovie != null && valueFormat != null) {
+                          const res = await formatMovieApi.getIdFormatMovieByFormatAndMovie(
+                              valueTimeMovie,
+                              valueFormat,
+                          );
+                          setDataFormatMovieByFormatAndMovie(res.data[0].id);
+                    }
                 } catch (error) {
                     funcUtils.notify(error.response.data, 'error');
                 } finally {
@@ -230,7 +235,6 @@ const AdminShowtime = () => {
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
-        setDataTimeMovie(null);
         setValueSelectProvince(null);
     };
 
@@ -347,6 +351,7 @@ const AdminShowtime = () => {
 
     const showModal = () => {
         handleReset();
+        setDataTimeMovie(null);
         setEditData(null);
         setOpen(true);
         form.setFieldsValue({
@@ -390,8 +395,6 @@ const AdminShowtime = () => {
         setSelectedOption3(record.cinema ? record.cinema.id : null);
         setSelectedOption4(record.formatMovie.movie ? record.formatMovie.movie.id : null);
         setSelectedOption5(record.startTime ? record.startTime : null);
-        setDataStartTime(formattedStartTime);
-        setDataEndTime(formattedEndTime);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -401,44 +404,42 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            // getIdFormatMovieByFormatAndMovie(values.movie, values.format);
-            const currentTime = new Date(); // Lấy ngày hiện tại
-            const startTime = new Date(dataStartTime);
-            const endTime = new Date(dataEndTime);
 
-            const tenDaysBeforeDataStartTime = new Date(dataStartTime - 10 * 24 * 60 * 60 * 1000);
-            if (currentTime >= startTime && currentTime <= endTime) {
+            //lấy ngày và giờ từ form
+            let date = values.date.format('YYYY-MM-DD');
+            let time = values.time.format('HH:mm:ss');
+            
+            console.log("giờ bắt đầu",time);
+            console.log('giờ của phim',dataTimeMovie);
+
+
+            const currentTime = new Date().toDateString(); // Lấy ngày hiện tại
+            const startTime = new Date(Date.parse(date + ' ' + time));
+            const endTime = new Date(Date.parse(date + ' ' + time));
+
+
+            if (currentTime === startTime.toDateString()) {
                 values = {
                     ...values,
                     startTime: startTime,
                     endTime: endTime,
                     status: 2, // Công chiếu
                 };
-            } else if (currentTime >= tenDaysBeforeDataStartTime && currentTime <= dataStartTime) {
-                // Trừ đi 10 ngày (10 * 24 giờ * 60 phút * 60 giây * 1000 mili giây)
+            } else if (currentTime < startTime.toDateString()  ) {
                 values = {
                     ...values,
                     startTime: startTime,
                     endTime: endTime,
                     status: 1, // sắp chiếu
                 };
-            } else if (currentTime > endTime) {
+            } else if (currentTime > startTime.toDateString()) {
                 values = {
                     ...values,
                     startTime: startTime,
                     endTime: endTime,
                     status: 3, //Kết thúc chiếu
                 };
-            } else {
-                // Trường hợp khác
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 0, //chưa công chiếu
-                };
-            }
-
+            } 
             if (editData) {
                 const resp = await showtimeApi.put(
                     editData.id,
@@ -529,54 +530,23 @@ const AdminShowtime = () => {
             'range-time-picker': [],
         });
     };
-
-    const onChangeDate = (dates) => {
-        if (dates && dates.length === 2) {
-            setDataStartTime(dates[0]);
-            setDataEndTime(dates[1]);
-
-            const startTime = new Date(dates[0]);
-            const endTime = new Date(dates[1]);
-
-            // Lấy giờ và phút của startTime và endTime
-            const startHours = startTime.getHours();
-            const startMinutes = startTime.getMinutes();
-            const endHours = endTime.getHours();
-            const endMinutes = endTime.getMinutes();
-
-            // Tính sự khác biệt giờ và phút
-            let hourDiff = endHours - startHours;
-            let minuteDiff = endMinutes - startMinutes;
-
-            // Đảm bảo rằng giá trị âm của phút và giây không làm sai kết quả
-            if (minuteDiff < 0) {
-                minuteDiff += 60;
-                hourDiff -= 1;
-            }
-
-            // Định dạng giờ, phút thành chuỗi với số 0 đứng trước nếu cần
-            const formattedHour = hourDiff.toString().padStart(2, '0');
-            const formattedMinute = minuteDiff.toString().padStart(2, '0');
-            const diff = `${formattedHour}:${formattedMinute}`;
-            setVaLidationTime(diff);
-        }
-    };
-
     //validate chọn ngày đến ngày
-    const rangeConfig = {
+    const configDate = {
         rules: [
             {
-                type: 'array',
+                type: 'object',
                 required: true,
-                message: 'Vui lòng chọn ngày và giờ',
+                message: 'Vui lòng chọn ngày ',
             },
+        ],
+    };
+
+    const configTime = {
+        rules: [
             {
-                validator: (_, value) => {
-                    if (vaLidationTime != dataTimeMovie) {
-                        return Promise.reject('Tổng giờ phải bằng giờ của phim');
-                    }
-                    return Promise.resolve();
-                },
+                type: 'object',
+                required: true,
+                message: 'Vui lòng chọn giờ',
             },
         ],
     };
@@ -789,20 +759,20 @@ const AdminShowtime = () => {
                                     : null}
                             </Select>
                         </Form.Item>
-                   
 
-                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
-                            <RangePicker
+                        <Form.Item name="date" label="Chọn ngày" {...configDate}>
+                            {/* <RangePicker
                                 disabled={!selectedOption5}
                                 showTime
                                 format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
-                            />
+                            /> */}
+                            <DatePicker />
                         </Form.Item>
-                        <Typography style={{ marginLeft: '145px', marginTop: '-20px' }}>
-                            {dataTimeMovie != null ? 'Giờ của phim là: ' + dataTimeMovie : null}
-                        </Typography>
+                        <Form.Item name="time" label="Thời lượng" {...configTime}>
+                            <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
+                        </Form.Item>
                     </Form>
                 </BaseModal>
             </Row>
