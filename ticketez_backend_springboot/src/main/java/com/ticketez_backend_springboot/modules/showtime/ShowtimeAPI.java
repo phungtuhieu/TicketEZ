@@ -1,7 +1,6 @@
 package com.ticketez_backend_springboot.modules.showtime;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,5 +142,12 @@ public class ShowtimeAPI {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // lấy dữ liệu bảng showtime theo endtime
+    // @GetMapping("/get-showtime-by-endtime/{endTime}")
+    // public ResponseEntity<List<Showtime>> getShowtimeByEndtime(@PathVariable("cinemaId")  Long cinemaId,
+    //         @PathVariable("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime) {
+    //     return ResponseEntity.ok(showtimeDAO.getShowtimeByEndtime(cinemaId,endTime));
+    // }
 
 }

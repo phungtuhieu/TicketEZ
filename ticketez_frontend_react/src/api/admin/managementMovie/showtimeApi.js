@@ -21,6 +21,9 @@ const showtimeApi = {
         const res = await axiosClient.get(url, { params });
         return res.data;
     },
+    getShowtimeByEndtime(endTime) {
+        return axiosClient.get(url + '/get-showtime-by-endtime/' + endTime);
+    },
     post: async (data, cinemaId, formatId, seatChartId) => {
         const [cinema, formatMovie, seatChart] = await Promise.all([
             cinemaApi.getId(cinemaId),
