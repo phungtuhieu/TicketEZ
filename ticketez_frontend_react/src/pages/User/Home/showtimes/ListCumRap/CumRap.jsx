@@ -89,7 +89,6 @@ const CumRap = ({ NameAndProvince }) => {
                         <Col span={24}>
                             {' '}
                             <List
-                                loading={initLoading}
                                 itemLayout="horizontal"
                                 // loadMore={loadMore}
                                 dataSource={list}

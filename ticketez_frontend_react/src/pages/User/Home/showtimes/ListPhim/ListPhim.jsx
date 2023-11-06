@@ -61,7 +61,7 @@ function ListPhim({ cinemaComplex }) {
         getMovies();
     }, [cinemaComplex, chooseDay]);
 
-    console.log('data', data);
+    console.log('data', data.length);
 
     const handShowtime = (value) => {
         setShowtime(value);
@@ -71,9 +71,11 @@ function ListPhim({ cinemaComplex }) {
         <>
             <Row
                 className={cx({
-                    wrapper: data.length > 0,
+                    wrapper: data.length !== 0,
                     wrapperCheck: data.length === 0,
                 })}
+
+                // className={cx("wrapper")}
             >
                 {loading && (
                     <div className={cx('loading')}>
