@@ -149,7 +149,7 @@ public class MovieAPI {
             // System.out.println("----Movie " +movieSaved);
             for (int i = 0; i < moviedDto.getActors().size(); i++) {
                 ActorMoviePK actorMoviePK = new ActorMoviePK(moviedDto.getActors().get(i).getId(), movieSaved.getId());
-                System.out.println("----actorMoviePK " + actorMoviePK);
+                // System.out.println("----actorMoviePK " + actorMoviePK);
                 ActorMovie actorMovie = new ActorMovie(actorMoviePK, moviedDto.getActors().get(i),
                         movieSaved);
                 actorMovies.add(actorMovie);
@@ -193,12 +193,15 @@ public class MovieAPI {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> put(@PathVariable("id") Long id, @RequestBody Movie movie) {
-        if (!dao.existsById(id)) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieDTO movieDto) {
+        for (Actor actor : movieDto.getActors()) {
+            // actorMovieDAO.
         }
-        dao.save(movie);
-        return ResponseEntity.ok(movie);
+        // if (!dao.existsById(id)) {
+        //     return ResponseEntity.notFound().build();
+        // }
+        dao.save(movieDto.getMovie());
+        return ResponseEntity.ok("movie");
     }
 
     @DeleteMapping("/{id}")

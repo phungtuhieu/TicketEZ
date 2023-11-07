@@ -8,7 +8,7 @@ const useSearchSelectEffect = (searchValue, api, options, initialOptions, loadin
         const fetchSearchResults = async () => {
             try {
                 loadingState.setLoadingStates({ ...loadingState, [options.field]: true });
-                const response = await api.getByPage(1, 20, searchValueDebounce);
+                const response = await api.getByPage(1, 10, searchValueDebounce);
                 options.setOptions(response.data);
             } catch (error) {
                 let message = 'Xảy ra lỗi khi tìm kiếm trong select:';
