@@ -1,42 +1,23 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useRef, useState, useEffect } from 'react';
-import {
-    Button,
-    Input,
-    Space,
-    Col,
-    Row,
-    Form,
-    Popconfirm,
-    DatePicker,
-    Tag,
-    Select,
-    Pagination,
-    Typography,
-} from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Button, Col, Row, Form, Popconfirm, DatePicker, Tag, Select, Pagination, Space, TimePicker } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
-import Highlighter from 'react-highlight-words';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Showtime.module.scss';
 import moment from 'moment';
-import { showtimeApi, cinemaApi, movieApi, cinemaComplexApi, provinceApi } from '~/api/admin';
+import { showtimeApi, movieApi, cinemaComplexApi, provinceApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
 import img from '~/assets/img';
-
-dayjs.extend(utc);
-
-const { RangePicker } = DatePicker;
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -46,9 +27,9 @@ const formItemLayout = {
 };
 
 const AdminShowtime = () => {
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+    // const [searchText, setSearchText] = useState('');
+    // const [searchedColumn, setSearchedColumn] = useState('');
+    // const searchInput = useRef(null);
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -58,22 +39,23 @@ const AdminShowtime = () => {
     const [posts, setPosts] = useState([]);
 
     //lưu dữ liệu Movie, Cinema
-    const [selectCinema, setSelectCinema] = useState();
     const [selectCinemaComplex, setSelectCinemaComplex] = useState();
     const [selectMovie, setSelectMovie] = useState();
     const [selectFormat, setSelectFormat] = useState();
     const [selectProvice, setSelectProvice] = useState();
-    console.log('!!', selectCinemaComplex);
     //set dữ liệu khi người dùng chọn
-    const [dataStartTime, setDataStartTime] = useState();
-    const [dataEndTime, setDataEndTime] = useState();
     const [valueSelectCinemaComplex, setValueSelectCinemaComplex] = useState(null);
+    const [valueFormat, setValueFormat] = useState(null);
     const [valueSelectProvince, setValueSelectProvince] = useState(null);
+    const [valueSelectDate, setValueSelectDate] = useState(null);
+    const [valueSeatChartByCinema, setValueSeatChartByCinema] = useState(null);
+    const [valueShowtimeByEndtime, setvalueShowtimeByEndtime] = useState(null);
+    const [valueCinema, setValueCinema] = useState(null);
     const [dataCinemaToComplex, setDataCinemaToComplex] = useState(null);
-    const [selectSeatChart, setSelectSeatChart] = useState(null);
+    const [dataFormatMovieByFormatAndMovie, setDataFormatMovieByFormatAndMovie] = useState(null);
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
+    const [valueEndtimeByTimeMovieAndStartime, setValueEndtimeByTimeMovieAndStartime] = useState(null);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
-    const [vaLidationTime, setVaLidationTime] = useState(null);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -87,7 +69,6 @@ const AdminShowtime = () => {
     const [selectedOption4, setSelectedOption4] = useState(null);
     const [selectedOption5, setSelectedOption5] = useState(null);
     const [selectedOption6, setSelectedOption6] = useState(null);
-
     //load dữ liệu và phân trang
     useEffect(() => {
         const getList = async () => {
@@ -108,100 +89,182 @@ const AdminShowtime = () => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
 
-    //load dữ liệu của selectAPi từ Cinema và Movie
-    useEffect(() => {
-        const selectMovie = async () => {
-            const [cinema, format, movie, seatChart, province] = await Promise.all([
-                cinemaApi.get(),
-                formatMovieApi.getDistinctFormarIds(),
-                formatMovieApi.getDistinctMovieIds(),
-                seatChartApi.getStatusSeatChart(),
-                provinceApi.getTotalCinemaComplexToPrivince(),
-            ]);
-            setSelectCinema(cinema.data.data);
-            setSelectMovie(movie.data);
-            setSelectFormat(format.data);
-            setSelectSeatChart(seatChart.data);
-            setSelectProvice(province.data);
-            console.log('province', province.data);
-        };
-        selectMovie();
-    }, []);
-
-    //hiển thị dữ liệu của cinema theo cinemacomplex
     useEffect(() => {
         setLoading(true);
-        const getCinemaComplexByNameAndProvince = async () => {
+
+        //đổ dữ liệu
+        const fetchCinemaData = async () => {
             try {
-                const res = await cinemaUserApi.getCinemaByCinemaComplex(valueSelectCinemaComplex);
-                setDataCinemaToComplex(res);
+                const [format, movie, province] = await Promise.all([
+                    formatMovieApi.getDistinctFormarIds(),
+                    formatMovieApi.getDistinctMovieIds(),
+                    provinceApi.getTotalCinemaComplexToPrivince(),
+                ]);
+                setSelectMovie(movie.data);
+                setSelectFormat(format.data);
+                setSelectProvice(province.data);
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
             }
         };
+        fetchCinemaData();
 
-        getCinemaComplexByNameAndProvince();
-    }, [valueSelectCinemaComplex]);
-
-    //hiển thị dữ liệu của cinemacomplex theo province
-    useEffect(() => {
-        setLoading(true);
-        const getComplexByProvince = async () => {
-            try {
-                const res = await cinemaComplexApi.getComplexByProvince(valueSelectProvince);
-                setSelectCinemaComplex(res.data);
-            } catch (error) {
-                funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getComplexByProvince();
-    }, [valueSelectProvince]);
-
-    //hiển thị giờ của movie
-    useEffect(() => {
-        setLoading(true);
-        const getMovie = async () => {
-            try {
-                const res = await movieApi.getById(valueTimeMovie);
-                const durationInSeconds = res.data.duration;
-
-                const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
-
-                //lưu  giờ và phút
-                if (timeParts.length === 3) {
-                    const hours = parseInt(timeParts[0]);
-                    const minutes = parseInt(timeParts[1]);
-
-                    const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                    setDataTimeMovie(formattedDuration);
-                } else {
-                    console.log('Invalid duration value:', durationInSeconds);
+        //hiển thị dữ liệu của cinema theo cinemacomplex
+        if (valueSelectCinemaComplex) {
+            const getCinemaComplexByNameAndProvince = async () => {
+                try {
+                    const res = await cinemaUserApi.getCinemaByCinemaComplex(valueSelectCinemaComplex);
+                    setDataCinemaToComplex(res);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                funcUtils.notify(error.response.data, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
+            };
 
-        getMovie();
-    }, [valueTimeMovie]);
+            getCinemaComplexByNameAndProvince();
+        }
+        if (valueSelectProvince) {
+            const getComplexByProvince = async () => {
+                try {
+                    const res = await cinemaComplexApi.getComplexByProvince(valueSelectProvince);
+                    setSelectCinemaComplex(res.data);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getComplexByProvince();
+        } else {
+            setLoading(false);
+        }
+
+        // lấy dữ liệu seatchart theo cinema
+        if (valueCinema) {
+            const getSeatChartByCinema = async () => {
+                try {
+                    const res = await seatChartApi.getSeatChartByCinema(valueCinema);
+                    setValueSeatChartByCinema(res.data[0].id);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getSeatChartByCinema();
+        } else {
+            setLoading(false);
+        }
+        //lấy showtime theo enditme
+        if (valueSelectDate) {
+            const getShowtimeByEndtime = async () => {
+                try {
+                    if (
+                        valueSelectDate != null &&
+                        valueCinema != null &&
+                        valueTimeMovie != null &&
+                        valueFormat != null
+                    ) {
+                        const res = await showtimeApi.getShowtimesByCCXAndMovieAndFormatAndEndtime(
+                            valueCinema,
+                            valueTimeMovie,
+                            valueFormat,
+                            valueSelectDate,
+                        );
+                        setvalueShowtimeByEndtime(res.data);
+                    }
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getShowtimeByEndtime();
+        } else {
+            setLoading(false);
+        }
+
+        //lấy giờ của movie
+        if (valueTimeMovie) {
+            const getMovie = async () => {
+                try {
+                    const res = await movieApi.getById(valueTimeMovie);
+                    const durationInSeconds = res.data.duration;
+
+                    const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
+
+                    // Lưu giờ, phút và giây
+                    if (timeParts.length === 3) {
+                        const hours = parseInt(timeParts[0]);
+                        const minutes = parseInt(timeParts[1]);
+                        const seconds = parseInt(timeParts[2]);
+
+                        const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+                            2,
+                            '0',
+                        )}:${String(seconds).padStart(2, '0')}`;
+                        let formatTime = moment(formattedDuration, 'HH:mm:ss');
+                        setDataTimeMovie(formatTime);
+                    } else {
+                        console.log('Invalid duration value:', durationInSeconds);
+                    }
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getMovie();
+
+            // Lấy id của format movie theo movie và format
+            const getIdFormatMovieByFormatAndMovie = async () => {
+                try {
+                    if (valueTimeMovie != null && valueFormat != null) {
+                        const res = await formatMovieApi.getIdFormatMovieByFormatAndMovie(valueTimeMovie, valueFormat);
+                        setDataFormatMovieByFormatAndMovie(res.data[0].id);
+                    }
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getIdFormatMovieByFormatAndMovie();
+        } else {
+            setLoading(false);
+        }
+    }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema, valueSelectDate]);
 
     const handleReset = () => {
-        form.resetFields();
+        form.setFieldsValue({
+            province: null,
+            cinemaComplex: null,
+            cinema: null,
+            movie: null,
+            format: null,
+            seatChart: null,
+            time: null,
+            date: null,
+        });
         setSelectedOption1(null);
         setSelectedOption2(null);
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
         setSelectedOption6(null);
-        setDataTimeMovie(null);
         setValueSelectProvince(null);
+        setValueCinema(null);
+        setValueFormat(null);
+        setvalueShowtimeByEndtime(null);
+        setValueSelectCinemaComplex(null);
+        setValueSelectDate(null);
+        setValueTimeMovie(null);
     };
 
     const columns = [
@@ -304,8 +367,8 @@ const AdminShowtime = () => {
                     <Popconfirm
                         title="Bạn có chắc"
                         description="Muốn xoá hay không?"
-                        okText="Yes"
-                        cancelText="No"
+                        okText="Có"
+                        cancelText="Không"
                         onConfirm={() => handleDelete(record)}
                     >
                         <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
@@ -319,9 +382,7 @@ const AdminShowtime = () => {
         handleReset();
         setEditData(null);
         setOpen(true);
-        form.setFieldsValue({
-            'range-time-picker': [],
-        });
+        form.resetFields();
     };
 
     const handleDelete = async (record) => {
@@ -338,31 +399,32 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        console.log(record);
-        dayjs.locale('vi');
-        const formattedStartTime = dayjs(record.startTime);
-        const formattedEndTime = dayjs(record.endTime);
-        onChangSelectCinemaConplex(record.cinema.cinemaComplex.id);
+        handleReset();
+        let time = moment(record.endTime).format('HH:mm');
         onChangSelectProvince(record.cinema.cinemaComplex.province.id);
+        onChangSelectCinemaConplex(record.cinema.cinemaComplex.id);
+        onChangSelectCinema(record.cinema.id);
+        onChangSelectFormatMovie(record.formatMovie.movie.id);
+        onChangSelectFormat(record.formatMovie.format.id);
+        onChangSelectDate(dayjs(record.startTime, { format: 'YYYY-MM-DD' }));
         form.setFieldsValue({
             ...record,
             province: record.cinema.cinemaComplex.province.id,
             cinemaComplex: record.cinema.cinemaComplex.id,
             cinema: record.cinema.id,
             movie: record.formatMovie.movie.id,
-            formatMovie: record.formatMovie.format.id,
+            format: record.formatMovie.format.id,
             seatChart: record.seatChart.id,
-            'range-time-picker': [formattedStartTime, formattedEndTime],
+            date: dayjs(record.startTime, { format: 'YYYY-MM-DD' }),
+            time: dayjs(record.startTime, { format: 'HH:mm:ss' }),
         });
         setDataTimeMovie(record.formatMovie.movie.duration);
+        setValueEndtimeByTimeMovieAndStartime(time);
         setSelectedOption1(record.cinema.cinemaComplex.province ? record.cinema.cinemaComplex.province.id : null);
         setSelectedOption2(record.cinema.cinemaComplex ? record.cinema.cinemaComplex.id : null);
         setSelectedOption3(record.cinema ? record.cinema.id : null);
         setSelectedOption4(record.formatMovie.movie ? record.formatMovie.movie.id : null);
-        setSelectedOption5(record.formatMovie.format ? record.formatMovie.format.id : null);
-        setSelectedOption6(record.startTime ? record.startTime : null);
-        setDataStartTime(formattedStartTime);
-        setDataEndTime(formattedEndTime);
+        setSelectedOption5(record.startTime ? record.startTime : null);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -373,67 +435,109 @@ const AdminShowtime = () => {
         try {
             let values = await form.validateFields();
 
-            const currentTime = new Date(); // Lấy ngày hiện tại
-            const startTime = new Date(dataStartTime);
-            const endTime = new Date(dataEndTime);
+            //lấy ngày và giờ từ form
+            let date = values.date.format('YYYY-MM-DD');
+            let time = values.time.format('HH:mm:ss');
 
-            const tenDaysBeforeDataStartTime = new Date(dataStartTime - 10 * 24 * 60 * 60 * 1000);
-            if (currentTime >= startTime && currentTime <= endTime) {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 2, // Công chiếu
-                };
-            } else if (currentTime >= tenDaysBeforeDataStartTime && currentTime <= dataStartTime) {
-                // Trừ đi 10 ngày (10 * 24 giờ * 60 phút * 60 giây * 1000 mili giây)
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 1, // sắp chiếu
-                };
-            } else if (currentTime > endTime) {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 3, //Kết thúc chiếu
-                };
-            } else {
-                // Trường hợp khác
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 0, //chưa công chiếu
-                };
+            const currentTime = new Date(); // Lấy ngày hiện tại
+            const startTime = new Date(Date.parse(date + ' ' + time));
+            const endTime = new Date(Date.parse(date + ' ' + valueEndtimeByTimeMovieAndStartime));
+            const newCurrentDateADd = new Date(endTime);
+            // Cộng thêm 10 ngày vào newCurrentDateADd
+            newCurrentDateADd.setDate(currentTime.getDate() + 10);
+
+            //tạo một biến mới để kiểm tra trùng xuất chiếu
+            let timeFormat = values.time.format('HH:mm');
+            //tạo mảng lưu endtime HH:mm của xuất chiếu
+            const endtimeFormatHHmm = [];
+            for (const showtime of valueShowtimeByEndtime) {
+                endtimeFormatHHmm.push(moment(showtime.endTime).format('HH:mm'));
             }
 
-            if (editData) {
-                const resp = await showtimeApi.put(
-                    editData.id,
-                    values,
-                    values.cinema,
-                    values.formatMovie,
-                    values.seatChart,
-                );
-                funcUtils.notify('Cập nhật thành công', 'success');
+            //lấy ra giờ cuối cùng
+            const lastArrayEndtime = endtimeFormatHHmm[endtimeFormatHHmm.length - 1];
+
+            //lấy ra giờ cuối cùng cộng thêm 15 phút
+            const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
+
+            //kiểm tra xuất chiếu có tồn tại hay chưa
+            if (endtimeFormatHHmm.includes(timeFormat)) {
+                funcUtils.notify('Xuất chiếu đã tồn tại vui lòng chọn xuất chiếu khác', 'error');
+                setOpen(true);
+                setLoading(false);
+                //kiểm tra giờ phải lớn hơn giờ cuối cùng
+            } else if (time < lastArrayEndtime) {
+                funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
+                setOpen(true);
+                setLoading(false);
             } else {
-                try {
-                    const resp = await showtimeApi.post(values, values.cinema, values.formatMovie, values.seatChart);
-                    if (resp.status === 200) {
-                        funcUtils.notify('Thêm thành công', 'success');
+                if (lastEndTimeWithExtra15Minutes != null) {
+                    if (currentTime.toDateString() === startTime.toDateString()) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 2, // Công chiếu
+                        };
+                    } else if (startTime > currentTime && startTime <= newCurrentDateADd) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 1, // sắp chiếu
+                        };
+                    } else if (currentTime > startTime) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 3, //Kết thúc chiếu
+                        };
+                    } else {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 0, //chưa công chiếu
+                        };
                     }
-                } catch (error) {
-                    console.log(error);
-                    funcUtils.notify(error.response.data, 'error');
+                    if (editData) {
+                        const resp = await showtimeApi.put(
+                            editData.id,
+                            values,
+                            values.cinema,
+                            dataFormatMovieByFormatAndMovie,
+                            valueSeatChartByCinema,
+                        );
+                        if (resp.status === 200) {
+                            funcUtils.notify('Cập nhật thành công', 'success');
+                        }
+                    } else {
+                        try {
+                            const resp = await showtimeApi.post(
+                                values,
+                                values.cinema,
+                                dataFormatMovieByFormatAndMovie,
+                                valueSeatChartByCinema,
+                            );
+                            if (resp.status === 200) {
+                                funcUtils.notify('Thêm thành công', 'success');
+                            }
+                        } catch (error) {
+                            console.log(error);
+                            funcUtils.notify(error.response.data, 'error');
+                        }
+                    }
+                    setOpen(false);
+                    form.resetFields();
+                    setLoading(false);
+                    setWorkSomeThing([!workSomeThing]);
+                } else if (time < lastEndTimeWithExtra15Minutes) {
+                    funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
+                    setOpen(true);
+                    setLoading(false);
                 }
             }
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setWorkSomeThing([!workSomeThing]);
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -453,21 +557,78 @@ const AdminShowtime = () => {
         setValueSelectCinemaComplex(value);
         setSelectedOption2(value);
         setSelectedOption3(null);
+        setSelectedOption4(null);
+        setSelectedOption5(null);
+        setSelectedOption6(null);
         setDataTimeMovie(null);
         form.setFieldsValue({
             cinema: null,
             movie: null,
-            formatMovie: null,
+            format: null,
             seatChart: null,
-            'range-time-picker': [],
+            time: null,
+            date: null,
         });
     };
 
     const onChangSelectFormatMovie = (value) => {
         setSelectedOption4(value);
         setValueTimeMovie(value);
+        setvalueShowtimeByEndtime(null);
     };
 
+    const onChangSelectFormat = (value) => {
+        setSelectedOption5(value);
+        setValueFormat(value);
+        form.setFieldsValue({
+            time: null,
+            date: null,
+        });
+        setvalueShowtimeByEndtime(null);
+    };
+
+    const onChangSelectDate = (date) => {
+        setSelectedOption6(date);
+        if (date != null) {
+            setValueSelectDate(date.format('YYYY-MM-DD'));
+        }
+    };
+
+    const onChangSelectTime = (value) => {
+        if (value != null) {
+            const gio1 = value.format('HH:mm');
+            const gio2 = dataTimeMovie;
+
+            const moment1 = moment(gio1, 'HH:mm:ss');
+            const moment2 = moment(gio2, 'HH:mm:ss');
+
+            const gio1Gio = moment1.hours();
+            const gio1Phut = moment1.minutes();
+            const gio1Giay = moment1.seconds();
+            const gio2Gio = moment2.hours();
+            const gio2Phut = moment2.minutes();
+            const gio2Giay = moment2.seconds();
+
+            let tongGio = gio1Gio + gio2Gio;
+            let tongPhut = gio1Phut + gio2Phut;
+            let tongGiay = gio1Giay + gio2Giay;
+            if (tongGiay >= 60) {
+                tongPhut += Math.floor(tongGiay / 60);
+                tongGiay %= 60;
+            }
+            if (tongPhut >= 60) {
+                tongGio += Math.floor(tongPhut / 60);
+                tongPhut %= 60;
+            }
+            const resultEndtime = moment().hours(tongGio).minutes(tongPhut).seconds(tongGiay).format('HH:mm:ss');
+            setValueEndtimeByTimeMovieAndStartime(resultEndtime);
+        }
+    };
+
+    const onChangSelectCinema = (value) => {
+        setSelectedOption3(value);
+        setValueCinema(value);
+    };
     const onChangSelectProvince = (value) => {
         setValueSelectProvince(value);
         setSelectedOption1(value);
@@ -475,67 +636,41 @@ const AdminShowtime = () => {
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
-        setSelectedOption6(null);
+        setvalueShowtimeByEndtime(null);
         setDataTimeMovie(null);
         form.setFieldsValue({
             cinemaComplex: null,
             cinema: null,
             movie: null,
-            formatMovie: null,
+            format: null,
             seatChart: null,
-            'range-time-picker': [],
+            time: null,
+            date: null,
         });
     };
-
-    const onChangeDate = (dates) => {
-        if (dates && dates.length === 2) {
-            setDataStartTime(dates[0]);
-            setDataEndTime(dates[1]);
-
-            const startTime = new Date(dates[0]);
-            const endTime = new Date(dates[1]);
-
-            // Lấy giờ và phút của startTime và endTime
-            const startHours = startTime.getHours();
-            const startMinutes = startTime.getMinutes();
-            const endHours = endTime.getHours();
-            const endMinutes = endTime.getMinutes();
-
-            // Tính sự khác biệt giờ và phút
-            let hourDiff = endHours - startHours;
-            let minuteDiff = endMinutes - startMinutes;
-
-            // Đảm bảo rằng giá trị âm của phút và giây không làm sai kết quả
-            if (minuteDiff < 0) {
-                minuteDiff += 60;
-                hourDiff -= 1;
-            }
-
-            // Định dạng giờ, phút thành chuỗi với số 0 đứng trước nếu cần
-            const formattedHour = hourDiff.toString().padStart(2, '0');
-            const formattedMinute = minuteDiff.toString().padStart(2, '0');
-            const diff = `${formattedHour}:${formattedMinute}`;
-            setVaLidationTime(diff);
-        }
-    };
-
     //validate chọn ngày đến ngày
-    const rangeConfig = {
+    const configDate = {
         rules: [
             {
-                type: 'array',
+                type: 'object',
                 required: true,
-                message: 'Vui lòng chọn ngày và giờ',
-            },
-            {
-                validator: (_, value) => {
-                    if (vaLidationTime != dataTimeMovie) {
-                        return Promise.reject('Tổng giờ phải bằng giờ của phim');
-                    }
-                    return Promise.resolve();
-                },
+                message: 'Vui lòng chọn ngày ',
             },
         ],
+    };
+
+    const configTime = {
+        rules: [
+            {
+                type: 'object',
+                required: true,
+                message: 'Vui lòng chọn giờ',
+            },
+        ],
+    };
+
+    const customFormat = (value) => {
+        return ` ${value.format('HH:mm')} ~ ${valueEndtimeByTimeMovieAndStartime}`;
     };
 
     return (
@@ -666,7 +801,7 @@ const AdminShowtime = () => {
                                 style={{ width: '100%' }}
                                 showSearch
                                 value={selectedOption3}
-                                onChange={(value) => setSelectedOption3(value)}
+                                onChange={(value) => onChangSelectCinema(value)}
                                 disabled={!selectedOption2}
                                 placeholder="Tìm kiếm hoặc chọn rạp"
                                 optionFilterProp="children"
@@ -722,13 +857,13 @@ const AdminShowtime = () => {
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name="formatMovie"
+                            name="format"
                             label="Chọn phụ đề"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phụ đề' }]}
                         >
                             <Select
                                 value={selectedOption5}
-                                onChange={(value) => setSelectedOption5(value)}
+                                onChange={(value) => onChangSelectFormat(value)}
                                 disabled={!selectedOption4}
                                 showSearch
                                 placeholder="Tìm kiếm hoặc chọn phụ đề"
@@ -746,44 +881,55 @@ const AdminShowtime = () => {
                                     : null}
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            name="seatChart"
-                            label="Chọn sơ đồ"
-                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn sơ đồ' }]}
-                        >
-                            <Select
-                                value={selectedOption6}
-                                onChange={(value) => setSelectedOption6(value)}
-                                disabled={!selectedOption5}
-                                showSearch
-                                placeholder="Tìm kiếm hoặc chọn sơ đồ"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                            >
-                                {selectSeatChart && selectSeatChart.length > 0
-                                    ? selectSeatChart.map((cinema) => (
-                                          <Option key={cinema.id} value={cinema.id}>
-                                              {cinema.name}
-                                          </Option>
-                                      ))
-                                    : null}
-                            </Select>
-                        </Form.Item>
+                        <Form.Item>
+                            <Row style={{ width: '890px' }}>
+                                <Col xs={24} sm={24} lg={9}>
+                                    <Form.Item name="date" label="Chọn ngày chiếu" {...configDate}>
+                                        <DatePicker
+                                            style={{ width: 170 }}
+                                            format={'DD-MM-YYYY'}
+                                            value={selectedOption6}
+                                            onChange={(value) => onChangSelectDate(value)}
+                                            disabled={!selectedOption5}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item name="time" label="Chọn giờ bắt đầu" {...configTime}>
+                                        <TimePicker
+                                            format={customFormat}
+                                            onChange={(value) => onChangSelectTime(value)}
+                                            style={{ width: 170 }}
+                                            placeholder="Chọn giờ bắt đầu"
+                                            disabled={!selectedOption6}
+                                        />
+                                    </Form.Item>
+                                </Col>
 
-                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
-                            <RangePicker
-                                disabled={!selectedOption6}
-                                showTime
-                                format="DD-MM-YYYY HH:mm:ss"
-                                value={[dataStartTime, dataEndTime]}
-                                onChange={onChangeDate}
-                            />
+                                <Col xs={24} sm={24} lg={15} style={{ marginTop: '-25px' }}>
+                                    {valueShowtimeByEndtime && valueShowtimeByEndtime.length > 0 ? (
+                                        <>
+                                            <span style={{ color: 'gray' }}>
+                                                Những xuất chiếu đã tồn tại trong ngày :{' '}
+                                            </span>
+                                            <br />
+                                            {valueShowtimeByEndtime.map((valueShowtime) => (
+                                                <Button
+                                                    key={valueShowtime.id}
+                                                    className={cx('btn-suat-chieu')}
+                                                    style={{ marginBottom: '25px', marginRight: '5px' }}
+                                                >
+                                                    <span className={cx('gio-bat-dau')}>
+                                                        {moment(valueShowtime.startTime).format('HH:mm')}
+                                                    </span>
+                                                    <span className={cx('gio-ket-thuc')}>
+                                                        {moment(valueShowtime.endTime).format('HH:mm')}
+                                                    </span>
+                                                </Button>
+                                            ))}
+                                        </>
+                                    ) : null}
+                                </Col>
+                            </Row>
                         </Form.Item>
-                        <Typography style={{ marginLeft: '145px', marginTop: '-20px' }}>
-                            {dataTimeMovie != null ? 'Giờ của phim là: ' + dataTimeMovie : null}
-                        </Typography>
                     </Form>
                 </BaseModal>
             </Row>

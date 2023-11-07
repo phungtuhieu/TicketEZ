@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.format.Format;
 import com.ticketez_backend_springboot.modules.movie.Movie;
@@ -29,5 +30,20 @@ public interface ShowtimeDAO extends JpaRepository<Showtime, Long> {
                         @Param("movie") Movie movie,
                         @Param("format") Format format,
                         @Param("date") LocalDate date);
-        //
+
+
+        //lấy showtime dựa trên cinema, movie, format và endtime
+        @Query("SELECT st FROM Showtime st WHERE "
+                        + "st.cinema = :cinema "
+                        + "AND st.formatMovie.movie = :movie "
+                        + "AND st.formatMovie.format = :format "
+                        + "AND CAST(st.startTime AS DATE) = :date "
+                        + "ORDER BY st.startTime")
+        List<Showtime> getShowtimesByCCXAndMovieAndFormatAndEndtime(@Param("cinema") Cinema cinema,
+                        @Param("movie") Movie movie,
+                        @Param("format") Format format,
+                        @Param("date") LocalDate date);
+
+
+
 }

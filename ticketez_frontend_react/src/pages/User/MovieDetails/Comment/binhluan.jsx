@@ -106,7 +106,7 @@ const Binhluan = () => {
                 </Col>
                 <Col span={16}>
                     <Avatar size={50}
-                        src={imageUrl || 'https://scontent.fsgn5-9.fna.fbcdn.net/v/t39.30808-1/358561081_1293432168233582_652710667370024877_n.jpg?stp=dst-jpg_s320x320&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_mhoYnzSwMAAX-9-CO8&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfCnpSIHUEW7K5yPJeT3roUHGSihg3KS5Op_1FrvdVzFcg&oe=652EBC00'}
+                        src={imageUrl || 'https://i.imgur.com/CjpMFXE.jpg'}
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
@@ -133,69 +133,132 @@ const Binhluan = () => {
                 </Col>
                 <Col span={16}>
                     <div style={{ overflowY: 'auto', maxHeight: '600px' }}>
-                    <List
-    className="demo-loadmore-list"
-    loading={initLoading}
-    itemLayout="horizontal"
-    dataSource={list}
-    renderItem={(item) => (
-        <List.Item>
-            <List.Item.Meta
-                avatar={<Avatar size={40} src={item.account.image} />}
-                title={<h4>{item.account.name}</h4>}
-                description={<span>{item.createdAt}</span>}
-            />
-            <h4><StarFilled style={{ color: 'yellow', fontSize: '20px' }} /> {item.comment.rating}/10 | Tuyệt vời</h4>
-            <p>
-                {item.comment.content}
-            </p>
-            <Space>
-                <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
-                <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
-            </Space>
-            {isCommentVisible && (
-                // Hiển thị giao diện bình luận ở đây
-                // Sử dụng dữ liệu từ API review để hiển thị bình luận
-                // Ví dụ:
-                <div className={cx('comment-container')}>
-                    <Row>
-                        <Col span={2}>
-                            <Avatar size={40} src={imageUrl || 'https://i.imgur.com/nHg881t.jpg'} />
-                        </Col>
-                        <Col span={22}>
-                            <div><h4>Nhã Nè</h4></div>
-                            <div>1 ngày trước</div>
-                        </Col>
-                        <p>Đồng quan điểm . Phim hay, cảnh quay đẹp, giải trí ok, miễn coi cảm thấy vui là được.</p>
-                        <Col span={24}>
-                            <Space>
-                                <CommentOutlined className={cx('col-icon')} /><span>Phản hồi</span>
-                                <LikeOutlined className={cx('col-icon')} /><span>Thích</span>
-                            </Space>
-                        </Col>
-                    </Row>
-                    <hr />
-                    <Row>
-                        <Col span={2}>
-                            <Avatar size={40} src={imageUrl || 'https://i.imgur.com/Lfimatm.jpg'} />
-                        </Col>
-                        <Col span={22}>
-                            <div><h4>KakaShi</h4></div>
-                            <div>1 ngày trước</div>
-                        </Col>
-                        <p>Điểm cộng là bối cảnh, nhạc phim mãn nhãn. Cảm giác bồi hồi thật sự khi ngắm nhìn khung cảnh sông nước làng quê xứ Tây Nam Bộ. Diễn xuất của dàn diễn viên nhí ổn áp, vai Út Lục Lâm cũng tạo ra nhiều tiếng cười sảng khoái.</p>
-                        <Col span={24}>
-                            <Space>
-                                <CommentOutlined className={cx('col-icon')} /><span>Phản hồi</span>
-                                <LikeOutlined className={cx('col-icon')} /><span>Thích</span>
-                            </Space>
-                        </Col>
-                    </Row>
-                </div>
-            )}
-        </List.Item>
-    )}
-/>
+                        <List
+
+                            className="demo-loadmore-list"
+                            loading={initLoading}
+                            itemLayout="horizontal"
+                            // loadMore={loadMore}
+                            dataSource={list}
+                            renderItem={(item) => (
+                                // actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+
+                                <List.Item>
+                                    {/* <Skeleton avatar title={false} loading={item.loading} active>
+                            <List.Item.Meta
+                                avatar={<Avatar src={item.picture.large} />}
+                                title={<a href="https://ant.design">{item.name?.last}</a>}
+                                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                            />
+                            <div>content</div>
+                        </Skeleton> */}
+                                    <Skeleton loading={item.loading}>  
+                                    <List.Item.Meta>
+                                                  
+                                    <Row>
+                                        <Col span={24} style={{ textAlign: 'left', width: '1080px' }}>
+                                            <Row>
+                                                <Col span={2}>
+                                                    <Avatar size={40}
+                                                        src={item.account.image}
+                                                    >
+                                                    </Avatar>
+                                                </Col>
+                                                <Col span={22}>
+                                                    <div className={cx('info-container')}>
+                                                        <h4>Anh Phùng</h4>
+                                                        <img
+                                                            src="https://i.imgur.com/CjpMFXE.jpg"
+                                                            width={'20px'}
+                                                            className={('icon')}
+                                                            loading="lazy"
+                                                        />
+                                                    </div>
+                                                    <div>2 ngày trước</div>
+
+                                                </Col>
+
+                                            </Row>
+                                        </Col>
+                                        <Col span={24} style={{ textAlign: 'left' }}>
+                                            <h4><StarFilled style={{ color: 'yellow', fontSize: '20px' }} /> 7/10 | Tuyệt vời</h4>
+                                            <p>
+                                                Hình ảnh, màu phim, cảnh phim rất đẹp và đầu tư.
+                                                Sau khi xem xong k đọng lại một thông điệp gì ý nghĩa, đang xem tự nhiên hết phim, hụt hẫng. K có cảnh cao trào,
+                                                diễn xuất của An và Út ổn nhưng theo ykr mình thấy bé An vẫn k nổi bật dù là nv9. Các nv khác xuất hiện chớp nhoáng,
+                                                k có đất diễn và k để lại ấn tượng gì. Diễn biến tâm lý nv k đặc sắc nên xem thấy nhàm.Thu gọn
+
+                                            </p>
+                                        </Col>
+                                        <Col span={24} style={{ textAlign: 'left' }}>
+                                            <Space>
+                                                <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
+                                                <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
+                                            </Space>
+                                        </Col>
+                                        {isCommentVisible && (
+                                            <Col span={24} style={{ textAlign: 'left' }}>
+                                                {/* Hiển thị giao diện bình luận ở đây */}
+                                                {/* Ví dụ: */}
+                                                <div className={cx('comment-container')}>
+                                                    <Row>
+                                                        <Col span={2}>
+                                                            <Avatar size={40}
+                                                                src={imageUrl || 'https://i.imgur.com/nHg881t.jpg'}
+                                                            >
+                                                            </Avatar>
+                                                        </Col>
+                                                        <Col span={22}>
+                                                            <div><h4>Nhã Nè</h4></div>
+                                                            <div>1 ngày trước</div>
+                                                            {/* <div class="absolute" style={{ textAlign: 'right' }}>
+                                            <img src="https://homepage.momocdn.net/img/momo-upload-api-230629163313-638236531936463134.png" width={'30px'} class="w-5" loading="lazy"></img>
+                                            </div> */}
+                                                        </Col>
+
+
+                                                        <p>
+                                                            Đồng quan điểm . Phim hay, cảnh quay đẹp, giải trí ok, miễn coi cảm thấy vui là được. </p>
+                                                        <Col span={24} style={{ textAlign: 'left' }}>
+                                                            <Space>
+                                                                <CommentOutlined className={cx('col-icon')} /><span>Phản hồi</span>
+                                                                <LikeOutlined className={cx('col-icon')} /><span>Thích</span>
+                                                            </Space>
+                                                        </Col>
+                                                    </Row>
+                                                    <hr />
+                                                    <Row>
+                                                        <Col span={2}>
+                                                            <Avatar size={40}
+                                                                src={imageUrl || 'https://i.imgur.com/Lfimatm.jpg'}
+                                                            >
+                                                            </Avatar>
+                                                        </Col>
+                                                        <Col span={22}>
+                                                            <div><h4>KakaShi</h4></div>
+                                                            <div>1 ngày trước</div>
+                                                            {/* <div class="absolute" style={{ textAlign: 'right' }}>
+                                            <img src="https://homepage.momocdn.net/img/momo-upload-api-230629163313-638236531936463134.png" width={'30px'} class="w-5" loading="lazy"></img>
+                                            </div> */}
+                                                        </Col>
+                                                        <p>
+                                                            Điểm cộng là bối cảnh, nhạc phim mãn nhãn. Cảm giác bồi hồi thật sự khi ngắm nhìn khung cảnh sông nước làng quê xứ Tây Nam Bộ. Diễn xuất của dàn diễn viên nhí ổn áp, vai Út Lục Lâm cũng tạo ra nhiều tiếng cười sảng khoái. </p>
+                                                        <Col span={24} style={{ textAlign: 'left' }}>
+                                                            <Space>
+                                                                <CommentOutlined className={cx('col-icon')} /><span>Phản hồi</span>
+                                                                <LikeOutlined className={cx('col-icon')} /><span>Thích</span>
+                                                            </Space>
+                                                        </Col>
+                                                    </Row>
+                                                </div>
+                                            </Col>
+                                        )}
+                                    </Row>
+                                    </List.Item.Meta> 
+                                    </Skeleton>
+                                </List.Item>
+                            )}
+                        />
                     </div>
 
                 </Col>
