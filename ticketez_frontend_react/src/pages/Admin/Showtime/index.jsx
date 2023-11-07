@@ -192,9 +192,8 @@ const AdminShowtime = () => {
         if (valueTimeMovie) {
             const getMovie = async () => {
                 try {
-                    if(valueTimeMovie != null) {
+                    if (valueTimeMovie != null) {
                         const res = await movieApi.getById(valueTimeMovie);
-                        console.log(res.data);
                         const durationInSeconds = res.data.movie.duration;
 
                         const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
@@ -215,7 +214,6 @@ const AdminShowtime = () => {
                             console.log('Invalid duration value:', durationInSeconds);
                         }
                     }
-                    
                 } catch (error) {
                     funcUtils.notify(error.response.data, 'error');
                 } finally {
@@ -475,7 +473,11 @@ const AdminShowtime = () => {
                 setOpen(true);
                 setLoading(false);
             } else {
-                if (lastEndTimeWithExtra15Minutes != null) {
+                if (time < lastEndTimeWithExtra15Minutes) {
+                    funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
+                    setOpen(true);
+                    setLoading(false);
+                } else {
                     if (currentTime.toDateString() === startTime.toDateString()) {
                         values = {
                             ...values,
@@ -536,10 +538,6 @@ const AdminShowtime = () => {
                     form.resetFields();
                     setLoading(false);
                     setWorkSomeThing([!workSomeThing]);
-                } else if (time < lastEndTimeWithExtra15Minutes) {
-                    funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
-                    setOpen(true);
-                    setLoading(false);
                 }
             }
         } catch (errorInfo) {

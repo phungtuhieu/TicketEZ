@@ -199,17 +199,9 @@ GO
 -- GO
 
     CREATE TABLE Seats_Booking (
-		id BIGINT IDENTITY(1, 1) NOT NULL,
-        [seat_id] BIGINT NOT NULL,
+        seat_id BIGINT NOT NULL,
         [booking_id] NVARCHAR(30) NOT NULL,
-        [status] INT NOT NULL, 
-    )
-	go 
-	
-    CREATE TABLE Seats_Choose (
-		id BIGINT IDENTITY(1, 1) NOT NULL,
-		last_selected_time DATETIME,
-		[seat_id] BIGINT NOT NULL,
+        [status] INT NOT NULL -- ĐÃ ĐẶT, ĐANG CHỌN, ĐÃ CHỌN
     )
 GO
     CREATE TABLE Price (
@@ -500,7 +492,7 @@ GO
 ALTER TABLE
     Seats_Booking
 ADD
-    CONSTRAINT PK_Seats_Booking PRIMARY KEY (id);
+    CONSTRAINT PK_Seats_Booking PRIMARY KEY (seat_id, booking_id);
 
 GO
 ALTER TABLE
@@ -551,11 +543,6 @@ ADD
     CONSTRAINT PK_MPAA_Rating PRIMARY KEY (id);
 
 GO
-ALTER TABLE
-    Seat_Choose
-ADD
-    CONSTRAINT PK_Seat_Choose PRIMARY KEY (id);
-	go
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
     Verification
@@ -814,11 +801,6 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_PaymentInfo_Booking FOREIGN KEY (booking_id) REFERENCES Booking(id)
 GO
-ALTER TABLE
-    [Seat_Choose]
-ADD
-    CONSTRAINT FK_Seat_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seat(id)
-	go
     -- /Payment_Info
 
 
@@ -1098,6 +1080,18 @@ VALUES
 	(N'Cinema 17', 0, 6, 5);
 GO
 
+INSERT INTO [TicketEZ].[dbo].[Formats_Movies]([movie_id], [format_id])
+VALUES  (1, 1),
+		(2, 1),
+		(3, 2),
+		(4, 2),
+		(5, 1),
+		(6, 3),
+		(7, 4),
+		(2, 1),
+		(1, 2),
+		(2, 2);
+GO
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
 INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
 VALUES
@@ -1138,8 +1132,7 @@ VALUES
     (N'Ghế hội nghị', 'url_anh_ghehoinghi.jpg', N'Loại ghế hội nghị dành cho các sự kiện, buổi họp, hội nghị.'),
     (N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
     (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
-	(N'đường đi', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
+    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
@@ -1401,23 +1394,8 @@ VALUES
 VALUES
   ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
-  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1),
-  ('2023-11-1 18:00:00', '2023-11-1 20:00:00', 1, 1, 1,1);
+  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1);
 GO
-
---24. thêm dữ liệu cho bảng booking
-INSERT INTO [TicketEZ].[dbo].[Booking] ([id], [account_id], [create_date], [showtime_id])
-VALUES ('1','user10','2023-10-28', 1);
-
-go
---26. thêm dữ liệu bảng seatbooking
-INSERT INTO [TicketEZ].[dbo].[Seats_Booking] ([seat_id], [booking_id], [status])
-VALUES (2,1, 1),
-(3,1, 1),
-(4,1, 1),
-(5,1, 1)
-
-go
 
 --25. thêm dữ liệu bảng Directors
     INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
