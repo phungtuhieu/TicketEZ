@@ -40,6 +40,7 @@ const items = [
     getItem('Ghế', 'grSeat', <FontAwesomeIcon icon={solidIcons.faCouch} />, [
         getItem(<Link to="/admin/seat">Ghế</Link>, 'seat', null),
         getItem(<Link to="/admin/seat-type">Loại ghế</Link>, 'seatType', null),
+        getItem(<Link to="/admin/seat-chart">Sơ đồ ghế</Link>, 'seatChart', null),
     ]),
 
     // Quản lý dịch vụ, sự kiện

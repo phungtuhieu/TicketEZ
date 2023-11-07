@@ -15,11 +15,15 @@ export const cinemaComplexUserApi = {
             cinemaChainName,
             searchNameCCX,
         };
-        const result = await axiosClient.get(
-            urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX',
-            { params },
-        );
-        return result.data;
+        try {
+            const result = await axiosClient.get(
+                urlCinemaComplex + '/get/get-cinemaComplex-by-provinceId-cinemaChainName-searchNameCCX',
+                { params },
+            );
+            return result.data;
+        } catch (error) {
+            return error;
+        }
     },
 };
 
@@ -33,6 +37,22 @@ export const movieUserApi = {
                 const result = await axiosClient.get(
                     urlMovie + '/get/movies-by-cinemaComplex/' + cinemaComplexId + '/' + date,
                 );
+                return result.data;
+            }
+            return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    },
+    getMovieAllByCinemaComplexAndDate: async (cinemaComplexId, date) => {
+        try {
+            if (cinemaComplexId ?? cinemaComplexId) {
+                const params = {
+                    cinemaComplexId,
+                    date,
+                };
+                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplexTest', { params });
                 return result.data;
             }
             return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
@@ -116,19 +136,26 @@ export const cinemaUserApi = {
 
 const urlShowtime = 'showtime';
 export const showtimeUserApi = {
-    getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (ccxId, movieId, formatId, date) => {
+    getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate: async (cinemaComplexId, movieId, formatId, date) => {
+        const params = {
+            cinemaComplexId,
+            movieId,
+            formatId,
+            date,
+        };
         try {
-            const result = await axiosClient.get(
-                urlShowtime +
-                    '/get/showtime-by-ccx-movie-format-date/' +
-                    ccxId +
-                    '/' +
-                    movieId +
-                    '/' +
-                    formatId +
-                    '/' +
-                    date,
-            );
+            // const result = await axiosClient.get(
+            //     urlShowtime +
+            //         '/get/showtime-by-ccx-movie-format-date/' +
+            //         cinemaComplexId +
+            //         '/' +
+            //         movieId +
+            //         '/' +
+            //         formatId +
+            //         '/' +
+            //         date,
+            // );
+            const result = await axiosClient.get(urlShowtime + '/get/showtime-by-ccx-movie-format-date', { params });
             return result.data;
         } catch (error) {
             return error;

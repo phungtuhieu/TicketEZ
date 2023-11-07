@@ -249,6 +249,7 @@ function AdminSeat() {
 
     // hành động khi chọn sơ đồ
     const onChange = (value) => {
+        setSeatBookingData([])
         fetchDataSeat(value);
         fetchDataShowTimeBySeatChart(value);
 
@@ -261,9 +262,6 @@ function AdminSeat() {
         console.log('search:', value);
     };
 
-    const check = () => {
-        console.log(seatBookingData);
-    };
 
     return (
         <>
@@ -348,7 +346,6 @@ function AdminSeat() {
                                 />
                             </>
                         )}
-                        <button onClick={check}>check</button>
                     </Card>
                 </Col>
                 <Col span={16}>

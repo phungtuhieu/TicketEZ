@@ -1,5 +1,7 @@
 package com.ticketez_backend_springboot.modules.cinemaComplex;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +29,12 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.province.Province;
 import com.ticketez_backend_springboot.modules.province.ProvinceDao;
+import com.ticketez_backend_springboot.dto.CCXShowtimeByMovieDTO;
+import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
+import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
+import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -36,6 +44,11 @@ public class CinemaComplexAPI {
     CinemaComplexDao cinemaComplexDao;
     @Autowired
     ProvinceDao provinceDao;
+
+    @Autowired
+    MovieDAO movieDAO;
+    @Autowired
+    ShowtimeDAO showtimeDao;
 
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -58,7 +71,7 @@ public class CinemaComplexAPI {
         }
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<List<CinemaComplex>> findAll() {
         List<CinemaComplex> seats = cinemaComplexDao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(seats);
@@ -128,7 +141,8 @@ public class CinemaComplexAPI {
 
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(0, results.orElse(999), sort);
-            Page<CinemaComplex> page = cinemaComplexDao.getCinemaComplexByProvinceIdAndCinemaChainNameAndSearchNameCCX(pageable, provinceId.orElse(2),
+            Page<CinemaComplex> page = cinemaComplexDao.getCinemaComplexByProvinceIdAndCinemaChainNameAndSearchNameCCX(
+                    pageable, provinceId.orElse(2),
                     cinemaChainName.orElse(""), searchNameCCX.orElse(""));
             ResponseDTO<CinemaComplex> responseDTO = new ResponseDTO<>();
             responseDTO.setData(page.getContent());
@@ -164,4 +178,55 @@ public class CinemaComplexAPI {
         }
 
     }
+    @GetMapping("/get/gettesst")
+    public ResponseEntity<?> getDuLiea(
+            @RequestParam("date") Optional<LocalDate> date,
+            @RequestParam("provinceId") Long provinceId,
+            @RequestParam("cinemaChainName") Optional<String> cinemaChainName,
+            @RequestParam("movieId") Long movieId) {
+
+        try {
+            if (cinemaChainName.isPresent() && cinemaChainName.get() == ""
+                    || cinemaChainName.get().equalsIgnoreCase("tất cả")) {
+                cinemaChainName = Optional.empty();
+            }
+            if (movieId.equals("")) {
+                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            }
+            Movie movie = movieDAO.findById(movieId).get();
+            List<CinemaComplex> cinemaComplexs = cinemaComplexDao.getCinemaComplexAndFormatShowtimesByMovie(provinceId,
+                    cinemaChainName.orElse(""), movie,
+                    date.orElse(LocalDate.now()));
+
+            CCXShowtimeByMovieDTO abc = new CCXShowtimeByMovieDTO();
+            List<CCXShowtimeByMovieDTO.CinemaComplexObjResp> listCinemaComplexObjResp = new ArrayList<>();
+
+            for (CinemaComplex cinemaComplex : cinemaComplexs) {
+                CCXShowtimeByMovieDTO.CinemaComplexObjResp cinemaComplexObjResp = abc.new CinemaComplexObjResp();
+
+                List<CCXShowtimeByMovieDTO.CinemaComplexObjResp.FormatAndShowtimes> lisFormatAndShowtimes = new ArrayList<>();
+
+                for (FormatMovie formatMovie : movie.getFormatsMovies()) {
+                    CCXShowtimeByMovieDTO.CinemaComplexObjResp.FormatAndShowtimes formatAndShowtimes = cinemaComplexObjResp.new FormatAndShowtimes();
+                    formatAndShowtimes.setFormat(formatMovie.getFormat());
+
+                    List<Showtime> showtime = showtimeDao.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
+                            movie, formatMovie.getFormat(), date.orElse(LocalDate.now()));
+                    formatAndShowtimes.setShowtimes(showtime);
+                    lisFormatAndShowtimes.add(formatAndShowtimes);
+                }
+
+                cinemaComplexObjResp.setCinemaComplex(cinemaComplex);
+                cinemaComplexObjResp.setListFormatAndShowtimes(lisFormatAndShowtimes);
+
+                listCinemaComplexObjResp.add(cinemaComplexObjResp);
+                abc.setCinemaComplexObjResps(listCinemaComplexObjResp);
+            }
+
+            return ResponseEntity.ok(abc);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

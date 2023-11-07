@@ -7,6 +7,7 @@ import { Col, Row, } from 'antd';
 import ShowTimes from './showtimes';
 import MovieShowing from './MovieShowing';
 import MovieUpcoming from './MovieUpcoming';
+import MovieType from './MovieType';
 
 const Homes = () => {
     const [items, setItems] = useState(homeData);
@@ -22,6 +23,9 @@ const Homes = () => {
                     </Col>
                     <Col span={24}>
                         <MovieUpcoming />
+                    </Col>
+                    <Col span={24}>
+                        <MovieType />
                     </Col>
                     <Col
                         span={24}

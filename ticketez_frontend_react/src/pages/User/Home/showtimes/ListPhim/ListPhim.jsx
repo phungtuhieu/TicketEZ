@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Modal } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
 
+import SeatChart from '../../../Booking/SeatChart';
 import moment from 'moment-timezone';
 
-import { movieUserApi, genreUserApi, formatUserApi, showtimeUserApi } from '~/api/user/showtime';
+import { movieUserApi } from '~/api/user/showtime';
 import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
 
 const cx = classNames.bind(style);
@@ -18,6 +19,16 @@ function ListPhim({ cinemaComplex }) {
     const daysOfWeekInVietnamese = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
     const [loading, setLoading] = useState(false);
 
+    const [showtime, setShowtime] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleOk = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút OK
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút Hủy
+    };
     useEffect(() => {
         const currentTimeInVietnam = moment.tz('Asia/Ho_Chi_Minh');
         const nextWeekDays = [];
@@ -25,12 +36,9 @@ function ListPhim({ cinemaComplex }) {
             const currentDay = currentTimeInVietnam.clone().add(i, 'days');
             nextWeekDays.push(currentDay);
         }
-        // console.log(nextWeekDays);
         setWeekDays(nextWeekDays);
     }, []);
-
     const [chooseDay, setChooseDay] = useState(moment().format('YYYY-MM-DD'));
-
     // console.log(chooseDay);
     const handleDayClick = (index) => {
         setDay(index + 1);
@@ -39,7 +47,6 @@ function ListPhim({ cinemaComplex }) {
         setChooseDay(formatSelectedDay);
         // console.log('Ngày được chọn:', selectedDay.format('DD-MM-YYYY'));
     };
-
     // -----------------movie by ccx-----------------------------------------------
 
     const [movieData, setMovieData] = useState([]);
@@ -47,13 +54,11 @@ function ListPhim({ cinemaComplex }) {
 
     useEffect(() => {
         setLoading(true);
-        const getMovie = async () => {
+        const getMovies = async () => {
             try {
                 if (cinemaComplex) {
-                    const resMovie = await movieUserApi.getMovieByCinemaComplex(cinemaComplex.id, chooseDay);
-                    setMovieData(resMovie);
-                } else {
-                    setMovieData([]);
+                    const resMovie = await movieUserApi.getMovieAllByCinemaComplexAndDate(cinemaComplex.id, chooseDay);
+                    setData(resMovie);
                 }
             } catch (error) {
                 console.log(error);
@@ -61,59 +66,17 @@ function ListPhim({ cinemaComplex }) {
                 setLoading(false);
             }
         };
-    
-        getMovie();
+
+        getMovies();
     }, [cinemaComplex, chooseDay]);
-    
 
-    const loadGenreByMovie = async (movie) => {
-        if (movie ?? movie) {
-            const resGenre = await genreUserApi.getGenreByMovie(movie.id);
-            return resGenre;
-        }
+    console.log('data', data);
+
+    const handShowtime = (value) => {
+        setShowtime(value);
+        console.log(showtime);
+        setIsModalVisible(true);
     };
-
-    const loadFormatByMovie = async (movie) => {
-        if (movie ?? cinemaComplex) {
-            const resFormat = await formatUserApi.getFormatByMovie(movie.id);
-            return Promise.all(
-                resFormat.map(async (valueFormat) => {
-                    const showtime = await showtimeUserApi.getShowtimesByCCXIdAndMovieIdAndFormatIdAndDate(
-                        cinemaComplex.id,
-                        movie.id,
-                        valueFormat.id,
-                        chooseDay,
-                    );
-                    return {
-                        format: valueFormat,
-                        // showtime: valueFormat.name,
-                        showtime,
-                    };
-                }),
-            );
-        }
-    };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await Promise.all(
-                movieData.map(async (valueMovie) => {
-                    const movie = valueMovie;
-                    const genre = await loadGenreByMovie(valueMovie);
-                    const formatShowTime = await loadFormatByMovie(valueMovie);
-                    return {
-                        movie,
-                        genre,
-                        formatShowTime,
-                    };
-                }),
-            );
-            // console.log('test', data);
-            setData(data);
-        };
-        fetchData();
-    }, [movieData]);
-    // style={{overflow: data.length === 0 ? 'none' : "auto"}}
 
     return (
         <>
@@ -184,7 +147,7 @@ function ListPhim({ cinemaComplex }) {
                     </Row>
                 </Col>
                 <Col span={24} className={cx('col2')}>
-                    {data.map((data, index) => (
+                    {data.listMovieObjResp?.map((data, index) => (
                         <Row key={index} className={cx('container-movie')}>
                             <Col span={4} className={cx('col1-movie')}>
                                 <div className={cx('border-movie')}>
@@ -201,7 +164,7 @@ function ListPhim({ cinemaComplex }) {
                                         <div className={cx('k')}>{data.movie.mpaaRating.ratingCode}</div>
                                         <div className={cx('ten-phim')}>{data.movie.title}</div>
                                         <div className={cx('the-loai-phim')}>
-                                            {data.genre.map((valueGenre, index) => (
+                                            {data.genres.map((valueGenre, index) => (
                                                 <span className={cx('span')} key={index}>
                                                     {valueGenre.name}
                                                 </span>
@@ -209,14 +172,19 @@ function ListPhim({ cinemaComplex }) {
                                         </div>
                                     </Col>
 
-                                    {data.formatShowTime.map((valueFormat, index) => {
-                                        if (valueFormat.name ?? valueFormat.showtime.length > 0) {
+                                    {data.listFormatAndShowtimes.map((valueFormat, index) => {
+                                        if (valueFormat.name ?? valueFormat.showtimes.length > 0) {
                                             return (
                                                 <Col key={index} span={24} className={cx('container-suat-chieu')}>
                                                     <div className={cx('title')}>{valueFormat.format.name}</div>
                                                     <div className={cx('suat-chieu')}>
-                                                        {valueFormat.showtime.map((valueShowtime, index) => (
-                                                            <Button key={index} className={cx('btn-suat-chieu')} danger>
+                                                        {valueFormat.showtimes.map((valueShowtime, index) => (
+                                                            <Button
+                                                                key={index}
+                                                                className={cx('btn-suat-chieu')}
+                                                                danger
+                                                                onClick={() => handShowtime(valueShowtime)}
+                                                            >
                                                                 <span className={cx('gio-bat-dau')}>
                                                                     {moment(valueShowtime.startTime).format('HH:mm')}
                                                                 </span>
@@ -243,6 +211,17 @@ function ListPhim({ cinemaComplex }) {
                     )}
                 </Col>
             </Row>
+            <Modal
+                title="Sơ đồ rạp phim"
+                visible={isModalVisible}
+                footer={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={800}
+                style={{ marginBottom: '20px' }}
+            >
+                <SeatChart showtime={showtime}></SeatChart>
+            </Modal>
         </>
     );
 }

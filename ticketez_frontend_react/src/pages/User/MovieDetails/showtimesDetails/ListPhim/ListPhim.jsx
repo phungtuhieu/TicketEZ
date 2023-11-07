@@ -6,7 +6,14 @@ import style from './ListPhim.module.scss';
 
 const cx = classNames.bind(style);
 
-function ListPhim() {
+function ListPhim({propsValue}) {
+
+
+
+    useEffect(() => {
+        console.log("propsValue",propsValue);
+    },[propsValue])
+
     const [ngay, setNgay] = useState(1);
 
     const count = 3;

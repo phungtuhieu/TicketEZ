@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.discount;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.discountBooking.DiscountsBooking;
 
@@ -36,6 +37,7 @@ public class Discount {
 	@JoinColumn(name = "cinema_complex_id")
 	private CinemaComplex cinemaComplex;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "discount")
 	private List<DiscountsBooking> discountsBookings;
 
