@@ -477,57 +477,7 @@ const AdminShowtime = () => {
         setEditorData(data);
     };
 
-    const itemsDescriptions = (record) => [
-        {
-            key: '1',
-            label: 'Id',
-            children: record.id,
-        },
-        {
-            key: '2',
-            label: 'Tên',
-            children: record.name,
-        },
-        {
-            key: '3',
-            label: 'Ngày bắt đầu',
-            children: moment(record.startDate).format('DD/MM/YYYY'),
-        },
-        {
-            key: '4',
-            label: 'Ngày kết thúc',
-            children: moment(record.endDate).format('DD/MM/YYYY'),
-        },
-        {
-            key: '7',
-            label: 'Cụm rạp',
-            children: record.cinemaComplex.name,
-        },
-        {
-            key: '6',
-            label: 'Trạng thái',
-            children: record.status === true ? 'Hoạt động' : 'Kết thúc',
-        },
-        {
-            key: '5',
-            label: 'Ảnh',
-            children: (
-                <Image
-                    src={`http://localhost:8081/api/upload/${record.banner}`}
-                    alt={record.banner}
-                    width={65}
-                    style={{ marginTop: '-10px' }}
-                />
-            ),
-        },
-        {
-            key: '8',
-            label: 'Mô tả',
-            children: record.description !== null && (
-                <span dangerouslySetInnerHTML={{ __html: record.description }} style={{ marginTop: '-15px' }} />
-            ),
-        },
-    ];
+   
 
     return (
         <div>
@@ -572,7 +522,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            label="Chọn Banner"
+                            label="Chọn ảnh"
                             name="banner"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                         >
@@ -591,12 +541,12 @@ const AdminShowtime = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="name"
-                            label="Chọn phim"
+                            label="Nhập tên sự kiện"
                             rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                         >
-                            <Input />
+                            <Input placeholder='Nhập tên phim...'/>
                         </Form.Item>
-                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
+                        <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
                                 format="DD-MM-YYYY HH:mm:ss"
@@ -608,7 +558,7 @@ const AdminShowtime = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="cinemaComplex"
-                            label="Chọn phim"
+                            label="Chọn cụm rạp"
                             rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                         >
                             <Select
@@ -616,8 +566,6 @@ const AdminShowtime = () => {
                                 showSearch
                                 placeholder="Chọn loại"
                                 optionFilterProp="children"
-                                // onChange={onchangeSelectLoaiVanBan}
-                                //onSearch={onSearchSelectBox}
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
@@ -630,7 +578,7 @@ const AdminShowtime = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="description"
-                            label="Chọn rạp"
+                            label="Nhập nội dung"
                             rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
                         >
                             <CustomCKEditor value={editorData} onChange={handleEditorChange} />
@@ -646,9 +594,15 @@ const AdminShowtime = () => {
                     key: post.id,
                 }))}
                 expandable={{
-                    expandedRowRender: (record) => (
-                        <Descriptions title="Thông tin chi tiết" items={itemsDescriptions(record)} />
-                    ),
+                    expandedRowRender: (record) => {
+                        return (
+                            <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                                <Descriptions title="Xem thêm"></Descriptions>
+                                <b style={{ marginBottom: '8px' }}>Mô tả: </b>
+                                {record.description !== null && <span dangerouslySetInnerHTML={{ __html: record.description }} />}
+                            </div>
+                        );
+                    },
                 }}
             />
             <div className={cx('wrapp-pagination')}>
