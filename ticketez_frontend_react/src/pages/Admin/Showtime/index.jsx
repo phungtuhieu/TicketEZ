@@ -192,26 +192,30 @@ const AdminShowtime = () => {
         if (valueTimeMovie) {
             const getMovie = async () => {
                 try {
-                    const res = await movieApi.getById(valueTimeMovie);
-                    const durationInSeconds = res.data.duration;
+                    if(valueTimeMovie != null) {
+                        const res = await movieApi.getById(valueTimeMovie);
+                        console.log(res.data);
+                        const durationInSeconds = res.data.movie.duration;
 
-                    const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
+                        const timeParts = durationInSeconds.split(':'); // Tách chuỗi theo dấu :
 
-                    // Lưu giờ, phút và giây
-                    if (timeParts.length === 3) {
-                        const hours = parseInt(timeParts[0]);
-                        const minutes = parseInt(timeParts[1]);
-                        const seconds = parseInt(timeParts[2]);
+                        // Lưu giờ, phút và giây
+                        if (timeParts.length === 3) {
+                            const hours = parseInt(timeParts[0]);
+                            const minutes = parseInt(timeParts[1]);
+                            const seconds = parseInt(timeParts[2]);
 
-                        const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
-                            2,
-                            '0',
-                        )}:${String(seconds).padStart(2, '0')}`;
-                        let formatTime = moment(formattedDuration, 'HH:mm:ss');
-                        setDataTimeMovie(formatTime);
-                    } else {
-                        console.log('Invalid duration value:', durationInSeconds);
+                            const formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+                                2,
+                                '0',
+                            )}:${String(seconds).padStart(2, '0')}`;
+                            let formatTime = moment(formattedDuration, 'HH:mm:ss');
+                            setDataTimeMovie(formatTime);
+                        } else {
+                            console.log('Invalid duration value:', durationInSeconds);
+                        }
                     }
+                    
                 } catch (error) {
                     funcUtils.notify(error.response.data, 'error');
                 } finally {

@@ -19,37 +19,37 @@ const Binhluan = () => {
     const [workSomeThing, setWorkSomeThing] = useState();
     const [imageUrl, setImageUrl] = useState(null);
     const [isCommentVisible, setCommentVisible] = useState(false); // xử lý mở comment
-    // useEffect(() => {
-    //     fetch(fakeDataUrl)
-    //         .then((res) => res.json())
-    //         .then((res) => {
-    //             setInitLoading(false);
-    //             setData(res.results);
-    //             setList(res.results);
-    //         });
-    // }, []);
-
-      useEffect(() => {
-        const getList = async () => {
-            setLoading(true);
-            try {
-                const res = await reviewApi.getAll();
-                setReview(res.results);
+    useEffect(() => {
+        fetch(fakeDataUrl)
+            .then((res) => res.json())
+            .then((res) => {
                 setInitLoading(false);
                 setData(res.results);
                 setList(res.results);
-                setLoading(false);
-                console.log(res);
-            } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    funcUtils.notify(error.response.data, 'error');
-                } else {
-                    console.log(error);
-                }
-            }
-        };
-        getList();
-    }, [workSomeThing]);
+            });
+    }, []);
+
+    //   useEffect(() => {
+    //     const getList = async () => {
+    //         setLoading(true);
+    //         try {
+    //             const res = await reviewApi.getAll();
+    //             setReview(res.results);
+    //             setInitLoading(false);
+    //             setData(res.results);
+    //             setList(res.results);
+    //             setLoading(false);
+    //             console.log(res);
+    //         } catch (error) {
+    //             if (error.hasOwnProperty('response')) {
+    //                 funcUtils.notify(error.response.data, 'error');
+    //             } else {
+    //                 console.log(error);
+    //             }
+    //         }
+    //     };
+    //     getList();
+    // }, [workSomeThing]);
     const onLoadMore = () => {
         setLoading(true);
         setList(
@@ -152,15 +152,13 @@ const Binhluan = () => {
                             />
                             <div>content</div>
                         </Skeleton> */}
-                                    <Skeleton loading={item.loading}>  
-                                    <List.Item.Meta>
-                                                  
+                                  
                                     <Row>
                                         <Col span={24} style={{ textAlign: 'left', width: '1080px' }}>
                                             <Row>
                                                 <Col span={2}>
                                                     <Avatar size={40}
-                                                        src={item.account.image}
+                                                          src={imageUrl || 'https://i.imgur.com/CjpMFXE.jpg'}
                                                     >
                                                     </Avatar>
                                                 </Col>
@@ -168,7 +166,7 @@ const Binhluan = () => {
                                                     <div className={cx('info-container')}>
                                                         <h4>Anh Phùng</h4>
                                                         <img
-                                                            src="https://i.imgur.com/CjpMFXE.jpg"
+                                                            src="https://homepage.momocdn.net/img/momo-upload-api-230629163313-638236531936463134.png"
                                                             width={'20px'}
                                                             className={('icon')}
                                                             loading="lazy"
@@ -254,8 +252,7 @@ const Binhluan = () => {
                                             </Col>
                                         )}
                                     </Row>
-                                    </List.Item.Meta> 
-                                    </Skeleton>
+                                 
                                 </List.Item>
                             )}
                         />
