@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.ticketez_backend_springboot.modules.cinema.CinemaDAO;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplexDao;
 import com.ticketez_backend_springboot.modules.format.Format;
@@ -41,10 +43,15 @@ public class ShowtimeAPI {
 
     @Autowired
     MovieDAO movieDAO;
+
     @Autowired
     FormatDAO formatDAO;
+
     @Autowired
     CinemaComplexDao cinemaComplexDAO;
+
+    @Autowired
+    CinemaDAO cinemaDAO;
 
     @GetMapping
     public ResponseEntity<ResponseDTO<Showtime>> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -144,10 +151,31 @@ public class ShowtimeAPI {
     }
 
     // lấy dữ liệu bảng showtime theo endtime
-    // @GetMapping("/get-showtime-by-endtime/{endTime}")
-    // public ResponseEntity<List<Showtime>> getShowtimeByEndtime(@PathVariable("cinemaId")  Long cinemaId,
-    //         @PathVariable("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime) {
-    //     return ResponseEntity.ok(showtimeDAO.getShowtimeByEndtime(cinemaId,endTime));
-    // }
+    @GetMapping("/get/showtime-by-endTime-movie-format-date/{cinema}/{movieId}/{formatId}/{date}")
+    public ResponseEntity<?> getShowtimesByCCXAndMovieAndFormatAndEndtime(
+            @PathVariable("cinema") Long Cinema,
+            @PathVariable("movieId") Long movieId,
+            @PathVariable("formatId") Long formatId,
+            @PathVariable("date") LocalDate date) {
+        try {
+            if (Cinema.equals("") && movieId.equals("") && formatId.equals("")) {
+                return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+            }
+            if (date == null || date.equals("")) {
+                date = LocalDate.now();
+            }
+            Cinema cinema = cinemaDAO.findById(Cinema).get();
+            Movie movie = movieDAO.findById(movieId).get();
+            Format format = formatDAO.findById(formatId).get();
+            if (cinema != null && movie != null && format != null) {
+                List<Showtime> showtimes = showtimeDAO.getShowtimesByCCXAndMovieAndFormatAndEndtime(
+                     cinema,movie, format, date);
+                return ResponseEntity.ok(showtimes);
+            }
+            return null;
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

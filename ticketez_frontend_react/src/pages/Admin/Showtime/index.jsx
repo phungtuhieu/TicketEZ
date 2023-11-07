@@ -16,11 +16,8 @@ import funcUtils from '~/utils/funcUtils';
 import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
 import img from '~/assets/img';
-
-dayjs.extend(utc);
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -57,6 +54,7 @@ const AdminShowtime = () => {
     const [dataCinemaToComplex, setDataCinemaToComplex] = useState(null);
     const [dataFormatMovieByFormatAndMovie, setDataFormatMovieByFormatAndMovie] = useState(null);
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
+    const [valueEndtimeByTimeMovieAndStartime, setValueEndtimeByTimeMovieAndStartime] = useState(null);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
@@ -164,9 +162,20 @@ const AdminShowtime = () => {
         if (valueSelectDate) {
             const getShowtimeByEndtime = async () => {
                 try {
-                    const res = await showtimeApi.getShowtimeByEndtime(valueSelectDate);
-                    console.log(res.data);
-                    setvalueShowtimeByEndtime(res.data);
+                    if (
+                        valueSelectDate != null &&
+                        valueCinema != null &&
+                        valueTimeMovie != null &&
+                        valueFormat != null
+                    ) {
+                        const res = await showtimeApi.getShowtimesByCCXAndMovieAndFormatAndEndtime(
+                            valueCinema,
+                            valueTimeMovie,
+                            valueFormat,
+                            valueSelectDate,
+                        );
+                        setvalueShowtimeByEndtime(res.data);
+                    }
                 } catch (error) {
                     funcUtils.notify(error.response.data, 'error');
                 } finally {
@@ -178,6 +187,7 @@ const AdminShowtime = () => {
         } else {
             setLoading(false);
         }
+
         //lấy giờ của movie
         if (valueTimeMovie) {
             const getMovie = async () => {
@@ -232,7 +242,16 @@ const AdminShowtime = () => {
     }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema, valueSelectDate]);
 
     const handleReset = () => {
-        form.resetFields();
+        form.setFieldsValue({
+            province: null,
+            cinemaComplex: null,
+            cinema: null,
+            movie: null,
+            format: null,
+            seatChart: null,
+            time: null,
+            date: null,
+        });
         setSelectedOption1(null);
         setSelectedOption2(null);
         setSelectedOption3(null);
@@ -240,6 +259,12 @@ const AdminShowtime = () => {
         setSelectedOption5(null);
         setSelectedOption6(null);
         setValueSelectProvince(null);
+        setValueCinema(null);
+        setValueFormat(null);
+        setvalueShowtimeByEndtime(null);
+        setValueSelectCinemaComplex(null);
+        setValueSelectDate(null);
+        setValueTimeMovie(null);
     };
 
     const columns = [
@@ -355,10 +380,9 @@ const AdminShowtime = () => {
 
     const showModal = () => {
         handleReset();
+        setEditData(null);
         setOpen(true);
-        form.setFieldsValue({
-            'range-time-picker': [],
-        });
+        form.resetFields();
     };
 
     const handleDelete = async (record) => {
@@ -375,12 +399,14 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
-        console.log(record);
-        dayjs.locale('vi');
-        const formattedStartTime = dayjs(record.startTime);
-        const formattedEndTime = dayjs(record.endTime);
-        onChangSelectCinemaConplex(record.cinema.cinemaComplex.id);
+        handleReset();
+        let time = moment(record.endTime).format('HH:mm');
         onChangSelectProvince(record.cinema.cinemaComplex.province.id);
+        onChangSelectCinemaConplex(record.cinema.cinemaComplex.id);
+        onChangSelectCinema(record.cinema.id);
+        onChangSelectFormatMovie(record.formatMovie.movie.id);
+        onChangSelectFormat(record.formatMovie.format.id);
+        onChangSelectDate(dayjs(record.startTime, { format: 'YYYY-MM-DD' }));
         form.setFieldsValue({
             ...record,
             province: record.cinema.cinemaComplex.province.id,
@@ -389,9 +415,11 @@ const AdminShowtime = () => {
             movie: record.formatMovie.movie.id,
             format: record.formatMovie.format.id,
             seatChart: record.seatChart.id,
-            'range-time-picker': [formattedStartTime, formattedEndTime],
+            date: dayjs(record.startTime, { format: 'YYYY-MM-DD' }),
+            time: dayjs(record.startTime, { format: 'HH:mm:ss' }),
         });
         setDataTimeMovie(record.formatMovie.movie.duration);
+        setValueEndtimeByTimeMovieAndStartime(time);
         setSelectedOption1(record.cinema.cinemaComplex.province ? record.cinema.cinemaComplex.province.id : null);
         setSelectedOption2(record.cinema.cinemaComplex ? record.cinema.cinemaComplex.id : null);
         setSelectedOption3(record.cinema ? record.cinema.id : null);
@@ -411,7 +439,164 @@ const AdminShowtime = () => {
             let date = values.date.format('YYYY-MM-DD');
             let time = values.time.format('HH:mm:ss');
 
-            const gio1 = time;
+            const currentTime = new Date(); // Lấy ngày hiện tại
+            const startTime = new Date(Date.parse(date + ' ' + time));
+            const endTime = new Date(Date.parse(date + ' ' + valueEndtimeByTimeMovieAndStartime));
+            const newCurrentDateADd = new Date(endTime);
+            // Cộng thêm 10 ngày vào newCurrentDateADd
+            newCurrentDateADd.setDate(currentTime.getDate() + 10);
+
+            //tạo một biến mới để kiểm tra trùng xuất chiếu
+            let timeFormat = values.time.format('HH:mm');
+            //tạo mảng lưu endtime HH:mm của xuất chiếu
+            const endtimeFormatHHmm = [];
+            for (const showtime of valueShowtimeByEndtime) {
+                endtimeFormatHHmm.push(moment(showtime.endTime).format('HH:mm'));
+            }
+
+            //lấy ra giờ cuối cùng
+            const lastArrayEndtime = endtimeFormatHHmm[endtimeFormatHHmm.length - 1];
+
+            //lấy ra giờ cuối cùng cộng thêm 15 phút
+            const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
+
+            //kiểm tra xuất chiếu có tồn tại hay chưa
+            if (endtimeFormatHHmm.includes(timeFormat)) {
+                funcUtils.notify('Xuất chiếu đã tồn tại vui lòng chọn xuất chiếu khác', 'error');
+                setOpen(true);
+                setLoading(false);
+                //kiểm tra giờ phải lớn hơn giờ cuối cùng
+            } else if (time < lastArrayEndtime) {
+                funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
+                setOpen(true);
+                setLoading(false);
+            } else {
+                if (lastEndTimeWithExtra15Minutes != null) {
+                    if (currentTime.toDateString() === startTime.toDateString()) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 2, // Công chiếu
+                        };
+                    } else if (startTime > currentTime && startTime <= newCurrentDateADd) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 1, // sắp chiếu
+                        };
+                    } else if (currentTime > startTime) {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 3, //Kết thúc chiếu
+                        };
+                    } else {
+                        values = {
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: 0, //chưa công chiếu
+                        };
+                    }
+                    if (editData) {
+                        const resp = await showtimeApi.put(
+                            editData.id,
+                            values,
+                            values.cinema,
+                            dataFormatMovieByFormatAndMovie,
+                            valueSeatChartByCinema,
+                        );
+                        if (resp.status === 200) {
+                            funcUtils.notify('Cập nhật thành công', 'success');
+                        }
+                    } else {
+                        try {
+                            const resp = await showtimeApi.post(
+                                values,
+                                values.cinema,
+                                dataFormatMovieByFormatAndMovie,
+                                valueSeatChartByCinema,
+                            );
+                            if (resp.status === 200) {
+                                funcUtils.notify('Thêm thành công', 'success');
+                            }
+                        } catch (error) {
+                            console.log(error);
+                            funcUtils.notify(error.response.data, 'error');
+                        }
+                    }
+                    setOpen(false);
+                    form.resetFields();
+                    setLoading(false);
+                    setWorkSomeThing([!workSomeThing]);
+                } else if (time < lastEndTimeWithExtra15Minutes) {
+                    funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
+                    setOpen(true);
+                    setLoading(false);
+                }
+            }
+        } catch (errorInfo) {
+            console.log('Failed:', errorInfo);
+            setLoading(false);
+        }
+    };
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+    //phân trang
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
+
+    const onChangSelectCinemaConplex = (value) => {
+        setValueSelectCinemaComplex(value);
+        setSelectedOption2(value);
+        setSelectedOption3(null);
+        setSelectedOption4(null);
+        setSelectedOption5(null);
+        setSelectedOption6(null);
+        setDataTimeMovie(null);
+        form.setFieldsValue({
+            cinema: null,
+            movie: null,
+            format: null,
+            seatChart: null,
+            time: null,
+            date: null,
+        });
+    };
+
+    const onChangSelectFormatMovie = (value) => {
+        setSelectedOption4(value);
+        setValueTimeMovie(value);
+        setvalueShowtimeByEndtime(null);
+    };
+
+    const onChangSelectFormat = (value) => {
+        setSelectedOption5(value);
+        setValueFormat(value);
+        form.setFieldsValue({
+            time: null,
+            date: null,
+        });
+        setvalueShowtimeByEndtime(null);
+    };
+
+    const onChangSelectDate = (date) => {
+        setSelectedOption6(date);
+        if (date != null) {
+            setValueSelectDate(date.format('YYYY-MM-DD'));
+        }
+    };
+
+    const onChangSelectTime = (value) => {
+        if (value != null) {
+            const gio1 = value.format('HH:mm');
             const gio2 = dataTimeMovie;
 
             const moment1 = moment(gio1, 'HH:mm:ss');
@@ -436,118 +621,7 @@ const AdminShowtime = () => {
                 tongPhut %= 60;
             }
             const resultEndtime = moment().hours(tongGio).minutes(tongPhut).seconds(tongGiay).format('HH:mm:ss');
-
-            const currentTime = new Date(); // Lấy ngày hiện tại
-            const startTime = new Date(Date.parse(date + ' ' + time));
-            const endTime = new Date(Date.parse(date + ' ' + resultEndtime));
-            const newEndTime = new Date(endTime);
-            // Cộng thêm 10 ngày vào newEndTime
-            newEndTime.setDate(currentTime.getDate() + 10);
-
-            if (currentTime.toDateString() === startTime.toDateString()) {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 2, // Công chiếu
-                };
-            } else if (startTime > currentTime && startTime <= newEndTime) {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 1, // sắp chiếu
-                };
-            } else if (currentTime > startTime) {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 3, //Kết thúc chiếu
-                };
-            } else {
-                values = {
-                    ...values,
-                    startTime: startTime,
-                    endTime: endTime,
-                    status: 0, //chưa công chiếu
-                };
-            }
-            if (editData) {
-                const resp = await showtimeApi.put(
-                    editData.id,
-                    values,
-                    values.cinema,
-                    values.formatMovie,
-                    values.seatChart,
-                );
-                if (resp.status === 200) {
-                    funcUtils.notify('Cập nhật thành công', 'success');
-                }
-            } else {
-                try {
-                    const resp = await showtimeApi.post(
-                        values,
-                        values.cinema,
-                        dataFormatMovieByFormatAndMovie,
-                        valueSeatChartByCinema,
-                    );
-                    if (resp.status === 200) {
-                        funcUtils.notify('Thêm thành công', 'success');
-                    }
-                } catch (error) {
-                    console.log(error);
-                    funcUtils.notify(error.response.data, 'error');
-                }
-            }
-            setOpen(false);
-            form.resetFields();
-            setDataTimeMovie(null);
-            setLoading(false);
-            setWorkSomeThing([!workSomeThing]);
-        } catch (errorInfo) {
-            console.log('Failed:', errorInfo);
-            setLoading(false);
-        }
-    };
-    const handleCancel = () => {
-        setOpen(false);
-    };
-
-    //phân trang
-    const handlePageChange = (page, pageSize) => {
-        setCurrentPage(page);
-        setPageSize(pageSize);
-    };
-
-    const onChangSelectCinemaConplex = (value) => {
-        setValueSelectCinemaComplex(value);
-        setSelectedOption2(value);
-        setSelectedOption3(null);
-        setDataTimeMovie(null);
-        form.setFieldsValue({
-            cinema: null,
-            movie: null,
-            formatMovie: null,
-            seatChart: null,
-            'range-time-picker': [],
-        });
-    };
-
-    const onChangSelectFormatMovie = (value) => {
-        setSelectedOption4(value);
-        setValueTimeMovie(value);
-    };
-
-    const onChangSelectFormat = (value) => {
-        setSelectedOption5(value);
-        setValueFormat(value);
-    };
-
-    const onChangSelectDate = (date) => {
-        setSelectedOption6(date);
-        if (date != null) {
-            setValueSelectDate(date.format('YYYY-MM-DD'));
+            setValueEndtimeByTimeMovieAndStartime(resultEndtime);
         }
     };
 
@@ -555,7 +629,6 @@ const AdminShowtime = () => {
         setSelectedOption3(value);
         setValueCinema(value);
     };
-
     const onChangSelectProvince = (value) => {
         setValueSelectProvince(value);
         setSelectedOption1(value);
@@ -563,14 +636,16 @@ const AdminShowtime = () => {
         setSelectedOption3(null);
         setSelectedOption4(null);
         setSelectedOption5(null);
+        setvalueShowtimeByEndtime(null);
         setDataTimeMovie(null);
         form.setFieldsValue({
             cinemaComplex: null,
             cinema: null,
             movie: null,
-            formatMovie: null,
+            format: null,
             seatChart: null,
-            'range-time-picker': [],
+            time: null,
+            date: null,
         });
     };
     //validate chọn ngày đến ngày
@@ -592,6 +667,10 @@ const AdminShowtime = () => {
                 message: 'Vui lòng chọn giờ',
             },
         ],
+    };
+
+    const customFormat = (value) => {
+        return ` ${value.format('HH:mm')} ~ ${valueEndtimeByTimeMovieAndStartime}`;
     };
 
     return (
@@ -803,11 +882,11 @@ const AdminShowtime = () => {
                             </Select>
                         </Form.Item>
                         <Form.Item>
-                            <Row gutter={24}>
-                                <Col  xs={24} sm={24} lg={11}>
-                                    <Form.Item name="date" label="Chọn ngày  chiếu" {...configDate}>
+                            <Row style={{ width: '890px' }}>
+                                <Col xs={24} sm={24} lg={9}>
+                                    <Form.Item name="date" label="Chọn ngày chiếu" {...configDate}>
                                         <DatePicker
-                                            style={{ width: 160 }}
+                                            style={{ width: 170 }}
                                             format={'DD-MM-YYYY'}
                                             value={selectedOption6}
                                             onChange={(value) => onChangSelectDate(value)}
@@ -816,79 +895,38 @@ const AdminShowtime = () => {
                                     </Form.Item>
                                     <Form.Item name="time" label="Chọn giờ bắt đầu" {...configTime}>
                                         <TimePicker
-                                            style={{ width: 160 }}
+                                            format={customFormat}
+                                            onChange={(value) => onChangSelectTime(value)}
+                                            style={{ width: 170 }}
                                             placeholder="Chọn giờ bắt đầu"
                                             disabled={!selectedOption6}
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col  xs={24} sm={24} lg={13}>
-                                    <Form.Item>
-                                        <span>xuất chiếu đã tồn tại trong ngày : </span> <br />
-                                        <Button
-                                            className={cx('btn-suat-chieu')}
-                                            style={{ marginBottom: '5px', marginRight: '5px' }}
-                                        >
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
+
+                                <Col xs={24} sm={24} lg={15} style={{ marginTop: '-25px' }}>
+                                    {valueShowtimeByEndtime && valueShowtimeByEndtime.length > 0 ? (
+                                        <>
+                                            <span style={{ color: 'gray' }}>
+                                                Những xuất chiếu đã tồn tại trong ngày :{' '}
                                             </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')}>
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
-                                            </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')}>
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
-                                            </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')}>
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
-                                            </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')}>
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
-                                            </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                        <Button className={cx('btn-suat-chieu')}>
-                                            <span className={cx('gio-bat-dau')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.startTime).format('HH:mm')} */}
-                                            </span>
-                                            <span className={cx('gio-ket-thuc')}>
-                                                12:12
-                                                {/* {moment(valueShowtime.endTime).format('HH:mm')} */}
-                                            </span>
-                                        </Button>
-                                    </Form.Item>
+                                            <br />
+                                            {valueShowtimeByEndtime.map((valueShowtime) => (
+                                                <Button
+                                                    key={valueShowtime.id}
+                                                    className={cx('btn-suat-chieu')}
+                                                    style={{ marginBottom: '25px', marginRight: '5px' }}
+                                                >
+                                                    <span className={cx('gio-bat-dau')}>
+                                                        {moment(valueShowtime.startTime).format('HH:mm')}
+                                                    </span>
+                                                    <span className={cx('gio-ket-thuc')}>
+                                                        {moment(valueShowtime.endTime).format('HH:mm')}
+                                                    </span>
+                                                </Button>
+                                            ))}
+                                        </>
+                                    ) : null}
                                 </Col>
                             </Row>
                         </Form.Item>
