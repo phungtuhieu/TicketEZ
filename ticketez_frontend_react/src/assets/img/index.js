@@ -2,6 +2,7 @@ import logoLogin from './logo-login.png';
 import bgAuth from './bg-auth.jpeg';
 import datrungphuongnam from './datrungphuongnam.jpg';
 import tagDatTruoc from './logo-dat-truoc.svg';
+import event from './event.jpg';
 
 // 
 
@@ -15,7 +16,8 @@ const img = {
     tagDatTruoc,
     // 
     notFoundLogo,
-    gifLoading
+    gifLoading,
+    event
 };
 
 
