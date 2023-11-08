@@ -12,12 +12,12 @@ import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @Repository
 public interface FormatMovieDAO extends JpaRepository<FormatMovie, Long> {
-    @Query("SELECT DISTINCT f.movie FROM FormatMovie f")
+    @Query("SELECT DISTINCT f.movie FROM FormatMovie f ")
     List<Movie> getDistinctMovie();
 
 
-    @Query("SELECT DISTINCT f.format FROM FormatMovie f")
-    List<Format> getDistinctFormats();
+    @Query("SELECT DISTINCT f.format FROM FormatMovie f where f.movie = :movieId")
+    List<Format> getDistinctFormats(@Param("movieId") Movie movieId);
 
 
     //lấy id của formatmovie dựa theo id của movie và format

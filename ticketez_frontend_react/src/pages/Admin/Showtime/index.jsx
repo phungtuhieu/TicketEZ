@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect } from 'react';
-import { Button, Col, Row, Form, Popconfirm, DatePicker, Tag, Select, Pagination, Space, TimePicker } from 'antd';
+import { Button, Col, Row, Form, Popconfirm, DatePicker, Tag, Select, Pagination, Space, TimePicker, Image } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -17,7 +17,6 @@ import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
-import img from '~/assets/img';
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -95,13 +94,11 @@ const AdminShowtime = () => {
         //đổ dữ liệu
         const fetchCinemaData = async () => {
             try {
-                const [format, movie, province] = await Promise.all([
-                    formatMovieApi.getDistinctFormarIds(),
+                const [movie, province] = await Promise.all([
                     formatMovieApi.getDistinctMovieIds(),
                     provinceApi.getTotalCinemaComplexToPrivince(),
                 ]);
                 setSelectMovie(movie.data);
-                setSelectFormat(format.data);
                 setSelectProvice(province.data);
             } catch (error) {
                 funcUtils.notify(error.response.data, 'error');
@@ -220,8 +217,17 @@ const AdminShowtime = () => {
                     setLoading(false);
                 }
             };
-
-            getMovie();
+            //lấy format theo movie
+            const getDistinctFormarIds = async () => {
+                try {
+                    const res = await formatMovieApi.getDistinctFormarIds(valueTimeMovie);
+                    setSelectFormat(res.data);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
 
             // Lấy id của format movie theo movie và format
             const getIdFormatMovieByFormatAndMovie = async () => {
@@ -237,6 +243,8 @@ const AdminShowtime = () => {
                 }
             };
 
+            getMovie();
+            getDistinctFormarIds();
             getIdFormatMovieByFormatAndMovie();
         } else {
             setLoading(false);
@@ -309,9 +317,19 @@ const AdminShowtime = () => {
         },
         {
             title: 'Sơ đồ ghế',
-            dataIndex: 'seatChart',
+            dataIndex: 'formatMovie',
             align: 'center',
-            render: (seatChart) => (seatChart ? seatChart.name : ''),
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.formatMovie.movie.poster}`}
+                    />
+                </Space>
+            ),
         },
         {
             title: 'Trạng thái',
@@ -473,11 +491,7 @@ const AdminShowtime = () => {
                 setOpen(true);
                 setLoading(false);
             } else {
-                if (time < lastEndTimeWithExtra15Minutes) {
-                    funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
-                    setOpen(true);
-                    setLoading(false);
-                } else {
+                if (lastArrayEndtime == null) {
                     if (currentTime.toDateString() === startTime.toDateString()) {
                         values = {
                             ...values,
@@ -534,10 +548,78 @@ const AdminShowtime = () => {
                             funcUtils.notify(error.response.data, 'error');
                         }
                     }
+
                     setOpen(false);
                     form.resetFields();
                     setLoading(false);
                     setWorkSomeThing([!workSomeThing]);
+                } else {
+                    if (time < lastEndTimeWithExtra15Minutes) {
+                        funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
+                        setOpen(true);
+                        setLoading(false);
+                    } else {
+                        if (currentTime.toDateString() === startTime.toDateString()) {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 2, // Công chiếu
+                            };
+                        } else if (startTime > currentTime && startTime <= newCurrentDateADd) {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 1, // sắp chiếu
+                            };
+                        } else if (currentTime > startTime) {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 3, //Kết thúc chiếu
+                            };
+                        } else {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 0, //chưa công chiếu
+                            };
+                        }
+                        if (editData) {
+                            const resp = await showtimeApi.put(
+                                editData.id,
+                                values,
+                                values.cinema,
+                                dataFormatMovieByFormatAndMovie,
+                                valueSeatChartByCinema,
+                            );
+                            if (resp.status === 200) {
+                                funcUtils.notify('Cập nhật thành công', 'success');
+                            }
+                        } else {
+                            try {
+                                const resp = await showtimeApi.post(
+                                    values,
+                                    values.cinema,
+                                    dataFormatMovieByFormatAndMovie,
+                                    valueSeatChartByCinema,
+                                );
+                                if (resp.status === 200) {
+                                    funcUtils.notify('Thêm thành công', 'success');
+                                }
+                            } catch (error) {
+                                console.log(error);
+                                funcUtils.notify(error.response.data, 'error');
+                            }
+                        }
+                        setOpen(false);
+                        form.resetFields();
+                        setLoading(false);
+                        setWorkSomeThing([!workSomeThing]);
+                    }
                 }
             }
         } catch (errorInfo) {
@@ -844,11 +926,13 @@ const AdminShowtime = () => {
                                               <Space style={{ justifyContent: 'flex-start', display: 'flex' }}>
                                                   <div>
                                                       <span role="img" aria-label="China">
-                                                          {/* <img
+                                                          <img
                                                               className={cx('img-Movie')}
-                                                              src={`http://localhost:8081/api/upload/${formatMovie.movie.id}`}
-                                                          /> */}
-                                                          <img className={cx('img-Movie')} src={img.datrungphuongnam} />
+                                                              src={`http://localhost:8081/api/upload/${formatMovie.poster}`}
+
+                                                              //   src={`http://localhost:8081/api/upload/${formatMovie.movie.poster}`}
+                                                          />
+                                                          {/* <img className={cx('img-Movie')} src={img.datrungphuongnam} /> */}
                                                       </span>
                                                   </div>
                                                   <span>{formatMovie.title}</span>

@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.formatMovie;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +45,23 @@ public class FormatMovieAPI {
     @GetMapping("/getDistinctMovie")
     public ResponseEntity<?> getDistinctMovie() {
         List<Movie> distinctMovieIds = dao.getDistinctMovie();
+        // Sắp xếp danh sách giảm dần theo id
+        Collections.sort(distinctMovieIds, (movie1, movie2) -> movie2.getId().compareTo(movie1.getId()));
         return ResponseEntity.ok(distinctMovieIds);
     }
 
-    @GetMapping("/getDistinctFormat")
-    public ResponseEntity<?> getDistinctFormats() {
-        List<Format> distinctMovieIds = dao.getDistinctFormats();
-        return ResponseEntity.ok(distinctMovieIds);
+    @GetMapping("/getDistinctFormat/{movieId}")
+    public ResponseEntity<?> getDistinctFormats(@PathVariable("movieId") long movieId) {
+        try {
+            Movie movie = daoMovie.findById(movieId).get();
+            List<Format> distinctMovieIds = dao.getDistinctFormats(movie);
+            Collections.sort(distinctMovieIds, (movie1, movie2) -> movie2.getId().compareTo(movie1.getId()));
+            return ResponseEntity.ok(distinctMovieIds);
+        } catch (Exception e) {
+            // Xử lý lỗi kết nối cơ sở dữ liệu
+            String errorMessage = "Lỗi kết nối cơ sở dữ liệu: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
     }
 
     // lấy id của formatmovie dựa theo id của movie và format
@@ -81,7 +92,7 @@ public class FormatMovieAPI {
             Movie movie = daoMovie.findById(movieId).get();
             Format format = daoFormat.findById(formatId).get();
             if (movie != null) {
-                List<FormatMovie> formatMovie = dao.getIdFoMatMvoie(movie,format);
+                List<FormatMovie> formatMovie = dao.getIdFoMatMvoie(movie, format);
                 return ResponseEntity.ok(formatMovie);
             }
             return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
