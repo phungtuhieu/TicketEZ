@@ -7,7 +7,7 @@ const cinemaChainApi = {
         return axiosClient.get(url + '/' + cinemaChainId);
     },
     get: async () => {
-        return axiosClient.get(url);
+        return axiosClient.get(url + '/get/all');
     },
     post: async (data) => {
         const values = { ...data};
