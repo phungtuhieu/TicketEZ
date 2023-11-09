@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.MovieByShowtimeShowingDTO;
 import com.ticketez_backend_springboot.dto.MovieDTO;
 import com.ticketez_backend_springboot.dto.MovieShowtimeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
@@ -99,9 +100,9 @@ public class MovieAPI {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        
+
         if (!dao.existsById(id)) {
-            
+
             return new ResponseEntity<>("Không tìm thấy phim", HttpStatus.NOT_FOUND);
         }
 
@@ -111,7 +112,7 @@ public class MovieAPI {
         List<Director> directors = new ArrayList<>();
         List<Format> formats = new ArrayList<>();
         List<Genre> genres = new ArrayList<>();
-         
+
         for (ActorMovie actorMovie : movie.getActorsMovies()) {
             actors.add(actorMovie.getActor());
         }
@@ -124,7 +125,7 @@ public class MovieAPI {
         for (GenreMovie genreMovie : movie.getGenresMovies()) {
             genres.add(genreMovie.getGenre());
         }
-      
+
         MovieDTO resp = new MovieDTO();
         resp.setActors(actors);
         resp.setDirectors(directors);
@@ -196,7 +197,7 @@ public class MovieAPI {
             // actorMovieDAO.
         }
         // if (!dao.existsById(id)) {
-        //     return ResponseEntity.notFound().build();
+        // return ResponseEntity.notFound().build();
         // }
         dao.save(movieDto.getMovie());
         return ResponseEntity.ok("movie");
@@ -205,13 +206,13 @@ public class MovieAPI {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
-            
+
             if (!dao.existsById(id)) {
                 return ResponseEntity.notFound().build();
-            }           
+            }
             Movie movie = dao.findById(id).get();
             for (int i = 0; i < movie.getFormatsMovies().size(); i++) {
-                if(!movie.getFormatsMovies().get(i).getShowtimes().isEmpty()) {
+                if (!movie.getFormatsMovies().get(i).getShowtimes().isEmpty()) {
                     return new ResponseEntity<>("Không thể Xoá, phim đã được thêm vào lịch chiếu", HttpStatus.CONFLICT);
                 }
             }
@@ -238,24 +239,26 @@ public class MovieAPI {
     ////////////////////////////////
     // @GetMapping("/get/movies-by-cinemaComplex/{cinemaComplexId}/{date}")
     // public ResponseEntity<?> getDuLie(
-    //         @PathVariable("cinemaComplexId") Long CinemaComplexId,
-    //         @PathVariable("date") LocalDate date) {
-    //     try {
-    //         if (CinemaComplexId.equals("")) {
-    //             return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-    //         }
-    //         if (date == null || date.equals("")) {
-    //             date = LocalDate.now();
-    //         }
-    //         CinemaComplex cinemaComplex = cinemaComplexDao.findById(CinemaComplexId).get();
-    //         if (cinemaComplex != null) {
-    //             List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
-    //             return ResponseEntity.ok(movie);
-    //         }
-    //         return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
-    //     } catch (Exception e) {
-    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
+    // @PathVariable("cinemaComplexId") Long CinemaComplexId,
+    // @PathVariable("date") LocalDate date) {
+    // try {
+    // if (CinemaComplexId.equals("")) {
+    // return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    // }
+    // if (date == null || date.equals("")) {
+    // date = LocalDate.now();
+    // }
+    // CinemaComplex cinemaComplex =
+    //////////////////////////////// cinemaComplexDao.findById(CinemaComplexId).get();
+    // if (cinemaComplex != null) {
+    // List<Movie> movie = dao.getMoviesByCinemaComplex(cinemaComplex, date);
+    // return ResponseEntity.ok(movie);
+    // }
+    // return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
+    // } catch (Exception e) {
+    // return new ResponseEntity<>("Lỗi kết nối server",
+    //////////////////////////////// HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
 
     // }
 
@@ -270,9 +273,9 @@ public class MovieAPI {
 
             CinemaComplex cinemaComplex = cinemaComplexDao.findById(cinemaComplexId).get();
             List<Movie> movies = dao.getMoviesByCinemaComplex(cinemaComplex, date.orElse(LocalDate.now()));
-            
-            if(movies.isEmpty()) {
-               return ResponseEntity.ok(new ArrayList<>());
+
+            if (movies.isEmpty()) {
+                return ResponseEntity.ok(new ArrayList<>());
             }
 
             MovieShowtimeDTO movieShowtimeDTO = new MovieShowtimeDTO();
@@ -302,7 +305,7 @@ public class MovieAPI {
                     listFormatAndShowtimes.add(formatAndShowtimes);
 
                 }
-                
+
                 movieObjResp.setMovie(movie);
                 movieObjResp.setGenres(genres);
                 movieObjResp.setListFormatAndShowtimes(listFormatAndShowtimes);
@@ -324,6 +327,32 @@ public class MovieAPI {
         try {
             List<Movie> movie = dao.getMoviesExistsMovieIdShowtimes();
             return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/get/movie-by-showtime-showing")
+    public ResponseEntity<?> getMovieByShowtimeShowing() {
+        try {
+            List<Movie> movies = dao.getMovieByShowtimeShowing();
+            MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
+            List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+            for(Movie movie : movies){
+                MovieByShowtimeShowingDTO.MovieObjResp  movieObjResp = movieShowingDTO.new MovieObjResp();
+                List<Genre> genres = new ArrayList<>();
+                for(GenreMovie genrMovie : movie.getGenresMovies()){
+                    genres.add(genrMovie.getGenre());
+                }
+                movieObjResp.setMovie(movie);
+                movieObjResp.setGenres(genres);
+                listMovieObjResp.add(movieObjResp);
+                movieShowingDTO.setListMovieObjResp(listMovieObjResp);
+
+            }
+            return ResponseEntity.ok(movieShowingDTO);
+
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }

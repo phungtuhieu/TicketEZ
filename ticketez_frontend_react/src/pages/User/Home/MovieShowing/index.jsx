@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './movieShowing.module.scss';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import ProductCard from './ProductCard';
-import img from '~/assets/img';
+import { MovieShowingUserAPI } from '~/api/user/carousel';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -31,12 +32,31 @@ const SamplePrevArrow = (props) => {
 };
 
 const MovieShowing = () => {
+
+    const[getMovieByShowtimeShowing, setGetMovieByShowtimeShowing] = useState(null);
+    console.log(getMovieByShowtimeShowing);
+    useEffect(() => {
+        //đổ dữ liệu
+        const getMovieByShowtimeShowing = async () => {
+            try {
+                const [movie] = await Promise.all([MovieShowingUserAPI.getMovieShowing()]);
+                
+                setGetMovieByShowtimeShowing(movie.listMovieObjResp);
+            } catch (error) {
+                funcUtils.notify(error.response.data, 'error');
+            }
+        };
+        getMovieByShowtimeShowing();
+    },[]);
+
+
     const slides = [];
+
 
     for (let i = 1; i <= 9; i++) {
         slides.push({
             id: i,
-            img: img.datrungphuongnam,
+            // img: img,
         });
     }
 
@@ -86,7 +106,7 @@ const MovieShowing = () => {
             <Slider {...settings} className={cx('slider')}>
                 {slides.map((slide, index) => (
                     <div key={index} className={cx('slider')}>
-                        <ProductCard imgSrc={slide.img} idSrc={slide.id} />
+                        <ProductCard data={slide}  index={index}/>
                     </div>
                 ))}
             </Slider>

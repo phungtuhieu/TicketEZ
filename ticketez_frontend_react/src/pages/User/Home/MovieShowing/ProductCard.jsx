@@ -10,9 +10,10 @@ const cx = classNames.bind(style);
 const { Paragraph, Title } = Typography;
 
 const ProductCard = (props) => {
+    console.log(props);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [ setLoading] = useState(false);
-    const [ellipsis ] = useState(true);
+    const [setLoading] = useState(false);
+    const [ellipsis] = useState(true);
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -32,6 +33,7 @@ const ProductCard = (props) => {
                 <Tag color="#D80032" className={cx('tag-overlay2')}>
                     <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
                 </Tag>
+                {}
                 <img className={cx('img-overlay')} src={props.imgSrc} />
                 <svg
                     onClick={showModal}
@@ -70,7 +72,7 @@ const ProductCard = (props) => {
                     </g>
                 </svg>
                 <span className={cx('id-overlay')} style={{ color: '#E5E5E5' }}>
-                    {props.idSrc}
+                    {props.index}
                 </span>
             </div>
             <div>
@@ -98,7 +100,12 @@ const ProductCard = (props) => {
                     <>
                         <Row gutter={24}>
                             <Col lg={3}>
-                                <img src={props.imgSrc} width={80} height={120} className={cx('img-modal')} />
+                                <img
+                                    src={`http://localhost:8081/api/upload/${props.imgSrc}`}
+                                    width={80}
+                                    height={120}
+                                    className={cx('img-modal')}
+                                />
                             </Col>
                             <Col lg={21} className={cx('name-video-modal')}>
                                 <Title level={5}>
