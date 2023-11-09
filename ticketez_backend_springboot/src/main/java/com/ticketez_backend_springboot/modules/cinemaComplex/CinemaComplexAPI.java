@@ -178,7 +178,8 @@ public class CinemaComplexAPI {
         }
 
     }
-    @GetMapping("/get/gettesst")
+    // @GetMapping("/get/gettesst")
+    @GetMapping("/get/ccx-format-showtime-by-movie")
     public ResponseEntity<?> getDuLiea(
             @RequestParam("date") Optional<LocalDate> date,
             @RequestParam("provinceId") Long provinceId,
@@ -194,10 +195,13 @@ public class CinemaComplexAPI {
                 return new ResponseEntity<>("Lỗi", HttpStatus.NOT_FOUND);
             }
             Movie movie = movieDAO.findById(movieId).get();
+
             List<CinemaComplex> cinemaComplexs = cinemaComplexDao.getCinemaComplexAndFormatShowtimesByMovie(provinceId,
                     cinemaChainName.orElse(""), movie,
                     date.orElse(LocalDate.now()));
-
+            if (cinemaComplexs.isEmpty()) {
+                return ResponseEntity.ok(new ArrayList<>());
+            }
             CCXShowtimeByMovieDTO abc = new CCXShowtimeByMovieDTO();
             List<CCXShowtimeByMovieDTO.CinemaComplexObjResp> listCinemaComplexObjResp = new ArrayList<>();
 
