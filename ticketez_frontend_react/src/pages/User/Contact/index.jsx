@@ -4,23 +4,13 @@ import { style } from '~/pages/Admin/Seat/SeatChart/SearChart.module.scss';
 import ProductSlider from '../MovieDetails/Comment/Carousel/ShowActor';
 
 
+
 function Contact() {
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Row style={{ width: 1088 }}>
-                <Col span={24} style={{ height: '50px', backgroundColor: 'red' }}>
-                    1
-                </Col>
-                <Col span={24} style={{ height: '50px', backgroundColor: 'blue' }}>
-                    2
-                </Col>
-                <Col span={24}  style={{ width: '1080px', backgroundColor: 'white' }}>3
-                {/* <Binhluan/> */}
-                <ProductSlider/>
-                </Col>
-            </Row>
-        </div>
-    );
+  return (
+    <div className='flex items-center justify-center text-[red] text-2xl'>
+       <h1>XIN chào anh em</h1>
+    </div>
+);
 }
 
 export default Contact;
