@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.movieStudio;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @RestController
 @CrossOrigin("*")
@@ -54,7 +56,15 @@ public class MovieStudioAPI {
         }
 
     }
-
+    @GetMapping("/get/all")
+        public ResponseEntity<?> findAll() {
+            try {
+            List<MovieStudio> list = dao.findAll();
+            return ResponseEntity.ok(list);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {

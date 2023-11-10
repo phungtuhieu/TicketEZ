@@ -15,6 +15,7 @@ public interface FormatMovieDAO extends JpaRepository<FormatMovie, Long> {
     @Query("SELECT DISTINCT f.movie FROM FormatMovie f")
     List<Movie> getDistinctMovie();
 
+    FormatMovie findByFormatAndMovie(Format format, Movie movie);
 
     @Query("SELECT DISTINCT f.format FROM FormatMovie f")
     List<Format> getDistinctFormats();
