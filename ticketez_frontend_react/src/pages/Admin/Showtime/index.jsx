@@ -466,8 +466,7 @@ const AdminShowtime = () => {
             // Cộng thêm 10 ngày vào newCurrentDateADd
             newCurrentDateADd.setDate(currentTime.getDate() + 10);
 
-            //tạo một biến mới để kiểm tra trùng xuất chiếu
-            let timeFormat = values.time.format('HH:mm');
+
             //tạo mảng lưu endtime HH:mm của xuất chiếu
             const endtimeFormatHHmm = [];
             for (const showtime of valueShowtimeByEndtime) {
@@ -479,14 +478,7 @@ const AdminShowtime = () => {
 
             //lấy ra giờ cuối cùng cộng thêm 15 phút
             const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
-
-            //kiểm tra xuất chiếu có tồn tại hay chưa
-            if (endtimeFormatHHmm.includes(timeFormat)) {
-                funcUtils.notify('Xuất chiếu đã tồn tại vui lòng chọn xuất chiếu khác', 'error');
-                setOpen(true);
-                setLoading(false);
-                //kiểm tra giờ phải lớn hơn giờ cuối cùng
-            } else if (time < lastArrayEndtime) {
+            if (time < lastArrayEndtime) {
                 funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
                 setOpen(true);
                 setLoading(false);
@@ -521,34 +513,21 @@ const AdminShowtime = () => {
                             status: 0, //chưa công chiếu
                         };
                     }
-                    if (editData) {
-                        const resp = await showtimeApi.put(
-                            editData.id,
+
+                    try {
+                        const resp = await showtimeApi.post(
                             values,
                             values.cinema,
                             dataFormatMovieByFormatAndMovie,
                             valueSeatChartByCinema,
                         );
                         if (resp.status === 200) {
-                            funcUtils.notify('Cập nhật thành công', 'success');
+                            funcUtils.notify('Thêm thành công', 'success');
                         }
-                    } else {
-                        try {
-                            const resp = await showtimeApi.post(
-                                values,
-                                values.cinema,
-                                dataFormatMovieByFormatAndMovie,
-                                valueSeatChartByCinema,
-                            );
-                            if (resp.status === 200) {
-                                funcUtils.notify('Thêm thành công', 'success');
-                            }
-                        } catch (error) {
-                            console.log(error);
-                            funcUtils.notify(error.response.data, 'error');
-                        }
+                    } catch (error) {
+                        console.log(error);
+                        funcUtils.notify(error.response.data, 'error');
                     }
-
                     setOpen(false);
                     form.resetFields();
                     setLoading(false);
@@ -588,32 +567,19 @@ const AdminShowtime = () => {
                                 status: 0, //chưa công chiếu
                             };
                         }
-                        if (editData) {
-                            const resp = await showtimeApi.put(
-                                editData.id,
+                        try {
+                            const resp = await showtimeApi.post(
                                 values,
                                 values.cinema,
                                 dataFormatMovieByFormatAndMovie,
                                 valueSeatChartByCinema,
                             );
                             if (resp.status === 200) {
-                                funcUtils.notify('Cập nhật thành công', 'success');
+                                funcUtils.notify('Thêm thành công', 'success');
                             }
-                        } else {
-                            try {
-                                const resp = await showtimeApi.post(
-                                    values,
-                                    values.cinema,
-                                    dataFormatMovieByFormatAndMovie,
-                                    valueSeatChartByCinema,
-                                );
-                                if (resp.status === 200) {
-                                    funcUtils.notify('Thêm thành công', 'success');
-                                }
-                            } catch (error) {
-                                console.log(error);
-                                funcUtils.notify(error.response.data, 'error');
-                            }
+                        } catch (error) {
+                            console.log(error);
+                            funcUtils.notify(error.response.data, 'error');
                         }
                         setOpen(false);
                         form.resetFields();
