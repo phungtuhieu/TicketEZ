@@ -35,9 +35,9 @@
 }
 
 .control-btn button {
-    background-color: #ffffff;
+    background-color: #fff;
     color: #000;
-    border: 2px solid #ffffff;
+    border: 1px solid #e5e5e5;
     padding: 0;
     width: 50px;
     height: 50px;
@@ -47,13 +47,13 @@
 .control-btn .next {
     position: absolute;
     top: 35%;
-    right: 0%;
+    right: 1%;
 }
 
 .control-btn .prev {
     position: absolute;
     top: 35%;
-    left: -2.3%;
+    left: -1.9%;
     z-index: 99;
 }
 .product-actions {
@@ -64,6 +64,10 @@
     color: #ffffff;
     text-align: start;
     font-family: var(--font-family);
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .category-movie {
     font-size: 13px;
@@ -118,7 +122,26 @@
     text-align: start;
     font-family: var(--font-family);
 }
+.theloai-modal {
+    color: gray;
+    font-size: 13px;
+      .span:not(:last-child)::after {
+        content: ', ';
+    }
+}
+.the-loai-phim {
+    font-size: 13px;
+    line-height: 16.25px;
+    text-align: start;
+    text-decoration: none solid rgb(0, 0, 0);
+    word-spacing: 0px;
+    font-weight: 150 !important;
+    font-family: var(--font-family) !important;
 
+    .span:not(:last-child)::after {
+        content: ', ';
+    }
+}
 .category-movie {
     font-size: 13px;
     line-height: 16.25px;
@@ -159,24 +182,11 @@
     font-size: 13px;
 }
 
-
-.name-card .title-name-card {
-    font: 700 4em/1 'Oswald', sans-serif;
-    letter-spacing: 0;
-    padding: 0.5em 0 0.325em;
-    display: block;
-    margin: 0 auto;
-    text-shadow: 0 0 80px rgba(255, 255, 255, 0.5);
-
-    background-color: #000000 ;
-    -webkit-background-clip: text;
-    background-clip: text;
-
-    -webkit-text-fill-color: transparent;
-    -webkit-animation: aitf 80s linear infinite;
-
-    -webkit-transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
+.title-name-card {
+   font-family: var(--font-family);
+    font-size: 35px;
+    color: #000;
+    font-weight: 600;
 }
 
 @keyframes aitf {

@@ -10,4 +10,12 @@ export const MovieShowingUserAPI = {
             return error;
         }
     },
+    getMovieUpcoming: async () => {
+        try {
+            const result = await axiosClient.get(urlMovie + '/get/movie-by-showtime-upcoming');
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
 };
