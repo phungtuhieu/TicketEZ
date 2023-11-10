@@ -383,7 +383,7 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            <BookingDetail open={isModalOpen} onCancel={handleCancel} />
+            <BookingDetail showtime={showtime} open={isModalOpen} onCancel={handleCancel} />
         </>
     );
 }
