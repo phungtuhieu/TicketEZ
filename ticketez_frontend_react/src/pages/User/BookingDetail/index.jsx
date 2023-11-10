@@ -1,12 +1,13 @@
 import { Badge, Button, Col, Descriptions, Divider, Input, Modal, QRCode, Row, Space, Tag } from 'antd';
 import Title from 'antd/es/typography/Title';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import style from './BookingDetail.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcon from '@fortawesome/free-solid-svg-icons';
 const cx = classNames.bind(style);
 function BookingDetail(props) {
+    const { seat ,showtime} = props;
     const [text, setText] = useState('https://ant.design/');
 
     return (
@@ -28,6 +29,7 @@ function BookingDetail(props) {
                                 K
                             </Tag>
                             <h3 className={cx('title-movie')} level={4}>
+                      
                                 Đất rừng phương nam
                             </h3>
                         </div>
