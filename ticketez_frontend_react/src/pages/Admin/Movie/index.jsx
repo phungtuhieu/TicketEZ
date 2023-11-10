@@ -185,43 +185,45 @@ function AdminMovie() {
                         if (fileList[0].hasOwnProperty('originFileObj')) {
                             imageName = await uploadApi.put(dataEdit.poster, fileList[0].originFileObj);
                         }
-                        const typesNoneSelect = [];
-                        if (selectedValue.actors.length <= 0) {
-                            typesNoneSelect.push('actor');
-                        }
-                        if (selectedValue.directors.length <= 0) {
-                            typesNoneSelect.push('director');
-                        }
-                        if (selectedValue.formats.length <= 0) {
-                            typesNoneSelect.push('format');
-                        }
-                        if (selectedValue.genres.length <= 0) {
-                            typesNoneSelect.push('genre');
-                        }
+                        // const typesNoneSelect = [];
+                        // if (selectedValue.actors.length <= 0) {
+                        //     typesNoneSelect.push('actor');
+                        // }
+                        // if (selectedValue.directors.length <= 0) {
+                        //     typesNoneSelect.push('director');
+                        // }
+                        // if (selectedValue.formats.length <= 0) {
+                        //     typesNoneSelect.push('format');
+                        // }
+                        // if (selectedValue.genres.length <= 0) {
+                        //     typesNoneSelect.push('genre');
+                        // }
 
-                        if (Object.keys(selectedValue.mpaaRating).length === 0) {
-                            typesNoneSelect.push('mpaa');
-                        }
+                        // if (Object.keys(selectedValue.mpaaRating).length === 0) {
+                        //     typesNoneSelect.push('mpaa');
+                        // }
 
-                        if (Object.keys(selectedValue.movieProducer).length === 0) {
-                            typesNoneSelect.push('movie-producer');
-                        }
-                        if (Object.keys(selectedValue.movieStudio).length === 0) {
-                            typesNoneSelect.push('movie-studio');
-                        }
-                        if (typesNoneSelect.length > 0) {
-                            await Promise.all([
-                                typesNoneSelect.includes('actor') && handleSelectOption(actors, 'actor'),
-                                typesNoneSelect.includes('format') && handleSelectOption(formats, 'format'),
-                                typesNoneSelect.includes('genre') && handleSelectOption(genres, 'genre'),
-                                typesNoneSelect.includes('director') && handleSelectOption(directors, 'director'),
-                                typesNoneSelect.includes('mpaa') && handleSelectOption(movieData.mpaaRating, 'mpaa'),
-                                typesNoneSelect.includes('movie-producer') &&
-                                    handleSelectOption(movieData.movieProducer, 'movie-producer'),
-                                typesNoneSelect.includes('movie-studio') &&
-                                    handleSelectOption(movieData.movieStudio, 'movie-studio'),
-                            ]);
-                        }
+                        // if (Object.keys(selectedValue.movieProducer).length === 0) {
+                        //     typesNoneSelect.push('movie-producer');
+                        // }
+                        // if (Object.keys(selectedValue.movieStudio).length === 0) {
+                        //     typesNoneSelect.push('movie-studio');
+                        // }
+
+                        // if (typesNoneSelect.length > 0) {
+                        // await Promise.all([
+                        //     typesNoneSelect.includes('actor') && handleSelectOption(actors, 'actor'),
+                        //     typesNoneSelect.includes('format') && handleSelectOption(formats, 'format'),
+                        //     typesNoneSelect.includes('genre') && handleSelectOption(genres, 'genre'),
+                        //     typesNoneSelect.includes('director') && handleSelectOption(directors, 'director'),
+                        //     typesNoneSelect.includes('mpaa') && handleSelectOption(movieData.mpaaRating, 'mpaa'),
+                        //     typesNoneSelect.includes('movie-producer') &&
+                        //         handleSelectOption(movieData.movieProducer, 'movie-producer'),
+                        //     typesNoneSelect.includes('movie-studio') &&
+                        //         handleSelectOption(movieData.movieStudio, 'movie-studio'),
+                        // ]);
+                        // typesNoneSelect = [];
+                        // }
 
                         let dataUpdate = {
                             genres: selectedValue.genres,
@@ -268,15 +270,15 @@ function AdminMovie() {
                         };
                         console.log('movieData', movieData);
                         console.log('dataUpdate', dataUpdate);
-                        if (typesNoneSelect.length <= 0) {
-                            const resp = await movieApi.update(dataEdit.id, dataUpdate);
-                            setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
-                            setworkSomething(!workSomething);
-                            if (resp.status === httpStatus.OK) {
-                                funcUtils.notify('Cập nhật phim thành công', 'success');
-                            }
-                            form.setFieldValue(resp.data);
+                        // if (typesNoneSelect.length <= 0) {
+                        const resp = await movieApi.update(dataEdit.id, dataUpdate);
+                        setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
+                        setworkSomething(!workSomething);
+                        if (resp.status === httpStatus.OK) {
+                            funcUtils.notify('Cập nhật phim thành công', 'success');
                         }
+                        form.setFieldValue(resp.data);
+                        // }
                         setLoadingButton(false);
                     } catch (error) {
                         setLoadingButton(false);
@@ -341,6 +343,19 @@ function AdminMovie() {
             if (drtsOpNotExist) {
                 setActorOptions((prev) => [...prev, ...drtsOpNotExist]);
             }
+            const formatIds = formats.map((o) => o.id);
+            const genreIds = genres.map((o) => o.id);
+            const directorIds = directors.map((o) => o.id);
+            const actorIds = actors.map((o) => o.id);
+            await Promise.all([
+                handleSelectOption(actorIds, 'actor'),
+                handleSelectOption(formatIds, 'format'),
+                handleSelectOption(genreIds, 'genre'),
+                handleSelectOption(directorIds, 'director'),
+                handleSelectOption(movie.mpaaRating.id, 'mpaa'),
+                handleSelectOption(movie.movieProducer.id, 'movie-producer'),
+                handleSelectOption(movie.movieStudio.id, 'movie-studio'),
+            ]);
 
             setPreviewTitle(`Poster của phim ${record.title}`);
             setIsModalOpen(true);
@@ -352,10 +367,10 @@ function AdminMovie() {
             setDataEdit(record);
             form.setFieldsValue({
                 ...movie,
-                genres: genres.map((o) => o.id),
-                formats: formats.map((o) => o.id),
-                directors: directors.map((o) => o.id),
-                actors: actors.map((o) => o.id),
+                genres: genreIds,
+                formats: formatIds,
+                directors: directorIds,
+                actors: actorIds,
                 movieProducer: movie.movieProducer.id,
                 movieStudio: movie.movieStudio.id,
                 mpaaRating: movie.mpaaRating.id,
