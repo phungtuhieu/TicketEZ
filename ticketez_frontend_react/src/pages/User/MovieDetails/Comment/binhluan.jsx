@@ -3,6 +3,8 @@ import { Avatar, Button, List, Skeleton, Row, Col, Rate, Space, Input, Typograph
 import { StarFilled, CommentOutlined, LikeOutlined } from '@ant-design/icons'
 import classNames from 'classnames/bind';
 import style from './binhluan.module.scss';
+import reviewApi from './../../../../api/user/review/reviewApi';
+import funcUtils from './../../../../utils/funcUtils';
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
 
@@ -13,6 +15,8 @@ const Binhluan = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [list, setList] = useState([]);
+    const [review, setReview] = useState([]);
+    const [workSomeThing, setWorkSomeThing] = useState();
     const [imageUrl, setImageUrl] = useState(null);
     const [isCommentVisible, setCommentVisible] = useState(false); // xử lý mở comment
     useEffect(() => {
@@ -24,6 +28,28 @@ const Binhluan = () => {
                 setList(res.results);
             });
     }, []);
+
+    //   useEffect(() => {
+    //     const getList = async () => {
+    //         setLoading(true);
+    //         try {
+    //             const res = await reviewApi.getAll();
+    //             setReview(res.results);
+    //             setInitLoading(false);
+    //             setData(res.results);
+    //             setList(res.results);
+    //             setLoading(false);
+    //             console.log(res);
+    //         } catch (error) {
+    //             if (error.hasOwnProperty('response')) {
+    //                 funcUtils.notify(error.response.data, 'error');
+    //             } else {
+    //                 console.log(error);
+    //             }
+    //         }
+    //     };
+    //     getList();
+    // }, [workSomeThing]);
     const onLoadMore = () => {
         setLoading(true);
         setList(
@@ -80,7 +106,7 @@ const Binhluan = () => {
                 </Col>
                 <Col span={16}>
                     <Avatar size={50}
-                        src={imageUrl || 'https://scontent.fsgn5-9.fna.fbcdn.net/v/t39.30808-1/358561081_1293432168233582_652710667370024877_n.jpg?stp=dst-jpg_s320x320&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_mhoYnzSwMAAX-9-CO8&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfCnpSIHUEW7K5yPJeT3roUHGSihg3KS5Op_1FrvdVzFcg&oe=652EBC00'}
+                        src={imageUrl || 'https://i.imgur.com/CjpMFXE.jpg'}
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
@@ -112,9 +138,8 @@ const Binhluan = () => {
                             className="demo-loadmore-list"
                             loading={initLoading}
                             itemLayout="horizontal"
-                            loadMore={loadMore}
+                            // loadMore={loadMore}
                             dataSource={list}
-
                             renderItem={(item) => (
                                 // actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
 
@@ -127,13 +152,13 @@ const Binhluan = () => {
                             />
                             <div>content</div>
                         </Skeleton> */}
-
+                                  
                                     <Row>
                                         <Col span={24} style={{ textAlign: 'left', width: '1080px' }}>
                                             <Row>
                                                 <Col span={2}>
                                                     <Avatar size={40}
-                                                        src={imageUrl || 'https://scontent.fsgn5-9.fna.fbcdn.net/v/t39.30808-1/358561081_1293432168233582_652710667370024877_n.jpg?stp=dst-jpg_s320x320&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_mhoYnzSwMAAX-9-CO8&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfCnpSIHUEW7K5yPJeT3roUHGSihg3KS5Op_1FrvdVzFcg&oe=652EBC00'}
+                                                          src={imageUrl || 'https://i.imgur.com/CjpMFXE.jpg'}
                                                     >
                                                     </Avatar>
                                                 </Col>
@@ -227,7 +252,7 @@ const Binhluan = () => {
                                             </Col>
                                         )}
                                     </Row>
-
+                                 
                                 </List.Item>
                             )}
                         />

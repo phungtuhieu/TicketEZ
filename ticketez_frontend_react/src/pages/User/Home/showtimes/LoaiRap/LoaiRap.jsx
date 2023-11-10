@@ -6,6 +6,7 @@ import CumRap from '../ListCumRap/CumRap';
 import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
 
 import funcUtils from '~/utils/funcUtils';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 
@@ -61,7 +62,7 @@ function LoaiRap({ province }) {
                             <div className={cx('border')}>
                                 <img
                                     className={cx('img')}
-                                    src={'http://localhost:8081/api/upload/' + name.image}
+                                    src={uploadApi.get(name.image)}
                                     alt=""
                                 />
                             </div>

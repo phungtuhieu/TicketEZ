@@ -16,20 +16,18 @@ import {
     Pagination,
     Tag
 } from 'antd';
-import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined,  } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import style from './Cinema.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
-import moment from 'moment';
-import { faL, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { cinemaApi, cinemaComplexApi } from '~/api/admin';
 import { cinemaTypeApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
-import axiosClient from '~/api/global/axiosClient';
+
 
 const cx = classNames.bind(style);
 
@@ -65,8 +63,10 @@ const AdminCinema = () => {
                 const res = await cinemaApi.getPage(currentPage, pageSize);
                 const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
                 setCinemaType(cinemaType.data);
-                setCinemaComplex(cinemaComplex.data.data);
+                setCinemaComplex(cinemaComplex.data);
                 //    const resType = await cinemaTypeApi.getCinemaType();
+                console.log(cinemaType)
+                console.log(cinemaComplex);
                 console.log(res);
                 //    console.log(resType);
                 setTotalItems(res.totalItems);
