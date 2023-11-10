@@ -552,9 +552,9 @@ ADD
 
 GO
 ALTER TABLE
-    Seat_Choose
+    Seats_Choose
 ADD
-    CONSTRAINT PK_Seat_Choose PRIMARY KEY (id);
+    CONSTRAINT PK_Seats_Choose PRIMARY KEY (id);
 	go
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
@@ -815,9 +815,9 @@ ADD
     CONSTRAINT FK_PaymentInfo_Booking FOREIGN KEY (booking_id) REFERENCES Booking(id)
 GO
 ALTER TABLE
-    [Seat_Choose]
+    [Seats_Choose]
 ADD
-    CONSTRAINT FK_Seat_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seat(id)
+    CONSTRAINT FK_Seats_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seats(id)
 	go
     -- /Payment_Info
 
@@ -1402,7 +1402,7 @@ VALUES
   ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
   ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1),
-  ('2023-11-1 18:00:00', '2023-11-1 20:00:00', 1, 1, 1,1);
+  ('2023-11-10 20:00:00', '2023-11-10 23:00:00', 1, 1, 1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking
@@ -1454,6 +1454,8 @@ SELECT * FROM Provinces
 SELECT * FROM Cinema_Complex
 SELECT * FROM Seat_Types
 SELECT * FROM Seats
+SELECT * FROM Seats_Choose
+
 SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
