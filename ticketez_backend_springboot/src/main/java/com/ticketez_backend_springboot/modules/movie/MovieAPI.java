@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -148,7 +149,6 @@ public class MovieAPI {
             // System.out.println("----Movie " +movieSaved);
             for (int i = 0; i < moviedDto.getActors().size(); i++) {
                 ActorMoviePK actorMoviePK = new ActorMoviePK(moviedDto.getActors().get(i).getId(), movieSaved.getId());
-                // System.out.println("----actorMoviePK " + actorMoviePK);
                 ActorMovie actorMovie = new ActorMovie(actorMoviePK, moviedDto.getActors().get(i),
                         movieSaved);
                 actorMovies.add(actorMovie);
@@ -192,15 +192,156 @@ public class MovieAPI {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieDTO movieDto) {
-        for (Actor actor : movieDto.getActors()) {
-            // actorMovieDAO.
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieDTO movieDTO) {
+
+        Movie movieDb = dao.findById(movieDTO.getMovie().getId()).orElse(null);
+        if (movieDb == null) {
+            return new ResponseEntity<>("Có lỗi, Không tìm thấy phim trong cơ sở dữ liệu",
+                    HttpStatus.NOT_FOUND);
         }
-        // if (!dao.existsById(id)) {
-        // return ResponseEntity.notFound().build();
-        // }
-        dao.save(movieDto.getMovie());
-        return ResponseEntity.ok("movie");
+        Movie movieForm = movieDTO.getMovie();
+
+        if (!movieDTO.getFormats().isEmpty()) {
+            List<Format> listFormatInMovie = movieDb.getFormatsMovies().stream()
+                    .map(FormatMovie::getFormat)
+                    .collect(Collectors.toList());
+
+            // List<FormatMovie> listFormatMovieDel = movieDb.getFormatsMovies().stream()
+            // .filter(f -> movieDTO.getFormats().stream()
+            // .noneMatch(form -> form.getId() == f.getId()))
+            // .collect(Collectors.toList());
+            List<FormatMovie> listFormatMovieDel = movieDb.getFormatsMovies().stream()
+                    .filter(f -> movieDTO.getFormats().stream()
+                            .noneMatch(form -> {
+                                return form.getId() == f.getFormat().getId();
+                            }))
+                    .collect(Collectors.toList());
+            List<FormatMovie> listFormatMovieCreate = movieDTO.getFormats().stream()
+                    .filter(f -> listFormatInMovie.stream().noneMatch(fInM -> {
+                        return fInM.getId() == f.getId();
+                    }))
+                    .map(formatForm -> {
+                        FormatMovie formatMovie = new FormatMovie();
+                        formatMovie.setFormat(formatForm);
+                        formatMovie.setMovie(movieForm);
+                        return formatMovie;
+                    }).collect(Collectors.toList());
+
+            if (listFormatMovieDel.size() > 0) {
+                formatMovieDAO.deleteAll(listFormatMovieDel);
+            }
+            if (listFormatMovieCreate.size() > 0) {
+                formatMovieDAO.saveAll(listFormatMovieCreate);
+            }
+        }
+        if (!movieDTO.getGenres().isEmpty()) {
+            List<Genre> listGenreInMovie = movieDb.getGenresMovies().stream()
+                    .map(GenreMovie::getGenre)
+                    .collect(Collectors.toList());
+
+            List<GenreMovie> listGenreMovieDel = movieDb.getGenresMovies().stream()
+                    .filter(f -> movieDTO.getGenres().stream()
+                            .noneMatch(form -> {
+                                return form.getId() == f.getGenre().getId();
+                            }))
+                    .collect(Collectors.toList());
+
+            List<GenreMovie> listGenreMovieCreate = movieDTO.getGenres().stream()
+                    .filter(f -> listGenreInMovie.stream().noneMatch(fInM -> {
+                        return fInM.getId() == f.getId();
+                    }))
+                    .map(genreForm -> {
+                        GenreMovie genreMovie = new GenreMovie();
+                        GenreMoviePK genreMoviePK = new GenreMoviePK();
+                        genreMoviePK.setGenre_id(genreForm.getId());
+                        genreMoviePK.setMovieId(movieForm.getId());
+
+                        genreMovie.setGenreMoviePK(genreMoviePK);
+                        genreMovie.setGenre(genreForm);
+                        genreMovie.setMovie(movieForm);
+                        return genreMovie;
+                    }).collect(Collectors.toList());
+
+            if (listGenreMovieDel.size() > 0) {
+                genreMovieDAO.deleteAll(listGenreMovieDel);
+            }
+            if (listGenreMovieCreate.size() > 0) {
+                genreMovieDAO.saveAll(listGenreMovieCreate);
+            }
+        }
+        if (!movieDTO.getActors().isEmpty()) {
+            List<Actor> listActorsInMovie = movieDb.getActorsMovies().stream()
+                    .map(ActorMovie::getActor)
+                    .collect(Collectors.toList());
+
+            List<ActorMovie> listDirectorMovieDel = movieDb.getActorsMovies().stream()
+                    .filter(f -> movieDTO.getActors().stream()
+                            .noneMatch(form -> {
+                                return form.getId() == f.getActor().getId();
+                            }))
+                    .collect(Collectors.toList());
+
+            List<ActorMovie> listActorMovieCreate = movieDTO.getActors().stream()
+                    .filter(f -> listActorsInMovie.stream().noneMatch(fInM -> {
+                        return fInM.getId() == f.getId();
+                    }))
+                    .map(actorForm -> {
+                        ActorMovie actorMovie = new ActorMovie();
+                        ActorMoviePK actorMoviePK = new ActorMoviePK();
+                        actorMoviePK.setActorId(actorForm.getId());
+                        actorMoviePK.setMovieId(movieForm.getId());
+
+                        actorMovie.setActorMoviePK(actorMoviePK);
+                        actorMovie.setActor(actorForm);
+                        actorMovie.setMovie(movieForm);
+                        return actorMovie;
+                    }).collect(Collectors.toList());
+
+            if (listDirectorMovieDel.size() > 0) {
+                actorMovieDAO.deleteAll(listDirectorMovieDel);
+            }
+            if (listActorMovieCreate.size() > 0) {
+                actorMovieDAO.saveAll(listActorMovieCreate);
+            }
+        }
+        if (!movieDTO.getDirectors().isEmpty()) {
+            List<Director> listDirectorsInMovie = movieDb.getDirectorsMovies().stream()
+                    .map(DirectorMovie::getDirector)
+                    .collect(Collectors.toList());
+
+            List<DirectorMovie> listDirectorMovieDel = movieDb.getDirectorsMovies().stream()
+                    .filter(f -> movieDTO.getDirectors().stream()
+                            .noneMatch(form -> {
+                                return form.getId() == f.getDirector().getId();
+                            }))
+                    .collect(Collectors.toList());
+
+            List<DirectorMovie> listDirectorsMovieCreate = movieDTO.getDirectors().stream()
+                    .filter(f -> listDirectorsInMovie.stream().noneMatch(fInM -> {
+                        return fInM.getId() == f.getId();
+                    }))
+                    .map(directorForm -> {
+                        DirectorMovie directorMovie = new DirectorMovie();
+                        DirectorMoviePK directorMoviePK = new DirectorMoviePK();
+                        directorMoviePK.setDirectorId(directorForm.getId());
+                        directorMoviePK.setMovieId(movieForm.getId());
+
+                        directorMovie.setDirectorMoviePK(directorMoviePK);
+                        directorMovie.setDirector(directorForm);
+                        directorMovie.setMovie(movieForm);
+                        return directorMovie;
+                    }).collect(Collectors.toList());
+
+            if (listDirectorMovieDel.size() > 0) {
+                directorMovieDAO.deleteAll(listDirectorMovieDel);
+            }
+            if (listDirectorsMovieCreate.size() > 0) {
+                directorMovieDAO.saveAll(listDirectorsMovieCreate);
+            }
+        }
+
+        dao.save(movieForm);
+        return ResponseEntity.ok(movieForm);
     }
 
     @DeleteMapping("/{id}")
@@ -339,10 +480,10 @@ public class MovieAPI {
             List<Movie> movies = dao.getMovieByShowtimeShowing();
             MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
             List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
-            for(Movie movie : movies){
-                MovieByShowtimeShowingDTO.MovieObjResp  movieObjResp = movieShowingDTO.new MovieObjResp();
+            for (Movie movie : movies) {
+                MovieByShowtimeShowingDTO.MovieObjResp movieObjResp = movieShowingDTO.new MovieObjResp();
                 List<Genre> genres = new ArrayList<>();
-                for(GenreMovie genrMovie : movie.getGenresMovies()){
+                for (GenreMovie genrMovie : movie.getGenresMovies()) {
                     genres.add(genrMovie.getGenre());
                 }
                 movieObjResp.setMovie(movie);
@@ -364,10 +505,10 @@ public class MovieAPI {
             List<Movie> movies = dao.getMovieByShowtimeUpcoming();
             MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
             List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
-            for(Movie movie : movies){
-                MovieByShowtimeShowingDTO.MovieObjResp  movieObjResp = movieShowingDTO.new MovieObjResp();
+            for (Movie movie : movies) {
+                MovieByShowtimeShowingDTO.MovieObjResp movieObjResp = movieShowingDTO.new MovieObjResp();
                 List<Genre> genres = new ArrayList<>();
-                for(GenreMovie genrMovie : movie.getGenresMovies()){
+                for (GenreMovie genrMovie : movie.getGenresMovies()) {
                     genres.add(genrMovie.getGenre());
                 }
                 movieObjResp.setMovie(movie);

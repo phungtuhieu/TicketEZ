@@ -34,15 +34,15 @@ public class GenreAPI {
     @Autowired
     MovieDAO daoMovie;
 
-    // @GetMapping("/get/all")
-    // public ResponseEntity<?> findAll() {
-    //     try {
-    //        List<Genre> list = dao.findAll();
-    //     return ResponseEntity.ok(list);
-    //     } catch (Exception e) {
-    //         return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    @GetMapping("/get/all")
+    public ResponseEntity<?> findAll() {
+        try {
+           List<Genre> list = dao.findAll();
+        return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping
         public ResponseEntity<?> findByPage(
                 @RequestParam("page") Optional<Integer> pageNo,
