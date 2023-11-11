@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.ActorAndDirectorDTO;
 import com.ticketez_backend_springboot.dto.MovieDTO;
 import com.ticketez_backend_springboot.dto.MovieShowtimeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
@@ -331,4 +332,32 @@ public class MovieAPI {
         }
 
     }
+
+    // lấy actor và director theo id của movie
+    @GetMapping("/get/actor-director-by-movie/{id}")
+    public ResponseEntity<?> getActorAndDirector(@PathVariable("id") Long id) {
+        try {
+            Movie movie = dao.findById(id).get();
+            ActorAndDirectorDTO actorAndDirectorDTO = new ActorAndDirectorDTO();
+            ActorAndDirectorDTO.ActorAndDirectorsObj actorAndDirectorsObj = actorAndDirectorDTO.new ActorAndDirectorsObj();
+            List<Actor> actors = new ArrayList<>();
+            List<Director> directors = new ArrayList<>();
+            for (ActorMovie actorMovie : movie.getActorsMovies()) {
+                actors.add(actorMovie.getActor());
+
+            }
+            for (DirectorMovie directorMovie : movie.getDirectorsMovies()) {
+                directors.add(directorMovie.getDirector());
+            }
+            actorAndDirectorsObj.setActors(actors);
+            actorAndDirectorsObj.setDirectors(directors);
+            actorAndDirectorDTO.setActorAndDirectorsObj(actorAndDirectorsObj);
+
+            return ResponseEntity.ok(actorAndDirectorDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 }
