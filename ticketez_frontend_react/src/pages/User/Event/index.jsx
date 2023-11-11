@@ -1,4 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
+import { faFire, faFireFlameCurved } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, Row, Typography } from 'antd';
 import React from 'react';
 import img from '~/assets/img';
@@ -10,7 +12,7 @@ const Event = () => {
             <div className="container bg-white text-black">
                 <Row gutter={22}>
                     <Col lg={16}>
-                        <img src={img.event} width={900} height={360} className="rounded-md mt-[19px]" />
+                        <img src={img.event} width={900} height={360} className="rounded-md mt-[59px]" />
                         <div className="font-bold text-pink-500 text-left text-4xl mt-[-40px] mb-[25px]">
                             Ngày vàng nạp dế nhân đôi điểm tích lũy, nhận quà tẹt ga
                         </div>
@@ -36,9 +38,9 @@ const Event = () => {
                         </Typography>
                     </Col>
                     <Col lg={8} style={{ borderLeft: '1px solid #D4D4D4' }}>
-                        <p className="font-semibold text-pink-500 text-left text-4xl mt-[19px] mb-[10px]">
-                            {' '}
-                            Tin tức liên quan
+                        <p className="font-semibold text-pink-500 text-left text-3xl mt-[19px] mb-[10px]">
+                           <FontAwesomeIcon icon={faFireFlameCurved} className='text-2xl mr-1'/>
+                          Tin tức liên quan
                         </p>
                         <Row gutter={24} className="h-24 mb-[30px]">
                             <Col lg={8}>
