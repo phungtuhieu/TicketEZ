@@ -11,6 +11,8 @@ import moment from 'moment-timezone';
 import { movieUserApi } from '~/api/user/showtime';
 import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
 import uploadApi from '~/api/service/uploadApi';
+import { Link } from 'react-router-dom';
+import Mapbox from '~/components/Mapbox';
 
 const cx = classNames.bind(style);
 
@@ -71,12 +73,22 @@ function ListPhim({ cinemaComplex }) {
         getMovies();
     }, [cinemaComplex, chooseDay]);
 
-    console.log('data', data.length);
+    // console.log('data', data.length);
 
     const handShowtime = (value) => {
         setShowtime(value);
         console.log(showtime);
         setIsModalVisible(true);
+    };
+
+    // modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCancelModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
@@ -117,8 +129,24 @@ function ListPhim({ cinemaComplex }) {
                                                 <div className={cx('chi-tiet-dia-chi')}>
                                                     {cinemaComplex?.address ?? ''}
                                                 </div>
-                                                <div className={cx('ban-do')}>[Bản đồ]</div>
+                                                <div className={cx('ban-do')} onClick={showModal}>[Bản đồ]</div>
+                                                <Modal
+                                                    title="Bản đồ"
+                                                    open={isModalOpen}
+                                                    onCancel={handleCancelModal}
+                                                    className='modal-map-lg'
+                                                    footer={
+                                                        <Button className={cx('modal-footer-btn-close')} onClick={handleCancelModal}>
+                                                            ĐÓNG
+                                                        </Button>
+                                                    }
+                                                >
+                                                    <div className='map-lg-content'>
+                                                    <Mapbox latitude={10.76317169124285} longitude={106.65670151096185} address={"Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012"}  />
+                                                    </div>
+                                                </Modal>
                                             </Col>
+                                               
                                         </Row>
                                     </Col>
                                 </Row>
@@ -151,11 +179,13 @@ function ListPhim({ cinemaComplex }) {
                         <Row key={index} className={cx('container-movie')}>
                             <Col span={4} className={cx('col1-movie')}>
                                 <div className={cx('border-movie')}>
-                                    <img
-                                        className={cx('img-movie')}
-                                        src="https://cinema.momocdn.net/img/21556485482318514-poster.jpg"
-                                        alt=""
-                                    />
+                                    <Link to={'movie-details/' + data.movie.id}>
+                                        <img
+                                            className={cx('img-movie')}
+                                            src="https://cinema.momocdn.net/img/21556485482318514-poster.jpg"
+                                            alt=""
+                                        />
+                                    </Link>
                                 </div>
                             </Col>
                             <Col span={20} className={cx('col2-movie')}>

@@ -9,6 +9,15 @@ import event from './event.jpg';
 import notFoundLogo from './not-found.svg'
 import gifLoading from './loading.gif'
 
+// 
+import markerPink from '../icon/mapbox-marker-icon-20px-pink.png'
+
+export const listIcon = {
+    markerPink
+}
+
+
+
 const img = {
     logoLogin,
     bgAuth,
@@ -22,3 +31,5 @@ const img = {
 
 
 export default img;
+
+

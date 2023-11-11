@@ -2,8 +2,12 @@ import { Col, Row, Card } from 'antd';
 import ViTri from './showtimesDetails/ViTri/ViTri';
 import Binhluan from './Comment/binhluan';
 import ActorSlider from './Comment/Carousel/ShowActor';
+import { useEffect } from 'react';
 
 function MovieDetails() {
+    useEffect(()=> {
+        window.scrollTo(0, 0);
+    },[])
     return (
         <>
             <Row style={{ display: 'flex', justifyContent: 'center' }}>

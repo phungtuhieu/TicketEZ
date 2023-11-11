@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Collapse } from 'antd';
+import { Button, Row, Col, Collapse, Modal } from 'antd';
 import { List, Skeleton } from 'antd';
 import classNames from 'classnames/bind';
 import style from './ListPhim.module.scss';
@@ -7,6 +7,9 @@ import { cinemaComplexUserApi } from '~/api/user/showtime';
 import moment from 'moment-timezone';
 import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
 import uploadApi from '~/api/service/uploadApi';
+
+import { useLocation } from 'react-router-dom';
+import Mapbox from '~/components/Mapbox';
 
 const cx = classNames.bind(style);
 
@@ -19,10 +22,15 @@ function ListPhim({ propsValue }) {
         setActiveKey(key);
     };
 
+    const location = useLocation();
+    const path = location.pathname;
+    const parts = path.split('/');
+    const movieId = parts[parts.indexOf('movie-details') + 1];
+
     useEffect(() => {
         const get = async () => {
             const res = await cinemaComplexUserApi.getCcxFormatShowtimeByMovie(
-                1,
+                movieId,
                 propsValue.provinces.id,
                 propsValue.cinemaChainName,
                 propsValue.chooseDay,
@@ -34,6 +42,14 @@ function ListPhim({ propsValue }) {
 
     const handShowtime = (value) => {
         setShowtime(value);
+    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCancelModal = () => {
+        setIsModalOpen(false);
     };
 
     const newList = list?.cinemaComplexObjResps?.map((item, index) => {
@@ -58,7 +74,28 @@ function ListPhim({ propsValue }) {
                             </Col>
                             <Col span={24} className={cx('container-info')}>
                                 <div className={cx('chi-tiet-dia-chi')}>{item.cinemaComplex.address}</div>
-                                <div className={cx('ban-do')}>[Bản đồ]</div>
+                                <div className={cx('ban-do')} onClick={showModal}>
+                                    [Bản đồ]
+                                </div>
+                                <Modal
+                                    title="Bản đồ"
+                                    open={isModalOpen}
+                                    onCancel={handleCancelModal}
+                                    className="modal-map-lg"
+                                    footer={
+                                        <Button className={cx('modal-footer-btn-close')} onClick={handleCancelModal}>
+                                            ĐÓNG
+                                        </Button>
+                                    }
+                                >
+                                    <div className="map-lg-content">
+                                        <Mapbox
+                                            latitude={10.76317169124285}
+                                            longitude={106.65670151096185}
+                                            address={'Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012'}
+                                        />
+                                    </div>
+                                </Modal>
                             </Col>
                         </Row>
                     </Col>
@@ -107,7 +144,7 @@ function ListPhim({ propsValue }) {
             ),
         };
     });
-    console.log(newList);
+    // console.log(newList);
     return (
         <>
             {list.length !== 0 && (
