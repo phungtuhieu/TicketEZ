@@ -12,16 +12,16 @@ const cx = classNames.bind(style);
 function SeatChart(props) {
     const { showtime } = props;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpenBooking, setIsModalOpenBooking] = useState(false);
 
     const showModal = () => {
-        setIsModalOpen(true);
+        setIsModalOpenBooking(true);
     };
     const handleOk = () => {
-        setIsModalOpen(false);
+        setIsModalOpenBooking(false);
     };
     const handleCancel = () => {
-        setIsModalOpen(false);
+        setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
         console.log('222222222222222222222222222222222222222222222222');
@@ -384,7 +384,14 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            <BookingDetail showtime={showtime}  seat={seatState ? seatState.seatReserved : null} open={isModalOpen} onCancel={handleCancel} />
+            {isModalOpenBooking == true && (
+                <BookingDetail
+                    showtime={showtime}
+                    seat={seatState ? seatState.seatReserved : null}
+                    open={isModalOpenBooking}
+                    onCancel={handleCancel}
+                />
+            )}
         </>
     );
 }
