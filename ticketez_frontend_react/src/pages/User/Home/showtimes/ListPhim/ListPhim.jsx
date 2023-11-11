@@ -182,7 +182,7 @@ function ListPhim({ cinemaComplex }) {
                                     <Link to={'movie-details/' + data.movie.id}>
                                         <img
                                             className={cx('img-movie')}
-                                            src="https://cinema.momocdn.net/img/21556485482318514-poster.jpg"
+                                            src={uploadApi.get(data.movie.poster)}
                                             alt=""
                                         />
                                     </Link>

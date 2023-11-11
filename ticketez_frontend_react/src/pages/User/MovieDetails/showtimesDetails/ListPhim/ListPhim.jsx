@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
 import uploadApi from '~/api/service/uploadApi';
 
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Mapbox from '~/components/Mapbox';
 
 const cx = classNames.bind(style);
@@ -22,10 +22,13 @@ function ListPhim({ propsValue }) {
         setActiveKey(key);
     };
 
-    const location = useLocation();
-    const path = location.pathname;
-    const parts = path.split('/');
-    const movieId = parts[parts.indexOf('movie-details') + 1];
+    // const location = useLocation();
+    // const path = location.pathname;
+    // const parts = path.split('/');
+    // const movieId = parts[parts.indexOf('movie-details') + 1];
+
+    const {movieId} = useParams();
+    console.log(movieId);
 
     useEffect(() => {
         const get = async () => {
