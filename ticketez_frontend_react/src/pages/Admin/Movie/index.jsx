@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import countriesJson from '~/data/countries.json';
-import Slider from 'react-slick';
 import {
     Button,
     Carousel,
@@ -41,7 +40,6 @@ import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import funcUtils from '~/utils/funcUtils';
 import genreApi from '~/api/admin/managementMovie/genreApi';
 import { useSearchSelectEffect } from '~/hooks';
-import { Option } from 'antd/es/mentions';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -90,6 +88,10 @@ function AdminMovie() {
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10);
+    const [selectDataTemp, setSelectDataTemp] = useState({
+        actors: [],
+        directors: [],
+    });
     const [workSomething, setworkSomething] = useState(10);
     const [loadingButton, setLoadingButton] = useState(false);
     const [selectedValue, setSelectedValue] = useState({
@@ -131,32 +133,10 @@ function AdminMovie() {
     const handleOk = async () => {
         // setLoadingButton(true);
         try {
-            const values = await form.validateFields();
+            const values = await form.getFieldsValue();
             console.log(values);
             const { genres, formats, directors, actors, poster, ...movieData } = values;
-            // movieStudio: {},
-            // movieProducer: {},
-            // mpaaRating: {},
-            // genres: [],
-            // actors: [],
-            // formats: [],
-            // directors: [],
-            let dataForm = {
-                genres: selectedValue.genres,
-                formats: selectedValue.formats,
-                directors: selectedValue.directors,
-                actors: selectedValue.actors,
-                movie: {
-                    ...movieData,
-                    releaseDate: movieData.releaseDate.format('YYYY-MM-DD'),
-                    duration: movieData.duration.format('HH:mm:ss'),
-                    rating: 0.0,
-                    movieStudio: selectedValue.movieStudio,
-                    movieProducer: selectedValue.movieProducer,
-                    mpaaRating: selectedValue.mpaaRating,
-                },
-            };
-            // console.log(dataForm);
+            console.log('movieData', movieData);
             // return;
             if (fileList.length > 0) {
                 if (!dataEdit) {
@@ -164,21 +144,30 @@ function AdminMovie() {
                         let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
                         console.log(imageName);
                         let dataCreate = {
-                            ...dataForm,
+                            genres: selectedValue.genres,
+                            formats: selectedValue.formats,
+                            directors: selectedValue.directors,
+                            actors: selectedValue.actors,
                             movie: {
-                                ...dataForm.movie,
+                                ...movieData,
+                                releaseDate: movieData.releaseDate.format('YYYY-MM-DD'),
+                                duration: movieData.duration.format('HH:mm:ss'),
+                                rating: 0.0,
+                                movieStudio: selectedValue.movieStudio,
+                                movieProducer: selectedValue.movieProducer,
+                                mpaaRating: selectedValue.mpaaRating,
                                 poster: imageName,
                             },
                         };
                         console.log('dataCreate', dataCreate);
                         const resp = await movieApi.create(dataCreate);
                         setLoadingButton(false);
-                        // handleResetForm();
+                        handleResetForm();
                         setworkSomething(!workSomething);
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Đã thêm phim thành công', 'success');
                         }
-                        // setIsModalOpen(false);
+                        setIsModalOpen(false);
                     } catch (error) {
                         setLoadingButton(false);
                         if (error.hasOwnProperty('response')) {
@@ -189,31 +178,108 @@ function AdminMovie() {
                         }
                     }
                 } else {
-                    console.log('Cập nhật', values);
+                    console.log('Cập nhật', dataEdit);
+
                     try {
                         let imageName = null;
                         if (fileList[0].hasOwnProperty('originFileObj')) {
-                            // console.log('ádfjahsfashjfas', fileList[0].originFileObj);
                             imageName = await uploadApi.put(dataEdit.poster, fileList[0].originFileObj);
-                            // imageName = 'ss';
                         }
-                        const dataUpdate = {
-                            ...values,
-                            releaseDate: values.releaseDate.format('YYYY-MM-DD'),
-                            duration: values.duration.format('HH:mm:ss'),
-                            poster: imageName != null ? imageName : values.poster,
-                            rating: dataEdit.rating,
-                            id: dataEdit.id,
+                        // const typesNoneSelect = [];
+                        // if (selectedValue.actors.length <= 0) {
+                        //     typesNoneSelect.push('actor');
+                        // }
+                        // if (selectedValue.directors.length <= 0) {
+                        //     typesNoneSelect.push('director');
+                        // }
+                        // if (selectedValue.formats.length <= 0) {
+                        //     typesNoneSelect.push('format');
+                        // }
+                        // if (selectedValue.genres.length <= 0) {
+                        //     typesNoneSelect.push('genre');
+                        // }
+
+                        // if (Object.keys(selectedValue.mpaaRating).length === 0) {
+                        //     typesNoneSelect.push('mpaa');
+                        // }
+
+                        // if (Object.keys(selectedValue.movieProducer).length === 0) {
+                        //     typesNoneSelect.push('movie-producer');
+                        // }
+                        // if (Object.keys(selectedValue.movieStudio).length === 0) {
+                        //     typesNoneSelect.push('movie-studio');
+                        // }
+
+                        // if (typesNoneSelect.length > 0) {
+                        // await Promise.all([
+                        //     typesNoneSelect.includes('actor') && handleSelectOption(actors, 'actor'),
+                        //     typesNoneSelect.includes('format') && handleSelectOption(formats, 'format'),
+                        //     typesNoneSelect.includes('genre') && handleSelectOption(genres, 'genre'),
+                        //     typesNoneSelect.includes('director') && handleSelectOption(directors, 'director'),
+                        //     typesNoneSelect.includes('mpaa') && handleSelectOption(movieData.mpaaRating, 'mpaa'),
+                        //     typesNoneSelect.includes('movie-producer') &&
+                        //         handleSelectOption(movieData.movieProducer, 'movie-producer'),
+                        //     typesNoneSelect.includes('movie-studio') &&
+                        //         handleSelectOption(movieData.movieStudio, 'movie-studio'),
+                        // ]);
+                        // typesNoneSelect = [];
+                        // }
+
+                        let dataUpdate = {
+                            genres: selectedValue.genres,
+                            formats: selectedValue.formats,
+                            directors: (function () {
+                                if (selectDataTemp.directors.length > 0) {
+                                    const selects = selectedValue.directors.reduce((total, item) => {
+                                        if (item != null) {
+                                            total.push(item);
+                                        }
+                                        return total;
+                                    }, []);
+                                    const directors = [...selectDataTemp.directors, ...selects];
+                                    return directors;
+                                } else {
+                                    return selectedValue.directors;
+                                }
+                            })(),
+                            actors: (function () {
+                                if (selectDataTemp.actors.length > 0) {
+                                    const selects = selectedValue.actors.reduce((total, item) => {
+                                        if (item != null) {
+                                            total.push(item);
+                                        }
+                                        return total;
+                                    }, []);
+                                    const actors = [...selectDataTemp.actors, ...selects];
+                                    return actors;
+                                } else {
+                                    return selectedValue.actors;
+                                }
+                            })(),
+                            movie: {
+                                ...movieData,
+                                releaseDate: movieData.releaseDate.format('YYYY-MM-DD'),
+                                duration: movieData.duration.format('HH:mm:ss'),
+                                rating: 0.0,
+                                movieStudio: selectedValue.movieStudio,
+                                movieProducer: selectedValue.movieProducer,
+                                mpaaRating: selectedValue.mpaaRating,
+                                poster: imageName != null ? imageName : values.poster,
+                                id: dataEdit.id,
+                            },
                         };
-                        console.log(dataUpdate);
+                        console.log('movieData', movieData);
+                        console.log('dataUpdate', dataUpdate);
+                        // if (typesNoneSelect.length <= 0) {
                         const resp = await movieApi.update(dataEdit.id, dataUpdate);
-                        setLoadingButton(false);
                         setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
                         setworkSomething(!workSomething);
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Cập nhật phim thành công', 'success');
                         }
                         form.setFieldValue(resp.data);
+                        // }
+                        setLoadingButton(false);
                     } catch (error) {
                         setLoadingButton(false);
                         if (error.hasOwnProperty('response')) {
@@ -238,45 +304,82 @@ function AdminMovie() {
         setFileList([]);
         form.resetFields();
     };
-    const handleCancelModal = () => {
+    const handleCancelModal = async () => {
         setIsModalOpen(false);
         handleResetForm();
         if (dataEdit != null) {
             setDataEdit(null);
         }
     };
+
     const handleEditData = async (record) => {
-        const movieResp = await movieApi.getById(record.id);
-        const { actors, directors, formats, genres, ...movieData } = movieResp.data;
-        console.log('movieResp', movieData);
-        const movie = movieData.movie;
-        // console.log(
-        //     '...genres.id',
-        //     genres.map((o) => o.id),
-        // );
-        // // return;
-        setFileList([
-            {
-                uid: record.id.toString(),
-                name: record.poster,
-                url: uploadApi.get(record.poster),
-            },
-        ]);
-        setPreviewTitle(`Poster của phim ${record.title}`);
-        setIsModalOpen(true);
-        setDataEdit(record);
-        form.setFieldsValue({
-            ...movie,
-            genres: genres.map((g) => g.id),
-            formats: formats.map((f) => f.id),
-            directors: directors.map((d) => d.id),
-            actors: actors.map((a) => a.id),
-            movieStudio: movie.movieStudio.id,
-            movieProducer: movie.movieProducer.id,
-            mpaaRating: movie.mpaaRating.id,
-            releaseDate: dayjs(record.releaseDate, 'DD-MM-YYYY'),
-            duration: dayjs(movie.duration, 'HH:mm:ss'),
-        });
+        try {
+            const movieResp = await movieApi.getById(record.id);
+            const { actors, directors, formats, genres, ...movieData } = movieResp.data;
+            const movie = movieData.movie;
+
+            setFileList([
+                {
+                    uid: record.id.toString(),
+                    name: record.poster,
+                    url: uploadApi.get(record.poster),
+                },
+            ]);
+            const actsOpNotExist = actors.reduce((totals, item) => {
+                if (!actorOptions.some((obj) => obj.id === item.id)) {
+                    totals.push(item);
+                }
+                return totals;
+            }, []);
+            if (actsOpNotExist) {
+                setActorOptions((prev) => [...prev, ...actsOpNotExist]);
+            }
+            const drtsOpNotExist = actors.reduce((totals, item) => {
+                if (!directorOptions.some((obj) => obj.id === item.id)) {
+                    totals.push(item);
+                }
+                return totals;
+            }, []);
+            if (drtsOpNotExist) {
+                setActorOptions((prev) => [...prev, ...drtsOpNotExist]);
+            }
+            const formatIds = formats.map((o) => o.id);
+            const genreIds = genres.map((o) => o.id);
+            const directorIds = directors.map((o) => o.id);
+            const actorIds = actors.map((o) => o.id);
+            await Promise.all([
+                handleSelectOption(actorIds, 'actor'),
+                handleSelectOption(formatIds, 'format'),
+                handleSelectOption(genreIds, 'genre'),
+                handleSelectOption(directorIds, 'director'),
+                handleSelectOption(movie.mpaaRating.id, 'mpaa'),
+                handleSelectOption(movie.movieProducer.id, 'movie-producer'),
+                handleSelectOption(movie.movieStudio.id, 'movie-studio'),
+            ]);
+
+            setPreviewTitle(`Poster của phim ${record.title}`);
+            setIsModalOpen(true);
+
+            setSelectDataTemp((prev) => ({ ...prev, actors: actors }));
+            setSelectDataTemp((prev) => ({ ...prev, directors: directors }));
+
+            console.log('actors-eidt', actors);
+            setDataEdit(record);
+            form.setFieldsValue({
+                ...movie,
+                genres: genreIds,
+                formats: formatIds,
+                directors: directorIds,
+                actors: actorIds,
+                movieProducer: movie.movieProducer.id,
+                movieStudio: movie.movieStudio.id,
+                mpaaRating: movie.mpaaRating.id,
+                releaseDate: dayjs(record.releaseDate, 'DD-MM-YYYY'),
+                duration: dayjs(movie.duration, 'HH:mm:ss'),
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -321,15 +424,15 @@ function AdminMovie() {
                     directorResp,
                 ] = await Promise.all([
                     movieApi.getByPage(currentPage, pageSize),
-                    movieStudioApi.getByPage(pageNoDefault, pageSizeDefault),
-                    movieProducerApi.getByPage(pageNoDefault, pageSizeDefault),
-                    mpaaRatingApi.getByPage(pageNoDefault, pageSizeDefault),
-                    genreApi.getByPage(pageNoDefault, pageSizeDefault),
-                    formatApi.getByPage(pageNoDefault, pageSizeDefault),
+                    movieStudioApi.getAll(),
+                    movieProducerApi.getAll(),
+                    mpaaRatingApi.getAll(),
+                    genreApi.getAll(),
+                    formatApi.getAll(),
                     actorApi.getByPage(pageNoDefault, pageSizeDefault),
                     directorApi.getByPage(pageNoDefault, pageSizeDefault),
                 ]);
-                // console.log(genreResp.data);
+                console.log(genreResp.data);
                 const movieStudioOptions = movieStudioResp.data;
                 const genreData = genreResp.data;
                 const movieProducerData = movieProducerResp.data;
@@ -369,38 +472,6 @@ function AdminMovie() {
         fetchData();
     }, [currentPage, pageSize, workSomething]);
 
-    useSearchSelectEffect(
-        searchValue.searchMovieStudio,
-        movieStudioApi,
-        { setOptions: setMovieStudios, field: 'movieStudio' },
-        initialOptions.movieStudios,
-        { loadingStates, setLoadingStates },
-        isSearch,
-    );
-    useSearchSelectEffect(
-        searchValue.searchGenre,
-        genreApi,
-        { setOptions: setGenreOptions, field: 'genre' },
-        initialOptions.genres,
-        { loadingStates, setLoadingStates },
-        isSearch,
-    );
-    useSearchSelectEffect(
-        searchValue.searchMovieProducer,
-        movieProducerApi,
-        { setOptions: setMovieProducers, field: 'movieProducer' },
-        initialOptions.movieProducers,
-        { loadingStates, setLoadingStates },
-        isSearch,
-    );
-    useSearchSelectEffect(
-        searchValue.searchFormat,
-        formatApi,
-        { setOptions: setFormatOptions, field: 'format' },
-        initialOptions.formats,
-        { loadingStates, setLoadingStates },
-        isSearch,
-    );
     useSearchSelectEffect(
         searchValue.searchActor,
         actorApi,
@@ -701,28 +772,27 @@ function AdminMovie() {
                 setSelectedValue((prev) => ({ ...prev, mpaaRating: mpaa }));
                 break;
             case 'genre':
-                let genres = value.map((val) => {
-                    return genreOptions.find((o) => o.id === val);
+                let genres = value.map((id) => {
+                    return genreOptions.find((o) => o.id === id);
                 });
                 setSelectedValue((prev) => ({ ...prev, genres: genres }));
                 break;
             case 'format':
-                let formats = value.map((val) => {
-                    return formatOptions.find((o) => o.id === val);
+                let formats = value.map((id) => {
+                    return formatOptions.find((o) => o.id === id);
                 });
                 console.log('formats', formats);
                 setSelectedValue((prev) => ({ ...prev, formats: formats }));
                 break;
             case 'actor':
-                let actors = value.map((val) => {
-                    return actorOptions.find((o) => o.id === val);
+                let actors = value.map((id) => {
+                    return actorOptions.find((o) => o.id === id);
                 });
-                console.log('actors', actors);
                 setSelectedValue((prev) => ({ ...prev, actors: actors }));
                 break;
             case 'director':
-                let directors = value.map((val) => {
-                    return directorOptions.find((o) => o.id === val);
+                let directors = value.map((id) => {
+                    return directorOptions.find((o) => o.id === id);
                 });
                 console.log('directors', directors);
                 setSelectedValue((prev) => ({ ...prev, directors: directors }));
@@ -905,8 +975,10 @@ function AdminMovie() {
                             allowClear
                             showSearch
                             placeholder="Tìm kiếm và chọn hãng sản xuât"
-                            filterOption={false}
-                            onSearch={(value) => handleSearchInput(value, 'movie-producer')}
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
                             loading={loadingStates.movieProducer}
                             onChange={(value) => handleSelectOption(value, 'movie-producer')}
                             options={[
@@ -927,8 +999,10 @@ function AdminMovie() {
                             allowClear
                             showSearch
                             placeholder="Tìm kiếm và chọn hãng phim"
-                            filterOption={false}
-                            onSearch={(value) => handleSearchInput(value, 'movie-studio')}
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
                             onChange={(value) => handleSelectOption(value, 'movie-studio')}
                             loading={loadingStates.movieStudio}
                             options={[
@@ -949,8 +1023,10 @@ function AdminMovie() {
                             showSearch
                             placeholder="Tìm kiếm và chọn loại phim"
                             allowClear
-                            filterOption={false}
-                            onSearch={(value) => handleSearchInput(value, 'genre')}
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
                             onChange={(value) => handleSelectOption(value, 'genre')}
                             loading={loadingStates.genre}
                             options={[
@@ -971,8 +1047,10 @@ function AdminMovie() {
                             showSearch
                             placeholder="Tìm kiếm và chọn định dạng phim"
                             allowClear
-                            filterOption={false}
-                            onSearch={(value) => handleSearchInput(value, 'format')}
+                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
                             onChange={(value) => handleSelectOption(value, 'format')}
                             loading={loadingStates.format}
                             options={[
@@ -1026,6 +1104,7 @@ function AdminMovie() {
                             tagRender={tagRender}
                             onSearch={(value) => handleSearchInput(value, 'actor')}
                             onChange={(value) => handleSelectOption(value, 'actor')}
+                            onDeselect={(value) => console.log('value', value)}
                             loading={loadingStates.actor}
                             optionLabelProp="children"
                         >

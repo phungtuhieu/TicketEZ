@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.modules.cinema.Cinema;
+import com.ticketez_backend_springboot.modules.cinema.CinemaDAO;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,9 @@ public class SeatChartAPI {
     
     @Autowired
     private SeatChartDAO dao;
+    
+    @Autowired
+    CinemaDAO cinemaDAO;
 
     @GetMapping("/getAll")
     public ResponseEntity<List<SeatChart>> getAll() {
@@ -80,9 +86,22 @@ public class SeatChartAPI {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/getStatusSeatChart")
-    public ResponseEntity<List<SeatChart>> getStatusSeatChart() {
-        List<SeatChart> seatCharts = dao.getStatusSeatChart();
-        return ResponseEntity.ok(seatCharts);
+
+    // lấy dử liệu của cineme theo searchat true và cinemacomplex
+    @GetMapping("/get/seatChart-by-cinema/{cinemaId}")
+    public ResponseEntity<?> getSeatChartsByCinema(@PathVariable("cinemaId") long cinemaId) {
+        try {
+            Cinema cinema = cinemaDAO.findById(cinemaId).get();
+            if (cinema != null) {
+                List<SeatChart> seatCharts = dao.getSeatChartsByCinema(cinema);
+                return ResponseEntity.ok(seatCharts);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
+
 }

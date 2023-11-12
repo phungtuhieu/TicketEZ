@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
 
 const CustomCKEditor = React.memo(({ value, onChange }) => {
     const handleEditorChange = useCallback((_event, editor) => {
@@ -14,7 +14,7 @@ const CustomCKEditor = React.memo(({ value, onChange }) => {
 
     return (
         <CKEditor
-            editor={ClassicEditor}
+            editor={Editor}
             data={memoizedData}
             onChange={handleEditorChange}
             onReady={(editor) => {

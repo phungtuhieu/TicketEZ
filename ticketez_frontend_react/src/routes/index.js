@@ -33,6 +33,7 @@ const publicRoutes = [
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginSignin, layout: DefaultLayout },
+    { path: '/event', component: PageUser.Event, layout: DefaultLayout },
     { path: '/contact', component: UserContact, layout: DefaultLayout },
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details', component: PageUser.MovieDetails, layout: DefaultLayout },

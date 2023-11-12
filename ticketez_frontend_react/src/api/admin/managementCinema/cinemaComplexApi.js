@@ -9,8 +9,8 @@ const cinemaComplexApi = {
         return axiosClient.get(url + '/' + cinemaComplexId);
     },
 
-    getAll: async () => {
-        return axiosClient.get(url + '/getAll');
+    get: async () => {
+        return axiosClient.get(url + '/get/all');
     },
 
     getPage: async (page, limit) => {

@@ -12,8 +12,11 @@ const formatMovieApi = {
     getDistinctMovieIds: async () => {
         return axiosClient.get(url + '/getDistinctMovie');
     },
-    getDistinctFormarIds: async () => {
-        return axiosClient.get(url + '/getDistinctFormat');
+    getDistinctFormarIds: async (movieId) => {
+        return axiosClient.get(url + '/getDistinctFormat/' + movieId);
+    },
+    getIdFormatMovieByFormatAndMovie: async (movieId, formatID) => {
+        return axiosClient.get(url + '/get/IdFormatMovieByFormatAndMovie/' + movieId + '/' + formatID);
     },
     post: async (data) => {
         return axiosClient.post(url, data);

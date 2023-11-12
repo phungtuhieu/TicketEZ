@@ -25,6 +25,20 @@ export const cinemaComplexUserApi = {
             return error;
         }
     },
+    getCcxFormatShowtimeByMovie: async (movieId, provinceId, cinemaChainName, date) => {
+        const params = {
+            movieId,
+            provinceId,
+            cinemaChainName,
+            date,
+        };
+        try {
+            const result = await axiosClient.get(urlCinemaComplex + '/get/ccx-format-showtime-by-movie', { params });
+            return result.data;
+        } catch (error) {
+            return error;
+        }
+    },
 };
 
 // ****************************************************************

@@ -9,8 +9,11 @@ const seatChartApi = {
     get: async () => {
         return axiosClient.get(url + '/getAll');
     },
-    getStatusSeatChart: async () => {
-        return axiosClient.get(url + '/getStatusSeatChart');
+    getCinemaByCinemaComplexAndSeatChartTrue: async (cinemaComplexId) => {
+        return axiosClient.get(url + '/get/cinema-by-cinemaComplex-by-seatchartTrue/' + cinemaComplexId);
+    },
+    getSeatChartByCinema: async (cinemaId) => {
+        return axiosClient.get(url + '/get/seatChart-by-cinema/' + cinemaId);
     },
     post: async (data) => {
         return axiosClient.post(url, data);

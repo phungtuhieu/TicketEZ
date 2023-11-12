@@ -12,6 +12,7 @@ import funcUtils from '~/utils/funcUtils';
 import { cinemaComplexUserApi, cinemaUserApi } from '~/api/user/showtime';
 import NotFountShowtime from '../NotFountShowtime/NotFountShowtime';
 import { LoadingOutlined } from '@ant-design/icons';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 
@@ -88,7 +89,6 @@ const CumRap = ({ NameAndProvince }) => {
                         <Col span={24}>
                             {' '}
                             <List
-                                loading={initLoading}
                                 itemLayout="horizontal"
                                 // loadMore={loadMore}
                                 dataSource={list}
@@ -111,9 +111,7 @@ const CumRap = ({ NameAndProvince }) => {
                                                 <div className={cx('border-img')}>
                                                     <img
                                                         className={cx('img')}
-                                                        src={
-                                                            'http://localhost:8081/api/upload/' + item.cinemaChain.image
-                                                        }
+                                                        src={uploadApi.get(item.cinemaChain.image)}
                                                         alt="lỗi"
                                                     />
                                                 </div>
