@@ -499,6 +499,7 @@ public class MovieAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
     @GetMapping("/get/movie-by-showtime-showing")
     public ResponseEntity<?> getMovieByShowtimeShowing() {
