@@ -5,7 +5,7 @@ import tagDatTruoc from './logo-dat-truoc.svg';
 import event from './event.jpg';
 
 // 
-
+import logoComment from './logo-cmt.webp';
 import notFoundLogo from './not-found.svg'
 import gifLoading from './loading.gif'
 
@@ -26,7 +26,8 @@ const img = {
     // 
     notFoundLogo,
     gifLoading,
-    event
+    event,
+    logoComment
 };
 
 

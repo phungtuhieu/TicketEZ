@@ -1,6 +1,7 @@
 package com.ticketez_backend_springboot.modules.review;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.cinemaType.CinemaType;
+import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -27,6 +30,8 @@ public class ReviewAPI {
     @Autowired
     ReviewDAO reviewDAO;
 
+    @Autowired
+    MovieDAO movieDAO;
     // @GetMapping
     // public ResponseEntity<List<Review>> findAll() {
     // return ResponseEntity.ok(reviewDAO.findAll());
@@ -84,6 +89,23 @@ public class ReviewAPI {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
         }
 
+    }
+
+    @GetMapping("/get/by-movie/{movieId}")
+    public ResponseEntity<?> getReviewsByMovieId(@PathVariable("movieId") Long movieId) {
+        try {
+            Optional<Movie> optionalMovie = movieDAO.findById(movieId);
+
+            if (optionalMovie.isPresent()) {
+                List<Review> reviews = reviewDAO.findAllByMovieId(movieId);
+                return ResponseEntity.ok(reviews);
+            }
+
+            return new ResponseEntity<>("Không tìm thấy phim có id " + movieId, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace(); // In lỗi để theo dõi tình trạng lỗi
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
