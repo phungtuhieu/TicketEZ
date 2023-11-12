@@ -24,8 +24,6 @@ function SeatChart(props) {
         setIsModalOpen(false);
     };
     const createSeatArray = () => {
-        console.log('222222222222222222222222222222222222222222222222');
-        console.log(showtime);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
@@ -99,8 +97,9 @@ function SeatChart(props) {
         try {
             const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${showtime.seatChart.id}`);
             const data = resp.data;
+            console.log(data);
             if (data.length <= 0) {
-                setSeatBookingData([]);
+                setSeatBookingData(['none']);
             }
             // console.log(data);
             data.forEach((newItem) => {
