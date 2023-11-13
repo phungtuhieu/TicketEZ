@@ -2,14 +2,14 @@ import { Col, Row, Card } from 'antd';
 import ViTri from './showtimesDetails/ViTri/ViTri';
 import Binhluan from './Comment/binhluan';
 import ActorSlider from './Comment/Carousel/ShowActor';
-import Banner from './Banner';
+import Banner from './Banner'
 
 function MovieDetails() {
     return (
         <>
             <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                <Col span={24} style={{ background: 'blue', height: 480 }}>
-                    <Banner />
+                <Col span={24} style={{ background: 'black', height: 480 }}>
+                   <Banner/>
                 </Col>
                 <Col
                     span={24}
@@ -21,28 +21,12 @@ function MovieDetails() {
                                 <Col span={24} style={{}}>
                                     <ViTri />
                                 </Col>
-                                <Col
-                                    span={24}
-                                    style={{
-                                        backgroundColor: '#ffffff',
-                                        display: 'flex',
-                                        marginTop: 50,
-                                        minHeight: 600,
-                                    }}
-                                >
-                                    <Binhluan />
+                                <Col span={24} style={{ backgroundColor: '#ffffff',display: 'flex',  marginTop: 50, minHeight: 600, }}>
+                                  <Binhluan/>
                                 </Col>
-                                <Col
-                                    span={24}
-                                    style={{
-                                        backgroundColor: '#ffffff',
-                                        display: 'flex',
-                                        marginTop: 50,
-                                        minHeight: 100,
-                                    }}
-                                >
-                                    {/* overflowY: 'auto' */}
-                                    <ActorSlider />
+                                <Col span={24} style={{ backgroundColor: '#ffffff',display: 'flex',  marginTop: 50, minHeight: 100,  }}> 
+                                {/* overflowY: 'auto' */}
+                                <ActorSlider/>
                                 </Col>
                             </Row>
                         </Col>
