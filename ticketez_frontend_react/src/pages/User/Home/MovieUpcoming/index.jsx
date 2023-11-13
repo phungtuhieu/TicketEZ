@@ -8,7 +8,8 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
 import funcUtils from '~/utils/funcUtils';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import img from '~/assets/img';
 
 const cx = classNames.bind(style);
 const { Paragraph, Title } = Typography;
@@ -122,100 +123,121 @@ const MovieShowing = () => {
                 return '#f50';
         }
     };
-       const CustomCloseIcon = ({ onClick }) => (
-           <CloseCircleOutlined
-               onClick={onClick}
-               style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
-           />
-       );
+    const CustomCloseIcon = ({ onClick }) => (
+        <CloseCircleOutlined
+            onClick={onClick}
+            style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
+        />
+    );
+    const [isLoadingPage, setIsLoading] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    }, []);
     return (
         <div className={cx('body')}>
             <span className={cx('title-name-card')}>Phim sắp chiếu</span>
 
-            <Slider
-                {...settings}
-                style={{
-                    maxWidth: '1300px',
-                    alignItems: 'center',
-                    display: 'flex',
-                    margin: '0 auto',
-                    marginTop: '-20px',
-                }}
-            >
-                {getMovieByShowtimeShowing?.map((slide) => (
-                    <>
-                        <div key={slide.movie.id} className={cx('container')}>
-                            <Tag
-                                className={cx('tag-overlay')}
-                                color={getColorForRating(slide.movie.mpaaRating.ratingCode)}
-                            >
-                                {slide.movie.mpaaRating.ratingCode}
-                            </Tag>
+            {isLoadingPage && (
+                <div style={{ height: '100px' }}>
+                    <div className={cx('loading')}>
+                        <LoadingOutlined className={cx('imgL')} />
+                    </div>
+                </div>
+            )}
+            {!isLoadingPage && (
+                <Slider
+                    {...settings}
+                    style={{
+                        maxWidth: '1300px',
+                        alignItems: 'center',
+                        display: 'flex',
+                        margin: '0 auto',
+                        marginTop: '-20px',
+                    }}
+                >
+                    {getMovieByShowtimeShowing && getMovieByShowtimeShowing.length > 0 ? (
+                        getMovieByShowtimeShowing?.map((slide, index) => (
+                            <>
+                                <div key={slide.movie.id} className={cx('container')}>
+                                    <Tag
+                                        className={cx('tag-overlay')}
+                                        color={getColorForRating(slide.movie.mpaaRating.ratingCode)}
+                                    >
+                                        {slide.movie.mpaaRating.ratingCode}
+                                    </Tag>
 
-                            {/* <Tag color="#D80032" className={cx('tag-overlay2')}>
-                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
-                             </Tag> */}
-                            <img
-                                className={cx('img-overlay')}
-                                src={`http://localhost:8081/api/upload/${slide.movie.poster}`}
-                            />
-                            <svg
-                                onClick={() => showModal(slide)}
-                                className={cx('icon-overlay')}
-                                fill="#ffffff"
-                                height="200px"
-                                width="200px"
-                                version="1.1"
-                                id="Layer_1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                viewBox="-51.2 -51.2 614.40 614.40"
-                                xmlSpace="preserve"
-                                stroke="#ffffff"
-                                strokeWidth="0.00512"
-                            >
-                                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                                <g
-                                    id="SVGRepo_tracerCarrier"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    stroke="#CCCCCC"
-                                    strokeWidth="1.024"
-                                ></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <g>
-                                        <g>
-                                            <path d="M256,0C114.608,0,0,114.608,0,256s114.608,256,256,256s256-114.608,256-256S397.392,0,256,0z M256,496C123.664,496,16,388.336,16,256S123.664,16,256,16s240,107.664,240,240S388.336,496,256,496z"></path>
+                                    {/* <Tag color="#D80032" className={cx('tag-overlay2')}>
+                                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
+                                             </Tag> */}
+                                    <img
+                                        className={cx('img-overlay')}
+                                        src={`http://localhost:8081/api/upload/${slide.movie.poster}`}
+                                    />
+                                    <svg
+                                        onClick={() => showModal(slide)}
+                                        className={cx('icon-overlay')}
+                                        fill="#ffffff"
+                                        height="200px"
+                                        width="200px"
+                                        version="1.1"
+                                        id="Layer_1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                                        viewBox="-51.2 -51.2 614.40 614.40"
+                                        xmlSpace="preserve"
+                                        stroke="#ffffff"
+                                        strokeWidth="0.00512"
+                                    >
+                                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                                        <g
+                                            id="SVGRepo_tracerCarrier"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            stroke="#CCCCCC"
+                                            strokeWidth="1.024"
+                                        ></g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <g>
+                                                <g>
+                                                    <path d="M256,0C114.608,0,0,114.608,0,256s114.608,256,256,256s256-114.608,256-256S397.392,0,256,0z M256,496C123.664,496,16,388.336,16,256S123.664,16,256,16s240,107.664,240,240S388.336,496,256,496z"></path>
+                                                </g>
+                                            </g>
+                                            <g>
+                                                <g>
+                                                    <polygon points="189.776,141.328 189.776,370.992 388.672,256.16"></polygon>
+                                                </g>
+                                            </g>
                                         </g>
-                                    </g>
-                                    <g>
-                                        <g>
-                                            <polygon points="189.776,141.328 189.776,370.992 388.672,256.16"></polygon>
-                                        </g>
-                                    </g>
-                                </g>
-                            </svg>
-                        </div>
-                        <div>
-                            <Title level={5} className={cx('name-movie')} style={{ color: '#000' }}>
-                                {slide.movie.title} <br />
-                                <span className={cx('the-loai-phim')} style={{ color: '#000' }}>
-                                    {slide.genres.map((valueGenre, index) => (
-                                        <span className={cx('span')} key={index}>
-                                            {valueGenre.name}
+                                    </svg>
+                                </div>
+                                <div>
+                                    <Title level={5} className={cx('name-movie')} style={{ color: '#000' }}>
+                                        {slide.movie.title} <br />
+                                        <span className={cx('the-loai-phim')} style={{ color: '#000' }}>
+                                            {slide.genres.map((valueGenre, index) => (
+                                                <span className={cx('span')} key={index}>
+                                                    {valueGenre.name}
+                                                </span>
+                                            ))}
                                         </span>
-                                    ))}
-                                </span>
-                                <br />
-                                {/* <span className={cx('rate-movie')} style={{ color: '#ffffff' }}>
-                                    {slide.movie.rating}
-                                </span>
-                                <Rate disabled defaultValue={1} style={{ fontSize: '13px', marginLeft: '-20px' }} /> */}
-                            </Title>
+                                        <br />
+                                    </Title>
+                                </div>
+                            </>
+                        ))
+                    ) : (
+                        <div style={{ marginLeft: '100px' }}>
+                            <img src={img.notFoundLogo} alt="" style={{ marginRight: '-300px', marginTop: '15px' }} />
+                            <span style={{ marginTop: '60px', marginLeft: '100px' }}>
+                                Không tìm thấy phim sắp chiếu
+                            </span>
                         </div>
-                    </>
-                ))}
-            </Slider>
+                    )}
+                </Slider>
+            )}
+
             <Modal
                 width={700}
                 closeIcon={<CustomCloseIcon />}

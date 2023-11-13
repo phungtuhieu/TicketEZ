@@ -1,12 +1,12 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  prefix: 'tw-', // Thêm tiền tố 'tw-'
-  important: true,
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+    content: [
+        './src/pages/User/**/*.{js,jsx,ts,tsx}',
+        //  loại bỏ thư mục Admin
+        '!./src/pages/Admin/**/*.{js,jsx,ts,tsx}',
+        '!./src/components/**/*.{js,jsx,ts,tsx}',
+    ],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+};
