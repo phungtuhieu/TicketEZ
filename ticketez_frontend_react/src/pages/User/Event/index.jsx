@@ -9,10 +9,10 @@ import img from '~/assets/img';
 const Event = () => {
     return (
         <>
-            <div className="container bg-white text-black">
+            <div className="container mx-auto px-[150px] bg-white text-black">
                 <Row gutter={22}>
                     <Col lg={16}>
-                        <img src={img.event} width={900} height={360} className="rounded-md mt-[59px]" />
+                        <img src={img.event} width="100%" height={344} className="rounded-md mt-[59px]" />
                         <div className="font-bold text-pink-500 text-left text-4xl mt-[-40px] mb-[25px]">
                             Ngày vàng nạp dế nhân đôi điểm tích lũy, nhận quà tẹt ga
                         </div>
@@ -39,52 +39,46 @@ const Event = () => {
                     </Col>
                     <Col lg={8} style={{ borderLeft: '1px solid #D4D4D4' }}>
                         <p className="font-semibold text-pink-500 text-left text-3xl mt-[19px] mb-[10px]">
-                           <FontAwesomeIcon icon={faFireFlameCurved} className='text-2xl mr-1'/>
-                          Tin tức liên quan
+                            <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl mr-1" />
+                            Tin tức liên quan
                         </p>
-                        <Row gutter={24} className="h-24 mb-[30px]">
+                        <Row gutter={24} className="h-24 mb-[45px]">
                             <Col lg={8}>
-                                <img src={img.event} width={150} height={70} className="rounded-md mt-2" />
+                                <img src={img.event} width={113} height={54} className="rounded-md mt-2 mr-[20px]" />
                             </Col>
                             <Col lg={16}>
-                                <div className="leading-normal text-left line-clamp-3 max-w-[220px] mt-2 font-semibold no-underline hover:underline">
+                                <div className="leading-normal text-left line-clamp-3 max-w-[180px]  mt-2 text-2xl  font-semibold no-underline hover:underline">
                                     Mua/nạp Data chỉ từ 1.000Đ hốt lộc đến 1.111.111Đ liền tay. Duy nhất ngày 11/11,
                                 </div>
+                                <span className="leading-normal text-left text-gray-500 line-clamp-3 max-w-[220px] mt-2 text-lg no-underline ">
+                                    11/12/2023
+                                </span>
                             </Col>
                         </Row>
-                        <Row gutter={24} className="h-24 mb-[40px]">
+                        <Row gutter={24} className="h-24 mb-[45px]">
                             <Col lg={8}>
-                                <img src={img.event} width={150} height={70} className="rounded-md mt-2" />
+                                <img src={img.event} width={113} height={54} className="rounded-md mt-2 mr-[20px]" />
                             </Col>
-                            <Col lg={16}>
-                                <div className="leading-normal text-left line-clamp-3 max-w-[220px] mt-2 font-semibold no-underline hover:underline">
+                            <Col lg={16} >
+                                <div className="leading-normal text-left line-clamp-3 max-w-[180px]  mt-2 text-2xl  font-semibold no-underline hover:underline">
                                     Mua/nạp Data chỉ từ 1.000Đ hốt lộc đến 1.111.111Đ liền tay. Duy nhất ngày 11/11,
-                                    MoMo tung triệu deal hoàn tiền khi mua/nạp Data 3G/4G, Combo Nghe Gọi + Data hoặc
                                 </div>
+                                <span className="leading-normal text-left text-gray-500 line-clamp-3 max-w-[220px]  mt-2 text-lg no-underline ">
+                                    11/12/2023
+                                </span>
                             </Col>
                         </Row>
-                        <Row gutter={24} className="h-24 mb-[40px]">
+                        <Row gutter={24} className="h-24 mb-[20px]">
                             <Col lg={8}>
-                                <img src={img.event} width={150} height={70} className="rounded-md mt-2" />
+                                <img src={img.event} width={113} height={54} className="rounded-md mt-2 mr-[20px]" />
                             </Col>
                             <Col lg={16}>
-                                <div className="leading-normal text-left line-clamp-3 mt-2 max-w-[220px] font-semibold no-underline hover:underline">
+                                <div className="leading-normal text-left line-clamp-3 max-w-[180px]  mt-2 text-2xl  font-semibold no-underline hover:underline">
                                     Mua/nạp Data chỉ từ 1.000Đ hốt lộc đến 1.111.111Đ liền tay. Duy nhất ngày 11/11,
-                                    MoMo tung triệu deal hoàn tiền khi mua/nạp Data 3G/4G, Combo Nghe Gọi + Data hoặc
-                                    Sim chính chủ. Chớp ngay!
                                 </div>
-                            </Col>
-                        </Row>
-                        <Row gutter={24} className="h-24 mb-[40px]">
-                            <Col lg={8}>
-                                <img src={img.event} width={150} height={70} className="rounded-md mt-2" />
-                            </Col>
-                            <Col lg={16}>
-                                <div className="leading-normal text-left line-clamp-3 mt-2 max-w-[220px] font-semibold no-underline hover:underline">
-                                    Mua/nạp Data chỉ từ 1.000Đ hốt lộc đến 1.111.111Đ liền tay. Duy nhất ngày 11/11,
-                                    MoMo tung triệu deal hoàn tiền khi mua/nạp Data 3G/4G, Combo Nghe Gọi + Data hoặc
-                                    Sim chính chủ. Chớp ngay!
-                                </div>
+                                <span className="leading-normal text-left text-gray-500 line-clamp-3 max-w-[220px] mt-2 text-lg no-underline ">
+                                    11/12/2023
+                                </span>
                             </Col>
                         </Row>
                     </Col>
