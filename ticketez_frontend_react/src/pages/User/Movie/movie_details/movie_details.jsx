@@ -7,11 +7,7 @@ import { Link } from 'react-router-dom';
 import SeatChart from '../../Booking/SeatChart';
 import ReactDOM from 'react-dom';
 
-
-
 const MovieDetails = (props) => {
-  
-
     function setZoom() {
         if (navigator.appVersion.indexOf('Win') !== -1) {
             document.body.style.zoom = '80%';
@@ -47,7 +43,6 @@ const MovieDetails = (props) => {
                 <Modal isOpen={isModalOpen} onClick={closeModal}>
                     <ModalContent isOpen={isModalOpen} onClick={(e) => e.stopPropagation()}>
                         <SeatChart />
-                    
                     </ModalContent>
                 </Modal>
             </Details>

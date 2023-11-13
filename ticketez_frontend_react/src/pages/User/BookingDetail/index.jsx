@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcon from '@fortawesome/free-solid-svg-icons';
 const cx = classNames.bind(style);
 function BookingDetail(props) {
-    const { seat ,showtime} = props;
+    const { seat, showtime, seatBooking } = props;
     const [text, setText] = useState('https://ant.design/');
 
     return (
@@ -29,7 +29,6 @@ function BookingDetail(props) {
                                 K
                             </Tag>
                             <h3 className={cx('title-movie')} level={4}>
-                      
                                 Đất rừng phương nam
                             </h3>
                         </div>
@@ -85,7 +84,9 @@ function BookingDetail(props) {
                                 <ul className={cx('wrapp-info-details')}>
                                     <li className={cx('label-inner', 'text-gray-500')}>Ghế</li>
                                     <li className={cx('info-inner')}>
-                                        <b>E8</b>{' '}
+                                        {seatBooking.map((seat) => (
+                                            <div key={seat.id}>{seat.id}</div>
+                                        ))}
                                     </li>
                                 </ul>
                             </Col>
