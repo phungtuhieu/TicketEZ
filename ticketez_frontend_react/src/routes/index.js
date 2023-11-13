@@ -39,6 +39,7 @@ const publicRoutes = [
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
 ];
 
+
 const privateRoutes = [];
 
 export { publicRoutes, privateRoutes };
