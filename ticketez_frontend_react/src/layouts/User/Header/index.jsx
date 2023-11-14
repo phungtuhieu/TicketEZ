@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
 import './header.css';
+import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
@@ -20,19 +21,17 @@ import {
 import { useLocation } from 'react-router-dom';
 
 const Header = () => {
+    const location = useLocation();
 
-     const location = useLocation(); // Use the useLocation hook to get the current path
-
-     // Check if the current path is '/event'
-     const allowedPaths = [
-         '/su-kien/khuyen-mai',
-         '/su-kien/tin-tuc',
-         /^\/su-kien\/tin-tuc\/\d+$/,
-         /^\/su-kien\/khuyen-mai\/\d+$/,
-     ];
-     const isEventPage = allowedPaths.some((path) =>
-         typeof path === 'string' ? location.pathname === path : path.test(location.pathname),
-     );
+    const allowedPaths = [
+        '/su-kien/khuyen-mai',
+        '/su-kien/tin-tuc',
+        /^\/su-kien\/tin-tuc\/\d+$/,
+        /^\/su-kien\/khuyen-mai\/\d+$/,
+    ];
+    const isEventPage = allowedPaths.some((path) =>
+        typeof path === 'string' ? location.pathname === path : path.test(location.pathname),
+    );
 
     const items = [
         {
@@ -76,9 +75,18 @@ const Header = () => {
         },
     ];
 
+    const scrollToShowTimes = () => {
+        scroll.scrollTo(1800);
+    };
+    const scrollToMovieUpcoming = () => {
+        scroll.scrollTo(1200);
+    };
+    const scrollToMovieShowing = () => {
+        scroll.scrollTo(600);
+    };
     return (
         <>
-            <nav className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0">
+            <nav className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0 ">
                 <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-border-b tw-container tw-mx-auto tw-px-[150px]">
                     <a href="/" className="tw-text-gray-700">
                         <div className="tw-flex tw-items-center tw-gap-2">
@@ -99,23 +107,20 @@ const Header = () => {
                     </a>
                     <div className="tw-flex tw-items-center tw-font-medium tw-cursor-pointer">
                         <div className="tw-hidden lg:tw-block tw-mr-[20px] tw-text-gray-700 tw-font-2xl">
-                            Lịch chiếu
+                            <a onClick={scrollToShowTimes} className="tw-text-gray-700">
+                                Lịch chiếu
+                            </a>
                         </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
-                            <Dropdown
-                                menu={{
-                                    items,
-                                }}
-                                placement="bottom"
-                                arrow
-                            >
-                                <a onClick={(e) => e.preventDefault()} className="tw-text-gray-700">
-                                    Loại phim
-                                </a>
-                            </Dropdown>
+                            <a onClick={scrollToMovieShowing} className="tw-text-gray-700">
+                                Phim đang chiếu
+                            </a>
                         </div>
-                        <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">Phim sắp chiếu</div>
-
+                        <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
+                            <a onClick={scrollToMovieUpcoming} className="tw-text-gray-700">
+                                Phim sắp chiếu
+                            </a>
+                        </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] ">
                             <a href="/su-kien/tin-tuc" className="tw-text-gray-700">
                                 Sự kiện

@@ -37,7 +37,7 @@ const Homes = () => {
                         justifyContent: 'center',
                     }}
                 >
-                    <ShowTimes />
+                    <ShowTimes  />
                 </Col>
             </Row>
         </>

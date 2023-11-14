@@ -171,9 +171,7 @@ const MovieShowing = () => {
                         {getMovieByShowtimeShowing && getMovieByShowtimeShowing.length > 0 ? (
                             getMovieByShowtimeShowing?.map((slide, index) => (
                                 <>
-                                    <Link
-                                    //  to={`/movie/${slide.movie.id}`}
-                                    >
+                                    <Link to={`/movie-details/${slide.movie.id}`}>
                                         <div key={slide.movie.id} className={cx('container')}>
                                             <Tag
                                                 className={cx('tag-overlay')}
@@ -183,14 +181,17 @@ const MovieShowing = () => {
                                             </Tag>
 
                                             {/* <Tag color="#D80032" className={cx('tag-overlay2')}>
-                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
-                             </Tag> */}
+                                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
+                                            </Tag> */}
                                             <img
                                                 className={cx('img-overlay')}
                                                 src={`http://localhost:8081/api/upload/${slide.movie.poster}`}
                                             />
                                             <svg
-                                                onClick={() => showModal(slide)}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    showModal(slide);
+                                                }}
                                                 className={cx('icon-overlay')}
                                                 fill="#ffffff"
                                                 height="200px"

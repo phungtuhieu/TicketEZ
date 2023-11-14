@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genres, tags, video } }) => {
     return (
         <>
-            <Row className="tw-mt-[40px]">
+            <Row >
                 <Col>
                     <div className="coverImage  tw-h-[100%]  tw-w-[100%] ">
                         <img src={cover} alt="" />
@@ -16,7 +16,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                     </div>
                 </Col>
                 <Col>
-                    <Row className="tw-mt-[-45px]">
+                    <Row className="tw-mt-[-95px]">
                         <Col span={14} className="col-title ">
                             <div className="movie-title">{name}</div>
                             <div className="rating ">

@@ -1,16 +1,24 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import uploadApi from '~/api/service/uploadApi';
-import '../Banner/banner.css';
-import { Col, Row } from 'antd';
+import classNames from 'classnames/bind';
+import style from './Banner.module.scss';
+import { Col, Modal, Row, Typography } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
+
+const cx = classNames.bind(style);
 const BannerDetail = () => {
+    const { Paragraph, Title } = Typography;
     const { movieId } = useParams();
     const [dataMovie, setDaTaMovie] = useState(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
-
+    console.log("123",dataMovie);
     const handleToggle = () => {
         setExpanded(!expanded);
     };
@@ -72,6 +80,29 @@ const BannerDetail = () => {
     };
 
     const MAX_CHARACTERS = 150;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState(null);
+    const [setLoading] = useState(false);
+    const showModal = (movie) => {
+        setSelectedMovie(movie);
+        setIsModalOpen(true);
+    };
+    const CustomCloseIcon = ({ onClick }) => (
+        <CloseCircleOutlined
+            onClick={onClick}
+            style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
+        />
+    );
+    const handleOk = () => {
+        setLoading(true);
+        setIsModalOpen(false);
+    };
+
+     const handleCancel = () => {
+         setIsModalOpen(false);
+         setSelectedMovie(null);
+     };
+     const [ellipsis] = useState(true);
 
     return (
         <div className="background" style={background}>
@@ -84,10 +115,7 @@ const BannerDetail = () => {
                             <Col span={4}>
                                 <div style={imgCustom} className="tw-mt-20">
                                     <img src={uploadApi.get(dataMovie?.movie.poster)} alt="poster" width="256" />
-                                    <a
-                                        href="/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <div
                                         className="tw-hover:transform tw-hover:scale-190"
                                         style={{
                                             position: 'absolute',
@@ -96,7 +124,8 @@ const BannerDetail = () => {
                                             transform: 'translate(-50%, -50%)',
                                         }}
                                     >
-                                        <svg 
+                                        <svg
+                                            onClick={() => showModal(dataMovie)}
                                             style={{ border: '2px solid #fff', borderRadius: '50%' }}
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="#fff"
@@ -106,7 +135,7 @@ const BannerDetail = () => {
                                         >
                                             <path d="M8 5v14l11-7z" />
                                         </svg>
-                                    </a>
+                                    </div>
                                 </div>
                             </Col>
                             <Col span={19}>
@@ -115,7 +144,7 @@ const BannerDetail = () => {
                                         13+
                                     </div>
 
-                                    <div className=" tw-text-5xl tw-ms-20 tw-mt-2 tw-text-2xl tw-font-bold tw-text-white tw-md:text-4xl">
+                                    <div className=" tw-text-5xl tw-ms-20 tw-mt-2  tw-font-bold tw-text-white tw-md:text-4xl">
                                         {dataMovie?.movie.title}
                                     </div>
                                     <ul className="tw-ms-20 tw-mt-4 tw-flex tw-flex-wrap tw-items-center tw-text-2xl tw-text-white tw-text-opacity-60 tw-md:text-base">
@@ -138,7 +167,7 @@ const BannerDetail = () => {
                                     <p className="tw-ms-20 tw-mt-14 tw-italic tw-text-2xl tw-text-white tw-text-opacity-60">
                                         <li> {dataMovie?.movie.title}</li>
                                     </p>
-                                    <h3 className=" tw-mt-8 tw-text-xl tw-ms-20 tw-mt-2 tw-text-3xl tw-font-bold tw-text-white tw-md:text-xl">
+                                    <h3 className=" tw-mt-8 tw-text-xl tw-ms-20 tw-font-bold tw-text-white tw-md:text-xl">
                                         Nội dung
                                     </h3>
 
@@ -169,7 +198,7 @@ const BannerDetail = () => {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="tw-text-xl tw-ms-20 tw-mt-2 tw-text-2xl tw-text-white tw-md:text-4xl tw-text-opacity-60">
+                                    <div className="tw-text-xl tw-ms-20 tw-mt-2 tw-text-white tw-md:text-4xl tw-text-opacity-60">
                                         <Row>
                                             <Col span={4}>
                                                 <div>Ngày chiếu</div>
@@ -206,6 +235,72 @@ const BannerDetail = () => {
                 </Col>
                 <Col span={3}></Col>
             </Row>
+            <Modal
+                width={700}
+                closeIcon={<CustomCloseIcon />}
+                onOk={handleOk}
+                open={isModalOpen}
+                onCancel={handleCancel}
+                footer={[
+                    <>
+                        <Row gutter={24}>
+                            <Col lg={3}>
+                                {selectedMovie ? (
+                                    <img
+                                        width={80}
+                                        height={120}
+                                        className={cx('img-modal')}
+                                        src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
+                                    />
+                                ) : (
+                                    ''
+                                )}
+                            </Col>
+                            <Col lg={21} className={cx('name-video-modal')}>
+                                <Title level={5}>
+                                    {selectedMovie ? selectedMovie.movie.title : ''} - {''}
+                                    <span className={cx('theloai-modal')}>
+                                        {selectedMovie?.genres.map((valueGenre, index) => (
+                                            <span className={cx('span')} key={index}>
+                                                {valueGenre.name}
+                                            </span>
+                                        ))}
+                                    </span>{' '}
+                                    <br />
+                                </Title>
+                                <Paragraph
+                                    ellipsis={
+                                        ellipsis
+                                            ? {
+                                                  rows: 4,
+                                              }
+                                            : false
+                                    }
+                                    style={{ color: 'gray' }}
+                                >
+                                    {selectedMovie ? selectedMovie.movie.description : ''}
+                                </Paragraph>
+                            </Col>
+                        </Row>
+                    </>,
+                ]}
+            >
+                <iframe
+                    style={{
+                        width: '107.5%',
+                        height: '400px',
+                        border: 'none',
+                        borderTopLeftRadius: '3px',
+                        borderTopRightRadiusRadius: '3px',
+                        marginLeft: '-24px',
+                        marginTop: '-24px',
+                    }}
+                    src={selectedMovie ? selectedMovie.movie.videoTrailer : ''}
+                    title={selectedMovie ? selectedMovie.movie.title : ''}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                ></iframe>
+            </Modal>
         </div>
     );
 };
