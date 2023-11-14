@@ -140,7 +140,13 @@ const MovieShowing = () => {
     return (
         <div className={cx('body')}>
             <p className={cx('name-card')}>
-                <span className={cx('title-name-card')}>Phim đang chiếu</span>
+                <h1
+                    // className={cx('title-name-card')}
+                    className="tw-text-white-600 tw-m-auto  tw-mb-[50px]"
+                >
+                    <br />
+                    <br /> Phim đang chiếu
+                </h1>
             </p>
 
             <div>

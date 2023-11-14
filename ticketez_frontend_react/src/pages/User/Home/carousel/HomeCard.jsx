@@ -20,7 +20,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                         <Col span={14} className="col-title ">
                             <div className="movie-title">{name}</div>
                             <div className="rating ">
-                                <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
+                                <i className="fa fa-star tw-text-[var(--pink-color)] "></i>
                                 <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
                                 <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
                                 <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
