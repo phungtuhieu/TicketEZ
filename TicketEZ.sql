@@ -1,7 +1,8 @@
-USE [master] 
-GO
-CREATE DATABASE TicketEZ
-GO
+
+USE master
+go
+--CREATE DATABASE TicketEZ 
+--GO
     -- DROP DATABASE TicketEZ 
     USE TicketEZ
 GO
@@ -171,6 +172,8 @@ GO
         phone NVARCHAR(15) NOT NULL,
         opening_time TIME(0) NOT NULL,
         closing_time TIME(0) NOT NULL,
+		[longitude]  FLOAT NOT NULL,
+		[latitude]  FLOAT NOT NULL,
         cinema_chain_id BIGINT NOT NULL,
         province_id BIGINT NOT NULL
     )
@@ -232,7 +235,7 @@ GO
         end_date DATETIME NOT NULL,
         banner NVARCHAR(MAX) NOT NULL,
         [status] BIT NOT NULL,
-        cinema_complex_id BIGINT NOT NULL
+        type_event INT NOT NULL
     )
 GO
     CREATE TABLE Services (
@@ -719,11 +722,6 @@ GO
     -- /Seats
     -------------- Cinema_Complex
 ALTER TABLE
-    [Events]
-ADD
-    CONSTRAINT FK_Events_CinemaComplex FOREIGN KEY (cinema_complex_id) REFERENCES Cinema_Complex(id)
-GO
-ALTER TABLE
     [Services]
 ADD
     CONSTRAINT FK_Service_Cinema_Complex FOREIGN KEY (cinema_complex_id) REFERENCES Cinema_Complex(id)
@@ -1041,23 +1039,23 @@ VALUES
 (N'Galaxy Cinema',N'c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
-  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time], [cinema_chain_id],[province_id])
+  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[longitude],[latitude], [cinema_chain_id],[province_id])
 VALUES
-    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',1, 2),
-    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00', 2,2),
-    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00', 3,5),
-    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00', 4,5),
-    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00', 5,54),
-    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00', 2,54),
-    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00', 3,55),
-    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00', 1,55),
-    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',4, 1),
-    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',5, 1),
-    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 1,42),
-    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00', 3,42),
-    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00', 2,42),
-    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00', 1,42),
-    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00', 4,42);
+    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',9.606043206497885,105.97480616466075,1, 2),
+    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00',9.604932472586011,105.97232780342735, 2,2),
+    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00',9.606773115369991,105.9696563231368, 3,5),
+    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00',9.608730109651306,105.97046098587491, 4,5),
+    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00',9.608084831706202,105.97164115789083, 5,54),
+    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00',9.607439552530897,105.97330412754958, 2,54),
+    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00',9.60557775654029,105.97298226245434, 3,55),
+    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00',9.60557775654029,105.97298226245434, 1,55),
+    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',9.60557775654029,105.97298226245434,4, 1),
+    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',9.60557775654029,105.97298226245434,5, 1),
+    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 9.60557775654029,105.97298226245434,1,42),
+    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00',9.60557775654029,105.97298226245434, 3,42),
+    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00',9.60557775654029,105.97298226245434, 2,42),
+    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00',9.60557775654029,105.97298226245434, 1,42),
+    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00',9.60557775654029,105.97298226245434, 4,42);
 GO
 
 
@@ -1284,7 +1282,7 @@ GO
 
 GO
  -- 16. thêm bảng dữ liệu events 
-  INSERT INTO [TicketEZ].[dbo].[Events] ([name], [description], [start_date], [end_date], [banner], [status], [cinema_complex_id])
+  INSERT INTO [TicketEZ].[dbo].[Events] ([name], [description], [start_date], [end_date], [banner], [status], [type_event])
 VALUES
   (N'Sự kiện Buổi ra mắt phim mới', N'Rạp phim thường tổ chức buổi ra mắt các bộ phim mới với sự kiện đặc biệt, bao gồm việc mời các diễn viên và đạo diễn tham dự.', '2023-12-01', '2023-12-05', 'bannerA.jpg', 1, 1),
   (N'Sự kiện Ngày hội phim hoạt hình', N'Một sự kiện dành riêng cho các bộ phim hoạt hình, có thể kèm theo các hoạt động vui chơi và trò chơi dành cho trẻ em', N'2023-11-20', '2023-11-25', 'bannerB.jpg', 1, 2),

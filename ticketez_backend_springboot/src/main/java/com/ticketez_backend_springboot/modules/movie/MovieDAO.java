@@ -36,8 +36,8 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         "    SELECT fm.id AS formatMovieId, MAX(s.endTime) AS maxEndTime " +
                         "    FROM Showtime s " +
                         "    JOIN s.formatMovie fm " +
-                        "    WHERE s.status = 2 " +
-                        "      AND CAST(s.endTime AS DATE) = CAST(CURRENT_DATE AS DATE) " +
+                        "    WHERE " +
+                        "     CAST(s.endTime AS DATE) = CAST(CURRENT_DATE AS DATE) " +
                         "    GROUP BY fm.id " +
                         ") maxShowtimes ON fm.id = maxShowtimes.formatMovieId " +
                         "JOIN Showtime s ON s.formatMovie.id = fm.id AND s.endTime = maxShowtimes.maxEndTime")
@@ -50,8 +50,8 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         "    SELECT fm.movie_id, MAX(s.end_time) AS max_end_time " +
                         "    FROM Showtimes s " +
                         "    JOIN Formats_Movies fm ON s.format_movie_id = fm.id " +
-                        "    WHERE s.status = 1 " +
-                        "      AND s.end_time >= GETDATE() " +
+                        "    WHERE  " +
+                        "     s.end_time >= GETDATE() " +
                         "      AND s.end_time <= DATEADD(day, 10, GETDATE()) " +
                         "    GROUP BY fm.movie_id " +
                         ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +

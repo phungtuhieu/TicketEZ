@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.discount.Discount;
-import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.province.Province;
 import com.ticketez_backend_springboot.modules.service.Service;
 
@@ -43,13 +42,13 @@ public class CinemaComplex {
 	@Column(name = "closing_time")
 	private Time closingTime;
 
+	private float longitude;
+	private float latitude;
+	
 	@ManyToOne
 	@JoinColumn(name = "province_id")
 	private Province province;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "cinemaComplex")
-	private List<Event> events;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
@@ -58,6 +57,7 @@ public class CinemaComplex {
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Discount> discounts;
+
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")

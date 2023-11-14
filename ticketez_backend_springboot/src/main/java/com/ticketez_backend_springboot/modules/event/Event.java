@@ -2,15 +2,11 @@ package com.ticketez_backend_springboot.modules.event;
 
 import java.util.Date;
 
-import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -34,12 +30,11 @@ public class Event {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "end_date")
 	private Date endDate;
-	
+
 	private String banner;
 	private boolean status;
 
-	@ManyToOne
-	@JoinColumn(name = "cinema_complex_id")
-	private CinemaComplex cinemaComplex;
+	@Column(name = "type_event")
+	private int typeEvent;
 
 }

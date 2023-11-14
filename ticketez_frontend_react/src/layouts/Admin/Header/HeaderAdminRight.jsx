@@ -2,7 +2,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { faBell, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, Row, Input, Dropdown } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
 import { Menu } from 'antd';

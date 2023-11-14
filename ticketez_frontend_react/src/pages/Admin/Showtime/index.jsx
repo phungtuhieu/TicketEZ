@@ -2,7 +2,20 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect } from 'react';
-import { Button, Col, Row, Form, Popconfirm, DatePicker, Tag, Select, Pagination, Space, TimePicker, Image } from 'antd';
+import {
+    Button,
+    Col,
+    Row,
+    Form,
+    Popconfirm,
+    DatePicker,
+    Tag,
+    Select,
+    Pagination,
+    Space,
+    TimePicker,
+    Image,
+} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -17,6 +30,7 @@ import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -316,7 +330,7 @@ const AdminShowtime = () => {
             render: (formatMovie) => (formatMovie ? formatMovie.format.name : ''),
         },
         {
-            title: 'Sơ đồ ghế',
+            title: 'Ảnh phim',
             dataIndex: 'formatMovie',
             align: 'center',
             render: (_, record) => (
@@ -326,7 +340,7 @@ const AdminShowtime = () => {
                         height={80}
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
-                        src={`http://localhost:8081/api/upload/${record.formatMovie.movie.poster}`}
+                        src={uploadApi.get(record.formatMovie.movie.poster)}
                     />
                 </Space>
             ),
@@ -419,6 +433,7 @@ const AdminShowtime = () => {
     };
 
     const handleEditData = (record) => {
+        console.log(record);
         handleReset();
         let time = moment(record.endTime).format('HH:mm');
         onChangSelectProvince(record.cinema.cinemaComplex.province.id);
@@ -445,16 +460,16 @@ const AdminShowtime = () => {
         setSelectedOption3(record.cinema ? record.cinema.id : null);
         setSelectedOption4(record.formatMovie.movie ? record.formatMovie.movie.id : null);
         setSelectedOption5(record.startTime ? record.startTime : null);
+        setValueSeatChartByCinema(record.seatChart.id);
+        setEditData(record);
         setOpen(true);
         setResetForm(false);
-        setEditData(record);
     };
 
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-
             //lấy ngày và giờ từ form
             let date = values.date.format('YYYY-MM-DD');
             let time = values.time.format('HH:mm:ss');
@@ -466,8 +481,6 @@ const AdminShowtime = () => {
             // Cộng thêm 10 ngày vào newCurrentDateADd
             newCurrentDateADd.setDate(currentTime.getDate() + 10);
 
-            //tạo một biến mới để kiểm tra trùng xuất chiếu
-            let timeFormat = values.time.format('HH:mm');
             //tạo mảng lưu endtime HH:mm của xuất chiếu
             const endtimeFormatHHmm = [];
             for (const showtime of valueShowtimeByEndtime) {
@@ -479,14 +492,7 @@ const AdminShowtime = () => {
 
             //lấy ra giờ cuối cùng cộng thêm 15 phút
             const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
-
-            //kiểm tra xuất chiếu có tồn tại hay chưa
-            if (endtimeFormatHHmm.includes(timeFormat)) {
-                funcUtils.notify('Xuất chiếu đã tồn tại vui lòng chọn xuất chiếu khác', 'error');
-                setOpen(true);
-                setLoading(false);
-                //kiểm tra giờ phải lớn hơn giờ cuối cùng
-            } else if (time < lastArrayEndtime) {
+            if (time < lastArrayEndtime && editData == null) {
                 funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
                 setOpen(true);
                 setLoading(false);
@@ -522,15 +528,34 @@ const AdminShowtime = () => {
                         };
                     }
                     if (editData) {
-                        const resp = await showtimeApi.put(
-                            editData.id,
-                            values,
-                            values.cinema,
-                            dataFormatMovieByFormatAndMovie,
-                            valueSeatChartByCinema,
-                        );
-                        if (resp.status === 200) {
-                            funcUtils.notify('Cập nhật thành công', 'success');
+                        let putData = {
+                            id: editData.id,
+                            ...values,
+                            startTime: startTime,
+                            endTime: endTime,
+                            status: editData.status,
+                        };
+                        try {
+                            const resPut = await showtimeApi.put(
+                                putData.id,
+                                putData,
+                                putData.cinema,
+                                dataFormatMovieByFormatAndMovie,
+                                valueSeatChartByCinema,
+                            );
+                            if (resPut.status === 200) {
+                                funcUtils.notify('Cập nhật xuất chiếu thành công', 'success');
+                                setOpen(false);
+                                form.resetFields();
+                                setLoading(false);
+                                setWorkSomeThing([!workSomeThing]);
+                            }
+                        } catch (error) {
+                            if (error.status === 500) {
+                                funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                                setLoading(false);
+                            }
+                            console.log(error);
                         }
                     } else {
                         try {
@@ -542,19 +567,18 @@ const AdminShowtime = () => {
                             );
                             if (resp.status === 200) {
                                 funcUtils.notify('Thêm thành công', 'success');
+                                setOpen(false);
+                                form.resetFields();
+                                setLoading(false);
+                                setWorkSomeThing([!workSomeThing]);
                             }
                         } catch (error) {
                             console.log(error);
                             funcUtils.notify(error.response.data, 'error');
                         }
                     }
-
-                    setOpen(false);
-                    form.resetFields();
-                    setLoading(false);
-                    setWorkSomeThing([!workSomeThing]);
                 } else {
-                    if (time < lastEndTimeWithExtra15Minutes) {
+                    if (time < lastEndTimeWithExtra15Minutes && editData == null) {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
@@ -588,37 +612,57 @@ const AdminShowtime = () => {
                                 status: 0, //chưa công chiếu
                             };
                         }
-                        if (editData) {
-                            const resp = await showtimeApi.put(
-                                editData.id,
-                                values,
-                                values.cinema,
-                                dataFormatMovieByFormatAndMovie,
-                                valueSeatChartByCinema,
-                            );
-                            if (resp.status === 200) {
-                                funcUtils.notify('Cập nhật thành công', 'success');
-                            }
-                        } else {
-                            try {
-                                const resp = await showtimeApi.post(
-                                    values,
-                                    values.cinema,
-                                    dataFormatMovieByFormatAndMovie,
-                                    valueSeatChartByCinema,
-                                );
-                                if (resp.status === 200) {
-                                    funcUtils.notify('Thêm thành công', 'success');
-                                }
-                            } catch (error) {
-                                console.log(error);
-                                funcUtils.notify(error.response.data, 'error');
-                            }
-                        }
-                        setOpen(false);
-                        form.resetFields();
-                        setLoading(false);
-                        setWorkSomeThing([!workSomeThing]);
+
+                         if (editData) {
+                             let putData = {
+                                 id: editData.id,
+                                 ...values,
+                                 startTime: startTime,
+                                 endTime: endTime,
+                                 status: editData.status,
+                             };
+                             try {
+                                 const resPut = await showtimeApi.put(
+                                     putData.id,
+                                     putData,
+                                     putData.cinema,
+                                     dataFormatMovieByFormatAndMovie,
+                                     valueSeatChartByCinema,
+                                 );
+                                 if (resPut.status === 200) {
+                                     funcUtils.notify('Cập nhật xuất chiếu thành công', 'success');
+                                     setOpen(false);
+                                     form.resetFields();
+                                     setLoading(false);
+                                     setWorkSomeThing([!workSomeThing]);
+                                 }
+                             } catch (error) {
+                                 if (error.status === 500) {
+                                     funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                                     setLoading(false);
+                                 }
+                                 console.log(error);
+                             }
+                         } else {
+                             try {
+                                 const resp = await showtimeApi.post(
+                                     values,
+                                     values.cinema,
+                                     dataFormatMovieByFormatAndMovie,
+                                     valueSeatChartByCinema,
+                                 );
+                                 if (resp.status === 200) {
+                                     funcUtils.notify('Thêm thành công', 'success');
+                                     setOpen(false);
+                                     form.resetFields();
+                                     setLoading(false);
+                                     setWorkSomeThing([!workSomeThing]);
+                                 }
+                             } catch (error) {
+                                 console.log(error);
+                                 funcUtils.notify(error.response.data, 'error');
+                             }
+                         }
                     }
                 }
             }
@@ -865,7 +909,7 @@ const AdminShowtime = () => {
                                                       <span role="img" aria-label="China" className={cx('border-img')}>
                                                           <img
                                                               className={cx('img')}
-                                                              src={`http://localhost:8081/api/upload/${cinemaComplex.cinemaChain.image}`}
+                                                              src={uploadApi.get(cinemaComplex.cinemaChain.image)}
                                                           />
                                                       </span>
                                                   </div>
@@ -928,11 +972,8 @@ const AdminShowtime = () => {
                                                       <span role="img" aria-label="China">
                                                           <img
                                                               className={cx('img-Movie')}
-                                                              src={`http://localhost:8081/api/upload/${formatMovie.poster}`}
-
-                                                              //   src={`http://localhost:8081/api/upload/${formatMovie.movie.poster}`}
+                                                              src={uploadApi.get(formatMovie.poster)}
                                                           />
-                                                          {/* <img className={cx('img-Movie')} src={img.datrungphuongnam} /> */}
                                                       </span>
                                                   </div>
                                                   <span>{formatMovie.title}</span>
@@ -972,6 +1013,7 @@ const AdminShowtime = () => {
                                 <Col xs={24} sm={24} lg={9}>
                                     <Form.Item name="date" label="Chọn ngày chiếu" {...configDate}>
                                         <DatePicker
+                                            placeholder="Chọn ngày"
                                             style={{ width: 170 }}
                                             format={'DD-MM-YYYY'}
                                             value={selectedOption6}
