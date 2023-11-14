@@ -35,9 +35,11 @@ public class SeatChooseAPI {
         return ResponseEntity.ok(dao.findAll());
     }
 
-    @GetMapping("find-seat-choose-by-seat-char-id/{seatChartID}")
-    public ResponseEntity<List<String>> findByStatus(@PathVariable("seatChartID") long id) {
-        return ResponseEntity.ok(dao.findSeatNamesBySeatChartId(id));
+    @GetMapping("find-seat-choose-by-seat-char-id-and-showtime-id/{seatChartID}/{showTimeID}")
+    public ResponseEntity<List<String>> findByStatus(
+            @PathVariable("seatChartID") Long seatChartId,
+            @PathVariable("showTimeID") Long showTimeId) {
+        return ResponseEntity.ok(dao.findSeatNamesBySeatChartIdAndShowTimeId(seatChartId, showTimeId));
     }
 
     @PostMapping

@@ -30,7 +30,7 @@ function SeatChart(props) {
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
         const seatState = {
             seat: [],
-            way: ['A2'],
+            way: [],
             seatAvailable: [],
             seatReserved: [],
             vipSeat: listSeatVip,
@@ -95,7 +95,9 @@ function SeatChart(props) {
 
     const fetchDataSeatBooking = async () => {
         try {
-            const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${showtime.seatChart.id}`);
+            const resp = await axiosClient.get(
+                `seat-choose/find-seat-choose-by-seat-char-id-and-showtime-id/${showtime.seatChart.id}/${showtime.id}`,
+            );
             const data = resp.data;
             console.log(data);
             if (data.length <= 0) {
@@ -191,6 +193,18 @@ function SeatChart(props) {
             console.error(error);
         }
     };
+    // trường hợp bấm vào 2 suất chiếu
+
+    useEffect(() => {
+        setShowSeat(false);
+        setListSeatVip([]);
+        setListSeatNormal([]);
+        fetchDataSeat();
+    }, [showtime]);
+    useEffect(() => {
+        fetchDataSeat();
+    }, [reload]);
+
     const [showInfo, setShowInfo] = useState('');
     useEffect(() => {
         if (showInfo === 'success') {
@@ -288,9 +302,9 @@ function SeatChart(props) {
             const data = duplicateSeat.map((s) => ({
                 lastSelectedTime: formattedTime,
                 seat: s,
+                showtime: showtime,
             }));
             await Promise.all([]);
-
             try {
                 const resp = await axiosClient.post(`seat-choose`, data);
                 console.log(data);
@@ -301,10 +315,6 @@ function SeatChart(props) {
             console.error('Lỗi khi lấy dữ liệu từ server', error);
         }
     };
-
-    useEffect(() => {
-        fetchDataSeat();
-    }, [reload]);
 
     const handleButtonClick = () => {
         console.log(seatBooking);
