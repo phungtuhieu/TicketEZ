@@ -159,7 +159,6 @@ const MovieShowing = () => {
                             alignItems: 'center',
                             display: 'flex',
                             margin: '0 auto',
-                            marginTop: '20px',
                             marginBottom: '20px',
                         }}
                     >
@@ -253,15 +252,9 @@ const MovieShowing = () => {
                                 </>
                             ))
                         ) : (
-                            <div style={{ marginLeft: '100px' }}>
-                                <img
-                                    src={img.notFoundLogo}
-                                    alt=""
-                                    style={{ marginRight: '-300px', marginTop: '15px' }}
-                                />
-                                <span style={{ marginTop: '60px', marginLeft: '100px' }}>
-                                    Không tìm thấy phim chiếu ngày hôm nay
-                                </span>
+                            <div>
+                                <img src={img.notFoundLogo} alt="" style={{ marginLeft: '100px' }} />
+                                <span>Không tìm thấy phim chiếu ngày hôm nay</span>
                             </div>
                         )}
                     </Slider>

@@ -24,13 +24,13 @@ const Homes = () => {
                 <Col span={24}>
                     <MovieUpcoming />
                 </Col>
-                <Col span={24}>
+                {/* <Col span={24}>
                     <MovieType />
-                </Col>
+                </Col> */}
                 <Col
                     span={24}
                     style={{
-                        backgroundColor: 'gray',
+                        backgroundColor: '#ffffff',
                         height: 1000,
                         display: 'flex',
                         alignItems: 'center',

@@ -3,6 +3,8 @@ import bgAuth from './bg-auth.jpeg';
 import datrungphuongnam from './datrungphuongnam.jpg';
 import tagDatTruoc from './logo-dat-truoc.svg';
 import event from './event.jpg';
+import logoHome from './logoHome.svg';
+import logoAdmin from './logoAdmin.png';
 
 // 
 import logoComment from './logo-cmt.webp';
@@ -14,11 +16,13 @@ const img = {
     bgAuth,
     datrungphuongnam,
     tagDatTruoc,
-    // 
+    //
     notFoundLogo,
     gifLoading,
     event,
-    logoComment
+    logoComment,
+    logoHome,
+    logoAdmin,
 };
 
 

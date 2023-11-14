@@ -137,7 +137,7 @@ const MovieShowing = () => {
     }, []);
     return (
         <div className={cx('body')}>
-            <span className={cx('title-name-card')}>Phim sắp chiếu</span>
+            <h1 className='tw-text-pink-600'>Phim sắp chiếu</h1>
 
             {isLoadingPage && (
                 <div style={{ height: '100px' }}>
