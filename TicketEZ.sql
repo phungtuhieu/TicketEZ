@@ -199,9 +199,17 @@ GO
 -- GO
 
     CREATE TABLE Seats_Booking (
-        seat_id BIGINT NOT NULL,
+		id BIGINT IDENTITY(1, 1) NOT NULL,
+        [seat_id] BIGINT NOT NULL,
         [booking_id] NVARCHAR(30) NOT NULL,
-        [status] INT NOT NULL -- ĐÃ ĐẶT, ĐANG CHỌN, ĐÃ CHỌN
+        [status] INT NOT NULL, 
+    )
+	go 
+	
+    CREATE TABLE Seats_Choose (
+		id BIGINT IDENTITY(1, 1) NOT NULL,
+		last_selected_time DATETIME,
+		[seat_id] BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Price (
@@ -492,7 +500,7 @@ GO
 ALTER TABLE
     Seats_Booking
 ADD
-    CONSTRAINT PK_Seats_Booking PRIMARY KEY (seat_id, booking_id);
+    CONSTRAINT PK_Seats_Booking PRIMARY KEY (id);
 
 GO
 ALTER TABLE
@@ -543,6 +551,11 @@ ADD
     CONSTRAINT PK_MPAA_Rating PRIMARY KEY (id);
 
 GO
+ALTER TABLE
+    Seats_Choose
+ADD
+    CONSTRAINT PK_Seats_Choose PRIMARY KEY (id);
+	go
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
     Verification
@@ -801,6 +814,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_PaymentInfo_Booking FOREIGN KEY (booking_id) REFERENCES Booking(id)
 GO
+ALTER TABLE
+    [Seats_Choose]
+ADD
+    CONSTRAINT FK_Seats_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seats(id)
+	go
     -- /Payment_Info
 
 
@@ -1080,18 +1098,6 @@ VALUES
 	(N'Cinema 17', 0, 6, 5);
 GO
 
-INSERT INTO [TicketEZ].[dbo].[Formats_Movies]([movie_id], [format_id])
-VALUES  (1, 1),
-		(2, 1),
-		(3, 2),
-		(4, 2),
-		(5, 1),
-		(6, 3),
-		(7, 4),
-		(2, 1),
-		(1, 2),
-		(2, 2);
-GO
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
 INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
 VALUES
@@ -1132,7 +1138,8 @@ VALUES
     (N'Ghế hội nghị', 'url_anh_ghehoinghi.jpg', N'Loại ghế hội nghị dành cho các sự kiện, buổi họp, hội nghị.'),
     (N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
     (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
+    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+	(N'đường đi', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
@@ -1394,8 +1401,23 @@ VALUES
 VALUES
   ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
-  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1);
+  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1),
+  ('2023-11-12 20:00:00', '2023-11-12 23:00:00', 1, 1, 1,1);
 GO
+
+--24. thêm dữ liệu cho bảng booking
+INSERT INTO [TicketEZ].[dbo].[Booking] ([id], [account_id], [create_date], [showtime_id])
+VALUES ('1','user10','2023-10-28', 1);
+
+go
+--26. thêm dữ liệu bảng seatbooking
+INSERT INTO [TicketEZ].[dbo].[Seats_Booking] ([seat_id], [booking_id], [status])
+VALUES (2,1, 1),
+(3,1, 1),
+(4,1, 1),
+(5,1, 1)
+
+go
 
 --25. thêm dữ liệu bảng Directors
     INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
@@ -1412,6 +1434,36 @@ VALUES
   (2, 1),
   (3, 2);
 GO
+
+--27 bảng dữ liệu reivew
+ SELECT *
+FROM [TicketEZ].[dbo].[Reviews]
+WHERE [movie_id] = 1;
+
+  INSERT INTO [TicketEZ].[dbo].[Reviews] ([comment], [rating], [create_date], [edit_date], [account_id], [movie_id])
+VALUES 
+(N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
+Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 1),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 1),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 1),
+(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 1),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 1),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 1),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 1),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 1),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 1),
+(N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
+Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 2),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 2),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 2),
+(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 2),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 2),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 2),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 2),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
 
 SELECT * FROM Accounts
@@ -1432,6 +1484,8 @@ SELECT * FROM Provinces
 SELECT * FROM Cinema_Complex
 SELECT * FROM Seat_Types
 SELECT * FROM Seats
+SELECT * FROM Seats_Choose
+
 SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price

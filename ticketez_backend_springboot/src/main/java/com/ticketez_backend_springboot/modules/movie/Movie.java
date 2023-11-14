@@ -51,38 +51,35 @@ public class Movie implements Serializable {
 	@Column(name = "video_trailer")
 	private String videoTrailer;
 
-	
 	@ManyToOne
 	@JoinColumn(name = "movie_studio_id")
 	private MovieStudio movieStudio;
 
-	
 	@ManyToOne
 	@JoinColumn(name = "movie_producer_id")
 	private MovieProducer movieProducer;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "MPAA_rating_id")
 	private MPAARating mpaaRating;
 
-
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
 	private List<GenreMovie> genresMovies;
 
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
 	private List<FormatMovie> formatsMovies;
 
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
 	private List<DirectorMovie> directorsMovies;
 
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
 	private List<ActorMovie> actorsMovies;
 
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
 	private List<Price> prices;
 }

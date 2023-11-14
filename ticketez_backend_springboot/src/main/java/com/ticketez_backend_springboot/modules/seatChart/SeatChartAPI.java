@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.cinema.CinemaDAO;
 
-
 import java.util.List;
 import java.util.Optional;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/seatchart")
 public class SeatChartAPI {
-    
+
     @Autowired
     private SeatChartDAO dao;
-    
+
     @Autowired
     CinemaDAO cinemaDAO;
 
@@ -44,7 +44,6 @@ public class SeatChartAPI {
         List<SeatChart> seatCharts = dao.findByCinemaId(cinemaComplexId);
         return ResponseEntity.ok(seatCharts);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<SeatChart> getOne(@PathVariable("id") Long id) {
@@ -85,7 +84,6 @@ public class SeatChartAPI {
         dao.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
 
     // lấy dử liệu của cineme theo searchat true và cinemacomplex
     @GetMapping("/get/seatChart-by-cinema/{cinemaId}")

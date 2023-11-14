@@ -278,6 +278,7 @@ function SeatChart(props) {
     }, [reload]);
 
     const handleButtonClick = () => {
+        console.log(seatState.seatReserved);
         onCreateDaTaSeatChoose();
         showModal();
     };
@@ -383,7 +384,7 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            <BookingDetail open={isModalOpen} onCancel={handleCancel} />
+            <BookingDetail showtime={showtime}  seat={seatState ? seatState.seatReserved : null} open={isModalOpen} onCancel={handleCancel} />
         </>
     );
 }
