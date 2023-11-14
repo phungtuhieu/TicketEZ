@@ -1,43 +1,57 @@
 import { Row, Col } from 'antd';
 import React from 'react';
+import uploadApi from '~/api/service/uploadApi';
 import { Link } from 'react-router-dom';
 
-const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genres, tags, video } }) => {
+const HomeCard = ({ item: { movie, actors, genres } }) => {
+    const style = {
+        background: 'linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%)'
+    };
+    
     return (
         <>
             <Row>
                 <Col style={{ backgroundColor: 'red' }}>
                     <div className="coverImage">
-                        <img src={cover} alt="" />
+                        <img src={uploadApi.get(movie.poster)} alt="" />
                     </div>
                 </Col>
                 <Col>
                     <Row>
                         <Col span={14} className="col-title">
-                            <div className="movie-title">{name}</div>
+                            <div className="movie-title">{movie.title}</div>
                             <div className="rating ">
                                 <i className="fa fa-star"></i>
                                 <i className="fa fa-star"></i>
                                 <i className="fa fa-star"></i>
                                 <i className="fa fa-star"></i>
                                 <i className="fa fa-star-half"></i>
-                                <label>{rating}(Imdb)</label>
+                                <label>{movie.rating}(Đánh giá)</label>
                                 <span className="border">GP</span>
-                                <label>{time}</label>
+                                <label>{movie.duration}</label>
                             </div>
-                            <p className="description">{desc}</p>
+                            <p className="description">{movie.description}</p>
                             <div className="cast">
-                                <p>
-                                    <span>Starring </span>
-                                    {starring}
+                                <p className="tw-flex tw-items-center">
+                                    <span className="tw-mr-2">Diễn viên: </span>
+
+                                    {actors.map((actor, index) => (
+                                        <React.Fragment key={actor.id}>
+                                            <li>{actor.fullname}</li>
+                                            {index < genres.length - 1 && <span className="tw-mx-2">,</span>}
+                                        </React.Fragment>
+                                    ))}
                                 </p>
-                                <p>
-                                    <span>Genres </span>
-                                    {genres}
-                                </p>
-                                <p>
-                                    <span>Tags </span>
-                                    {tags}
+                                <p className="tw-flex tw-items-center">
+                                    <span className="tw-mr-2">Thể loại: </span>
+                                    <div className="tw-mt-1 tw-font-bold tw-text-white tw-text-opacity-90 tw-flex">
+                                        {genres.map((genre, index) => (
+                                            <React.Fragment key={genre.id}>
+                                                <li>{genre.name}</li>
+                                                {index < genres.length - 1 && <span className="tw-mx-2">,</span>}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
                                 </p>
                             </div>
                             <button className="border">
@@ -46,7 +60,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                         </Col>
                         <Col span={10}>
                             <div className="palyButton ">
-                                <Link to={`/singlepage/${id}`}>
+                                <Link to={`/singlepage/${movie.id}`}>
                                     <button>
                                         <div className="img">
                                             <img src="./images/play-button.png" alt="" />
