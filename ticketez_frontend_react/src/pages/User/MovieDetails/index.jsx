@@ -2,14 +2,18 @@ import { Col, Row, Card } from 'antd';
 import ViTri from './showtimesDetails/ViTri/ViTri';
 import Binhluan from './Comment/binhluan';
 import ActorSlider from './Comment/Carousel/ShowActor';
+import { useEffect } from 'react';
+import Banner from './Banner'
 
 function MovieDetails() {
+    useEffect(()=> {
+        window.scrollTo(0, 0);
+    },[])
     return (
         <>
             <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                <Col span={24} style={{ background: 'blue', height: 480 }}>
-                    {' '}
-                    chi tiet
+                <Col span={24} style={{ background: 'black', height: 480 }}>
+                   <Banner/>
                 </Col>
                 <Col
                     span={24}
