@@ -5,3 +5,4 @@ export { default as Home } from './Home';
 export { default as ProfilePage } from './Profile';
 export { default as Event } from './Event';
 export { default as MovieDetails } from './MovieDetails'
+export { default as MovieSearch } from './MovieSearch';
