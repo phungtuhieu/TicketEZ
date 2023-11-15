@@ -58,4 +58,16 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time", nativeQuery = true)
         List<Movie> getMovieByShowtimeUpcoming();
 
+        // Lấy ra top 5 phim có booking cao nhất
+        @Query("SELECT m, COUNT(b) as bookingCount " +
+                        "FROM Movie m " +
+                        "LEFT JOIN m.formatsMovies fm " +
+                        "LEFT JOIN fm.showtimes st " +
+                        "LEFT JOIN st.bookings b " +
+                        "WHERE st.startTime >= CURRENT_TIMESTAMP " +
+                        "GROUP BY m.id, m.country, m.description, m.duration, m.movieProducer, m.movieStudio, m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title, m.videoTrailer "
+                        +
+                        "ORDER BY bookingCount DESC")
+        List<Movie> findTop5MoviesByBookingCount();
+
 }

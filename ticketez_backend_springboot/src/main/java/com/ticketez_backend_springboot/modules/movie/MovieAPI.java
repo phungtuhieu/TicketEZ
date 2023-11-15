@@ -551,4 +551,36 @@ public class MovieAPI {
         }
     }
 
+    // Lấy ra 5 sản phẩm có booking cao nhất
+    @GetMapping("/get/fivemovie")
+    public ResponseEntity<List<MovieDTO>> findFiveMovie() {
+        List<Movie> movies = dao.findTop5MoviesByBookingCount();
+        List<MovieDTO> movieDTOList = new ArrayList<>();
+
+        for (Movie movie : movies) {
+            List<Actor> actors = new ArrayList<>();
+            List<Director> directors = new ArrayList<>();
+            List<Format> formats = new ArrayList<>();
+            List<Genre> genres = new ArrayList<>();
+
+            for (ActorMovie actorMovie : movie.getActorsMovies()) {
+                actors.add(actorMovie.getActor());
+            }
+            for (DirectorMovie directorMovie : movie.getDirectorsMovies()) {
+                directors.add(directorMovie.getDirector());
+            }
+            for (FormatMovie formatMovie : movie.getFormatsMovies()) {
+                formats.add(formatMovie.getFormat());
+            }
+            for (GenreMovie genreMovie : movie.getGenresMovies()) {
+                genres.add(genreMovie.getGenre());
+            }
+
+            MovieDTO movieDTO = new MovieDTO(movie, directors, actors, genres, formats);
+            movieDTOList.add(movieDTO);
+        }
+
+        return ResponseEntity.ok(movieDTOList);
+    }
+
 }

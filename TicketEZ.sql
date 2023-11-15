@@ -213,6 +213,7 @@ GO
 		id BIGINT IDENTITY(1, 1) NOT NULL,
 		last_selected_time DATETIME,
 		[seat_id] BIGINT NOT NULL,
+	  showtime_id BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Price (
@@ -817,6 +818,10 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Seats_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seats(id)
 	go
+	ALTER TABLE
+    [Seats_Choose]
+ADD
+    CONSTRAINT FK_Choose_Seat_showtime FOREIGN KEY (showtime_id) REFERENCES Showtimes(id)
     -- /Payment_Info
 
 
@@ -1389,7 +1394,7 @@ GO
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
 INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    ( 1, 1),
+    ( 3, 1),
     ( 1, 2),
     ( 2, 1),
     ( 2, 2);
@@ -1397,10 +1402,10 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
 VALUES
-  ('2023-10-10 10:00:00', '2023-10-10 12:00:00', 1, 1, 1,1),
+  ('2023-11-15 10:00:00', '2023-11-15 12:00:00', 1, 1, 1,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
-  ('2023-10-11 10:00:00', '2023-10-11 12:00:00', 0, 3, 1,1),
-  ('2023-11-12 20:00:00', '2023-11-12 23:00:00', 1, 1, 1,1);
+  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
+  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking

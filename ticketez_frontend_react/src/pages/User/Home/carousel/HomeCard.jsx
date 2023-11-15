@@ -3,45 +3,59 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Row, Col } from 'antd';
 import React from 'react';
+import uploadApi from '~/api/service/uploadApi';
 import { Link } from 'react-router-dom';
 
-const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genres, tags, video } }) => {
+const HomeCard = ({ item: { movie, actors, genres } }) => {
+    const style = {
+        background:
+            'linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%)',
+    };
+
     return (
         <>
-            <Row >
-                <Col>
-                    <div className="coverImage  tw-h-[100%]  tw-w-[100%] ">
-                        <img src={cover} alt="" />
-                        <div className="tw-h-[100%]  tw-w-[100%] tw-bg-gradient-to-r tw-from-cyan-500 tw-to-blue-500"></div>
+            <Row>
+                <Col style={{ backgroundColor: 'red' }}>
+                    <div className="coverImage">
+                        <img src={uploadApi.get(movie.poster)} alt="" />
                     </div>
                 </Col>
                 <Col>
-                    <Row className="tw-mt-[-95px]">
-                        <Col span={14} className="col-title ">
-                            <div className="movie-title">{name}</div>
+                    <Row>
+                        <Col span={14} className="col-title">
+                            <div className="movie-title">{movie.title}</div>
                             <div className="rating ">
-                                <i className="fa fa-star tw-text-[var(--pink-color)] "></i>
-                                <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
-                                <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
-                                <i className="fa fa-star tw-text-[var(--pink-color)]"></i>
-                                <i className="fa fa-star-half tw-text-[var(--pink-color)]"></i>
-                                <label>{rating}(Imdb)</label>
+                                <i className="fa fa-star"></i>
+                                <i className="fa fa-star"></i>
+                                <i className="fa fa-star"></i>
+                                <i className="fa fa-star"></i>
+                                <i className="fa fa-star-half"></i>
+                                <label>{movie.rating}(Đánh giá)</label>
                                 <span className="border">GP</span>
-                                <label>{time}</label>
+                                <label>{movie.duration}</label>
                             </div>
-                            <p className="description">{desc}</p>
+                            <p className="description">{movie.description}</p>
                             <div className="cast">
-                                <p>
-                                    <span className="tw-text-[var(--pink-color)] ">Starring </span>
-                                    {starring}
+                                <p className="tw-flex tw-items-center">
+                                    <span className="tw-mr-2">Diễn viên: </span>
+
+                                    {actors.map((actor, index) => (
+                                        <React.Fragment key={actor.id}>
+                                            <li>{actor.fullname}</li>
+                                            {index < genres.length - 1 && <span className="tw-mx-2">,</span>}
+                                        </React.Fragment>
+                                    ))}
                                 </p>
-                                <p>
-                                    <span className="tw-text-[var(--pink-color)]">Genres </span>
-                                    {genres}
-                                </p>
-                                <p>
-                                    <span className="tw-text-[var(--pink-color)]">Tags </span>
-                                    {tags}
+                                <p className="tw-flex tw-items-center">
+                                    <span className="tw-mr-2">Thể loại: </span>
+                                    <div className="tw-mt-1 tw-font-bold tw-text-white tw-text-opacity-90 tw-flex">
+                                        {genres.map((genre, index) => (
+                                            <React.Fragment key={genre.id}>
+                                                <li>{genre.name}</li>
+                                                {index < genres.length - 1 && <span className="tw-mx-2">,</span>}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
                                 </p>
                             </div>
                             <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900">
@@ -50,7 +64,7 @@ const HomeCard = ({ item: { id, cover, name, rating, time, desc, starring, genre
                         </Col>
                         <Col span={10}>
                             <div className="palyButton ">
-                                <Link to={`/singlepage/${id}`}>
+                                <Link to={`/singlepage/${movie.id}`}>
                                     <button>
                                         <div className="img">
                                             <img src="./images/play-button.png" alt="" />
