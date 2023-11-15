@@ -11,10 +11,10 @@ import {
     DatePicker,
     Tag,
     Switch,
-    Select,
     Upload,
     Descriptions,
     Pagination,
+    Radio,
 } from 'antd';
 import Image from 'antd/lib/image';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
@@ -25,7 +25,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './Event.module.scss';
-import axiosClient from '~/api/global/axiosClient';
 import moment from 'moment';
 import CustomCKEditor from '~/pages/Templates/Ckeditor';
 import { eventApi } from '~/api/admin';
@@ -56,7 +55,6 @@ const AdminShowtime = () => {
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
-
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
@@ -203,12 +201,7 @@ const AdminShowtime = () => {
             width: '10%',
             render: (_, record) => (
                 <Space size="middle">
-                    <Image
-                        src={`http://localhost:8081/api/upload/${record.banner}`}
-                        alt="không có ảnh"
-                        width={65}
-                        loading="lazy"
-                    />
+                    <Image src={uploadApi.get(record.banner)} alt="không có ảnh" width={65} loading="lazy" />
                 </Space>
             ),
         },
@@ -226,6 +219,23 @@ const AdminShowtime = () => {
             filters: [
                 { text: 'Hoạt động', value: 'true' },
                 { text: 'Kết thúc', value: 'false' },
+            ],
+            filterMultiple: false,
+        },
+        {
+            title: 'Thể loại',
+            dataIndex: 'typeEvent',
+            align: 'center',
+            render: (_, record) => {
+                const statusText = record.typeEvent === 0 ? 'Tin tức' : 'Khuyến mãi';
+                const tagColor = record.typeEvent === 0 ? '#F4CE14' : '#96C291';
+
+                return <Tag color={tagColor}>{statusText}</Tag>;
+            },
+            onFilter: (value, record) => record.typeEvent === (value === 0),
+            filters: [
+                { text: 'Tin tức', value: 0 },
+                { text: 'Khuyến mãi', value: 1 },
             ],
             filterMultiple: false,
         },
@@ -261,11 +271,11 @@ const AdminShowtime = () => {
         setEditData(null);
         setOpen(true);
         setResetForm(true);
-
         setFileList([]);
         form.setFieldsValue({
             status: true,
             'range-time-picker': [],
+            typeEvent: 0
         });
     };
 
@@ -327,7 +337,6 @@ const AdminShowtime = () => {
         try {
             let values = await form.validateFields();
             if (fileList.length > 0) {
-                console.log(values);
                 if (editData) {
                     let putData = {
                         id: editData.id,
@@ -335,7 +344,7 @@ const AdminShowtime = () => {
                         startDate: new Date(dataStartTime),
                         endDate: new Date(dataEndTime),
                     };
-                    console.log(putData);
+
                     if (putData.banner.file) {
                         const file = putData.banner.fileList[0].originFileObj;
                         const images = await uploadApi.put(editData.banner, file);
@@ -344,9 +353,8 @@ const AdminShowtime = () => {
                             banner: images,
                         };
                     }
-
                     try {
-                        const resPut = await eventApi.put(putData.id, putData, putData.cinemaComplex);
+                        const resPut = await eventApi.put(putData.id, putData);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật sự kiện thành công', 'success');
                         }
@@ -367,9 +375,8 @@ const AdminShowtime = () => {
                             endDate: new Date(dataEndTime),
                             banner: images,
                         };
-                        console.log(postData);
-                        const resPost = await eventApi.post(postData, postData.cinemaComplex);
-                        console.log('resPost', resPost);
+                        const resPost = await eventApi.post(postData);
+
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm sự kiện thành công', 'success');
                         }
@@ -406,9 +413,6 @@ const AdminShowtime = () => {
         form.validateFields(['nickname']);
     }, [checkNick, form]);
 
-    useEffect(() => {
-        apiSelectCinemaComplex();
-    }, []);
 
     const handleResetForm = () => {
         form.resetFields();
@@ -419,15 +423,7 @@ const AdminShowtime = () => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
-    const [selectCinemaComplex, setSelectCinemaComplex] = useState();
-    const apiSelectCinemaComplex = async () => {
-        try {
-            const resp = await axiosClient.get(`cinemaComplex`);
-            setSelectCinemaComplex(resp.data.data);
-        } catch (error) {
-            console.error('Error fetching province data:', error);
-        }
-    };
+
 
     const rangeConfig = {
         rules: [
@@ -477,16 +473,25 @@ const AdminShowtime = () => {
         setEditorData(data);
     };
 
-   
+   const optionsWithDisabled = [
+       {
+           value: 0,
+           label: 'Tin tức',
+       },
+       {
+           value: 1,
+           label: 'Khuyến mãi',
+       },
+   ];
 
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    <h1 className='tw-mt-[-7px]'>Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button type="primary"  icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
                 </Col>
@@ -544,7 +549,7 @@ const AdminShowtime = () => {
                             label="Nhập tên sự kiện"
                             rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                         >
-                            <Input placeholder='Nhập tên phim...'/>
+                            <Input placeholder="Nhập tên phim..." />
                         </Form.Item>
                         <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
                             <RangePicker
@@ -557,22 +562,14 @@ const AdminShowtime = () => {
 
                         <Form.Item
                             {...formItemLayout}
-                            name="cinemaComplex"
-                            label="Chọn cụm rạp"
+                            name="typeEvent"
+                            label="Chọn thể loại"
                             rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                         >
-                            <Select
-                                style={{ width: '100%' }}
-                                showSearch
-                                placeholder="Chọn loại"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={selectCinemaComplex?.map((cinemaComplex) => ({
-                                    value: cinemaComplex.id,
-                                    label: cinemaComplex.name,
-                                }))}
+                            <Radio.Group
+                                options={optionsWithDisabled}
+                                optionType="button"
+                                buttonStyle="solid"
                             />
                         </Form.Item>
                         <Form.Item
@@ -599,7 +596,9 @@ const AdminShowtime = () => {
                             <div style={{ maxHeight: '400px', overflow: 'auto' }}>
                                 <Descriptions title="Xem thêm"></Descriptions>
                                 <b style={{ marginBottom: '8px' }}>Mô tả: </b>
-                                {record.description !== null && <span dangerouslySetInnerHTML={{ __html: record.description }} />}
+                                {record.description !== null && (
+                                    <span dangerouslySetInnerHTML={{ __html: record.description }} />
+                                )}
                             </div>
                         );
                     },

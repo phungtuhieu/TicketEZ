@@ -4,12 +4,13 @@ import ViTri from './ViTri/ViTri';
 
 function ShowTimes() {
     return (
-        <div className="wrapper">
-            <Card bordered={false} style={{ width: 1088, height: 694.8, overflow: 'hidden' }}>
-                <Row>
-                    <Col span={24} className="bo" style={{ backgroundColor: '#ffffff' }}>
-                        <ViTri />
-                        {/* <Row>
+        <>  
+            <div className="wrapper tw-shadow-2xl">
+                <Card bordered={false} style={{ width: 1088, height: 694.8, overflow: 'hidden' }}>
+                    <Row>
+                        <Col span={24} className="bo" style={{ backgroundColor: '#ffffff' }}>
+                            <ViTri />
+                            {/* <Row>
                             <Col
                                 span={24}
                                 style={{
@@ -35,8 +36,8 @@ function ShowTimes() {
                                 </Row>
                             </Col>
                         </Row> */}
-                    </Col>
-                    {/* <Col span={24} estyl={{ minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
+                        </Col>
+                        {/* <Col span={24} estyl={{ minHeight: 550, maxHeight: 550, borderTop: '1px solid #e5e5e5' }}>
                         <Row className="bo" style={{ height: '100%' }}>
                             <Col span={8} style={{ height: '100%' }}>
                                 3
@@ -46,9 +47,10 @@ function ShowTimes() {
                             </Col>
                         </Row>
                     </Col> */}
-                </Row>
-            </Card>
-        </div>
+                    </Row>
+                </Card>
+            </div>
+        </>
     );
 }
 

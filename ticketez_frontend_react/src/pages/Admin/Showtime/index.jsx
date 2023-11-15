@@ -30,6 +30,7 @@ import { cinemaUserApi } from '~/api/user/showtime';
 import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -329,7 +330,7 @@ const AdminShowtime = () => {
             render: (formatMovie) => (formatMovie ? formatMovie.format.name : ''),
         },
         {
-            title: 'Sơ đồ ghế',
+            title: 'Ảnh phim',
             dataIndex: 'formatMovie',
             align: 'center',
             render: (_, record) => (
@@ -339,7 +340,7 @@ const AdminShowtime = () => {
                         height={80}
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
-                        src={`http://localhost:8081/api/upload/${record.formatMovie.movie.poster}`}
+                        src={uploadApi.get(record.formatMovie.movie.poster)}
                     />
                 </Space>
             ),
@@ -908,7 +909,7 @@ const AdminShowtime = () => {
                                                       <span role="img" aria-label="China" className={cx('border-img')}>
                                                           <img
                                                               className={cx('img')}
-                                                              src={`http://localhost:8081/api/upload/${cinemaComplex.cinemaChain.image}`}
+                                                              src={uploadApi.get(cinemaComplex.cinemaChain.image)}
                                                           />
                                                       </span>
                                                   </div>
@@ -971,11 +972,8 @@ const AdminShowtime = () => {
                                                       <span role="img" aria-label="China">
                                                           <img
                                                               className={cx('img-Movie')}
-                                                              src={`http://localhost:8081/api/upload/${formatMovie.poster}`}
-
-                                                              //   src={`http://localhost:8081/api/upload/${formatMovie.movie.poster}`}
+                                                              src={uploadApi.get(formatMovie.poster)}
                                                           />
-                                                          {/* <img className={cx('img-Movie')} src={img.datrungphuongnam} /> */}
                                                       </span>
                                                   </div>
                                                   <span>{formatMovie.title}</span>

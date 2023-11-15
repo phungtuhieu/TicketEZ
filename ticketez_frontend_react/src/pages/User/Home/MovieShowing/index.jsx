@@ -140,7 +140,13 @@ const MovieShowing = () => {
     return (
         <div className={cx('body')}>
             <p className={cx('name-card')}>
-                <span className={cx('title-name-card')}>Phim đang chiếu</span>
+                <h1
+                    // className={cx('title-name-card')}
+                    className="tw-text-white-600 tw-m-auto  tw-mb-[50px]"
+                >
+                    <br />
+                    <br /> Phim đang chiếu
+                </h1>
             </p>
 
             <div>
@@ -159,16 +165,13 @@ const MovieShowing = () => {
                             alignItems: 'center',
                             display: 'flex',
                             margin: '0 auto',
-                            marginTop: '20px',
                             marginBottom: '20px',
                         }}
                     >
                         {getMovieByShowtimeShowing && getMovieByShowtimeShowing.length > 0 ? (
                             getMovieByShowtimeShowing?.map((slide, index) => (
                                 <>
-                                    <Link
-                                    //  to={`/movie/${slide.movie.id}`}
-                                    >
+                                    <Link to={`/movie-details/${slide.movie.id}`}>
                                         <div key={slide.movie.id} className={cx('container')}>
                                             <Tag
                                                 className={cx('tag-overlay')}
@@ -178,14 +181,17 @@ const MovieShowing = () => {
                                             </Tag>
 
                                             {/* <Tag color="#D80032" className={cx('tag-overlay2')}>
-                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
-                             </Tag> */}
+                                                <FontAwesomeIcon icon={faTicket} /> ĐẶT TRƯỚC
+                                            </Tag> */}
                                             <img
                                                 className={cx('img-overlay')}
                                                 src={`http://localhost:8081/api/upload/${slide.movie.poster}`}
                                             />
                                             <svg
-                                                onClick={() => showModal(slide)}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    showModal(slide);
+                                                }}
                                                 className={cx('icon-overlay')}
                                                 fill="#ffffff"
                                                 height="200px"
@@ -253,15 +259,9 @@ const MovieShowing = () => {
                                 </>
                             ))
                         ) : (
-                            <div style={{ marginLeft: '100px' }}>
-                                <img
-                                    src={img.notFoundLogo}
-                                    alt=""
-                                    style={{ marginRight: '-300px', marginTop: '15px' }}
-                                />
-                                <span style={{ marginTop: '60px', marginLeft: '100px' }}>
-                                    Không tìm thấy phim chiếu ngày hôm nay
-                                </span>
+                            <div>
+                                <img src={img.notFoundLogo} alt="" style={{ marginLeft: '100px' }} />
+                                <span>Không tìm thấy phim chiếu ngày hôm nay</span>
                             </div>
                         )}
                     </Slider>
