@@ -1,8 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/alt-text */
 import { Button, Col, List, Row } from 'antd';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import uploadApi from '~/api/service/uploadApi';
+import eventAPI from '~/api/user/event/eventAPI';
 import img from '~/assets/img';
 
 const EventListKhuyenMai = () => {
@@ -68,20 +71,45 @@ const EventListKhuyenMai = () => {
                 </Button>
             </div>
         ) : null;
+
+    const [dataEventByNew, setDataEventByNew] = useState(null);
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await eventAPI.getEventByPromotion();
+
+                setDataEventByNew(res.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, []);
     return (
         <>
-            <div className=" tw-text-pink-500 tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
-                Khuyến mãi
-            </div>
-            <Link to={'/su-kien/khuyen-mai/1'}>
-                <img src={img.event} width="100%" height={344} className="tw-rounded-md " />
-            </Link>
-            <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
-                08/11/2023 · 9.1K lượt xem
-            </div>
-            <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] ">
-                Ngày vàng nạp dế nhân đôi điểm tích lũy, nhận quà tẹt ga
-            </h1>
+            {dataEventByNew && dataEventByNew.length > 0 ? (
+                <>
+                    <Link to={`/su-kien/khuyen-mai/${dataEventByNew[0]?.id}`}>
+                        <div className=" tw-text-pink-500 tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
+                           Khuyến mãi
+                        </div>
+                        <img
+                            src={uploadApi.get(dataEventByNew[0]?.banner)}
+                            width="100%"
+                            height={344}
+                            className="tw-rounded-md "
+                        />
+                        <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
+                            {moment(dataEventByNew[0]?.startDate).format('DD-MM-YYYY ')} · 9.1K lượt xem
+                        </div>
+                        <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-text-black tw-mt-[-20px] ">
+                            {dataEventByNew[0]?.name}
+                        </h1>
+                    </Link>
+                </>
+            ) : null}
             <List
                 className="demo-loadmore-list"
                 loading={initLoading}

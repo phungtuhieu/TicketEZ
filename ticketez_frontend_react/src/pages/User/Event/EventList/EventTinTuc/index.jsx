@@ -1,8 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/alt-text */
-import { Button, Col, List, Row } from 'antd';
+import { Button, Col, List, Row, Skeleton } from 'antd';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import uploadApi from '~/api/service/uploadApi';
+import eventAPI from '~/api/user/event/eventAPI';
 import img from '~/assets/img';
 
 const EventListTinTuc = () => {
@@ -54,7 +57,7 @@ const EventListTinTuc = () => {
             >
                 <Button
                     onClick={onLoadMore}
-                    className="tw-rounded-full tw-border tw-w-[140px] tw-h-[33px] tw-border-pink-600 tw-py-1 tw-pl-4 tw-pr-6 tw-mb-[30px] tw-font-semibold tw-text-pink-500 tw-transition-all hover:tw-bg-pink-50 hover:tw-text-pink-800"
+                    className="tw-rounded-full tw-border tw-w-[140px] tw-h-[33px] tw-border-pink-600 tw-py-1 tw-pl-4 tw-pr-6  tw-font-semibold tw-text-pink-500 tw-transition-all hover:tw-bg-pink-50 hover:tw-text-pink-800"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -68,20 +71,45 @@ const EventListTinTuc = () => {
                 </Button>
             </div>
         ) : null;
+
+    const [dataEventByNew, setDataEventByNew] = useState(null);
+    useEffect(() => {
+        const getList = async () => {
+            setLoading(true);
+            try {
+                const res = await eventAPI.getEventByNew();
+
+                setDataEventByNew(res.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, []);
     return (
         <>
-            <div className=" tw-text-pink-500 tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
-                Tin tức
-            </div>
-            <Link to={'/event/1'}>
-                <img src={img.event} width="100%" height={344} className="tw-rounded-md " />
-            </Link>
-            <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
-                08/11/2023 · 9.1K lượt xem
-            </div>
-            <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] ">
-                Ngày vàng nạp dế nhân đôi điểm tích lũy, nhận quà tẹt ga
-            </h1>
+            {dataEventByNew && dataEventByNew.length > 0 ? (
+                <>
+                    <div className=" tw-text-pink-500 tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
+                        Tin tức
+                    </div>
+                    <Link to={`/su-kien/tin-tuc/${dataEventByNew[0]?.id}`}>
+                        <img
+                            src={uploadApi.get(dataEventByNew[0]?.banner)}
+                            width="100%"
+                            height={344}
+                            className="tw-rounded-md "
+                        />
+                    </Link>
+                    <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
+                        {moment(dataEventByNew[0]?.startDate).format('DD-MM-YYYY ')} · 9.1K lượt xem
+                    </div>
+                    <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] ">
+                        {dataEventByNew[0]?.name}
+                    </h1>
+                </>
+            ) : null}
             <List
                 className="demo-loadmore-list"
                 loading={initLoading}
@@ -90,41 +118,43 @@ const EventListTinTuc = () => {
                 dataSource={list}
                 renderItem={(item) => (
                     <>
-                        <Row gutter={24} className="tw-mb-[25px]">
-                            <Col lg={12} xs={24}>
-                                <Link to={'/event/1'}>
+                        <Skeleton avatar title={false} loading={item.loading} active>
+                            <Row gutter={24} className="tw-mb-[25px]">
+                                <Col lg={12} xs={24}>
+                                    <Link to={'/event/1'}>
+                                        <img
+                                            src={img.event}
+                                            width="100%"
+                                            height={184}
+                                            className=" tw-mt-2 tw-mr-[20px] tw-rounded-lg tw-opacity-100  hover:tw-opacity-50 "
+                                        />
+                                        <div className="tw-font-[var(--font-family)] tw-text-gray-400  tw-text-left tw-text-xl tw-mb-[25px]">
+                                            08/11/2023 · 9.1K lượt xem
+                                        </div>
+                                        <div className="tw-font-[var(--font-family)]  tw-text-left tw-text-2xl tw-mt-[-20px] hover:tw-underline ">
+                                            <span className="tw-text-gray-800">
+                                                MoMo khao quà chất - Lưu ngay Mini App Highlands Coffee thành dịch vụ
+                                                yêu thích!
+                                            </span>
+                                        </div>
+                                    </Link>
+                                </Col>
+                                <Col lg={12} xs={24}>
                                     <img
                                         src={img.event}
-                                        width={380}
+                                        width="100%"
                                         height={184}
                                         className=" tw-mt-2 tw-mr-[20px] tw-rounded-lg tw-opacity-100  hover:tw-opacity-50 "
                                     />
                                     <div className="tw-font-[var(--font-family)] tw-text-gray-400  tw-text-left tw-text-xl tw-mb-[25px]">
                                         08/11/2023 · 9.1K lượt xem
                                     </div>
-                                    <div className="tw-font-[var(--font-family)]  tw-text-left tw-text-2xl tw-mt-[-20px] hover:tw-underline ">
-                                        <span className="tw-text-gray-800">
-                                            MoMo khao quà chất - Lưu ngay Mini App Highlands Coffee thành dịch vụ yêu
-                                            thích!
-                                        </span>
+                                    <div className="tw-font-[var(--font-family)]  tw-text-left tw-text-2xl tw-mt-[-20px] hover:tw-underline">
+                                        MoMo khao quà chất - Lưu ngay Mini App Highlands Coffee thành dịch vụ yêu thích!
                                     </div>
-                                </Link>
-                            </Col>
-                            <Col lg={12} xs={24}>
-                                <img
-                                    src={img.event}
-                                    width={380}
-                                    height={184}
-                                    className=" tw-mt-2 tw-mr-[20px] tw-rounded-lg tw-opacity-100  hover:tw-opacity-50 "
-                                />
-                                <div className="tw-font-[var(--font-family)] tw-text-gray-400  tw-text-left tw-text-xl tw-mb-[25px]">
-                                    08/11/2023 · 9.1K lượt xem
-                                </div>
-                                <div className="tw-font-[var(--font-family)]  tw-text-left tw-text-2xl tw-mt-[-20px] hover:tw-underline">
-                                    MoMo khao quà chất - Lưu ngay Mini App Highlands Coffee thành dịch vụ yêu thích!
-                                </div>
-                            </Col>
-                        </Row>
+                                </Col>
+                            </Row>
+                        </Skeleton>
                     </>
                 )}
             />

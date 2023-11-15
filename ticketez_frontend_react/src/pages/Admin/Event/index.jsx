@@ -484,14 +484,19 @@ const AdminShowtime = () => {
        },
    ];
 
+   const disabledDate = (current) => {
+       // Can not select days before today and today
+       return current && current < dayjs().startOf('day');
+   };
+
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 className='tw-mt-[-7px]'>Bảng dữ liệu</h1>
+                    <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary"  icon={<PlusOutlined />} onClick={showModal}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
                 </Col>
@@ -553,6 +558,7 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
                             <RangePicker
+                                disabledDate={disabledDate}
                                 showTime
                                 format="DD-MM-YYYY HH:mm:ss"
                                 value={[dataStartTime, dataEndTime]}
@@ -566,11 +572,7 @@ const AdminShowtime = () => {
                             label="Chọn thể loại"
                             rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
                         >
-                            <Radio.Group
-                                options={optionsWithDisabled}
-                                optionType="button"
-                                buttonStyle="solid"
-                            />
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}

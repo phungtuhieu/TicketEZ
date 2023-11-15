@@ -32,6 +32,7 @@ public class Event {
 	private Date endDate;
 
 	private String banner;
+	
 	private boolean status;
 
 	@Column(name = "type_event")

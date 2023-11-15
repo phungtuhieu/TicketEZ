@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.event;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -95,6 +96,70 @@ public class EventAPI {
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Không thể xóa sự kiện do tài liệu tham khảo hiện có");
+        }
+    }
+
+
+     //lấy event theo news
+    @GetMapping("/get/event-by-promotion")
+    public ResponseEntity<ResponseDTO<Event>> getEventByPromotion(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return ResponseEntity.notFound().build();
+            }
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+
+            // Thực hiện truy vấn getEventByNews
+            List<Event> newsEvents = eventDAO.getEventByPromotion();
+
+            // Phân trang danh sách kết quả
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), newsEvents.size());
+            List<Event> paginatedEvents = newsEvents.subList(start, end);
+
+            // Tạo đối tượng ResponseDTO và cài đặt dữ liệu phản hồi
+            ResponseDTO<Event> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(paginatedEvents);
+            responseDTO.setTotalItems(Long.valueOf(newsEvents.size()));
+            responseDTO.setTotalPages((int) Math.ceil((double) newsEvents.size() / (double) pageable.getPageSize()));
+
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+
+    //lấy event theo news
+    @GetMapping("/get/event-by-news")
+    public ResponseEntity<ResponseDTO<Event>> getNewsEvents(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return ResponseEntity.notFound().build();
+            }
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+
+            // Thực hiện truy vấn getEventByNews
+            List<Event> newsEvents = eventDAO.getEventByNews();
+
+            // Phân trang danh sách kết quả
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), newsEvents.size());
+            List<Event> paginatedEvents = newsEvents.subList(start, end);
+
+            // Tạo đối tượng ResponseDTO và cài đặt dữ liệu phản hồi
+            ResponseDTO<Event> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(paginatedEvents);
+            responseDTO.setTotalItems(Long.valueOf(newsEvents.size()));
+            responseDTO.setTotalPages((int) Math.ceil((double) newsEvents.size() / (double) pageable.getPageSize()));
+
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

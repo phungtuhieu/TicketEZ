@@ -155,17 +155,30 @@ const Header = () => {
                         <Divider className="tw-mt-[-5px]" />
                         <div className="tw-container tw-mx-auto tw-px-[150px] tw-mt-[-10px] tw-mb-[10px] tw-text-gray-700 tw-font-2xl tw-font-[var(--font-family)]">
                             <Breadcrumb
-                                separator=<FontAwesomeIcon icon={faChevronRight} />
+                                separator={null}
                                 items={[
                                     {
                                         href: '/',
                                         title: <FontAwesomeIcon icon={faHome} />,
-                                        className: '',
+                                    },
+                                    {
+                                        type: 'separator',
+                                        separator: <FontAwesomeIcon icon={faChevronRight} />,
+                                    },
+                                    {
+                                        title: 'Sự kiện',
+                                        className: ' tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)]',
+                                    },
+                                    {
+                                        type: 'separator',
+                                        separator: <FontAwesomeIcon icon={faChevronRight} />,
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage && location.pathname === '/su-kien/tin-tuc'
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
                                         }`,
@@ -177,9 +190,15 @@ const Header = () => {
                                         ),
                                     },
                                     {
+                                        type: 'separator',
+                                        separator: ' | ',
+                                    },
+                                    {
                                         href: '/su-kien/khuyen-mai',
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage && location.pathname === '/su-kien/khuyen-mai'
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
                                         }`,

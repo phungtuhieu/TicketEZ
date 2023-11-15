@@ -33,9 +33,12 @@ const publicRoutes = [
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginSignin, layout: DefaultLayout },
+    //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
+    { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },
     { path: '/su-kien/khuyen-mai', component: PageUser.Event, layout: DefaultLayout },
-    { path: '/su-kien/khuyen-mai/1', component: PageUser.EventDetails, layout: DefaultLayout },
+    { path: '/su-kien/khuyen-mai/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },
+    //liên hệ
     { path: '/contact', component: UserContact, layout: DefaultLayout },
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
