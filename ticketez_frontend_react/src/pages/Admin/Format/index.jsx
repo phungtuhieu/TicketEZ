@@ -37,6 +37,20 @@ const AdminFormat = () => {
     const [posts, setPosts] = useState([]);
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
+    useEffect(() => {
+        const getList = async () => {
+            try {
+                const res = await formatApi.getAll()
+                setPosts(res.data);
+                console.log(res);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, [workSomeThing]);
+
+
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
@@ -242,7 +256,7 @@ const AdminFormat = () => {
                         const resPut = await formatApi.put(putData.id, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
-                            funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                            funcUtils.notify('Cập nhật Dạng phim thành công', 'success');
                         }
                     } catch (error) {
                         funcUtils.notify(error.response.data, 'error');
@@ -258,7 +272,7 @@ const AdminFormat = () => {
                         const resPost = await formatApi.post(postData);
                         console.log('resPost', resPost);
                         if (resPost.status === 200) {
-                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                            funcUtils.notify('Thêm Dạng phim thành công', 'success');
                         }
                     } catch (error) {
                         funcUtils.notify(error.response.data, 'error');
@@ -290,18 +304,6 @@ const AdminFormat = () => {
 
 
   
-    useEffect(() => {
-        const getList = async () => {
-            try {
-                const res = await formatApi.get()
-                setPosts(res.data);
-                console.log(res);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getList();
-    }, [workSomeThing]);
 
     //form
     const handleResetForm = () => {

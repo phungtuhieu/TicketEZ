@@ -66,11 +66,11 @@ function AdminPriceService() {
 
     useEffect(() => {
         const selectPrice = async () => {
-            const [service, cinemaComplex] = await Promise.all([serviceApi.getAll(), cinemaComplexApi.get()]);
+            const [service, cinemaComplex] = await Promise.all([serviceApi.getAll(), cinemaComplexApi.getPage()]);
             console.log('service', service);
             console.log('cinemaComplex', cinemaComplex);
             setService(service.data);
-            setSelectCinemaComplex(cinemaComplex.data.data);
+            setSelectCinemaComplex(cinemaComplex.data);
         };
 
         selectPrice();
