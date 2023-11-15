@@ -2,7 +2,7 @@
 import BaseApi from '~/api/global/baseApi';
 import cinemaComplexApi from '../managementCinema/cinemaComplexApi';
 import axiosClient from '~/api/global/axiosClient';
-import serviceApi from './serviceApi';
+
 const url = 'discount';
 
 class DiscountApi extends BaseApi {
@@ -10,11 +10,11 @@ class DiscountApi extends BaseApi {
         super('discount');
     }
 
-  
-    async post(data, serviceId, cinemaComplexId) {
+
+    async post(data, cinemaComplexId) {
         try {
-            const [service, cinemaComplex] = await Promise.all([serviceApi.getById(serviceId), cinemaComplexApi.getId(cinemaComplexId)]);
-            const values = { ...data, service: service.data, cinemaComplex: cinemaComplex.data };
+            const [cinemaComplex] = await Promise.all([cinemaComplexApi.getId(cinemaComplexId)]);
+            const values = { ...data, cinemaComplex: cinemaComplex.data };
             console.log('values', values);
             return axiosClient.post(url, values);
         } catch (error) {
@@ -23,10 +23,10 @@ class DiscountApi extends BaseApi {
         }
     }
 
-    async put(id, data, serviceId, cinemaComplexId) {
+    async put(id, data, cinemaComplexId) {
         try {
-            const [service, cinemaComplex] = await Promise.all([serviceApi.getById(serviceId), cinemaComplexApi.getId(cinemaComplexId)]);
-            const values = { id: id, ...data, service: service.data, cinemaComplex: cinemaComplex.data };
+            const [ cinemaComplex ] = await Promise.all([cinemaComplexApi.getId(cinemaComplexId)]);
+            const values = { id: id, ...data, cinemaComplex: cinemaComplex.data };
             console.log('values', values);
             return axiosClient.put(url + '/' + id, values);
         } catch (error) {

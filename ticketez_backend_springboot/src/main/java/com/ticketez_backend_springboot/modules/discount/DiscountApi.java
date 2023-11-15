@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -87,18 +86,14 @@ public class DiscountApi {
 
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Discount discount) {
-		try {
-			if (!dao.existsById(id)) {
-				return new ResponseEntity<>("Giảm giá không tồn tại", HttpStatus.NOT_FOUND);
-			}
-			dao.save(discount);
-			return ResponseEntity.ok(discount);
-		} catch (Exception e) {
-			return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+    @PutMapping("/{id}")
+    public ResponseEntity<Discount> put(@PathVariable("id") Long id, @RequestBody Discount discount) {
+        if (!dao.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        dao.save(discount);
+        return ResponseEntity.ok(discount);
+    }
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {

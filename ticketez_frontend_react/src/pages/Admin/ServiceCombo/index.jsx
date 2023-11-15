@@ -307,7 +307,7 @@ const AdminService = () => {
                         const resPut = await serviceApi.put(editData.id, putData, putData.cinemaComplex);
                         console.log(resPut);
                         if (resPut.status === 200) {
-                            funcUtils.notify('Cập nhật dịch thành công', 'success');
+                            funcUtils.notify('Cập nhật dịch vụ thành công', 'success');
                         }
                     } catch (error) {
                         if (error.hasOwnProperty('response')) {
