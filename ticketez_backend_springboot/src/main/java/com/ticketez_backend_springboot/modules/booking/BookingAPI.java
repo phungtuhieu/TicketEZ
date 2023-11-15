@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.booking;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ticketez_backend_springboot.modules.account.Account;
+import com.ticketez_backend_springboot.modules.account.AccountDAO;
+import com.ticketez_backend_springboot.modules.genre.Genre;
+import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
+import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
 
 @RestController
 @CrossOrigin("*")
@@ -40,21 +47,33 @@ public class BookingAPI {
 		}
 	}
 
-		@GetMapping("by-show-time/{id}")
+	@GetMapping("by-show-time/{id}")
 	public ResponseEntity<List<Booking>> getAllByShowTime(@PathVariable("id") Long id) {
 		List<Booking> bookingOptional = dao.findByShowtimeId(id);
 
-			return ResponseEntity.ok(bookingOptional);
-	
+		return ResponseEntity.ok(bookingOptional);
+
 	}
 
+	@Autowired
+	SeatBookingDao seatBookingDao;
+
 	@PostMapping
-	public ResponseEntity<Booking> post(@RequestBody Booking booking) {
-		if (booking == null) {
-			return ResponseEntity.badRequest().body(null);
+	public ResponseEntity<?> post(@RequestBody BookingDTO bookingDto) {
+		if (bookingDto == null) {
+			return new ResponseEntity<>("Không có dữ liệu để thêm", HttpStatus.BAD_REQUEST);
 		}
-		dao.save(booking);
-		return ResponseEntity.status(HttpStatus.CREATED).body(booking);
+		Booking createdBooking = dao.save(bookingDto.getBooking());
+		List<SeatBooking> seatBookings = bookingDto.getSeats().stream().map(seat -> {
+			SeatBooking seatBooking = new SeatBooking();
+			seatBooking.setBooking(createdBooking);
+			seatBooking.setSeat(seat);
+			seatBooking.setStatus(1);
+			return seatBooking;
+		}).collect(Collectors.toList());
+		seatBookingDao.saveAll(seatBookings);
+
+		return ResponseEntity.status(HttpStatus.OK).body(bookingDto);
 	}
 
 	@PutMapping("/{id}")

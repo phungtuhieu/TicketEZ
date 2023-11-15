@@ -12,18 +12,19 @@ const cx = classNames.bind(style);
 function SeatChart(props) {
     const { showtime } = props;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [isModalOpenBooking, setIsModalOpenBooking] = useState(false);
     const showModal = () => {
-        setIsModalOpen(true);
+        setIsModalOpenBooking(true);
     };
     const handleOk = () => {
-        setIsModalOpen(false);
+        setIsModalOpenBooking(false);
     };
     const handleCancel = () => {
-        setIsModalOpen(false);
+        setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
+        console.log('222222222222222222222222222222222222222222222222');
+        console.log(showtime);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
         // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
@@ -97,9 +98,8 @@ function SeatChart(props) {
         try {
             const resp = await axiosClient.get(`seat-choose/find-seat-choose-by-seat-char-id/${showtime.seatChart.id}`);
             const data = resp.data;
-            console.log(data);
             if (data.length <= 0) {
-                setSeatBookingData(['none']);
+                setSeatBookingData([]);
             }
             // console.log(data);
             data.forEach((newItem) => {
@@ -169,10 +169,10 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            console.log(listWay);
-            console.log(listSeatNormal);
-            console.log(listSeatVip);
-            console.log(allSeats);
+            // console.log(listWay);
+            // console.log(listSeatNormal);
+            // console.log(listSeatVip);
+            // console.log(allSeats);
             if (seatBookingData.length > 0) {
                 setReload(true);
             }
@@ -222,6 +222,7 @@ function SeatChart(props) {
             ...seatState,
             seatReserved: [...seatReserved, seat],
         });
+        // setChangeDataSeat(!changeDataSeat);
     };
     // Lọc ghế trùng
     const [duplicateSeat, setDuplicateSeat] = useState([]);
@@ -283,7 +284,6 @@ function SeatChart(props) {
             const vietnamTimezoneOffset = 7 * 60;
             // Chuyển múi giờ hiện tại thành múi giờ Việt Nam
             currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
-
             const formattedTime = currentTime.toISOString();
             const data = duplicateSeat.map((s) => ({
                 lastSelectedTime: formattedTime,
@@ -306,7 +306,7 @@ function SeatChart(props) {
         fetchDataSeat();
     }, [reload]);
 
-    const handleButtonClick = () => {
+    const handleButtonClick = async () => {
         console.log(seatBooking);
         console.log(seatState.seatReserved);
         onCreateDaTaSeatChoose();
@@ -343,7 +343,7 @@ function SeatChart(props) {
                                         <tr key={header}>
                                             <td className="header-cell">{header}</td>
                                             {seatState.seat[rowIndex].map((seat_no) => {
-                                                const seatClassName = `
+                                                const seatClassName = ` 
                   ${
                       seatState.way.indexOf(seat_no) > -1
                           ? 'way-user'
@@ -418,9 +418,10 @@ function SeatChart(props) {
                 showtime={showtime}
                 seatBooking={seatBooking}
                 seat={seatState ? seatState.seatReserved : null}
-                open={isModalOpen}
+                open={isModalOpenBooking}
                 onCancel={handleCancel}
             />
+            {/* )} */}
         </>
     );
 }

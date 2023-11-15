@@ -24,7 +24,7 @@ public class PaymentInfo {
 	@JoinColumn(name = "booking_id")
 	private Booking booking;
 
-	private float amount;
+	private Double amount;
 	private Date payDate;
 	private String orderInfo;
 	private String bankCode;
