@@ -201,7 +201,7 @@ GO
     CREATE TABLE Seats_Booking (
 		id BIGINT IDENTITY(1, 1) NOT NULL,
         [seat_id] BIGINT NOT NULL,
-        [booking_id] NVARCHAR(30) NOT NULL,
+        [booking_id] NVARCHAR(10) NOT NULL,
         [status] INT NOT NULL, 
     )
 	go 
@@ -289,7 +289,7 @@ GO
 GO
     CREATE TABLE Discounts_Booking (
         discount_id BIGINT NOT NULL,
-        booking_id NVARCHAR(30) NOT NULL,
+        booking_id NVARCHAR(10)NOT NULL,
     )
 GO
     CREATE TABLE Showtimes (
@@ -303,7 +303,7 @@ GO
     )
 GO
     CREATE TABLE Booking (
-        id NVARCHAR(30) NOT NULL,
+        id NVARCHAR(10) NOT NULL,
         -- HD23082023(Ngày giờ mili giây + hash)
         account_id NVARCHAR(20) NOT NULL,
         create_date DATETIME NOT NULL,
@@ -314,7 +314,7 @@ GO
     CREATE TABLE Payment_Info (
         transaction_id NVARCHAR(20) NOT NULL,
         tmn_code NVARCHAR (10) NOT NULL,
-        booking_id NVARCHAR(30) NOT NULL,
+        booking_id NVARCHAR(10)NOT NULL,
         amount FLOAT NOT NULL,
         pay_date DATETIME NOT NULL,
         order_info NVARCHAR(100) NOT NULL,
@@ -323,7 +323,7 @@ GO
     )
 GO
     CREATE TABLE Services_Booking (
-        booking_id NVARCHAR(30) NOT NULL,
+        booking_id NVARCHAR(10)NOT NULL,
         service_id BIGINT NOT NULL
     )
 GO

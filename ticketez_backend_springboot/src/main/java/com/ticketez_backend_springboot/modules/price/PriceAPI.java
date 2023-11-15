@@ -3,6 +3,8 @@ package com.ticketez_backend_springboot.modules.price;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,12 +28,31 @@ public class PriceAPI {
         return ResponseEntity.ok(priceDAO.findAll());
     }
 
+    @GetMapping("/get/all")
+    public ResponseEntity<List<Price>> getAll() {
+        return ResponseEntity.ok(priceDAO.findAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Price> findById(@PathVariable("id") Long id) {
         if (!priceDAO.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(priceDAO.findById(id).get());
+    }
+
+    @PostMapping("/get/price-by-seattype")
+    public ResponseEntity<?> getPriceListBySeatTypeIds(@RequestBody PriceFindDTO priceFindDTO) {
+        try {
+            List<Price> listPrice = priceDAO.getPriceListBySeatTypeIds(priceFindDTO.getSeatTypeIds(),
+                    priceFindDTO.getCinemaClxId(), priceFindDTO.getMovieId());
+            if (listPrice == null) {
+                return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
+            }
+            return ResponseEntity.ok(listPrice);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping

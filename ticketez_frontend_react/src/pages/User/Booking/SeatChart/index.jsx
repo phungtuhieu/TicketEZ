@@ -13,7 +13,6 @@ function SeatChart(props) {
     const { showtime } = props;
 
     const [isModalOpenBooking, setIsModalOpenBooking] = useState(false);
-
     const showModal = () => {
         setIsModalOpenBooking(true);
     };
@@ -102,7 +101,7 @@ function SeatChart(props) {
             if (data.length <= 0) {
                 setSeatBookingData([]);
             }
-            console.log(data);
+            // console.log(data);
             data.forEach((newItem) => {
                 // Kiểm tra xem newItem đã tồn tại trong mảng hay chưa
                 if (!seatBookingData.includes(newItem)) {
@@ -170,10 +169,10 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            console.log(listWay);
-            console.log(listSeatNormal);
-            console.log(listSeatVip);
-            console.log(allSeats);
+            // console.log(listWay);
+            // console.log(listSeatNormal);
+            // console.log(listSeatVip);
+            // console.log(allSeats);
             if (seatBookingData.length > 0) {
                 setReload(true);
             }
@@ -223,11 +222,17 @@ function SeatChart(props) {
             ...seatState,
             seatReserved: [...seatReserved, seat],
         });
+        // setChangeDataSeat(!changeDataSeat);
     };
+    // Lọc ghế trùng
     const [duplicateSeat, setDuplicateSeat] = useState([]);
-
-    const onCreateDaTaSeatChoose = async () => {
+    const [seatBooking, setSeatBooking] = useState([]);
+    const fetchData = async () => {
         try {
+            if (!seatState || !seatState.seatReserved || seatState.seatReserved.length === 0) {
+                throw new Error('No seats are reserved.');
+            }
+
             const responses = await Promise.all(
                 seatState.seatReserved.map(async (seat) => {
                     const respSeatChose = await axiosClient.get(
@@ -236,26 +241,55 @@ function SeatChart(props) {
                     return respSeatChose.data;
                 }),
             );
+
             const newData = responses.flatMap((data) => data);
             const uniqueData = [...new Set(newData)];
-            setDuplicateSeat((prev) => [...prev, ...uniqueData]);
+
+            // Kiểm tra xem uniqueData có dữ liệu mới hay không trước khi cập nhật state
+            if (uniqueData.length > 0) {
+                setDuplicateSeat((prev) => {
+                    const newSeatIds = new Set(uniqueData.map((seat) => seat.id));
+                    const updatedPrev = prev.filter((prevSeat) => !newSeatIds.has(prevSeat.id));
+                    return [...updatedPrev, ...uniqueData];
+                });
+            }
+        } catch (error) {
+            // Xử lý lỗi khi không có ghế nào được đặt
+            console.error(error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [duplicateSeat, seatState ? seatState.seatReserved : null]);
+
+    const onCreateDaTaSeatChoose = async () => {
+        try {
+            // const responses = await Promise.all(
+            //     seatState.seatReserved.map(async (seat) => {
+            //         const respSeatChose = await axiosClient.get(
+            //             `seat/by-seatchart-name/${showtime.seatChart.id}/${seat}`,
+            //         );
+            //         return respSeatChose.data;
+            //     }),
+            // );
+
+            // const newData = responses.flatMap((data) => data);
+            // const uniqueData = [...new Set(newData)];
+            // setDuplicateSeat((prev) => [...prev, ...uniqueData]);
 
             console.log(duplicateSeat);
-
+            setSeatBooking(duplicateSeat);
             const currentTime = new Date();
             const vietnamTimezoneOffset = 7 * 60;
-
             // Chuyển múi giờ hiện tại thành múi giờ Việt Nam
             currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
-
             const formattedTime = currentTime.toISOString();
             const data = duplicateSeat.map((s) => ({
                 lastSelectedTime: formattedTime,
                 seat: s,
             }));
-            await Promise.all([
-                // Add other asynchronous operations here if needed
-            ]);
+            await Promise.all([]);
 
             try {
                 const resp = await axiosClient.post(`seat-choose`, data);
@@ -268,16 +302,12 @@ function SeatChart(props) {
         }
     };
 
-    const onChange = (e) => {
-        console.log('radio checked', e.target.value);
-        setSelectedSeatType(e.target.value);
-    };
-
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
 
-    const handleButtonClick = () => {
+    const handleButtonClick = async () => {
+        console.log(seatBooking);
         console.log(seatState.seatReserved);
         onCreateDaTaSeatChoose();
         showModal();
@@ -384,14 +414,14 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            {isModalOpenBooking == true && (
-                <BookingDetail
-                    showtime={showtime}
-                    seat={seatState ? seatState.seatReserved : null}
-                    open={isModalOpenBooking}
-                    onCancel={handleCancel}
-                />
-            )}
+            <BookingDetail
+                showtime={showtime}
+                seatBooking={seatBooking}
+                seat={seatState ? seatState.seatReserved : null}
+                open={isModalOpenBooking}
+                onCancel={handleCancel}
+            />
+            {/* )} */}
         </>
     );
 }
