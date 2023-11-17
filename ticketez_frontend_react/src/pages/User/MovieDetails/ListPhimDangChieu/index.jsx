@@ -53,8 +53,8 @@ function MovieDetailsListMovieRight() {
     const [dataGenres, setDataGenres] = useState(false);
     const [dataMovieShowingByGenres, setDataMovieShowingByGenres] = useState(null);
     const [selectedButton, setSelectedButton] = useState(null);
-
     const { movieId } = useParams();
+    
     useEffect(() => {
         if (movieId) {
             const getList = async () => {
@@ -132,7 +132,6 @@ function MovieDetailsListMovieRight() {
     const scrollToTop = () => {
         scroll.scrollTo(0);
     };
-    console.log(dataGenres);
 
     return (
         <div className=" tw-text-black tw-font-[var(--font-family)] ">

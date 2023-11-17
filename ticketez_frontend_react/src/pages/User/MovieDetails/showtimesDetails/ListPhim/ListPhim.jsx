@@ -41,7 +41,7 @@ function ListPhim({ propsValue }) {
             setList(res);
         };
         get();
-    }, [propsValue]);
+    }, [movieId, propsValue]);
 
     const handShowtime = (value) => {
         setShowtime(value);

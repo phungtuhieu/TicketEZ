@@ -24,7 +24,7 @@ function MovieDetails() {
                         <Col span={16}>
                             <Row>
                                 <Col span={24} style={{}}>
-                                    <ViTri />
+                                    <ViTri  />
                                 </Col>
                                 <Col
                                     span={24}
