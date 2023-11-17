@@ -38,7 +38,7 @@ function List({ data }) {
             <div className="container-list">
                 <Link to={`/movie-details/${data.movie.id}`}>
                     <div className=" tw-flex tw-items-center tw-justify-center">
-                        <div className="tw-w-[200px] tw-h-[300px] tw-overflow-hidden tw-rounded ">
+                        <div className="tw-w-[200px] tw-h-[300px] `tw-overflow-hidden` tw-rounded ">
                             <div className="tag-overlay ">
                                 <div className={'tw-mr-3 ' + getColorForRating.name(data.movie.mpaaRating.ratingCode)}>
                                     {data.movie.mpaaRating.ratingCode === 'R' ||
@@ -99,14 +99,16 @@ function List({ data }) {
                     </div>
 
                     <div className=" tw-flex tw-items-center tw-justify-center tw-mt-2">
-                        <Title level={5} className="name-movie tw-w-[200px] ">
-                            <div className="tw-truncate tw-font-medium tw-text-[15px] tw-text-[#262626] tw-mt-1">
-                                {data.movie.title}
-                            </div>
-                            <div className="the-loai-phim tw-mt-1 tw-font-bold">
-                                {data.genres.map((genre) => (
-                                    <span className="span tw-font-normal">{genre.name}</span>
-                                ))}
+                        <Title level={5} className="name-movie tw-w-[200px]  ">
+                            <div className="tw-group  ">
+                                <div className="tw-truncate tw-f ont-medium tw-text-[15px] tw-text-[#262626] tw-mt-1 group-hover:tw-text-[#EB2F96]">
+                                    {data.movie.title}
+                                </div>
+                                <div className="the-loai-phim tw-mt-1 tw-font-bold group-hover:tw-text-[#FEA0CE]">
+                                    {data.genres.map((genre) => (
+                                        <span className="span tw-font-normal">{genre.name}</span>
+                                    ))}
+                                </div>
                             </div>
                             <div className="rate-movie tw-mt-1 ">
                                 <Rate disabled defaultValue={1} count={1} className="tw-text-[14px] tw-ml-[-25px]" />
