@@ -129,24 +129,34 @@ function ListPhim({ cinemaComplex }) {
                                                 <div className={cx('chi-tiet-dia-chi')}>
                                                     {cinemaComplex?.address ?? ''}
                                                 </div>
-                                                <div className={cx('ban-do')} onClick={showModal}>[Bản đồ]</div>
+                                                <div className={cx('ban-do')} onClick={showModal}>
+                                                    [Bản đồ]
+                                                </div>
                                                 <Modal
                                                     title="Bản đồ"
                                                     open={isModalOpen}
                                                     onCancel={handleCancelModal}
-                                                    className='modal-map-lg'
+                                                    className="modal-map-lg"
                                                     footer={
-                                                        <Button className={cx('modal-footer-btn-close')} onClick={handleCancelModal}>
+                                                        <Button
+                                                            className={cx('modal-footer-btn-close')}
+                                                            onClick={handleCancelModal}
+                                                        >
                                                             ĐÓNG
                                                         </Button>
                                                     }
                                                 >
-                                                    <div className='map-lg-content'>
-                                                    <Mapbox latitude={10.76317169124285} longitude={106.65670151096185} address={"Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012"}  />
+                                                    <div className="map-lg-content">
+                                                        <Mapbox
+                                                            latitude={10.76317169124285}
+                                                            longitude={106.65670151096185}
+                                                            address={
+                                                                'Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012'
+                                                            }
+                                                        />
                                                     </div>
                                                 </Modal>
                                             </Col>
-                                               
                                         </Row>
                                     </Col>
                                 </Row>
@@ -249,6 +259,7 @@ function ListPhim({ cinemaComplex }) {
                 onCancel={handleCancel}
                 width={800}
                 style={{ marginBottom: '20px' }}
+                destroyOnClose={true}
             >
                 <SeatChart showtime={showtime}></SeatChart>
             </Modal>

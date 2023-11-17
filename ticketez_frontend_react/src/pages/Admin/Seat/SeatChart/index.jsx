@@ -36,8 +36,10 @@ function SeatChart(props) {
             way: listWay,
             seatAvailable: [],
             seatReserved: [],
+            coupleSeat: listSeatCouple,
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
+
             seatUnavailable: nameSeat,
         };
         // Tạo mảng chỗ ngồi
@@ -90,6 +92,7 @@ function SeatChart(props) {
     const [reload, setReload] = useState(false);
     const [listSeatNormal, setListSeatNormal] = useState([]);
     const [listSeatVip, setListSeatVip] = useState([]);
+    const [listSeatCouple, setListSeatcouple] = useState([]);
     const [listWay, setListWay] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
@@ -117,6 +120,17 @@ function SeatChart(props) {
             const newNormalSeats = respNormal.data.map((seat) => seat.name);
             setListSeatNormal((prevState) => {
                 for (const newSeat of newNormalSeats) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
+            });
+
+            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${4}`);
+            const newCoupleSeats = respCouple.data.map((seat) => seat.name);
+            setListSeatcouple((prevState) => {
+                for (const newSeat of newCoupleSeats) {
                     if (!prevState.includes(newSeat)) {
                         prevState.push(newSeat);
                     }
@@ -159,6 +173,7 @@ function SeatChart(props) {
         const seatVipAndNormal = [
             ...seatState.vipSeat.map((seat) => ({ name: seat, type: 2 })),
             ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
+            ...seatState.coupleSeat.map((seat) => ({ name: seat, type: 4 })),
         ];
 
         const updatedSeat = allSeats.map((allSeat) => {
@@ -215,7 +230,7 @@ function SeatChart(props) {
     };
 
     const onClickData = (seat) => {
-        const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
+        const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable, coupleSeat } = seatState;
 
         console.log('------------------------------------------------');
         console.log('Vip', vipSeat);
@@ -233,6 +248,9 @@ function SeatChart(props) {
             while (normalSeat.indexOf(seat) > -1) {
                 normalSeat.splice(normalSeat.indexOf(seat), 1);
             }
+            while (coupleSeat.indexOf(seat) > -1) {
+                coupleSeat.splice(coupleSeat.indexOf(seat), 1);
+            }
             setSeatState({
                 ...seatState,
                 normalSeat: [...normalSeat, seat],
@@ -248,10 +266,31 @@ function SeatChart(props) {
             while (vipSeat.indexOf(seat) > -1) {
                 vipSeat.splice(vipSeat.indexOf(seat), 1);
             }
+            while (coupleSeat.indexOf(seat) > -1) {
+                coupleSeat.splice(coupleSeat.indexOf(seat), 1);
+            }
 
             setSeatState({
                 ...seatState,
                 vipSeat: [...vipSeat, seat],
+            });
+        }
+        if (selectedSeatType === 'couple-seat') {
+            while (normalSeat.indexOf(seat) > -1) {
+                normalSeat.splice(normalSeat.indexOf(seat), 1);
+            }
+            while (vipSeat.indexOf(seat) > -1) {
+                vipSeat.splice(vipSeat.indexOf(seat), 1);
+            }
+            while (seatUnavailable.indexOf(seat) > -1) {
+                seatUnavailable.splice(seatUnavailable.indexOf(seat), 1);
+            }
+            while (coupleSeat.indexOf(seat) > -1) {
+                coupleSeat.splice(coupleSeat.indexOf(seat), 1);
+            }
+            setSeatState({
+                ...seatState,
+                coupleSeat: [...coupleSeat, seat],
             });
         }
         if (selectedSeatType === 'unavailable') {
@@ -311,6 +350,8 @@ function SeatChart(props) {
                                                         ? 'normal-seat'
                                                         : seatState.vipSeat.indexOf(seat_no) > -1
                                                         ? 'vip-seat'
+                                                        : seatState.coupleSeat.indexOf(seat_no) > -1
+                                                        ? 'couple-seat'
                                                         : 'normal-seat'
                                                 } protected-element`;
                                                         return (
@@ -333,14 +374,17 @@ function SeatChart(props) {
                                 <Row>
                                     <Col span={24}>
                                         <Radio.Group style={radioStyl} onChange={onChange} value={selectedSeatType}>
-                                            <Radio style={radioStyle} value="unavailable">
+                                            {/* <Radio style={radioStyle} value="unavailable">
                                                 <Tag color="#404040">Đã đặt</Tag>
-                                            </Radio>
+                                            </Radio> */}
                                             <Radio style={radioStyle} value="vip-seat">
                                                 <Tag color="#b7232b">Ghế vip</Tag>
                                             </Radio>
                                             <Radio style={radioStyle} value="normal-seat">
                                                 <Tag color="#5b2b9f">Ghế thường</Tag>
+                                            </Radio>
+                                            <Radio style={radioStyle} value="couple-seat">
+                                                <Tag color="#d82d8b">Ghế đôi</Tag>
                                             </Radio>
                                         </Radio.Group>
                                     </Col>
@@ -369,6 +413,9 @@ function SeatChart(props) {
                                 </Tag>
                                 <Tag className={cx('tagg')} color="#5b2b9f">
                                     Ghế thường
+                                </Tag>
+                                <Tag className={cx('tagg')} color="#d82d8b">
+                                    Ghế đôi
                                 </Tag>
                             </Space>
                         </div>

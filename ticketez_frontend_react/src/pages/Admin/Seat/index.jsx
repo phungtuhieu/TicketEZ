@@ -249,7 +249,7 @@ function AdminSeat() {
 
     // hành động khi chọn sơ đồ
     const onChange = (value) => {
-        setSeatBookingData([])
+        setSeatBookingData([]);
         fetchDataSeat(value);
         fetchDataShowTimeBySeatChart(value);
 
@@ -262,13 +262,12 @@ function AdminSeat() {
         console.log('search:', value);
     };
 
-
     return (
         <>
             <Row className={cx('container')} style={{ width: '100%' }}>
                 <Col style={{ backgroundColor: 'transparent' }} className={cx('col-first')} span={8}>
                     <Card className={cx('card')} title="Ghế" bordered={true} style={{ width: 300 }}>
-                        <h3>Chọn cụm rạp</h3>
+                        <p className="tw-font-medium tw-mb-3">Chọn cụm rạp :</p>
                         <Select
                             className={cx('select')}
                             showSearch
@@ -283,7 +282,7 @@ function AdminSeat() {
                         />
                         {selectedCinemaComplex && (
                             <>
-                                <h3>Chọn rạp</h3>
+                                <p className="tw-font-medium tw-mb-3">Chọn rạp :</p>
                                 <Select
                                     className={cx('select')}
                                     showSearch
@@ -300,10 +299,13 @@ function AdminSeat() {
                         )}
                         {selectedOptionCinema && (
                             <>
-                                <h3>Chọn sơ đồ</h3>
-                                <Button type="primary" onClick={showModal}>
-                                    Thêm sơ đồ
-                                </Button>
+                                <div className="tw-flex tw-items-center">
+                                    <p className="tw-font-medium tw-mb-3 tw-mr-4">Chọn sơ đồ :</p>
+                                    <Button className='tw-ms-8' type="primary" icon={<PlusOutlined />} onClick={showModal}>
+                                        Thêm sơ đồ
+                                    </Button>
+                                </div>
+
                                 <Modal
                                     title="Thêm sơ đồ rạp"
                                     open={isModalOpen}
@@ -331,7 +333,7 @@ function AdminSeat() {
 
                         {selectedOption && (
                             <>
-                                <h3>Chọn xuất chiếu</h3>
+                                <p className="tw-font-medium tw-mb-3">Chọn xuất chiếu :</p>
                                 <Select
                                     className={cx('select')}
                                     showSearch

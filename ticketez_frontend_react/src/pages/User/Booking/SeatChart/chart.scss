@@ -99,15 +99,22 @@ ul.mar li {
 /*ghế thường */
 .normal-seat {
     border-radius: 10px;
-    background-color: #5b2b9f; /* Màu nền cho ghế thường */
-    color: white; /* Màu chữ cho ghế thường */
+    background-color: #5b2b9f; 
+    color: white;
 }
 
 /*ghế VIP */
 .vip-seat {
     border-radius: 10px;
-    background-color: #b7232b; /* Màu nền cho ghế VIP */
-    color: white; /* Màu chữ cho ghế VIP */
+    background-color: #b7232b; 
+    color: white; 
+}
+
+.couple-seat {
+    border-radius: 10px;
+    background-color: #d82d8b;
+    color: white; 
+    transform: scaleX(2);
 }
 
 .way {

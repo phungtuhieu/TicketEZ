@@ -23,17 +23,16 @@ function SeatChart(props) {
         setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
-        console.log('222222222222222222222222222222222222222222222222');
-        console.log(showtime);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
-        // Tạo mảng chú thích hàng ở bên trái dựa vào số hàng
+
         const rowLabels = Array.from({ length: seatRows }, (_, index) => String.fromCharCode(65 + index));
         const seatState = {
             seat: [],
-            way: [],
+            way: listWay,
             seatAvailable: [],
             seatReserved: [],
+            coupleSeat: listSeatCouple,
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
             seatUnavailable: seatBookingData,
@@ -89,6 +88,7 @@ function SeatChart(props) {
     const [listSeatVip, setListSeatVip] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
     const [listWay, setListWay] = useState([]);
+    const [listSeatCouple, setListSeatcouple] = useState([]);
     const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
@@ -136,7 +136,7 @@ function SeatChart(props) {
 
     const fetchDataSeat = async () => {
         try {
-            const respAll = await axiosClient.get(`seat/getAll`);
+            const respAll = await axiosClient.get(`seat/by-seatchart/${showtime.seatChart.id}`);
             setAllSeats(respAll.data);
             const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${2}`);
             const newVipSeats = respVip.data.map((seat) => seat.name);
@@ -153,6 +153,17 @@ function SeatChart(props) {
             const newNormalSeats = respNormal.data.map((seat) => seat.name);
             setListSeatNormal((prevState) => {
                 for (const newSeat of newNormalSeats) {
+                    if (!prevState.includes(newSeat)) {
+                        prevState.push(newSeat);
+                    }
+                }
+                return prevState;
+            });
+
+            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${4}`);
+            const newCoupleSeats = respCouple.data.map((seat) => seat.name);
+            setListSeatcouple((prevState) => {
+                for (const newSeat of newCoupleSeats) {
                     if (!prevState.includes(newSeat)) {
                         prevState.push(newSeat);
                     }
@@ -193,14 +204,7 @@ function SeatChart(props) {
             console.error(error);
         }
     };
-    // trường hợp bấm vào 2 suất chiếu
 
-    useEffect(() => {
-        setShowSeat(false);
-        setListSeatVip([]);
-        setListSeatNormal([]);
-        fetchDataSeat();
-    }, [showtime]);
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
@@ -279,19 +283,6 @@ function SeatChart(props) {
 
     const onCreateDaTaSeatChoose = async () => {
         try {
-            // const responses = await Promise.all(
-            //     seatState.seatReserved.map(async (seat) => {
-            //         const respSeatChose = await axiosClient.get(
-            //             `seat/by-seatchart-name/${showtime.seatChart.id}/${seat}`,
-            //         );
-            //         return respSeatChose.data;
-            //     }),
-            // );
-
-            // const newData = responses.flatMap((data) => data);
-            // const uniqueData = [...new Set(newData)];
-            // setDuplicateSeat((prev) => [...prev, ...uniqueData]);
-
             console.log(duplicateSeat);
             setSeatBooking(duplicateSeat);
             const currentTime = new Date();
@@ -321,8 +312,6 @@ function SeatChart(props) {
     }, [reload]);
 
     const handleButtonClick = () => {
-        console.log(seatBooking);
-        console.log(seatState.seatReserved);
         onCreateDaTaSeatChoose();
         showModal();
     };
@@ -369,6 +358,8 @@ function SeatChart(props) {
                           ? 'normal-seat'
                           : seatState.vipSeat.indexOf(seat_no) > -1
                           ? 'vip-seat'
+                          : seatState.coupleSeat.indexOf(seat_no) > -1
+                          ? 'couple-seat'
                           : 'normal-seat'
                   } protected-element`;
                                                 return (
@@ -405,14 +396,13 @@ function SeatChart(props) {
                                 <Tag className={cx('tagg')} color="#5b2b9f">
                                     Ghế thường
                                 </Tag>
+                                <Tag className={cx('tagg')} color="#d82d8b">
+                                    Ghế đôi
+                                </Tag>
                             </Space>
-                        </div>
-                    </Col>
-                    <Col span={100}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
                             <Button
                                 style={{
-                                    width: '200px',
+                                    width: '150px',
                                     height: '70px',
                                     backgroundColor: '#EB2F96',
                                     fontWeight: 'bolder',
@@ -425,6 +415,24 @@ function SeatChart(props) {
                                 Mua vé
                             </Button>
                         </div>
+                    </Col>
+                    <Col span={100} className="tw-bg-black">
+                        {/* <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
+                            <Button
+                                style={{
+                                    width: '150px',
+                                    height: '70px',
+                                    backgroundColor: '#EB2F96',
+                                    fontWeight: 'bolder',
+                                }}
+                                className={cx('btn')}
+                                type="primary"
+                                onClick={handleButtonClick}
+                                icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
+                            >
+                                Mua vé
+                            </Button>
+                        </div> */}
                     </Col>
                 </Row>
             </Card>
