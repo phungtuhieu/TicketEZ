@@ -15,18 +15,18 @@ GO
  
 CREATE TABLE Accounts (
 	id NVARCHAR(20) NOT NULL,
-    phone NVARCHAR(15) NOT NULL,
-    fullname NVARCHAR(100) NOT NULL,
-	[image] NVARCHAR(MAX) NOT NULL,
+    phone NVARCHAR(15) ,
+    fullname NVARCHAR(100),
+	[image] NVARCHAR(MAX),
     email NVARCHAR(350) NOT NULL,
 	[address] NVARCHAR(MAX),
-    [password] NVARCHAR(30) NOT NULL,
-    birthday DATE NOT NULL,
-    gender BIT NOT NULL,
-    [status] INT NOT NULL,
-    verified BIT NOT NULL,
-	created_date DATETIME NOT NULL,
-    points INT NOT NULL
+    [password] NVARCHAR(255) NOT NULL,
+    birthday DATE,
+    gender BIT ,
+    [status] INT ,
+    verified BIT ,
+	created_date DATETIME ,
+    points INT  
 )
 GO
 CREATE TABLE Accounts_Roles (
