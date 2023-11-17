@@ -551,4 +551,28 @@ public class MovieAPI {
         }
     }
 
+    @GetMapping("/get/movie-by-showtime-showing-genres/{genresId}")
+    public ResponseEntity<?> getMovieByShowtimeShowingByGenres(@PathVariable("genresId") Long genresId) {
+        try {
+            List<Movie> movies = dao.getMovieByShowtimeShowingByGenres(genresId);
+            MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
+            List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+            for (Movie movie : movies) {
+                MovieByShowtimeShowingDTO.MovieObjResp movieObjResp = movieShowingDTO.new MovieObjResp();
+                List<Genre> genres = new ArrayList<>();
+                for (GenreMovie genrMovie : movie.getGenresMovies()) {
+                    genres.add(genrMovie.getGenre());
+                }
+                movieObjResp.setMovie(movie);
+                movieObjResp.setGenres(genres);
+                listMovieObjResp.add(movieObjResp);
+                movieShowingDTO.setListMovieObjResp(listMovieObjResp);
+
+            }
+            return ResponseEntity.ok(movieShowingDTO);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

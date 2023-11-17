@@ -7,6 +7,7 @@ import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 import {
     faAddressCard,
     faChevronRight,
@@ -18,9 +19,11 @@ import {
     faSearch,
     faTicket,
 } from '@fortawesome/free-solid-svg-icons';
-import { useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 
 const Header = () => {
+       const navigate = useNavigate();
+
     const location = useLocation();
 
     const allowedPaths = [
@@ -76,12 +79,17 @@ const Header = () => {
     ];
 
     const scrollToShowTimes = () => {
+        navigate('/');
         scroll.scrollTo(1800);
     };
-    const scrollToMovieUpcoming = () => {
-        scroll.scrollTo(1200);
-    };
+   const scrollToMovieUpcoming = () => {
+       navigate('/');
+       // Assuming you are using a library like react-scroll for scrolling
+       // Replace 'scrollTo' with the actual scrolling logic you are using
+       scroll.scrollTo(1200);
+   };
     const scrollToMovieShowing = () => {
+        navigate('/');
         scroll.scrollTo(600);
     };
     return (

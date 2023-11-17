@@ -35,8 +35,12 @@ const reviewApi = {
     },
     getActorAndDirectorId: async (movieId) => {
         return axiosClient.get(urlMovie +  '/get/actor-director-by-movie/' + movieId);
-    }
+    },
 
+    //lấy movie theo thể loại và đang chiếu
+    getMovieByShowtimeShowingByGenres: async (genresId) => {
+        return axiosClient.get(urlMovie + '/get/movie-by-showtime-showing-genres/' + genresId);
+    }
 
 }
 

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @Repository
 public interface MovieDAO extends JpaRepository<Movie, Long> {
@@ -57,5 +58,23 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +
                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time", nativeQuery = true)
         List<Movie> getMovieByShowtimeUpcoming();
+
+         @Query(value = "SELECT DISTINCT m.* " +
+                         "FROM Movies m " +
+                         "JOIN Formats_Movies fm ON fm.movie_id = m.id " +
+                         "JOIN ( " +
+                         "    SELECT fm.movie_id, MAX(s.end_time) AS max_end_time " +
+                         "    FROM Showtimes s " +
+                         "    JOIN Formats_Movies fm ON s.format_movie_id = fm.id " +
+                         "    WHERE CONVERT(DATE, s.end_time) >= CONVERT(DATE, GETDATE()) " +
+                         "        AND CONVERT(DATE, s.start_time) <= CONVERT(DATE, GETDATE()) " +
+                         "    GROUP BY fm.movie_id " +
+                         ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +
+                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time " +
+                         "JOIN Genres_Movies gm ON gm.movie_id = m.id " +
+                         "WHERE gm.genre_id = :genresID " +
+                         "ORDER BY m.id; " +
+                         "", nativeQuery = true)
+        List<Movie> getMovieByShowtimeShowingByGenres(@Param("genresID") Long genresID);
 
 }

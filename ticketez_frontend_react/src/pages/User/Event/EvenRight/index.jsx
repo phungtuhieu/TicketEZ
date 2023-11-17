@@ -40,13 +40,13 @@ const EventRight = () => {
             {dataEventByNew && dataEventByNew.length > 0 && (
                 <div>
                     {dataEventByNew
-                        .filter((event) => handle(event))
+                        .filter((event) => event)
                         .slice(0, 3)
                         .map((event, index) => (
                             <div
                                 key={index}
                                 className={`tw-w-[318px] tw-h-[298px] tw-bg-white tw-shadow-lg tw-shadow-slate-300-500/50  tw-rounded-[20px] tw-mb-${
-                                    index < 2 ? '[15px]' : '[35px]'
+                                    index < 2 ? '[25px]' : '[45px]'
                                 } `}
                             >
                                 <Link to={`/su-kien/khuyen-mai/${event.id}`}>
