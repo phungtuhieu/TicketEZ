@@ -34,6 +34,7 @@ class BaseApi {
         const res = await axiosClient.get(this.uri, { params });
         return res.data;
     }
+
 }
 
 export default BaseApi;
