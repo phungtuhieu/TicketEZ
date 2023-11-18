@@ -227,20 +227,27 @@ function SeatChart(props) {
 
     const onClickData = async (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
-        while (normalSeat.indexOf(seat) > -1) {
-            normalSeat.splice(normalSeat.indexOf(seat), 1);
+        // while (normalSeat.indexOf(seat) > -1) {
+        //     normalSeat.splice(normalSeat.indexOf(seat), 1);
+        // }
+        // while (vipSeat.indexOf(seat) > -1) {
+        //     vipSeat.splice(vipSeat.indexOf(seat), 1);
+        // }
+        // while (seatReserved.indexOf(seat) > -1) {
+        //     seatReserved.splice(seatReserved.indexOf(seat), 1);
+        // }
+        if (seatReserved.length >= 8) {
+            alert('Quý khách chỉ có thể chọn tối đa 8 ghế 1 lần.');
+            return;
         }
-        while (vipSeat.indexOf(seat) > -1) {
-            vipSeat.splice(vipSeat.indexOf(seat), 1);
-        }
-        while (seatReserved.indexOf(seat) > -1) {
+        if (seatReserved.indexOf(seat) > -1) {
             seatReserved.splice(seatReserved.indexOf(seat), 1);
+        } else {
+            setSeatState({
+                ...seatState,
+                seatReserved: [...seatReserved, seat],
+            });
         }
-        setSeatState({
-            ...seatState,
-            seatReserved: [...seatReserved, seat],
-        });
-        // setChangeDataSeat(!changeDataSeat);
     };
     // Lọc ghế trùng
     const [duplicateSeat, setDuplicateSeat] = useState([]);
@@ -315,7 +322,30 @@ function SeatChart(props) {
         onCreateDaTaSeatChoose();
         showModal();
     };
+    // Lấy thời gian bắt đầu phim--------------------------------------------------
+    const startDate = new Date(showtime.startTime);
+    const startHour = startDate.getHours();
+    const startMinute = startDate.getMinutes();
+    const startSecond = startDate.getSeconds();
+    const formattedStartTime = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+    // Lấy thời gian kết thúc phim
+    const endDate = new Date(showtime.endTime);
+    const endHour = endDate.getHours();
+    const endMinute = endDate.getMinutes();
+    const endSecond = endDate.getSeconds();
+    const formattedEndTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
 
+    // Lấy ngày hiện tại
+    const currentDate = new Date();
+
+    // Lấy ngày và tháng từ đối tượng ngày
+    const dayOfMonth = startDate.getDate();
+    const month = startDate.getMonth() + 1;
+
+    const isToday =
+        startDate.getDate() === currentDate.getDate() &&
+        startDate.getMonth() === currentDate.getMonth() &&
+        startDate.getFullYear() === currentDate.getFullYear();
     return (
         <>
             <Card className="card" style={{ display: 'flex' }}>
@@ -380,7 +410,60 @@ function SeatChart(props) {
                     </Col>
                 </Row>
 
-                <Row gutter={50}>
+                <Row gutter={50} className="tw-bg-white">
+                    <Col span={24}>
+                        <div className="tw-mt-6">
+                            <b className="tw-text-3xl tw-line-clamp-1 tw-md:line-clamp-none">Chiếm Đoạt</b>
+                        </div>
+                        <div className="tw-mb-4">
+                            <span className="tw-block tw-text-tiny tw-text-orange-500 tw-lg:text-sm">
+                                {formattedStartTime} ~ {formattedEndTime} {isToday ? 'Hôm nay' : null}, {dayOfMonth}/
+                                {month} · {showtime.formatMovie.movie.title} · {showtime.formatMovie.format.name}
+                            </span>
+                        </div>
+                        <hr />
+                        <div className="tw-opacity-90"></div>
+                    </Col>
+                    <Col span={24}>
+                        <div>
+                            <div className="tw-flex tw-items-center tw-justify-between tw-space-x-3 tw-py-1.5">
+                                <span className="tw-shrink-0 tw-text-gray-500">Chỗ ngồi</span>
+                                {seatState && seatState.seatReserved && (
+  <div
+    style={{ border: '1px solid' }}
+    className="tw-flex tw-flex-wrap tw-flex tw-items-center tw-space-x-2 tw-rounded-lg tw-border tw-border-gray-200 tw-px-3 tw-py-1"
+  >
+    {seatState.seatReserved.map((isReserved, index, array) => (
+      <React.Fragment key={index}>
+        <div>
+          <span>{isReserved}</span>
+        </div>
+        {index < array.length - 1 && ','}
+      </React.Fragment>
+    ))}
+    {seatState && seatState.seatReserved && (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="rgb(239 68 68)"
+        viewBox="0 0 24 24"
+        strokeWidth="2"
+        stroke="currentColor"
+        aria-hidden="true"
+        className="tw-h-6 tw-shrink-0 tw-cursor-pointer tw-text-white tw-transition-all tw-hover:opacity-70"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+    )}
+  </div>
+)}
+
+                            </div>
+                        </div>
+                    </Col>
                     <Col span={120}>
                         <div style={{ marginTop: '50px' }}>
                             <Space size={[0, 200]} wrap>
