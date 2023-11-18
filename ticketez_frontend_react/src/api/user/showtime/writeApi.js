@@ -75,6 +75,16 @@ export const movieUserApi = {
             return error;
         }
     },
+    getMoviesByGenreNameAndCountryAndYearAndSearch: async (page, limit, genreName, country, year, search) => {
+        try {
+            const params = { page, limit, genreName, country, year, search };
+            const result = await axiosClient.get(urlMovie + '/get/find-movie-by-genre-country-year-search', { params });
+            return result.data;
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    },
 };
 // ****************************************************************
 

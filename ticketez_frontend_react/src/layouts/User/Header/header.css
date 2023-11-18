@@ -26,7 +26,7 @@ ul {
 button {
   background: #e50813;
   outline: none;
-  border: none;
+  /* border: none; */
   color: #fff;
   padding: 12px 40px;
   font-weight: 500;
