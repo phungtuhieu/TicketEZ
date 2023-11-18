@@ -1,8 +1,8 @@
 
 USE master
 go
---CREATE DATABASE TicketEZ 
---GO
+CREATE DATABASE TicketEZ 
+GO
     -- DROP DATABASE TicketEZ 
     USE TicketEZ
 GO
@@ -1402,7 +1402,7 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
 VALUES
-  ('2023-11-15 10:00:00', '2023-11-15 12:00:00', 1, 1, 1,1),
+  ('2023-11-16 10:00:00', '2023-11-16 12:00:00', 1, 1, 4,4),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
   ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
   ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);

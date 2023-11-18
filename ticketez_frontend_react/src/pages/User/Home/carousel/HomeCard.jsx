@@ -22,7 +22,7 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                 </Col>
                 <Col>
                     <Row>
-                        <Col span={14} className="col-title">
+                        <Col span={18} className="col-title">
                             <div className="movie-title">{movie.title}</div>
                             <div className="rating ">
                                 <i className="fa fa-star"></i>
@@ -36,13 +36,13 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                             </div>
                             <p className="description">{movie.description}</p>
                             <div className="cast">
-                                <p className="tw-flex tw-items-center">
+                                <p className="tw-flex tw-items-center ">
                                     <span className="tw-mr-2">Diễn viên: </span>
 
                                     {actors.map((actor, index) => (
                                         <React.Fragment key={actor.id}>
                                             <li>{actor.fullname}</li>
-                                            {index < genres.length - 1 && <span className="tw-mx-2">,</span>}
+                                            {index < actors.length - 1 && <span className="tw-mx-2 tw-text-white">,</span>}
                                         </React.Fragment>
                                     ))}
                                 </p>
@@ -62,7 +62,7 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                                 <FontAwesomeIcon icon={faPlay} /> Xem ngay
                             </button>
                         </Col>
-                        <Col span={10}>
+                        <Col span={6}>
                             <div className="palyButton ">
                                 <Link to={`/singlepage/${movie.id}`}>
                                     <button>
