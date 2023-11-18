@@ -1,6 +1,7 @@
 import axios from 'axios';
 import funcUtils from '~/utils/funcUtils';
 import httpStatus from './httpStatus';
+import authApi from '../user/Security/authApi';
 
 const baseUrl = process.env.REACT_APP_TICKET_PRODUCTION_REST_API;
 // setup axios client
@@ -40,19 +41,19 @@ axiosClient.interceptors.response.use(
     },
 );
 
-// axiosClient.interceptors.request.use(
-//   (config) => {
-//     console.log('Interceptor is running');
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//       config.headers['Authorization'] = `Bearer ${token}`;
-//       console.log('yes');
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   },
-// );
+axiosClient.interceptors.request.use(
+    (config) => {
+        // console.log('Interceptor is running');
+        const token = authApi.getToken();
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+            // console.log('yes');
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
 
 export default axiosClient;

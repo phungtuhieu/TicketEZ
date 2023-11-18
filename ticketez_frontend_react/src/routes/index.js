@@ -4,6 +4,7 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 import LoginSignin from '~/components/Auth/LoginResgiter';
 
+
 const publicRoutes = [
     //Admin
     { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout },
@@ -47,6 +48,8 @@ const publicRoutes = [
 ];
 
 
-const privateRoutes = [];
+const privateRoutes = [
+
+];
 
 export { publicRoutes, privateRoutes };
