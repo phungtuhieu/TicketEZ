@@ -7,6 +7,7 @@ import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 import {
     faAddressCard,
     faChevronRight,
@@ -18,9 +19,11 @@ import {
     faSearch,
     faTicket,
 } from '@fortawesome/free-solid-svg-icons';
-import { useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 
 const Header = () => {
+       const navigate = useNavigate();
+
     const location = useLocation();
 
     const allowedPaths = [
@@ -76,12 +79,17 @@ const Header = () => {
     ];
 
     const scrollToShowTimes = () => {
+        navigate('/');
         scroll.scrollTo(1800);
     };
-    const scrollToMovieUpcoming = () => {
-        scroll.scrollTo(1200);
-    };
+   const scrollToMovieUpcoming = () => {
+       navigate('/');
+       // Assuming you are using a library like react-scroll for scrolling
+       // Replace 'scrollTo' with the actual scrolling logic you are using
+       scroll.scrollTo(1200);
+   };
     const scrollToMovieShowing = () => {
+        navigate('/');
         scroll.scrollTo(600);
     };
     return (
@@ -155,17 +163,30 @@ const Header = () => {
                         <Divider className="tw-mt-[-5px]" />
                         <div className="tw-container tw-mx-auto tw-px-[150px] tw-mt-[-10px] tw-mb-[10px] tw-text-gray-700 tw-font-2xl tw-font-[var(--font-family)]">
                             <Breadcrumb
-                                separator=<FontAwesomeIcon icon={faChevronRight} />
+                                separator={null}
                                 items={[
                                     {
                                         href: '/',
                                         title: <FontAwesomeIcon icon={faHome} />,
-                                        className: '',
+                                    },
+                                    {
+                                        type: 'separator',
+                                        separator: <FontAwesomeIcon icon={faChevronRight} />,
+                                    },
+                                    {
+                                        title: 'Sự kiện',
+                                        className: ' tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)]',
+                                    },
+                                    {
+                                        type: 'separator',
+                                        separator: <FontAwesomeIcon icon={faChevronRight} />,
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage && location.pathname === '/su-kien/tin-tuc'
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
                                         }`,
@@ -177,9 +198,15 @@ const Header = () => {
                                         ),
                                     },
                                     {
+                                        type: 'separator',
+                                        separator: ' | ',
+                                    },
+                                    {
                                         href: '/su-kien/khuyen-mai',
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage && location.pathname === '/su-kien/khuyen-mai'
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
                                         }`,

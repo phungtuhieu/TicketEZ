@@ -13,6 +13,8 @@ import ListPhim from '../ListPhim/ListPhim';
 
 import cinemaChainApi from '~/api/admin/managementCinema/cinemaChainApi';
 import uploadApi from '~/api/service/uploadApi';
+import { useParams } from 'react-router-dom';
+import { movieApi } from '~/api/admin';
 
 const cx = classNames.bind(style);
 
@@ -87,7 +89,24 @@ function ViTri() {
     // loại rạp
     const [cinemaChainName, setCinemaChainName] = useState('tất cả');
     const [dataCinemaChainName, setDataCinemaChainName] = useState([]);
+    const [dataMovieByID, setDataMovieByID] = useState([]);
+    const { movieId } = useParams();
     useEffect(() => {
+          if (movieId) {
+              const getList = async () => {
+                  try {
+                      const res = await movieApi.getById(movieId);
+                      setDataMovieByID(res.data);
+                  } catch (error) {
+                      if (error.hasOwnProperty('response')) {
+                          funcUtils.notify(error.response.data, 'error');
+                      } else {
+                          console.log(error);
+                      }
+                  }
+              };
+              getList();
+          }
         const getCinemaChain = async () => {
             try {
                 const res = await cinemaChainApi.get();
@@ -101,7 +120,7 @@ function ViTri() {
             }
         };
         getCinemaChain();
-    }, []);
+    }, [movieId]);
 
 
     // value props
@@ -122,7 +141,7 @@ function ViTri() {
                 }}
             >
                 <div className={cx('khungne')}>
-                    <span className={cx('ten-phim')}>Lịch chiếu Đất Rừng Phương Nam</span>
+                    <span className={cx('ten-phim')}>Lịch chiếu {dataMovieByID?.movie?.title}</span>
                     <div className={cx('wrapper-vitri')}>
                         <Button className={cx('btn-first')} onClick={showModal} icon={<EnvironmentOutlined />}>
                             {provinces.name}
@@ -221,11 +240,7 @@ function ViTri() {
                                     onClick={() => setCinemaChainName(name.name)}
                                 >
                                     <div className={cx('border')}>
-                                        <img
-                                            className={cx('img')}
-                                            src={uploadApi.get(name.image)}
-                                            alt=""
-                                        />
+                                        <img className={cx('img')} src={uploadApi.get(name.image)} alt="" />
                                     </div>
                                     <div className={cx('title')}>{name.name} </div>
                                 </div>

@@ -18,7 +18,6 @@ const BannerDetail = () => {
     const [dataMovie, setDaTaMovie] = useState(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    console.log("123",dataMovie);
     const handleToggle = () => {
         setExpanded(!expanded);
     };

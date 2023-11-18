@@ -20,7 +20,6 @@ const Event = () => {
             <div className="tw-container tw-mx-auto tw-px-[150px] tw-bg-white tw-text-black  tw-mt-5">
                 <Row gutter={22}>
                     <Col lg={16}>
-                       
                         {isEventTinTucPage && (
                             <>
                                 <EventListTinTuc />
@@ -32,10 +31,10 @@ const Event = () => {
                             </>
                         )}
                     </Col>
-                    <Col lg={8} style={{ borderLeft: '1px solid #D4D4D4' }}>
+                    <Col lg={8} style={{ borderLeft: '1px solid #D4D4D4' }} className="tw-sticky tw-t-0">
                         <p className="tw-font-semibold tw-text-pink-500 tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
-                            <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl mr-1" />
-                            Tin tức liên quan
+                            <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl tw-mr-2" />
+                            khuyến mãi mới nhất
                         </p>
                         <EventRight />
                     </Col>
