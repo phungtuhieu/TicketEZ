@@ -13,6 +13,7 @@ import { accountApi } from '~/api/admin';
 import bookingApi from '~/api/user/booking/bookingApi';
 import httpStatus from '~/api/global/httpStatus';
 import funcUtils from '~/utils/funcUtils';
+import { useNavigate } from 'react-router-dom';
 const cx = classNames.bind(style);
 
 function BookingDetail(props) {
@@ -20,8 +21,10 @@ function BookingDetail(props) {
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
     const [loading, setLoading] = useState(true);
+    const [listPrice, setListPrice] = useState([]);
     const [ellipsis, setEllipsis] = useState(true);
     const [form] = Form.useForm();
+    const navigate = useNavigate();
     // Load table
     useEffect(() => {
         console.log('seatBooking2a', seatBooking);
@@ -50,18 +53,29 @@ function BookingDetail(props) {
                     };
                     const listPriceResp = await getPriceListBySeatTypeIdsAsync();
                     console.log('listPriceResp', listPriceResp);
+                    let listPr = [];
                     const totalAmount = seatBooking.reduce((total, item) => {
+                        const seatTypeAndPrice = {
+                            seatTypeId: 0,
+                            price: 0.0,
+                        };
                         const seatTypePrice = listPriceResp.data.find(
                             (price) => item.seatType.id === price.seatType.id,
                         );
+                        seatTypeAndPrice.seatTypeId = item.seatType.id;
                         if (seatTypePrice) {
                             const amountPrice =
                                 weekends[today] !== undefined ? seatTypePrice.weekendPrice : seatTypePrice.weekdayPrice;
+                            seatTypeAndPrice.price = amountPrice;
+                            listPr.push(seatTypeAndPrice);
                             return total + amountPrice;
                         } else {
+                            funcUtils.notify('Không tìm thấy giá của loại ghế này', 'error');
                             return (total = 0);
                         }
                     }, 0);
+
+                    setListPrice(listPr);
                     const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
                         style: 'currency',
                         currency: 'VND',
@@ -113,17 +127,17 @@ function BookingDetail(props) {
                 account: accResp.data,
                 showtime,
                 createDate: formattedDate,
+                status: 0, // 0: thành công, 1:thanh toán gặp lỗi
             };
 
             const bookingDto = {
                 booking,
                 seats: seatBooking,
+                listPrice,
             };
             const resp = await bookingApi.create(bookingDto);
-            console.log('resp', resp);
-            if (resp.status == httpStatus.OK) {
-                funcUtils.notify('Đã mua vé thành công!', 'success');
-            }
+            const payUrl = resp.data;
+            window.location.href = payUrl;
         } catch (error) {
             funcUtils.notify(error.data, 'error');
         }

@@ -1,6 +1,12 @@
 
+<<<<<<< HEAD
 USE master
 go
+=======
+USE [master]
+GO
+
+>>>>>>> 4bff40b3b55a1ac65dcde974770b5f7678a6a27c
 CREATE DATABASE TicketEZ 
 GO
     -- DROP DATABASE TicketEZ 
@@ -205,7 +211,7 @@ GO
 		id BIGINT IDENTITY(1, 1) NOT NULL,
         [seat_id] BIGINT NOT NULL,
         [booking_id] NVARCHAR(10) NOT NULL,
-        [status] INT NOT NULL, 
+		[price] FLOAT NOT NULL,
     )
 	go 
 	
@@ -213,7 +219,7 @@ GO
 		id BIGINT IDENTITY(1, 1) NOT NULL,
 		last_selected_time DATETIME,
 		[seat_id] BIGINT NOT NULL,
-	  showtime_id BIGINT NOT NULL,
+		showtime_id BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Price (
@@ -308,11 +314,10 @@ GO
 GO
     CREATE TABLE Booking (
         id NVARCHAR(10) NOT NULL,
-        -- HD23082023(Ngày giờ mili giây + hash)
         account_id NVARCHAR(20) NOT NULL,
         create_date DATETIME NOT NULL,
         showtime_id BIGINT NOT NULL,
-        
+        [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
     )
 GO
     CREATE TABLE Payment_Info (
@@ -1133,6 +1138,9 @@ VALUES
     (40000, '2023-10-05', '2023-10-31', 11),
     (30000, '2023-10-05', '2023-10-31', 12);
 GO
+
+
+
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
 INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name], [image], [description])
 VALUES
@@ -1259,7 +1267,13 @@ VALUES
 (N'Siêu Nhân Trái Đất', N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
 (N'Tinh Hoa Đất Việt', N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
-
+-- Chèn dữ liệu mẫu cho bảng Price
+INSERT INTO Price (weekday_price, weekend_price, [start_date], end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+VALUES
+    (65000, 75000, '2023-01-01', '2024-01-10', 1, 1, 1, 1),
+	(80000, 10000, '2023-01-01', '2024-01-10', 1, 2, 1, 1),
+    (75000, 89000, '2023-02-01', '2024-02-10', 1, 2, 2, 1);
+GO
   -- 13. Thêm dữ liệu cho bảng Discounts
 INSERT INTO [TicketEZ].[dbo].[Discounts] 
     ([title], [coupon_code], [amount], [start_date], [end_date], [status], [discount_type], [cinema_complex_id])
@@ -1409,19 +1423,21 @@ VALUES
 GO
 
 --24. thêm dữ liệu cho bảng booking
-INSERT INTO [TicketEZ].[dbo].[Booking] ([id], [account_id], [create_date], [showtime_id])
+/*
+INSERT INTO [TicketEZ].[dbo].[Booking] ([id], [account_id], [create_date], [showtime_id],[status])
 VALUES ('1','user10','2023-10-28', 1);
 
-go
+go*/
 --26. thêm dữ liệu bảng seatbooking
-INSERT INTO [TicketEZ].[dbo].[Seats_Booking] ([seat_id], [booking_id], [status])
+/*
+INSERT INTO [TicketEZ].[dbo].[Seats_Booking] ([seat_id], [booking_id])
 VALUES (2,1, 1),
 (3,1, 1),
 (4,1, 1),
 (5,1, 1)
 
 go
-
+*/
 --25. thêm dữ liệu bảng Directors
     INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
 VALUES

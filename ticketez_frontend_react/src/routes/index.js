@@ -4,7 +4,6 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 import LoginSignin from '~/components/Auth/LoginResgiter';
 
-
 const publicRoutes = [
     //Admin
     { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout },
@@ -44,12 +43,10 @@ const publicRoutes = [
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
-
+    { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: DefaultLayout },
+    { path: '/booking-paid', component: PageUser.BookingPaid, layout: DefaultLayout },
 ];
 
-
-const privateRoutes = [
-
-];
+const privateRoutes = [];
 
 export { publicRoutes, privateRoutes };
