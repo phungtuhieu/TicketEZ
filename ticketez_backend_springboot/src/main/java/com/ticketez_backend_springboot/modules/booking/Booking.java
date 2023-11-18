@@ -38,6 +38,7 @@ public class Booking {
 	@JoinColumn(name = "showtime_id")
 	private Showtime showtime;
 
+	private Integer status;
 	@OneToMany(mappedBy = "booking")
 	@JsonIgnore
 	private List<SeatBooking> seatsBookings;
