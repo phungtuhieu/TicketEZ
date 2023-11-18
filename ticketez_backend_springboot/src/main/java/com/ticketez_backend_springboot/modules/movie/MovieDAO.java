@@ -3,6 +3,8 @@ package com.ticketez_backend_springboot.modules.movie;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,6 +61,17 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time", nativeQuery = true)
         List<Movie> getMovieByShowtimeUpcoming();
 
+        // Lấy ra top 5 phim có booking cao nhất
+        @Query("SELECT m, COUNT(b) as bookingCount " +
+                        "FROM Movie m " +
+                        "LEFT JOIN m.formatsMovies fm " +
+                        "LEFT JOIN fm.showtimes st " +
+                        "LEFT JOIN st.bookings b " +
+                        "WHERE st.startTime >= CURRENT_TIMESTAMP " +
+                        "GROUP BY m.id, m.country, m.description, m.duration, m.movieProducer, m.movieStudio, m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title, m.videoTrailer "
+                        +
+                        "ORDER BY bookingCount DESC")
+        List<Movie> findTop5MoviesByBookingCount();
          @Query(value = "SELECT DISTINCT m.* " +
                          "FROM Movies m " +
                          "JOIN Formats_Movies fm ON fm.movie_id = m.id " +
@@ -76,5 +89,18 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                          "ORDER BY m.id; " +
                          "", nativeQuery = true)
         List<Movie> getMovieByShowtimeShowingByGenres(@Param("genresID") Long genresID);
+        @Query("SELECT m FROM Movie m JOIN m.genresMovies.genre g" +
+                        " WHERE g.name  LIKE CONCAT('%', :genreName, '%') "
+                        + "AND m.country  LIKE CONCAT('%', :country, '%') "
+                        + "AND YEAR(m.releaseDate)  LIKE CONCAT('%', :year, '%') "
+                        + "AND m.title LIKE CONCAT('%', :search, '%') GROUP BY m   ")
+        Page<Movie> findMovieByGenreAndCountryAndSearch(@Param("genreName") String genreName,
+                        @Param("country") String country,
+                        @Param("year") String year,
+                        @Param("search") String search,
+                        Pageable pageable);
+
+        @Query("SELECT m FROM Movie m WHERE m.releaseDate >= GETDATE() ORDER BY m.releaseDate ASC")
+        Page<Movie> findMovieByRandom(Pageable pageable);
 
 }

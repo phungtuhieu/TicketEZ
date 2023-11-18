@@ -23,11 +23,11 @@ public class Price {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private float weekdayPrice;
-	private float weekendPrice;
+	private Double weekdayPrice;
+	private Double weekendPrice;
 	private Date startDate;
 	private Date endDate;
-	private boolean status;
+	private Boolean status;
 
 	@ManyToOne
 	@JoinColumn(name = "seat_type_id")

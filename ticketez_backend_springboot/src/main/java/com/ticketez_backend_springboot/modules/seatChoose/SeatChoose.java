@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.seat.Seat;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,4 +28,9 @@ public class SeatChoose {
     @ManyToOne
 	@JoinColumn(name = "seat_id")
 	private Seat seat;
+
+	@ManyToOne
+	@JoinColumn(name = "showtime_id")
+	private Showtime showtime;
+
 }

@@ -30,6 +30,8 @@ public class SeatBooking {
 	@JoinColumn(name = "booking_id")
 	private Booking booking;
 
-	private int status; // Đã đặt, đang chọn, đã chọn
+	private Double price;
+
+	// private Integer status; // Đã đặt, đang chọn, đã chọn
 
 }

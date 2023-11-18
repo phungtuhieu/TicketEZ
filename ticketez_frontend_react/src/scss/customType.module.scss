@@ -3,9 +3,10 @@
 .t13,
 .t16,
 .t18,
-.dat-truoc {
+.dat-truoc,
+.sneak-show {
     min-width: 25px;
-    max-width: 55px;
+    max-width: 100px;
     color: #ffffff;
     display: flex;
     align-items: center;
@@ -15,7 +16,7 @@
     border-radius: 0.2rem;
     height: 18px;
     font-size: 10px;
-    padding-top: 3px;
+    padding: 5px 7px;
 
     &::after {
         content: '+';
@@ -53,12 +54,27 @@
 
 .dat-truoc {
     background-color: #ff5858;
-    width: 79px;
+    width: 95px;
+    height: 20px;
 
     &::after {
         content: '';
-        background-image: url('https://homepage.momocdn.net/fileuploads/svg/momo-file-230201104059.svg');
-        width: 79px;
+        background-image: url('../assets//img/logo-dat-truoc.svg');
+        width: 82px;
+        height: 20px;
+    }
+}
+
+
+.sneak-show {
+    background-color: #0091FF;
+    width: 108px;
+    height: 20px;
+
+    &::after {
+        content: '';
+        background-image: url('../assets/img/logo-ss.svg');
+        width: 88px;
         height: 20px;
     }
 }

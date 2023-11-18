@@ -29,6 +29,7 @@ import com.ticketez_backend_springboot.dto.MovieByShowtimeShowingDTO;
 import com.ticketez_backend_springboot.dto.MovieDTO;
 import com.ticketez_backend_springboot.dto.MovieShowtimeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.dto.SearchMovieDTO;
 import com.ticketez_backend_springboot.modules.actor.Actor;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovieDAO;
@@ -475,6 +476,83 @@ public class MovieAPI {
 
     }
 
+    @GetMapping("/get/find-movie-by-genre-country-year-search")
+    public ResponseEntity<?> findMovieByGenreAndCountryAndSearch(
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("genreName") Optional<String> genreName,
+            @RequestParam("country") Optional<String> country,
+            @RequestParam("year") Optional<String> year,
+            @RequestParam("search") Optional<String> search) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
+            }
+            if (genreName.isPresent() && genreName.get().equalsIgnoreCase("tất cả") ) {
+                genreName = Optional.empty();
+            }
+            if (country.isPresent() && country.get().equalsIgnoreCase("tất cả") || country.get().equalsIgnoreCase("tc") ) {
+                country = Optional.empty();
+            }
+            if (year.isPresent() && year.get().equalsIgnoreCase("tất cả") ) {
+                year = Optional.empty();
+            }
+
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+            Page<Movie> page = dao.findMovieByGenreAndCountryAndSearch(genreName.orElse(""), country.orElse(""),
+                    year.orElse(""), search.orElse(""), pageable);
+
+            SearchMovieDTO searchMovieDTO = new SearchMovieDTO();
+            List<SearchMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+
+            for (Movie movie : page.getContent()) {
+                SearchMovieDTO.MovieObjResp movieObjResp = searchMovieDTO.new MovieObjResp();
+                List<Genre> genres = new ArrayList<>();
+                for (GenreMovie genrMovie : movie.getGenresMovies()) {
+                    genres.add(genrMovie.getGenre());
+                }
+                movieObjResp.setMovie(movie);
+                movieObjResp.setGenres(genres);
+                listMovieObjResp.add(movieObjResp);
+                searchMovieDTO.setListMovieObjResp(listMovieObjResp);
+            }
+
+            searchMovieDTO.setTotalItems(page.getTotalElements());
+            searchMovieDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(searchMovieDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server12", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/get/movie-suggest")
+    public ResponseEntity<?> getMovieByRandom(@RequestParam("limit") Optional<Integer> limit) {
+        try {
+            Pageable pageable = PageRequest.of(0, limit.orElse(10));
+            Page<Movie> page = dao.findMovieByRandom( pageable);
+            MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
+            List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+            for (Movie movie : page.getContent()) {
+                MovieByShowtimeShowingDTO.MovieObjResp movieObjResp = movieShowingDTO.new MovieObjResp();
+                List<Genre> genres = new ArrayList<>();
+                for (GenreMovie genreMovie : movie.getGenresMovies()) {
+                    genres.add(genreMovie.getGenre());
+                }
+                movieObjResp.setMovie(movie);
+                movieObjResp.setGenres(genres);
+                listMovieObjResp.add(movieObjResp);
+                movieShowingDTO.setListMovieObjResp(listMovieObjResp);
+            }
+            return ResponseEntity.ok(movieShowingDTO);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     // lấy actor và director theo id của movie
     @GetMapping("/get/actor-director-by-movie/{id}")
     public ResponseEntity<?> getActorAndDirector(@PathVariable("id") Long id) {
@@ -549,6 +627,38 @@ public class MovieAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // Lấy ra 5 sản phẩm có booking cao nhất
+    @GetMapping("/get/fivemovie")
+    public ResponseEntity<List<MovieDTO>> findFiveMovie() {
+        List<Movie> movies = dao.findTop5MoviesByBookingCount();
+        List<MovieDTO> movieDTOList = new ArrayList<>();
+
+        for (Movie movie : movies) {
+            List<Actor> actors = new ArrayList<>();
+            List<Director> directors = new ArrayList<>();
+            List<Format> formats = new ArrayList<>();
+            List<Genre> genres = new ArrayList<>();
+
+            for (ActorMovie actorMovie : movie.getActorsMovies()) {
+                actors.add(actorMovie.getActor());
+            }
+            for (DirectorMovie directorMovie : movie.getDirectorsMovies()) {
+                directors.add(directorMovie.getDirector());
+            }
+            for (FormatMovie formatMovie : movie.getFormatsMovies()) {
+                formats.add(formatMovie.getFormat());
+            }
+            for (GenreMovie genreMovie : movie.getGenresMovies()) {
+                genres.add(genreMovie.getGenre());
+            }
+
+            MovieDTO movieDTO = new MovieDTO(movie, directors, actors, genres, formats);
+            movieDTOList.add(movieDTO);
+        }
+
+        return ResponseEntity.ok(movieDTOList);
     }
 
     @GetMapping("/get/movie-by-showtime-showing-genres/{genresId}")

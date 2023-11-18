@@ -1,77 +1,98 @@
-import React from 'react';
-import { Button, Checkbox,  Form, Input } from 'antd';
+import React, { useState } from 'react';
+import { Button, Checkbox, Form, Input, notification } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import classNames from 'classnames/bind';
+import authApi from '~/api/user/Security/authApi';
 
 const cx = classNames.bind(styles);
 
-const formItem = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-};
+const LoginForm = () => {
+    const [loginError, setLoginError] = useState('');
+    const navigate = useNavigate();
+    const onFinish = async (values) => {
+        try {
+            authApi.getLogin({
+                id: values.id,
+                password: values.password,
+            });
 
-const onFinish = (values) => {
-    console.log('Success:', values);
-};
-const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-};
-const App = () => (
-    <>
+            console.log(authApi.getToken());
+            console.log(authApi.getUser());
+
+
+
+            notification.success({ message: 'Đăng nhập thành công!' });
+
+            navigate('/');
+
+
+        } catch (error) {
+            setLoginError(error.message);
+            notification.error({ message: 'Đăng nhập thất bại', description: error.message });
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+             authApi.logout();
+            localStorage.clear();
+            notification.success({ message: 'Đã đăng xuất!' });
+        } catch (error) {
+            notification.error({ message: 'Đăng xuất thất bại', description: error.message });
+        }
+    };
+
+    return (
         <Form
-            style={{
-                maxWidth: 600,
-            }}
-            initialValues={{
-                remember: true,
-            }}
+            name="basic"
+            initialValues={{ remember: true }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
+            className={cx('login-form')}
         >
-            <Form.Item wrapperCol={{ span: 24 }}>
-                <div className={cx('name-login')}>
-                    <h1>Đăng nhập</h1>
-                    <span className={cx('des-name-login')}>
-                        Vui lòng nhập tài khoản và mật khẩu để có trải nghiệm tốt hơn
-                    </span>
-                </div>
-            </Form.Item>
+            <h1 className={cx('login-title')}>Đăng nhập</h1>
+
+            {loginError && <p className={cx('login-error')}>{loginError}</p>}
+
             <Form.Item
-                {...formItem}
                 label="Tài khoản"
-                name="username"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input your username!',
-                    },
-                ]}
+                name="id"
+                rules={[{ required: true, message: 'Vui lòng nhập tài khoản của bạn!' }]}
             >
                 <Input />
             </Form.Item>
+
             <Form.Item
-                {...formItem}
                 label="Mật khẩu"
                 name="password"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input your password!',
-                    },
-                ]}
+                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu của bạn!' }]}
             >
                 <Input.Password />
             </Form.Item>
-            <Form.Item wrapperCol={{ span: 4, offset: 8 }} name="remember" valuePropName="checked">
-                <Checkbox>nhớ tôi ?</Checkbox>
+
+            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8 }}>
+                <Checkbox>Nhớ tôi</Checkbox>
             </Form.Item>
-            <Form.Item wrapperCol={{ span: 16, offset: 8 }}>
-                <Button type="primary" htmlType="submit" block className={cx('buttonSubmit')}>
+
+            <Form.Item
+                wrapperCol={{ offset: 8, span: 16 }}
+            >
+                <Button type="primary" htmlType="submit" block>
                     Đăng nhập
                 </Button>
             </Form.Item>
+            <div className=''>
+                <Button type="default" onClick={handleLogout} block>
+                    Đăng xuất
+                </Button>
+            </div>
+            <div className=''>
+
+            </div>
         </Form>
-    </>
-);
-export default App;
+
+    );
+};
+
+export default LoginForm;

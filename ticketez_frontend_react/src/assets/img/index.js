@@ -31,6 +31,9 @@ import icon2 from '../icon/icon2.png';
 import icon3 from '../icon/icon3.png';
 import momo from '../icon/momo.png';
 
+import check from '../icon/check-solid.svg';
+
+
 export const listIcon = {
     markerPink,
     veXimPhim,
@@ -47,6 +50,7 @@ export const listIcon = {
     icon2,
     icon3,
     momo,
+    check,
 };
 
 const img = {

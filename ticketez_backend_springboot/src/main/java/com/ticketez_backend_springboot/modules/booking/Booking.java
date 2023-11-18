@@ -11,6 +11,7 @@ import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -30,12 +31,14 @@ public class Booking {
 	@JoinColumn(name = "account_id")
 	private Account account;
 
+	@Column(name = "create_date")
 	private Date createDate;
 
 	@ManyToOne
 	@JoinColumn(name = "showtime_id")
 	private Showtime showtime;
 
+	private Integer status;
 	@OneToMany(mappedBy = "booking")
 	@JsonIgnore
 	private List<SeatBooking> seatsBookings;
@@ -45,8 +48,10 @@ public class Booking {
 	private List<DiscountsBooking> discountsBookings;
 
 	@OneToMany(mappedBy = "booking")
+	@JsonIgnore
 	private List<ServiceBooking> servicesBookings;
 
 	@OneToMany(mappedBy = "booking")
+	@JsonIgnore
 	private List<PaymentInfo> paymentInfos;
 }
