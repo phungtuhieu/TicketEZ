@@ -12,20 +12,17 @@ const reviewApi = {
     },
     post: async (data, accountId, movieId) => {
         const [account, movie] = await Promise.all([
-            accountApi.getId(accountId),
-            movieApi.getId(movieId),
+            accountApi.getById(accountId),
+            movieApi.getById(movieId),
         ]);
-        const values = { ...data, account: account.data, movie: movie.data };
+        const values = { ...data, account: account.data, movie: movie.data.movie };
         console.log('values', values);
         return axiosClient.post(url, values);
     },
-    put: async (id, data, accountId, movieId) => {
-        const [account, movie] = await Promise.all([
-            accountApi.getId(accountId),
-            movieApi.getId(movieId),
-        ]);
-        const values = { id: id, ...data, account: account.data, movie: movie.data };
-        return axiosClient.put(url + '/' + id, values);
+    put: async ( data) => {
+    
+        const values = { ...data };
+        return axiosClient.put(url + '/' + values.id ,  values);
     },
     delete: async (reviewId) => {
         return axiosClient.delete(url + '/' + reviewId);

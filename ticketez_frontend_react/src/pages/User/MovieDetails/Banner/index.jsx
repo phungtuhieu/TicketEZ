@@ -10,7 +10,6 @@ import { Col, Modal, Row, Typography } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-
 const cx = classNames.bind(style);
 const BannerDetail = () => {
     const { Paragraph, Title } = Typography;
@@ -18,6 +17,7 @@ const BannerDetail = () => {
     const [dataMovie, setDaTaMovie] = useState(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    // console.log("123",dataMovie);
     const handleToggle = () => {
         setExpanded(!expanded);
     };
@@ -97,11 +97,11 @@ const BannerDetail = () => {
         setIsModalOpen(false);
     };
 
-     const handleCancel = () => {
-         setIsModalOpen(false);
-         setSelectedMovie(null);
-     };
-     const [ellipsis] = useState(true);
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setSelectedMovie(null);
+    };
+    const [ellipsis] = useState(true);
 
     return (
         <div className="background" style={background}>
