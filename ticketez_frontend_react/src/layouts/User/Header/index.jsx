@@ -126,6 +126,11 @@ const Header = () => {
                                 Sự kiện
                             </a>
                         </div>
+                        <div className="tw-xl:tw-hidden tw-mr-[20px] ">
+                            <a href="/review" className="tw-text-gray-700">
+                               Review Phim
+                            </a>
+                        </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">
                             <FontAwesomeIcon icon={faSearch} />
                         </div>

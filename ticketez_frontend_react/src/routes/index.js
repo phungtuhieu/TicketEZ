@@ -39,6 +39,7 @@ const publicRoutes = [
     { path: '/contact', component: UserContact, layout: DefaultLayout },
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
+    { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
 ];
 
 

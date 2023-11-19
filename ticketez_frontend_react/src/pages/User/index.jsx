@@ -7,4 +7,6 @@ export { default as EventKhuyenMai } from './Event/EventList/EventKhuyenMai';
 export { default as EventTinTuc } from './Event/EventList/EventTinTuc';
 export { default as EventDetails } from './Event/EventDetails';
 export { default as Event } from './Event';
-export { default as MovieDetails } from './MovieDetails'
+export { default as MovieDetails } from './MovieDetails';
+export { default as ReviewMovie } from './Review';
+

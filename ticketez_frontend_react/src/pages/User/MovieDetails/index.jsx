@@ -19,7 +19,7 @@ function MovieDetails() {
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center', background: '#ffffff', minHeight: 2000 }}
                 >
-                    <Row style={{ width: 1088, height: 1000 }}>
+                    <Row style={{ width: 1088, height: 'auto' }}>
                         <Col span={16}>
                             <Row>
                                 <Col span={24} style={{}}>
