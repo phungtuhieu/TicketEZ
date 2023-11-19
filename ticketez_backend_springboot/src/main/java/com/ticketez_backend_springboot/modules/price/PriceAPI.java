@@ -41,6 +41,13 @@ public class PriceAPI {
         return ResponseEntity.ok(priceDAO.findById(id).get());
     }
 
+    @GetMapping("/find-by-id-cinema-compex-movie/{cinemaComplexId}/{movieId}")
+    public ResponseEntity<List<Price>> findByIdCinemaComplexAndMovie(
+            @PathVariable("cinemaComplexId") Long CinemaComplexId, @PathVariable("movieId") Long movieId) {
+
+        return ResponseEntity.ok(priceDAO.findPricesByCinemaComplexIdAndMovieId(CinemaComplexId, movieId));
+    }
+
     @PostMapping("/get/price-by-seattype")
     public ResponseEntity<?> getPriceListBySeatTypeIds(@RequestBody PriceFindDTO priceFindDTO) {
         try {

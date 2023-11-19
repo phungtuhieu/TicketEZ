@@ -1469,6 +1469,13 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
 
+-- Inserting sample data into the Price table
+INSERT INTO Price (weekday_price, weekend_price, start_date, end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+VALUES
+    (10.00, 15.00, '2023-11-20', '2023-11-27', 1, 1, 2, 1),
+    (12.00, 18.00, '2023-11-20', '2023-11-27', 1, 2, 2, 1),
+    (20.00, 12.00, '2023-11-20', '2023-11-27', 1, 4, 2, 1)
+
 SELECT * FROM Accounts
 SELECT * FROM Verification
 SELECT * FROM Reviews
