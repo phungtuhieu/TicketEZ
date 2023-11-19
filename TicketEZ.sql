@@ -1,12 +1,7 @@
 
-<<<<<<< HEAD
-USE master
-go
-=======
 USE [master]
 GO
 
->>>>>>> 4bff40b3b55a1ac65dcde974770b5f7678a6a27c
 CREATE DATABASE TicketEZ 
 GO
     -- DROP DATABASE TicketEZ 
@@ -318,6 +313,7 @@ GO
         create_date DATETIME NOT NULL,
         showtime_id BIGINT NOT NULL,
         [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
     )
 GO
     CREATE TABLE Payment_Info (
