@@ -313,6 +313,7 @@ GO
         create_date DATETIME NOT NULL,
         showtime_id BIGINT NOT NULL,
         [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
     )
 GO
     CREATE TABLE Payment_Info (

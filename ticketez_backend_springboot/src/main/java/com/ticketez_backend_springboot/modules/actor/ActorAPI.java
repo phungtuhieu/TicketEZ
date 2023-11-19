@@ -43,7 +43,7 @@ public class ActorAPI {
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<Actor> page = actorDAO.findByKeyword(search.orElse(""),pageable);
+            Page<Actor> page = actorDAO.findByKeyword(search.orElse(""), pageable);
             ResponseDTO<Actor> responseDTO = new ResponseDTO<>();
             responseDTO.setData(page.getContent());
             responseDTO.setTotalItems(page.getTotalElements());

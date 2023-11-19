@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './movieShowing.module.scss';
 import Slider from 'react-slick';
-import { Col, Modal, Rate, Row,  Tag, Typography } from 'antd';
+import { Col, Modal, Rate, Row, Tag, Typography } from 'antd';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
 import funcUtils from '~/utils/funcUtils';
-import { Link, } from 'react-router-dom';
-import { CloseCircleOutlined,  LoadingOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import img from '~/assets/img';
 
 const cx = classNames.bind(style);
@@ -131,12 +131,12 @@ const MovieShowing = () => {
             style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
         />
     );
-     const [isLoadingPage, setIsLoading] = useState(true);
-     useEffect(() => {
-         setTimeout(() => {
-             setIsLoading(false);
-         }, 1000);
-     }, []);
+    const [isLoadingPage, setIsLoading] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    }, []);
     return (
         <div className={cx('body')}>
             <p className={cx('name-card')}>
