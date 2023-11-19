@@ -39,6 +39,9 @@ public class Booking {
 	private Showtime showtime;
 
 	private Integer status;
+
+	@Column(name = "ticket_status")
+	private Integer ticketStatus;
 	@OneToMany(mappedBy = "booking")
 	@JsonIgnore
 	private List<SeatBooking> seatsBookings;
