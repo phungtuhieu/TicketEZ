@@ -93,6 +93,7 @@ function SeatChart(props) {
     const [seatState, setSeatState] = useState();
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
     const [seatBookingData, setSeatBookingData] = useState([]);
+    const [prices, setPrices] = useState([]);
 
     const fetchDataSeatBooking = async () => {
         try {
@@ -182,6 +183,12 @@ function SeatChart(props) {
                 return prevState;
             });
 
+            const respPrice = await axiosClient.get(
+                `price/find-by-id-cinema-compex-movie/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
+            );
+            const newPrices = respPrice.data.map((price) => price);
+            setPrices(newPrices);
+
             // console.log(listWay);
             // console.log(listSeatNormal);
             // console.log(listSeatVip);
@@ -225,23 +232,66 @@ function SeatChart(props) {
         const respVip = await axiosClient.put(`seat/${idSeat}`, data);
     };
 
+    // Lấy price từ ghế
+
+    const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
+        let result = null;
+
+        seatStateArray.forEach((seatItem) => {
+            if (seatItem === seat) {
+                result = prices.find((price) => price.seatType.id === seatTypeId);
+                return;
+            }
+        });
+
+        return result;
+    };
+
+    // Check giá theo ngày
+    const moment = require('moment');
+
+    const getSeatPrice = (priceOneSeat) => {
+        const currentDate = moment();
+        const dayOfWeek = currentDate.day();
+
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            return priceOneSeat.weekdayPrice;
+        } else if (dayOfWeek === 6 || dayOfWeek === 0) {
+            return priceOneSeat.weekendPrice;
+        } else {
+            return null;
+        }
+    };
+
+    const [priceSeats, setPriceSeats] = useState(0);
     const onClickData = async (seat) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
-        while (normalSeat.indexOf(seat) > -1) {
-            normalSeat.splice(normalSeat.indexOf(seat), 1);
-        }
-        while (vipSeat.indexOf(seat) > -1) {
-            vipSeat.splice(vipSeat.indexOf(seat), 1);
-        }
-        while (seatReserved.indexOf(seat) > -1) {
+
+        let normal = findPriceBySeatType(seatState.normalSeat, seat, 1);
+        let vip = findPriceBySeatType(seatState.vipSeat, seat, 2);
+
+        const priceOneSeat = normal ? normal : vip;
+
+        const seatPrices = getSeatPrice(priceOneSeat);
+
+        if (seatReserved.indexOf(seat) > -1) {
             seatReserved.splice(seatReserved.indexOf(seat), 1);
+            // Trừ tiền
+            setPriceSeats(priceSeats - seatPrices);
+        } else {
+            if (seatReserved.length >= 8) {
+                alert('Quý khách chỉ có thể chọn tối đa 8 ghế 1 lần.');
+                return;
+            }
+            setSeatState({
+                ...seatState,
+                seatReserved: [...seatReserved, seat],
+            });
+            // Cộng tiền
+            setPriceSeats(priceSeats + seatPrices);
         }
-        setSeatState({
-            ...seatState,
-            seatReserved: [...seatReserved, seat],
-        });
-        // setChangeDataSeat(!changeDataSeat);
     };
+
     // Lọc ghế trùng
     const [duplicateSeat, setDuplicateSeat] = useState([]);
     const [seatBooking, setSeatBooking] = useState([]);
@@ -316,6 +366,40 @@ function SeatChart(props) {
         showModal();
     };
 
+    const deleteSeat = () => {
+        // setSeatState({ seatReserved: [] });
+
+        setSeatState({
+            ...seatState,
+            seatReserved: [],
+        });
+        setPriceSeats(0);
+    };
+
+    // Lấy thời gian bắt đầu phim--------------------------------------------------
+    const startDate = new Date(showtime.startTime);
+    const startHour = startDate.getHours();
+    const startMinute = startDate.getMinutes();
+    const startSecond = startDate.getSeconds();
+    const formattedStartTime = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+    // Lấy thời gian kết thúc phim
+    const endDate = new Date(showtime.endTime);
+    const endHour = endDate.getHours();
+    const endMinute = endDate.getMinutes();
+    const endSecond = endDate.getSeconds();
+    const formattedEndTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
+
+    // Lấy ngày hiện tại
+    const currentDate = new Date();
+
+    // Lấy ngày và tháng từ đối tượng ngày
+    const dayOfMonth = startDate.getDate();
+    const month = startDate.getMonth() + 1;
+
+    const isToday =
+        startDate.getDate() === currentDate.getDate() &&
+        startDate.getMonth() === currentDate.getMonth() &&
+        startDate.getFullYear() === currentDate.getFullYear();
     return (
         <>
             <Card className="card" style={{ display: 'flex' }}>
@@ -380,9 +464,70 @@ function SeatChart(props) {
                     </Col>
                 </Row>
 
-                <Row gutter={50}>
+                <Row gutter={50} className="tw-bg-white">
+                    <Col span={24}>
+                        <div className="tw-mt-6">
+                            <b className="tw-text-3xl tw-line-clamp-1 tw-md:line-clamp-none">
+                                {showtime.formatMovie.movie.title}
+                            </b>
+                        </div>
+                        <div className="tw-mb-4">
+                            <span className="tw-block tw-text-tiny tw-text-orange-500 tw-lg:text-sm">
+                                {formattedStartTime} ~ {formattedEndTime} {isToday ? 'Hôm nay' : null}, {dayOfMonth}/
+                                {month} · {showtime.formatMovie.movie.title} · {showtime.formatMovie.format.name}
+                            </span>
+                        </div>
+                        <hr />
+                        <div className="tw-opacity-90"></div>
+                    </Col>
+                    <Col span={24}>
+                        <div className="tw-mt-3 tw-mb-3">
+                            <div className="tw-flex tw-items-center tw-justify-between tw-space-x-3 tw-py-1.5">
+                                <span className="tw-shrink-0 tw-text-gray-500">Chỗ ngồi</span>
+                                {seatState && seatState.seatReserved && (
+                                    <div
+                                        style={{ border: '1px solid' }}
+                                        className="tw-flex tw-flex-wrap tw-flex tw-items-center tw-space-x-2 tw-rounded-lg tw-border tw-border-gray-200 tw-px-3 tw-py-1"
+                                    >
+                                        {seatState.seatReserved.map((isReserved, index, array) => (
+                                            <React.Fragment key={index}>
+                                                <div>
+                                                    <span>{isReserved}</span>
+                                                </div>
+                                                {index < array.length - 1 && ','}
+                                            </React.Fragment>
+                                        ))}
+
+                                        <svg
+                                            onClick={deleteSeat}
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="rgb(239 68 68)"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth="2"
+                                            stroke="currentColor"
+                                            aria-hidden="true"
+                                            className="tw-h-6 tw-shrink-0 tw-cursor-pointer tw-text-white tw-transition-all tw-hover:opacity-70"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            ></path>
+                                        </svg>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <hr />
+                    </Col>
+                    <Col span={24}>
+                        <div className="tw-flex-1 tw-mt-3">
+                            <span className="tw-block tw-text-gray-500 tw-text-2xl tw-mb-2 ">Tạm tính</span>
+                            <b className="tw-text-2xl tw-mt-5">{priceSeats}đ</b>
+                        </div>
+                    </Col>
                     <Col span={120}>
-                        <div style={{ marginTop: '50px' }}>
+                        <div className="tw-mt-12 tw-mb-6">
                             <Space size={[0, 200]} wrap>
                                 <Tag className={cx('tagg')} color="#404040">
                                     Đã đặt
@@ -400,9 +545,9 @@ function SeatChart(props) {
                                     Ghế đôi
                                 </Tag>
                             </Space>
-                            <Button
+                            {/* <Button
                                 style={{
-                                    width: '150px',
+                                    width: '140px',
                                     height: '70px',
                                     backgroundColor: '#EB2F96',
                                     fontWeight: 'bolder',
@@ -413,26 +558,33 @@ function SeatChart(props) {
                                 icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
                             >
                                 Mua vé
-                            </Button>
+                            </Button> */}
                         </div>
                     </Col>
-                    <Col span={100} className="tw-bg-black">
-                        {/* <div style={{ display: 'flex', justifyContent: 'flex-end', height: '100px' }}>
-                            <Button
-                                style={{
-                                    width: '150px',
-                                    height: '70px',
-                                    backgroundColor: '#EB2F96',
-                                    fontWeight: 'bolder',
-                                }}
-                                className={cx('btn')}
-                                type="primary"
-                                onClick={handleButtonClick}
-                                icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
-                            >
-                                Mua vé
-                            </Button>
-                        </div> */}
+
+                    <Col span={24}>
+                        <hr></hr>
+                        <Row>
+                            <Col span={15}></Col>
+                            <Col span={9}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="tw-mt-6">
+                                    <Button
+                                        style={{
+                                            width: '150px',
+                                            height: '70px',
+                                            backgroundColor: '#EB2F96',
+                                            fontWeight: 'bolder',
+                                        }}
+                                        className={cx('btn')}
+                                        type="primary"
+                                        onClick={handleButtonClick}
+                                        icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
+                                    >
+                                        Mua vé
+                                    </Button>
+                                </div>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
             </Card>
