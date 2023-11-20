@@ -75,7 +75,7 @@ const AdminAccount = () => {
                 console.log(res.data);
             } catch (error) {
                 console.log(error);
-                funcUtils.notify(error.response.data, 'error');
+                // funcUtils.notify(error.response, 'error');
             }
         };
         getList();
