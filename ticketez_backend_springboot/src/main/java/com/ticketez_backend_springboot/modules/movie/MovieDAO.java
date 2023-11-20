@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
-import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @Repository
 public interface MovieDAO extends JpaRepository<Movie, Long> {
@@ -72,23 +72,25 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         +
                         "ORDER BY bookingCount DESC")
         List<Movie> findTop5MoviesByBookingCount();
-         @Query(value = "SELECT DISTINCT m.* " +
-                         "FROM Movies m " +
-                         "JOIN Formats_Movies fm ON fm.movie_id = m.id " +
-                         "JOIN ( " +
-                         "    SELECT fm.movie_id, MAX(s.end_time) AS max_end_time " +
-                         "    FROM Showtimes s " +
-                         "    JOIN Formats_Movies fm ON s.format_movie_id = fm.id " +
-                         "    WHERE CONVERT(DATE, s.end_time) >= CONVERT(DATE, GETDATE()) " +
-                         "        AND CONVERT(DATE, s.start_time) <= CONVERT(DATE, GETDATE()) " +
-                         "    GROUP BY fm.movie_id " +
-                         ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +
-                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time " +
-                         "JOIN Genres_Movies gm ON gm.movie_id = m.id " +
-                         "WHERE gm.genre_id = :genresID " +
-                         "ORDER BY m.id; " +
-                         "", nativeQuery = true)
+
+        @Query(value = "SELECT DISTINCT m.* " +
+                        "FROM Movies m " +
+                        "JOIN Formats_Movies fm ON fm.movie_id = m.id " +
+                        "JOIN ( " +
+                        "    SELECT fm.movie_id, MAX(s.end_time) AS max_end_time " +
+                        "    FROM Showtimes s " +
+                        "    JOIN Formats_Movies fm ON s.format_movie_id = fm.id " +
+                        "    WHERE CONVERT(DATE, s.end_time) >= CONVERT(DATE, GETDATE()) " +
+                        "        AND CONVERT(DATE, s.start_time) <= CONVERT(DATE, GETDATE()) " +
+                        "    GROUP BY fm.movie_id " +
+                        ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +
+                        "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time " +
+                        "JOIN Genres_Movies gm ON gm.movie_id = m.id " +
+                        "WHERE gm.genre_id = :genresID " +
+                        "ORDER BY m.id; " +
+                        "", nativeQuery = true)
         List<Movie> getMovieByShowtimeShowingByGenres(@Param("genresID") Long genresID);
+
         @Query("SELECT m FROM Movie m JOIN m.genresMovies.genre g" +
                         " WHERE g.name  LIKE CONCAT('%', :genreName, '%') "
                         + "AND m.country  LIKE CONCAT('%', :country, '%') "
@@ -102,5 +104,18 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
 
         @Query("SELECT m FROM Movie m WHERE m.releaseDate >= GETDATE() ORDER BY m.releaseDate ASC")
         Page<Movie> findMovieByRandom(Pageable pageable);
+
+        @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
+                        " COUNT(DISTINCT k.id) AS total_tickets, " +
+                        " COUNT(DISTINCT m.id) AS total_movies ) " +
+                        " FROM Booking k " +
+                        " JOIN " +
+                        " k.showtime s" +
+                        " JOIN " +
+                        " s.formatMovie fm" +
+                        " JOIN " +
+                        " fm.movie m" + 
+                        " WHERE k.ticketStatus = 1")
+        List<TotalDashboardAdmin> getTotalTicketsAndTotalMovies();
 
 }
