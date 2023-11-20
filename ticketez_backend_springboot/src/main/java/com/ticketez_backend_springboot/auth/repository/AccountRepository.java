@@ -18,4 +18,8 @@ public interface AccountRepository extends JpaRepository<SecurityAccount, String
 
     Boolean existsByEmail(String email);
 
+    SecurityAccount findByIdAndPassword (String id , String password);
+
+
+
 }

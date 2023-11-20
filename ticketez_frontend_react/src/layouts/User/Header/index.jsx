@@ -4,7 +4,7 @@ import React from 'react';
 import './header.css';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
-import { Avatar, Breadcrumb, Divider, Dropdown,notification } from 'antd';
+import { Avatar, Breadcrumb, Divider, Dropdown, notification } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
@@ -19,23 +19,24 @@ import {
     faSearch,
     faTicket,
 } from '@fortawesome/free-solid-svg-icons';
-import {  useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 
 const Header = () => {
-    
-       const navigate = useNavigate();
+
+    const navigate = useNavigate();
 
     const location = useLocation();
 
-
     const handleLogout = async () => {
         try {
-             authApi.logout();
+            authApi.logout();
             localStorage.clear();
-            notification.success({ message: 'Đã đăng xuất!' });
+            funcUtils.notify('Đăng Xuất thành công!', 'success');
+            navigate('/')
         } catch (error) {
-            notification.error({ message: 'Đăng xuất thất bại', description: error.message });
+            funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
     };
 
@@ -83,24 +84,25 @@ const Header = () => {
         {
             key: '4',
             label: (
-                <a target="_blank" onClick={handleLogout} rel="noopener noreferrer" href="">
+                <a target="_self" onClick={handleLogout} rel="noopener noreferrer" href="">
                     Đăng xuất
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
-        },
+        }
+        
     ];
 
     const scrollToShowTimes = () => {
         navigate('/');
         scroll.scrollTo(1800);
     };
-   const scrollToMovieUpcoming = () => {
-       navigate('/');
-       // Assuming you are using a library like react-scroll for scrolling
-       // Replace 'scrollTo' with the actual scrolling logic you are using
-       scroll.scrollTo(1200);
-   };
+    const scrollToMovieUpcoming = () => {
+        navigate('/');
+        // Assuming you are using a library like react-scroll for scrolling
+        // Replace 'scrollTo' with the actual scrolling logic you are using
+        scroll.scrollTo(1200);
+    };
     const scrollToMovieShowing = () => {
         navigate('/');
         scroll.scrollTo(600);
@@ -196,13 +198,12 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage &&
-                                            (location.pathname === '/su-kien/tin-tuc' ||
-                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                                (location.pathname === '/su-kien/tin-tuc' ||
+                                                    /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
-                                        }`,
+                                            }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -216,13 +217,12 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage &&
-                                            (location.pathname === '/su-kien/khuyen-mai' ||
-                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                                (location.pathname === '/su-kien/khuyen-mai' ||
+                                                    /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
-                                        }`,
+                                            }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />

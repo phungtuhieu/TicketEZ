@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import classNames from 'classnames/bind';
 import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(styles);
 
@@ -13,24 +14,20 @@ const LoginForm = () => {
 
     const onFinish = async (values) => {
         try {
-            authApi.getLogin({
+            const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
             });
-
+            console.log(response);
             if (authApi) {
                 console.log(authApi.getToken());
                 console.log(authApi.getUser());
 
-                notification.success({ message: 'Đăng nhập thành công!' });
+                funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/');
-            } else {
-                throw new Error('Login failed');
             }
         } catch (error) {
-            const errorMessage = error.message || 'Đăng nhập thất bại. ID hoặc mật khẩu không đúng!';
-            setLoginError(errorMessage);
-            notification.error({ message: errorMessage });
+            funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
         }
     };
 

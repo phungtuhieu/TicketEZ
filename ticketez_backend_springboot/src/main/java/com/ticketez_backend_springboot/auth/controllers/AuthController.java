@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -62,12 +63,19 @@ public class AuthController {
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+    SecurityAccount securityAccount = accountRepository.findByIdAndPassword(loginRequest.getId(),encoder.encode(loginRequest.getPassword()));
+    // if (securityAccount == null) {
+    //   return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
+
+    // }
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.getId(), loginRequest.getPassword()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+
     String jwt = jwtUtils.generateJwtToken(authentication);
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())

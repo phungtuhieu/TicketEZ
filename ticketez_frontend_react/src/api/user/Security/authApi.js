@@ -5,7 +5,7 @@ import axiosClient from '~/api/global/axiosClient';
 
 const auth = 'auth/signin'
 const signupSecurity = 'auth/signup'
-
+const logoutSecurity = 'auth/signup'
 
 const authApi = {
 
@@ -27,7 +27,7 @@ const authApi = {
             }
             console.log('Phản hồi từ server:', response);
 
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Lỗi đăng nhập:', error);
             throw error;
@@ -85,8 +85,14 @@ const authApi = {
 
     logout() {
         localStorage.removeItem('user');
-        localStorage.removeItem('token')
-        return axiosClient.get(auth)
+        localStorage.removeItem('token');
+        return axiosClient.get(logoutSecurity)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+            });
     }
 
 
