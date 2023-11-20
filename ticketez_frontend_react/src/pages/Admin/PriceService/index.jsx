@@ -205,7 +205,7 @@ function AdminPriceService() {
             };
             console.log(values);
             if (editData) {
-                const resp = await priceServiceApi.put(editData.id, putData, putData.service, putData.cinemaComplex);
+                const resp = await priceServiceApi.put(editData.id, putData, putData.service);
                 console.log(resp);
                 funcUtils.notify("Cập nhật thành công", 'success');
             }
@@ -354,7 +354,7 @@ function AdminPriceService() {
                         <Input placeholder="Giá dịch vụ" />
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         {...formItemLayout}
                         name="cinemaComplex"
                         label="Chọn Rạp"
@@ -377,7 +377,7 @@ function AdminPriceService() {
                             }))}
 
                         />
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item
                         name="range-time-picker"
                         label="Ngày giờ" {...rangeConfig} >
