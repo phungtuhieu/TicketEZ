@@ -208,7 +208,6 @@ function MovieDetailsListMovieRight() {
                                             </Col>
                                             <Col lg={16} className="tw-leading-normal tw-text-left tw-mt-[-10px]">
                                                 <Tag
-                                                    className={cx('tag-overlay')}
                                                     color={getColorForRating(value.movie.mpaaRating.ratingCode)}
                                                 >
                                                     {value.movie.mpaaRating.ratingCode}
@@ -243,7 +242,7 @@ function MovieDetailsListMovieRight() {
                     ) : (
                         <div>
                             <img src={img.notFoundLogo} alt="" className="tw-ml-[120px]" />
-                            <span className="tw-text-gray-400 tw-leading-normal tw-ml-[-230px]">
+                            <span className="tw-text-gray-400 tw-text-xl tw-leading-normal tw-ml-[-230px]">
                                 Không tìm thấy thể loại này trong phim đang chiếu
                             </span>
                         </div>
