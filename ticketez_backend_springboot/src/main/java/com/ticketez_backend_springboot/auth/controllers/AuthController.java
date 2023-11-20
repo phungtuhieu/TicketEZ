@@ -72,8 +72,6 @@ public class AuthController {
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
-    System.out.println("log2" + userDetails);
-    System.out.println("log3" + roles);
     return ResponseEntity.ok(new JwtResponse(
         jwt,
         userDetails.getId(),

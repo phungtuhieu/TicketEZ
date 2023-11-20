@@ -62,67 +62,16 @@ public class JwtUtils {
       Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
       return true;
     } catch (MalformedJwtException e) {
-      logger.error("Invalid JWT token: {}", e.getMessage());
+      logger.error("Mã thông báo JWT không hợp lệ: ", e.getMessage());
     } catch (ExpiredJwtException e) {
-      logger.error("JWT token is expired: {}", e.getMessage());
+      logger.error("Mã thông báo JWT đã hết hạn: {}", e.getMessage());
     } catch (UnsupportedJwtException e) {
-      logger.error("JWT token is unsupported: {}", e.getMessage());
+      logger.error("Mã thông báo JWT không được hỗ trợ: {}", e.getMessage());
     } catch (IllegalArgumentException e) {
-      logger.error("JWT claims string is empty: {}", e.getMessage());
+      logger.error("Chuỗi xác nhận quyền sở hữu JWT trống: {}", e.getMessage());
     }
 
     return false;
   }
 
-  // private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
-  // byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
-  // @Value("${bezkoder.app.jwtSecret}")
-  // private String jwtSecret;
-
-  // @Value("${bezkoder.app.jwtExpirationMs}")
-  // private int jwtExpirationMs;
-
-  // public String generateJwtToken(UserDetailsImpl userPrincipal) {
-  // return generateTokenFromUsername(userPrincipal.getUsername());
-  // }
-
-  // public String generateTokenFromUsername(String username) {
-  // return Jwts.builder()
-  // .setSubject("example")
-  // .signWith(SignatureAlgorithm.HS512, keyBytes)
-  // .compact();
-  // }
-
-  // public String getUserNameFromJwtToken(String token) {
-  // return
-  // Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-  // }
-
-  // public boolean validateJwtToken(String authToken) {
-  // try {
-  // // String jwtSecret = "yourJwtSecret";
-  // // String authToken = "yourAuthToken";
-
-  // Jws<Claims> claimsJws = Jwts.parserBuilder()
-  // .setSigningKey(jwtSecret)
-  // .build()
-  // .parseClaimsJws(authToken);
-
-  // Claims claims = claimsJws.getBody();
-  // return true;
-  // } catch (SignatureException e) {
-  // logger.error("Invalid JWT signature: {}", e.getMessage());
-  // } catch (MalformedJwtException e) {
-  // logger.error("Invalid JWT token: {}", e.getMessage());
-  // } catch (ExpiredJwtException e) {
-  // logger.error("JWT token is expired: {}", e.getMessage());
-  // } catch (UnsupportedJwtException e) {
-  // logger.error("JWT token is unsupported: {}", e.getMessage());
-  // } catch (IllegalArgumentException e) {
-  // logger.error("JWT claims string is empty: {}", e.getMessage());
-  // }
-
-  // return false;
-  // }
 }

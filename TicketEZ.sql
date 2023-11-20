@@ -1,12 +1,6 @@
 
-<<<<<<< HEAD
 USE master
 go
-=======
-USE [master]
-GO
-
->>>>>>> 4bff40b3b55a1ac65dcde974770b5f7678a6a27c
 CREATE DATABASE TicketEZ 
 GO
     -- DROP DATABASE TicketEZ 

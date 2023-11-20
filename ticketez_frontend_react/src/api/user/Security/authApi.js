@@ -4,37 +4,88 @@ import axiosClient from '~/api/global/axiosClient';
 
 
 const auth = 'auth/signin'
+const signupSecurity = 'auth/signup'
+
 
 const authApi = {
 
-    getLogin: async (valus) => {
+    getLogin: async (values) => {
+        try {
+            const response = await axiosClient.post(auth, values);
 
-        // try {
+            if (response.data.token) {
+                localStorage.setItem('token', JSON.stringify(response.data.token));
+                console.log('Token:', response.data.token);
+            }
+            else {
+                console.log('Không có dữ liệu user trong phản hồi');
+            }
+            if (response.data && response.data) {
+                localStorage.setItem('user', JSON.stringify(response.data));
+            } else {
+                console.log('Không có dữ liệu user trong phản hồi');
+            }
+            console.log('Phản hồi từ server:', response);
 
-        const { data } = await axiosClient.post(auth, valus)
-        localStorage.setItem('token', JSON.stringify(data.token))
-        localStorage.setItem('user', JSON.stringify(data))
-        return axiosClient.post(auth, valus)
-        // } catch (error) {
-
-        //     return console.log(error);
-        // }
-
-
+            return response.data;
+        } catch (error) {
+            console.error('Lỗi đăng nhập:', error);
+            throw error;
+        }
     },
+
+
+    signup: async (values) => {
+        try {
+            const response = await axiosClient.post(signupSecurity, values);
+            const { data } = response;
+            if (data.token) {
+                localStorage.setItem('token', JSON.stringify(data.token));
+            }
+            if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+
+            return data;
+        } catch (error) {
+            console.error('lỗi', error);
+            throw error;
+        }
+    },
+
+
     getToken() {
-        return JSON.parse(localStorage.getItem('token'))
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                return JSON.parse(token);
+            } catch (e) {
+                console.error('Lỗi khi phân tích token:', e);
+                return null;
+            }
+        }
+        return null;
     },
 
     getUser() {
-        return JSON.parse(localStorage.getItem('user'))
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                return JSON.parse(user);
+            } catch (e) {
+                console.error('Lỗi khi phân tích user:', e);
+            }
+        }
+        return null;
     },
+
 
 
 
 
     logout() {
         localStorage.removeItem('user');
+        localStorage.removeItem('token')
         return axiosClient.get(auth)
     }
 
