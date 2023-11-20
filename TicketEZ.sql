@@ -1,12 +1,7 @@
 
-<<<<<<< HEAD
-USE master
-go
-=======
 USE [master]
 GO
 
->>>>>>> 4bff40b3b55a1ac65dcde974770b5f7678a6a27c
 CREATE DATABASE TicketEZ 
 GO
     -- DROP DATABASE TicketEZ 
@@ -318,6 +313,7 @@ GO
         create_date DATETIME NOT NULL,
         showtime_id BIGINT NOT NULL,
         [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
     )
 GO
     CREATE TABLE Payment_Info (
@@ -1484,6 +1480,13 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
+
+-- Inserting sample data into the Price table
+INSERT INTO Price (weekday_price, weekend_price, start_date, end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+VALUES
+    (10.00, 15.00, '2023-11-20', '2023-11-27', 1, 1, 2, 1),
+    (12.00, 18.00, '2023-11-20', '2023-11-27', 1, 2, 2, 1),
+    (20.00, 12.00, '2023-11-20', '2023-11-27', 1, 4, 2, 1)
 
 SELECT * FROM Accounts
 SELECT * FROM Verification

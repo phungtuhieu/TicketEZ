@@ -92,9 +92,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 "/api/movie-studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
                 "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
                 "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
-                "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**")
+                "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**")
             .permitAll()
-             .requestMatchers("/api/test/**").permitAll()
+            .requestMatchers("/api/test/**").permitAll()
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());

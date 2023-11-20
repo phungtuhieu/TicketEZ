@@ -104,7 +104,7 @@ public class BookingAPI {
 
 	@GetMapping("/vnpay-payment")
 	public ResponseEntity<?> payment(HttpServletRequest request) {
-		Boolean paymentStatus = vnPayService.orderReturn(request);
+		Integer paymentStatus = vnPayService.orderReturn(request);
 
 		String bookingId = request.getParameter("bookingId");
 		Booking booking = dao.findById(bookingId).orElse(null);
@@ -144,15 +144,11 @@ public class BookingAPI {
 					HttpStatus.CONFLICT);
 		}
 		pmIDao.save(paymentInfo);
-		if (paymentStatus) {
-			PaymentInfoDTO pmDTO = new PaymentInfoDTO();
-			pmDTO.setSeatBookings(seatBookings);
-			pmDTO.setStatus(paymentStatus);
-			pmDTO.setPageInvoiceUrl("/booking-paid");
-			pmDTO.setPaymentInfo(paymentInfo);
-			return ResponseEntity.status(HttpStatus.OK).body(pmDTO);
+		if (paymentStatus >= 0) {
+			String urlRedirect = "/booking-paid";
+			return ResponseEntity.status(HttpStatus.OK).body(urlRedirect);
 		} else {
-			return new ResponseEntity<>("Giao dịch không thành công",
+			return new ResponseEntity<>(paymentStatus,
 					HttpStatus.CONFLICT);
 		}
 	}

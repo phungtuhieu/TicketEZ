@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
-import './header.css';
+import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
@@ -19,10 +19,10 @@ import {
     faSearch,
     faTicket,
 } from '@fortawesome/free-solid-svg-icons';
-import {  useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Header = () => {
-       const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const location = useLocation();
 
@@ -82,12 +82,12 @@ const Header = () => {
         navigate('/');
         scroll.scrollTo(1800);
     };
-   const scrollToMovieUpcoming = () => {
-       navigate('/');
-       // Assuming you are using a library like react-scroll for scrolling
-       // Replace 'scrollTo' with the actual scrolling logic you are using
-       scroll.scrollTo(1200);
-   };
+    const scrollToMovieUpcoming = () => {
+        navigate('/');
+        // Assuming you are using a library like react-scroll for scrolling
+        // Replace 'scrollTo' with the actual scrolling logic you are using
+        scroll.scrollTo(1200);
+    };
     const scrollToMovieShowing = () => {
         navigate('/');
         scroll.scrollTo(600);
@@ -132,6 +132,11 @@ const Header = () => {
                         <div className="tw-xl:tw-hidden tw-mr-[20px] ">
                             <a href="/su-kien/tin-tuc" className="tw-text-gray-700">
                                 Sự kiện
+                            </a>
+                        </div>
+                        <div className="tw-xl:tw-hidden tw-mr-[20px] ">
+                            <a href="/review" className="tw-text-gray-700">
+                               Review Phim
                             </a>
                         </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">

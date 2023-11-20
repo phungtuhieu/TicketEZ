@@ -1,14 +1,16 @@
 import classNames from 'classnames/bind';
 import style from './ConnectorPage.module.scss';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import bookingApi from '~/api/user/booking/bookingApi';
+import { Flex, Spin } from 'antd';
 
 const cx = classNames.bind(style);
 
 function ConnectorPage() {
     const { bookingId } = useParams();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const callPaymentApi = async () => {
             const queryParams = new URLSearchParams(window.location.search);
@@ -40,19 +42,34 @@ function ConnectorPage() {
                 vnp_SecureHash,
                 bookingId,
             };
-
-            // Gọi tới API sử dụng axios
-            const resp = await bookingApi.getPaymentInfo(params);
-            const page = resp.data.pageInvoiceUrl;
-            navigate(page, {
-                state: { paymentInfo: resp.data },
-            });
+            try {
+                const resp = await bookingApi.getPaymentInfo(params);
+                const page = resp.data;
+                navigate(page, {
+                    state: { paymentInfo: resp.data },
+                });
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+            }
         };
-
         callPaymentApi();
     }, []);
 
-    return <div className={cx('wrapper', 'tw-text-red-300')}>aaaaa</div>;
+    return (
+        <>
+            {loading && (
+                <div id="initSpinner">
+                    <div className="cm-spinner"></div>
+                </div>
+            )}
+        </>
+    );
+    // <div className={cx('wrapper', 'tw-text-red-300')}>
+    //     <Flex align="center" gap="middle">
+    //         <Spin size="large" spinning={loading} />
+    //     </Flex>
+    // </div>
 }
 
 export default ConnectorPage;
