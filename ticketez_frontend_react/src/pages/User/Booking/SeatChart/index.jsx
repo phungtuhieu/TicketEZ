@@ -272,6 +272,7 @@ function SeatChart(props) {
 
         const priceOneSeat = normal ? normal : vip;
 
+        console.log(priceOneSeat);
         const seatPrices = getSeatPrice(priceOneSeat);
 
         if (seatReserved.indexOf(seat) > -1) {
