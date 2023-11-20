@@ -276,6 +276,8 @@ function SeatChart(props) {
         const seatPrices = getSeatPrice(priceOneSeat);
 
         if (seatReserved.indexOf(seat) > -1) {
+            removeDataFromDuplicateSeatByName(seat);
+
             seatReserved.splice(seatReserved.indexOf(seat), 1);
             // Trừ tiền
             setPriceSeats(priceSeats - seatPrices);
@@ -328,9 +330,20 @@ function SeatChart(props) {
         }
     };
 
+    const removeDataFromDuplicateSeatByName = (seatNamesToRemove) => {
+        setDuplicateSeat((prev) => {
+            const updatedPrev = prev.filter((prevSeat) => {
+                const shouldKeep = !seatNamesToRemove.includes(prevSeat.name);
+                return shouldKeep;
+            });
+
+            return updatedPrev;
+        });
+    };
+
     useEffect(() => {
         fetchData();
-    }, [duplicateSeat, seatState ? seatState.seatReserved : null]);
+    }, [seatState ? seatState.seatReserved : null]);
 
     const onCreateDaTaSeatChoose = async () => {
         try {
@@ -369,7 +382,7 @@ function SeatChart(props) {
 
     const deleteSeat = () => {
         // setSeatState({ seatReserved: [] });
-
+        setDuplicateSeat([]);
         setSeatState({
             ...seatState,
             seatReserved: [],
