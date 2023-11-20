@@ -4,42 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import classNames from 'classnames/bind';
 import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(styles);
 
 const LoginForm = () => {
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
+
     const onFinish = async (values) => {
         try {
-            authApi.getLogin({
+            const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
             });
+            console.log(response);
+            if (authApi) {
+                console.log(authApi.getToken());
+                console.log(authApi.getUser());
 
-            console.log(authApi.getToken());
-            console.log(authApi.getUser());
-
-
-
-            notification.success({ message: 'Đăng nhập thành công!' });
-
-            navigate('/');
-
-
+                funcUtils.notify('Đăng nhập thành công!', 'success');
+                navigate('/');
+            }
         } catch (error) {
-            setLoginError(error.message);
-            notification.error({ message: 'Đăng nhập thất bại', description: error.message });
-        }
-    };
-
-    const handleLogout = async () => {
-        try {
-             authApi.logout();
-            localStorage.clear();
-            notification.success({ message: 'Đã đăng xuất!' });
-        } catch (error) {
-            notification.error({ message: 'Đăng xuất thất bại', description: error.message });
+            funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
         }
     };
 
@@ -82,14 +70,7 @@ const LoginForm = () => {
                     Đăng nhập
                 </Button>
             </Form.Item>
-            <div className=''>
-                <Button type="default" onClick={handleLogout} block>
-                    Đăng xuất
-                </Button>
-            </div>
-            <div className=''>
 
-            </div>
         </Form>
 
     );
