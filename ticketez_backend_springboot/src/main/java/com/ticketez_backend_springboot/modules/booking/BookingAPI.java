@@ -76,6 +76,8 @@ public class BookingAPI {
 		if (bookingDto == null) {
 			return new ResponseEntity<>("Không có dữ liệu để thêm", HttpStatus.BAD_REQUEST);
 		}
+
+		bookingDto.getBooking().setTicketStatus(TicketStatus.UNUSED);
 		Booking createdBooking = dao.save(bookingDto.getBooking());
 		List<SeatBooking> seatBookings = bookingDto.getSeats().stream().map(seat -> {
 			SeatBooking seatBooking = new SeatBooking();
@@ -112,7 +114,7 @@ public class BookingAPI {
 			return new ResponseEntity<>("Không thể tìm thấy booking",
 					HttpStatus.NOT_FOUND);
 		}
-		List<SeatBooking> seatBookings = seatBookingDao.findByBooking(booking);
+		// List<SeatBooking> seatBookings = seatBookingDao.findByBooking(booking);
 
 		String orderInfo = request.getParameter("vnp_OrderInfo");
 		String tmnCode = request.getParameter("vnp_TmnCode");
@@ -125,6 +127,7 @@ public class BookingAPI {
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		PaymentInfo paymentInfo = new PaymentInfo();
+
 		try {
 			Date date = inputFormat.parse(paymentTime);
 			String outputDateString = dateFormat.format(date);
@@ -147,8 +150,11 @@ public class BookingAPI {
 		if (paymentStatus >= 0) {
 			String urlRedirect = "/booking-paid";
 			return ResponseEntity.status(HttpStatus.OK).body(urlRedirect);
+		} else if (paymentStatus == 0) {
+			return new ResponseEntity<>("Giao dịch thất bại",
+					HttpStatus.CONFLICT);
 		} else {
-			return new ResponseEntity<>(paymentStatus,
+			return new ResponseEntity<>("Thông tin giao dịch không chính xác",
 					HttpStatus.CONFLICT);
 		}
 	}

@@ -42,6 +42,7 @@ public class Booking {
 
 	@Column(name = "ticket_status")
 	private Integer ticketStatus;
+
 	@OneToMany(mappedBy = "booking")
 	@JsonIgnore
 	private List<SeatBooking> seatsBookings;

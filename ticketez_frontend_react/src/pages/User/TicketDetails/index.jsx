@@ -1,18 +1,12 @@
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import style from './BookingPaid.module.scss';
+import style from './TicketDetails.module.scss';
 import { Col, QRCode, Row, Tag } from 'antd';
 import datrungphuongnamImg from '../../../assets/img/datrungphuongnam.jpg';
 import logorap from '../../../assets/img/lotte.jpg';
 const cx = classNames.bind(style);
 
-const styleBarcode = {
-    height: 30,
-    format: 'CODE128',
-    width: 3,
-    displayValue: false,
-};
-function BookingPaid() {
+function TicketDetails() {
     // const location = useLocation();
     const getColorForRating = (ratingCode) => {
         switch (ratingCode) {
@@ -169,4 +163,4 @@ function BookingPaid() {
     );
 }
 
-export default BookingPaid;
+export default TicketDetails;
