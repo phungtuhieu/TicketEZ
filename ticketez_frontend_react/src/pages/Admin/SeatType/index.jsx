@@ -1,14 +1,15 @@
-import React, {  useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image } from 'antd';
-import {  PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import axiosClient from '~/api/global/axiosClient';
 
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
 
-import {  seatTypeApi } from '~/api/admin';
+import { seatTypeApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 
 import classNames from 'classnames/bind';
@@ -26,8 +27,6 @@ const formItemLayout = {
 };
 
 const AdminSeatType = () => {
- 
-
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -39,15 +38,17 @@ const AdminSeatType = () => {
 
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
-    
     //call api
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await seatTypeApi.getAll();
+                const res = await axiosClient.get(`seatType/getAll`);
                 console.log(res);
-                setPosts(res.data);
+
+                const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
+
+                setPosts(filteredPosts);
                 setLoading(false);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
@@ -58,9 +59,7 @@ const AdminSeatType = () => {
             }
         };
         getList();
-    }, [ workSomeThing]);
-
- 
+    }, [workSomeThing]);
 
     const columns = [
         {
@@ -70,12 +69,12 @@ const AdminSeatType = () => {
             sorter: (a, b) => a.id - b.id,
         },
         {
-            title: 'Họ và tên',
+            title: 'tên loại ghế',
             dataIndex: 'name',
             width: '30%',
         },
         {
-            title: 'Ngày sinh',
+            title: 'Ghi chú',
             dataIndex: 'description',
         },
         {
@@ -166,12 +165,14 @@ const AdminSeatType = () => {
         try {
             const values = await form.validateFields();
 
+            console.log(fileList);
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
                         id: editData.id,
                         ...values,
                     };
+
                     if (putData.image.file) {
                         console.log(putData);
 
@@ -183,32 +184,10 @@ const AdminSeatType = () => {
                         };
                     }
                     try {
-                        const resPut = await seatTypeApi.update(putData.id, putData);
+                        const resPut = await axiosClient.put(`seatType/${putData.id}`, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật loại ghế thành công', 'success');
-                        }
-                    } catch (error) {
-                        if (error.hasOwnProperty('response')) {
-                            message.error(error.response.data);
-                        } else {
-                            console.log(error);
-                        }
-                    }
-                }
-                if (!editData) {
-                    try {
-                        const file = values.image.fileList[0].originFileObj;
-                        const images = await uploadApi.post(file);
-                        const postData = {
-                            ...values,
-                            image: images,
-                        };
-                        console.log(postData);
-                        const resPost = await seatTypeApi.create(postData);
-                        console.log('resPost', resPost);
-                        if (resPost.status === 200) {
-                            funcUtils.notify('Thêm loại ghế thành công', 'success');
                         }
                     } catch (error) {
                         if (error.hasOwnProperty('response')) {
@@ -262,7 +241,6 @@ const AdminSeatType = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
-
     return (
         <>
             <Row>
@@ -305,11 +283,7 @@ const AdminSeatType = () => {
                             <Input placeholder="Tên ghế" />
                         </Form.Item>
 
-                        <Form.Item
-                            {...formItemLayout}
-                            name="description"
-                            label="Mô tả"
-                        >
+                        <Form.Item {...formItemLayout} name="description" label="Mô tả">
                             <TextArea rows={4} />
                         </Form.Item>
 
@@ -343,7 +317,6 @@ const AdminSeatType = () => {
                     key: post.id,
                 }))}
             />
-            
         </>
     );
 };

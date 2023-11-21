@@ -100,6 +100,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [rating_code] NVARCHAR(10) NOT NULL,
         icon NVARCHAR(MAX) NOT NULL,
+		[color_code] NVARCHAR(30) NOT NULL,
         [description] NVARCHAR(MAX)
     )
 GO
@@ -237,7 +238,9 @@ GO
         end_date DATETIME NOT NULL,
         banner NVARCHAR(MAX) NOT NULL,
         [status] BIT NOT NULL,
-        type_event INT NOT NULL
+        type_event INT NOT NULL,
+		account_id NVARCHAR(20) NOT NULL,
+
     )
 GO
     CREATE TABLE Services (
@@ -301,7 +304,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
-        [status] BIGINT NOT NULL,
+        [status] INT NOT NULL,
         cinema_id BIGINT NOT NULL,
         format_movie_id BIGINT NOT NULL,
         seat_chart_id BIGINT NOT NULL,
@@ -1242,13 +1245,13 @@ VALUES
     ('Sony Pictures Entertainment',	N'Mỹ', 'hieupt@sony.com', N'Studio sản xuất phim của Sony.');
 GO
  -- 10. Chèn dữ liệu vào bảng MPAA_Rating
-INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon], [description])
+INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon],[color_code], [description])
 VALUES
-    ('G', 'G_icon.png', N'Phù hợp cho mọi đối tượng.'),
-    ('PG', 'PG_icon.png', N'Cần có sự hướng dẫn của cha mẹ hoặc người trưởng thành.'),
-    ('PG-13', 'PG-13_icon.png', N'Không phù hợp cho trẻ dưới 13 tuổi.'),
-    ('R', 'R_icon.png', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
-    ('NC-17', 'NC-17_icon.png', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
+    ('G', 'G_icon.png', '#1A5D1A',N'Phù hợp cho mọi đối tượng.'),
+    ('PG', 'PG_icon.png','#7A9D54', N'Cần có sự hướng dẫn của cha mẹ hoặc người trưởng thành.'),
+    ('PG-13', 'PG-13_icon.png','#FF9B50', N'Không phù hợp cho trẻ dưới 13 tuổi.'),
+    ('R', 'R_icon.png','#FFCD4B', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
+    ('NC-17', 'NC-17_icon.png','#D80032', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
 GO
 INSERT INTO Movies (title, poster,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
 VALUES
@@ -1297,15 +1300,15 @@ GO
 
 GO
  -- 16. thêm bảng dữ liệu events 
-  INSERT INTO [TicketEZ].[dbo].[Events] ([name], [description], [start_date], [end_date], [banner], [status], [type_event])
+  INSERT INTO [TicketEZ].[dbo].[Events] ([name], [description], [start_date], [end_date], [banner], [status], [type_event],[account_id])
 VALUES
-  (N'Sự kiện Buổi ra mắt phim mới', N'Rạp phim thường tổ chức buổi ra mắt các bộ phim mới với sự kiện đặc biệt, bao gồm việc mời các diễn viên và đạo diễn tham dự.', '2023-12-01', '2023-12-05', 'bannerA.jpg', 1, 1),
-  (N'Sự kiện Ngày hội phim hoạt hình', N'Một sự kiện dành riêng cho các bộ phim hoạt hình, có thể kèm theo các hoạt động vui chơi và trò chơi dành cho trẻ em', N'2023-11-20', '2023-11-25', 'bannerB.jpg', 1, 2),
-  (N'Sự kiện Tuần lễ phim nước ngoài', N'Rạp phim có thể tổ chức các tuần lễ đặc biệt để giới thiệu các bộ phim từ các quốc gia khác nhau', '2023-10-25', '2023-11-02', 'bannerC.jpg', 0, 3),
-   (N'Marathon phim', N'Buổi chiếu liên tiếp của một loạt phim cùng chủ đề hoặc của cùng một series', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3),
-	(N'Sự kiện Buổi chiếu phim cổ điển', N'Rạp phim có thể tổ chức các buổi chiếu phim cổ điển để làm tái hiện các bộ phim kinh điển trên màn ảnh lớn', '2023-10-25', '2023-11-02', 'bannerC.jpg', 0, 3),
-   (N'Sự kiện Khuyến mãi vé và phần thưởng', N'Các chương trình khuyến mãi và phần thưởng cho các khách hàng thường xuyên có thể là một phần quan trọng của sự kiện của rạp phim', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3),
-   (N'Sự kiện Thảm đỏ và sự kiện thời trang', N' Cho các buổi ra mắt phim hoặc sự kiện đặc biệt, thảm đỏ và sự kiện thời trang có thể được tổ chức', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3)
+  (N'Sự kiện Buổi ra mắt phim mới', N'Rạp phim thường tổ chức buổi ra mắt các bộ phim mới với sự kiện đặc biệt, bao gồm việc mời các diễn viên và đạo diễn tham dự.', '2023-12-01', '2023-12-05', 'bannerA.jpg', 1, 1,'admin'),
+  (N'Sự kiện Ngày hội phim hoạt hình', N'Một sự kiện dành riêng cho các bộ phim hoạt hình, có thể kèm theo các hoạt động vui chơi và trò chơi dành cho trẻ em', N'2023-11-20', '2023-11-25', 'bannerB.jpg', 1, 2,'admin'),
+  (N'Sự kiện Tuần lễ phim nước ngoài', N'Rạp phim có thể tổ chức các tuần lễ đặc biệt để giới thiệu các bộ phim từ các quốc gia khác nhau', '2023-10-25', '2023-11-02', 'bannerC.jpg', 0, 3,'admin'),
+   (N'Marathon phim', N'Buổi chiếu liên tiếp của một loạt phim cùng chủ đề hoặc của cùng một series', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3,'admin'),
+	(N'Sự kiện Buổi chiếu phim cổ điển', N'Rạp phim có thể tổ chức các buổi chiếu phim cổ điển để làm tái hiện các bộ phim kinh điển trên màn ảnh lớn', '2023-10-25', '2023-11-02', 'bannerC.jpg', 0, 3,'admin'),
+   (N'Sự kiện Khuyến mãi vé và phần thưởng', N'Các chương trình khuyến mãi và phần thưởng cho các khách hàng thường xuyên có thể là một phần quan trọng của sự kiện của rạp phim', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3,'admin'),
+   (N'Sự kiện Thảm đỏ và sự kiện thời trang', N' Cho các buổi ra mắt phim hoặc sự kiện đặc biệt, thảm đỏ và sự kiện thời trang có thể được tổ chức', '2023-10-25', '2023-11-02', 'bannerC.jpg', 1, 3,'admin')
 GO
 INSERT INTO Roles ([name], [description])
 VALUES

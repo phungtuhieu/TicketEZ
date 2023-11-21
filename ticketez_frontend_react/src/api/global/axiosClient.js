@@ -26,9 +26,9 @@ axiosClient.interceptors.response.use(
                 case httpStatus.INTERNAL_SERVER_ERROR:
                     funcUtils.notify('Lỗi kết nối server', 'error');
                     break;
-                case 401:
-                    funcUtils.notify(error.response.data.message, 'error');
-                    break;
+                // case 401:
+                //     funcUtils.notify(error.response.data.message, 'error');
+                //     break;
                 // case httpStatus.CONFLICT:
                 //     funcUtils.notify(error.response.data, 'error');
                 //     break;

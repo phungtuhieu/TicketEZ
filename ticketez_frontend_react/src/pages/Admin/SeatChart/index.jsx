@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, Switch } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import axiosClient from '~/api/global/axiosClient';
 
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -41,7 +42,7 @@ const AdminSeatChart = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await seatChartApi.getAll();
+                const res = await axiosClient.get(`seatchart/getAll`);
                 console.log(res);
                 setPosts(res.data);
                 setLoading(false);
@@ -69,9 +70,26 @@ const AdminSeatChart = () => {
             width: '30%',
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'description',
+            title: 'Trạng thái',
+            render: (_, record) => (record.status ? 'Còn hoạt động' : 'Không còn hoạt động'),
+            width: '30%',
         },
+        {
+            title: 'Chuỗi rạp chiếu',
+            render: (_, record) => record.cinema.cinemaComplex.cinemaChain.name,
+            width: '30%',
+        },
+        {
+            title: 'Cụm rạp',
+            render: (_, record) => record.cinema.cinemaComplex.name,
+            width: '30%',
+        },
+        {
+            title: 'rạp',
+            render: (_, record) => record.cinema.name,
+            width: '30%',
+        },
+
         {
             title: 'Thao tác',
             render: (_, record) => (
@@ -83,16 +101,6 @@ const AdminSeatChart = () => {
                             handleEditData(record);
                         }}
                     />
-
-                    <Popconfirm
-                        title="Bạn có chắc"
-                        description="Muốn xoá hay không?"
-                        okText="Đồng ý"
-                        cancelText="Huỷ"
-                        onConfirm={() => handleDelete(record)}
-                    >
-                        <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
-                    </Popconfirm>
                 </Space>
             ),
         },
@@ -110,28 +118,7 @@ const AdminSeatChart = () => {
         setFileList([]);
     };
 
-    const handleDelete = async (record) => {
-        try {
-            const res = await seatChartApi.delete(record.id);
-            console.log(res);
-            if (res.status === 200) {
-                await uploadApi.delete(record.avatar);
-                funcUtils.notify('Xoá thành công', 'success');
-            }
-        } catch (error) {
-            console.log(error);
-        }
-
-        setWorkSomeThing(!workSomeThing);
-    };
-
     const handleEditData = (record) => {
-        const newUploadFile = {
-            uid: record.id.toString(),
-            name: record.image,
-            url: `http://localhost:8081/api/upload/${record.image}`,
-        };
-        setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -144,68 +131,32 @@ const AdminSeatChart = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
+            console.log(values.status);
+            if (editData) {
+                let putData = {
+                    id: editData.id,
+                    name: values.name,
+                    status: values.status,
+                };
 
-            if (fileList.length > 0) {
-                if (editData) {
-                    let putData = {
-                        id: editData.id,
-                        ...values,
-                    };
-                    if (putData.image.file) {
-                        console.log(putData);
-
-                        const file = putData.image.fileList[0].originFileObj;
-                        const images = await uploadApi.put(editData.image, file);
-                        putData = {
-                            ...putData,
-                            image: images,
-                        };
+                try {
+                    const resPatch = await axiosClient.patch(`seatchart/${putData.id}`, putData);
+                    console.log(resPatch);
+                    if (resPatch.status === 200) {
+                        funcUtils.notify('Cập nhật loại ghế thành công', 'success');
                     }
-                    try {
-                        const resPut = await seatChartApi.update(putData.id, putData);
-                        console.log(resPut);
-                        if (resPut.status === 200) {
-                            funcUtils.notify('Cập nhật loại ghế thành công', 'success');
-                        }
-                    } catch (error) {
-                        if (error.hasOwnProperty('response')) {
-                            message.error(error.response.data);
-                        } else {
-                            console.log(error);
-                        }
+                } catch (error) {
+                    if (error.hasOwnProperty('response')) {
+                        message.error(error.response.data);
+                    } else {
+                        console.log(error);
                     }
                 }
-                if (!editData) {
-                    try {
-                        const file = values.image.fileList[0].originFileObj;
-                        const images = await uploadApi.post(file);
-                        const postData = {
-                            ...values,
-                            image: images,
-                        };
-                        console.log(postData);
-                        const resPost = await seatChartApi.create(postData);
-                        console.log('resPost', resPost);
-                        if (resPost.status === 200) {
-                            funcUtils.notify('Thêm loại ghế thành công', 'success');
-                        }
-                    } catch (error) {
-                        if (error.hasOwnProperty('response')) {
-                            message.error(error.response.data);
-                        } else {
-                            console.log(error);
-                        }
-                    }
-                }
-                setOpen(false);
-                form.resetFields();
-                setLoading(false);
-                setFileList([]);
-                setWorkSomeThing(!workSomeThing);
-            } else {
-                setLoading(false);
-                message.error('vui lòng chọn ảnh');
             }
+            setOpen(false);
+            form.resetFields();
+            setLoading(false);
+            setWorkSomeThing(!workSomeThing);
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
             setLoading(false);
@@ -214,12 +165,6 @@ const AdminSeatChart = () => {
     const handleCancel = () => {
         setOpen(false);
     };
-
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
-
-    //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
@@ -247,11 +192,7 @@ const AdminSeatChart = () => {
                 <Col span={22}>
                     <h1 className={cx('title')}>Bảng dữ liệu sơ đồ</h1>
                 </Col>
-                <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
-                        Thêm
-                    </Button>
-                </Col>
+                <Col span={2}></Col>
                 <BaseModal
                     maskClosable={false}
                     open={open}
@@ -283,28 +224,8 @@ const AdminSeatChart = () => {
                             <Input placeholder="Tên ghế" />
                         </Form.Item>
 
-                        <Form.Item {...formItemLayout} name="description" label="Mô tả">
-                            <TextArea rows={4} />
-                        </Form.Item>
-
-                        <Form.Item
-                            {...formItemLayout}
-                            label="Ảnh ghế"
-                            name="image"
-                            rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
-                        >
-                            <Upload
-                                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-                                accept=".png, .jpg"
-                                listType="picture-card"
-                                onChange={onChangeUpload}
-                                onPreview={onPreview}
-                                fileList={fileList}
-                                name="image"
-                                maxCount={1}
-                            >
-                                {fileList.length < 2 && '+ Upload'}
-                            </Upload>
+                        <Form.Item {...formItemLayout} name="status" label="Trạng thái" valuePropName="checked">
+                            <Switch checkedChildren="Hoạt động" unCheckedChildren="Không hoạt động" defaultChecked />
                         </Form.Item>
                     </Form>
                 </BaseModal>

@@ -40,4 +40,6 @@ public interface AccountDAO extends JpaRepository<Account, String> {
                         )
         List<TotalDashboardAdmin> getTotalUser();
 
+    
+
 }
