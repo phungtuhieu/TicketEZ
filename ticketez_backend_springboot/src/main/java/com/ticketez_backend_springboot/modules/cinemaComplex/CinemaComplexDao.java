@@ -27,7 +27,6 @@ public interface CinemaComplexDao extends JpaRepository<CinemaComplex, Long> {
                         @Param("cinemaChainName") String cinemaChainName,
                         @Param("searchNameCCX") String searchNameCCX);
 
-
         @Query("SELECT NEW com.ticketez_backend_springboot.dto.CinemaToCinemaComplexDTO(CC.id , " +
                         "CC.name , " +
                         "CC.address, " +
@@ -44,25 +43,27 @@ public interface CinemaComplexDao extends JpaRepository<CinemaComplex, Long> {
                         "HAVING COALESCE(COUNT(C.id), 0) > 0") // chỉ lấy những có dữ liệu
         List<CinemaToCinemaComplexDTO> getTotalCinemaToCinemaComplex();
 
-
-        //lấy danh sách complex theo province
+        // lấy danh sách complex theo province
         @Query("SELECT c FROM CinemaComplex c WHERE c.province = :province")
         List<CinemaComplex> getCinemaComplexByProvince(@Param("province") Province province);
+
         @Query("SELECT ccx FROM CinemaComplex ccx WHERE EXISTS "
-        
-        +"(SELECT st FROM Showtime st JOIN st.cinema.cinemaComplex ccxs WHERE "
-        +"ccx.id = ccxs.id "
-        +"AND st.startTime >= CURRENT_TIMESTAMP "
-        +"AND CAST(st.startTime AS DATE) = :date "
-        +"AND ccxs.province.id = :provinceId "
-        +"AND ccxs.cinemaChain.name like CONCAT('%', :cinemaChainName, '%') "
-        +"AND st.formatMovie.movie = :movie"
-        +" )"
-)                     
+
+                        + "(SELECT st FROM Showtime st JOIN st.cinema.cinemaComplex ccxs WHERE "
+                        + "ccx.id = ccxs.id "
+                        + "AND st.startTime >= CURRENT_TIMESTAMP "
+                        + "AND CAST(st.startTime AS DATE) = :date "
+                        + "AND ccxs.province.id = :provinceId "
+                        + "AND ccxs.cinemaChain.name like CONCAT('%', :cinemaChainName, '%') "
+                        + "AND st.formatMovie.movie = :movie"
+                        + " )")
         List<CinemaComplex> getCinemaComplexAndFormatShowtimesByMovie(
                         @Param("provinceId") Long provinceId,
                         @Param("cinemaChainName") String cinemaChainName,
                         @Param("movie") Movie movie,
                         @Param("date") LocalDate date);
+
+        // lấy cinemacomplex theo cinemaChainId
+        List<CinemaComplex> findByCinemaChainId(Long cinemaChainId);
 
 }

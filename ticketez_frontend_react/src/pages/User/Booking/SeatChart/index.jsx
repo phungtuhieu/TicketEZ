@@ -23,6 +23,7 @@ function SeatChart(props) {
         setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
+        console.log(allSeats);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
 
@@ -189,7 +190,7 @@ function SeatChart(props) {
             const newPrices = respPrice.data.map((price) => price);
             setPrices(newPrices);
 
-            // console.log(listWay);
+            console.log(listWay);
             // console.log(listSeatNormal);
             // console.log(listSeatVip);
             // console.log(allSeats);
