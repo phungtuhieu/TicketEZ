@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.accountRole.AccountRole;
 import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.review.Review;
 
 import jakarta.persistence.Column;
@@ -57,7 +58,8 @@ public class Account {
 	@OneToMany(mappedBy = "account")
 	private List<ActivityLog> activityLogs;
 
-	// @OneToMany(mappedBy = "account")
-	// private List<ServiceBooking> servicesBookings;
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	private List<Event> events;
 
 }
