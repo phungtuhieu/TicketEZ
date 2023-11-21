@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -74,6 +75,26 @@ public class SeatChartAPI {
         }
         dao.save(seatChart);
         return ResponseEntity.ok(seatChart);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<SeatChart> patch(@PathVariable("id") Long id, @RequestBody SeatChart seatChartUpdates) {
+        if (seatChartUpdates == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // Kiểm tra xem SeatChart có tồn tại hay không
+        SeatChart existingSeatChart = dao.findById(id).orElse(null);
+        if (existingSeatChart == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        if (seatChartUpdates.getName() != null) {
+            existingSeatChart.setName(seatChartUpdates.getName());
+            existingSeatChart.setStatus(seatChartUpdates.getStatus());
+        }
+        dao.save(existingSeatChart);
+
+        return ResponseEntity.ok(existingSeatChart);
     }
 
     @DeleteMapping("/{id}")

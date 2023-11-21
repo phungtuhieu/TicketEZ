@@ -86,7 +86,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**", "/api/account/**", "/api/actor/**", "/api/booking/**", "/api/cinema/**",
-                "/api/booking/**", "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
+                "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
                 "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
                 "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
                 "/api/movie-studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",

@@ -1,69 +1,19 @@
-import React, { useState } from 'react';
-import { Button, Card, Col, Row, Space } from 'antd';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Row, Select, Space } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import style from './Home.module.scss';
 import classNames from 'classnames/bind';
 import ReactApexChart from 'react-apexcharts';
+import AdminDashboardApi from '~/api/admin/AdminDashboard';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilm, faTicket, faUser } from '@fortawesome/free-solid-svg-icons';
+import { Option } from 'antd/es/mentions';
 
 const cx = classNames.bind(style);
 
 // Các options và series cho biểu đồ ApexCharts
-const apexChartOptions = {
-    chart: {
-        type: 'bar',
-        height: 350,
-    },
-    plotOptions: {
-        bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            endingShape: 'rounded',
-        },
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-    },
-    xaxis: {
-        categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-    },
-    yaxis: {
-        title: {
-            text: '$ (thousands)',
-        },
-    },
-    fill: {
-        opacity: 1,
-    },
-    tooltip: {
-        y: {
-            formatter: function (val) {
-                return '$ ' + val + ' thousands';
-            },
-        },
-    },
-    colors: ['#5F6F94', '#5D87FF', '#ABD9FF'],
-};
-
-const apexChartSeries = [
-    {
-        name: 'Net Profit',
-        data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-        
-    },
-    {
-        name: 'Revenue',
-        data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
-    },
-    {
-        name: 'Free Cash Flow',
-        data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
-    },
-];
+// Tính tổng doanh thu theo từng tháng và năm
 
 const seriesData = [
     {
@@ -74,7 +24,6 @@ const seriesData = [
         name: 'series2',
         data: [11, 32, 45, 32, 34, 52, 41],
     },
-   
 ];
 const options = {
     chart: {
@@ -104,7 +53,7 @@ const options = {
             format: 'dd/MM/yy HH:mm',
         },
     },
-    colors: [ '#5D87FF','#5F6F94'],
+    colors: ['#5D87FF', '#5F6F94'],
 };
 
 const dataBieuDoTron = [44, 55, 41, 17, 15];
@@ -131,6 +80,140 @@ const optionsBieuDoTron = {
 
 const AdminIndex = () => {
     const [size, setSize] = useState('large');
+    const [dataTotalMovieAndTicket, setDataTotalMovieAndTicket] = useState(1);
+    const [dataTotalUser, setDataTotalUser] = useState(1);
+    const [dataRevenueStatistics, setDataRevenueStatistics] = useState([]);
+    const [dataYear, setDataYear] = useState([]);
+    const [valueSelectYear, setValueSelectYear] = useState(2023);
+    const [totalRevenueForSelectedYear, setTotalRevenueForSelectedYear] = useState(0);
+
+    useEffect(() => {
+        const getList = async () => {
+            try {
+                const [totalMovieAndTicket, totalUser, getRevenueStatistics] = await Promise.all([
+                    AdminDashboardApi.getTotalMovieAndTicket(),
+                    AdminDashboardApi.getTotalUser(),
+                    AdminDashboardApi.getRevenueStatistics(),
+                ]);
+                setDataTotalMovieAndTicket(totalMovieAndTicket.data);
+                setDataTotalUser(totalUser.data);
+                setDataRevenueStatistics(getRevenueStatistics.data);
+
+                const uniqueYears = Array.from(new Set(getRevenueStatistics.data.map((item) => item.year)));
+                setDataYear(uniqueYears);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getList();
+    }, []);
+
+    useEffect(() => {
+        // Tính tổng tiền theo năm đã chọn
+        const calculateTotalRevenueForSelectedYear = () => {
+            const selectedYear = valueSelectYear;
+            const yearlyRevenue = dataRevenueStatistics
+                .filter((entry) => entry.year === selectedYear)
+                .reduce((total, entry) => total + entry.amount, 0);
+
+            setTotalRevenueForSelectedYear(yearlyRevenue);
+        };
+
+        // Gọi hàm tính tổng khi có thay đổi trong valueSelectYear hoặc dataRevenueStatistics
+        calculateTotalRevenueForSelectedYear();
+    }, [valueSelectYear, dataRevenueStatistics]);
+
+    const monthlyRevenue = {};
+    dataRevenueStatistics.forEach((entry) => {
+        const key = `${entry.year}-${entry.month}`;
+        if (!monthlyRevenue[key]) {
+            monthlyRevenue[key] = 0;
+        }
+        monthlyRevenue[key] += entry.amount;
+    });
+
+    // Chuyển dữ liệu thành mảng để sử dụng trong biểu đồ
+    const months = [
+        'Tháng 1',
+        'Tháng 2',
+        'Tháng 3',
+        'Tháng 4',
+        'Tháng 5',
+        'Tháng 6',
+        'Tháng 7',
+        'Tháng 8',
+        'Tháng 9',
+        'Tháng 10',
+        'Tháng 11',
+        'Tháng 12',
+    ];
+
+    const revenueData = months.map((month, index) => {
+        const key = `${valueSelectYear}-${index + 1}`;
+        const revenueInVND = monthlyRevenue[key] || 0;
+
+        // Chuyển đổi giá trị thành VNĐ và định dạng số
+        const formattedRevenue = revenueInVND.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        });
+
+        return formattedRevenue;
+    });
+
+    // Cập nhật options và series cho biểu đồ
+    const apexChartOptions = {
+        chart: {
+            type: 'bar',
+            height: 350,
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '55%',
+                endingShape: 'rounded',
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+        },
+        xaxis: {
+            categories: months,
+        },
+
+        fill: {
+            opacity: 1,
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    // Chuyển đổi giá trị thành đơn vị VNĐ và sử dụng dấu chấm phẩy
+                    return val.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' VNĐ';
+                },
+            },
+        },
+        colors: ['#5D87FF'],
+    };
+
+    const apexChartSeries = [
+        {
+            name: 'Tổng tiền',
+            data: revenueData,
+        },
+    ];
+
+    const totalTickets = dataTotalMovieAndTicket[0]?.total_tickets;
+    const totalMovies = dataTotalMovieAndTicket[0]?.total_movies;
+    const totalUsers = dataTotalUser[0]?.total_user;
+
+    const onChangeSelectYearRevenue = (value) => {
+        setValueSelectYear(value);
+    };
     return (
         <>
             {/* 4 card thống kê  */}
@@ -139,17 +222,24 @@ const AdminIndex = () => {
                     <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
-                                <span className={cx('title-card-top')}>Today's Moneys</span>
+                                <span className={cx('title-card-top')}>Tổng số vé đã bán </span>
                                 <br />
-                                <span className={cx('money-card-top')}>$53,000 </span>
-                                <span className={cx('char-card-top')}> +55%</span>
+                                <span className={cx('money-card-top')}>
+                                    {totalTickets != null
+                                        ? totalTickets > 1000000
+                                            ? (totalTickets / 1000000).toFixed(1) + 'M'
+                                            : totalTickets > 1000
+                                            ? (totalTickets / 1000).toFixed(1) + 'k'
+                                            : totalTickets
+                                        : null}
+                                </span>
                             </Col>
                             <Col xs={12} lg={4}>
                                 <Space wrap>
                                     <Button
                                         type="primary"
                                         className={cx('button-card-top')}
-                                        icon={<DownloadOutlined />}
+                                        icon={<FontAwesomeIcon icon={faTicket} />}
                                         size={size}
                                     />
                                 </Space>
@@ -161,17 +251,24 @@ const AdminIndex = () => {
                     <Card bordered={false} className={cx('card-top')}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
-                                <span className={cx('title-card-top')}>Today's Moneys</span>
+                                <span className={cx('title-card-top')}>Tổng phim </span>
                                 <br />
-                                <span className={cx('money-card-top')}>$53,000 </span>
-                                <span className={cx('char-card-top')}> +55%</span>
+                                <span className={cx('money-card-top')}>
+                                    {totalMovies != null
+                                        ? totalMovies > 1000000
+                                            ? (totalMovies / 1000000).toFixed(1) + 'M'
+                                            : totalMovies > 1000
+                                            ? (totalMovies / 1000).toFixed(1) + 'k'
+                                            : totalMovies
+                                        : null}
+                                </span>
                             </Col>
                             <Col xs={12} lg={4}>
                                 <Space wrap>
                                     <Button
                                         type="primary"
                                         className={cx('button-card-top')}
-                                        icon={<DownloadOutlined />}
+                                        icon={<FontAwesomeIcon icon={faFilm} />}
                                         size={size}
                                     />
                                 </Space>
@@ -183,17 +280,24 @@ const AdminIndex = () => {
                     <Card bordered={false} className={cx('card-top')}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
-                                <span className={cx('title-card-top')}>Today's Moneys</span>
+                                <span className={cx('title-card-top')}>Tổng người dùng</span>
                                 <br />
-                                <span className={cx('money-card-top')}>$53,000 </span>
-                                <span className={cx('char-card-top')}> +55%</span>
+                                <span className={cx('money-card-top')}>
+                                    {totalUsers != null
+                                        ? totalUsers > 1000000
+                                            ? (totalUsers / 1000000).toFixed(1) + 'M'
+                                            : totalUsers > 1000
+                                            ? (totalUsers / 1000).toFixed(1) + 'k'
+                                            : totalUsers
+                                        : null}
+                                </span>
                             </Col>
                             <Col xs={12} lg={4}>
                                 <Space wrap>
                                     <Button
                                         type="primary"
                                         className={cx('button-card-top')}
-                                        icon={<DownloadOutlined />}
+                                        icon={<FontAwesomeIcon icon={faUser} />}
                                         size={size}
                                     />
                                 </Space>
@@ -228,18 +332,40 @@ const AdminIndex = () => {
                 <Col xs={24} lg={16}>
                     <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <div id="chart">
-                            <span>
+                            <div>
                                 <span className={cx('money-card-top')}>Biểu đồ thống kê doanh thu</span>
                                 <br />
-                                <span className={cx('char-card-top')}>5% hơn </span>
-                                <span className={cx('title-card-top')}>năm 2023 </span>
-                            </span>
+                                <span className={cx('title-card-top')}>trong năm </span>
+                                <span className={cx('char-card-top')}>
+                                    {valueSelectYear} ·{' '}
+                                    {totalRevenueForSelectedYear.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') +
+                                        ' VNĐ'}
+                                </span>
+                                <Select
+                                    className="tw-float-right tw-mt-[-30px]  "
+                                    showSearch
+                                    placeholder="Chọn năm"
+                                    defaultValue={2023}
+                                    optionFilterProp="children"
+                                    onChange={onChangeSelectYearRevenue}
+                                    // onSearch={onSearch}
+                                    filterOption={(input, option) =>
+                                        (option && option.label ? option.label.toLowerCase() : '').includes(
+                                            input.toLowerCase(),
+                                        )
+                                    }
+                                    options={dataYear?.map((item) => ({
+                                        value: item,
+                                        label: item.toString(),
+                                    }))}
+                                ></Select>
+                            </div>
                             <ReactApexChart
                                 options={apexChartOptions} // Sử dụng options từ biến apexChartOptions
                                 series={apexChartSeries} // Sử dụng series từ biến apexChartSeries
                                 type="bar"
                                 height={350}
-                                style={{ maxWidth: '720px' }}
+                                // style={{ maxWidth: '790px' }}
                             />
                         </div>
                     </Card>
@@ -252,7 +378,7 @@ const AdminIndex = () => {
                                 <span className={cx('money-card-top')}>Biểu đồ thống kê số lượng vé</span>
                                 <br />
                                 <span className={cx('char-card-top')}>5% hơn </span>
-                                <span className={cx('title-card-top')}>trong 2023 </span>
+                                <span className={cx('title-card-top')}>trong {valueSelectYear} là </span>
                             </span>
                             <div className="chart-donut">
                                 <ReactApexChart

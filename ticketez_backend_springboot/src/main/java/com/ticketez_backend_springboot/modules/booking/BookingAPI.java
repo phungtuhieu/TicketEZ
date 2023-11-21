@@ -4,11 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.modules.account.Account;
-import com.ticketez_backend_springboot.modules.account.AccountDAO;
-import com.ticketez_backend_springboot.modules.genre.Genre;
+import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfoDAO;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
@@ -179,4 +174,18 @@ public class BookingAPI {
 		dao.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}
+
+
+
+	@GetMapping("/get/Revenue-statistics")
+    public ResponseEntity<?> getRevenueStatisticsDTO() {
+        try {
+            List<RevenueStatisticsDTO> booking = dao.getRevenueStatisticsDTO();
+            return ResponseEntity.ok(booking);
+            
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

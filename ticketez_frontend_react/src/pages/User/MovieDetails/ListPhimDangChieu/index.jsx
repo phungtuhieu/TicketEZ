@@ -112,23 +112,6 @@ function MovieDetailsListMovieRight() {
         setSelectedButton(value);
     };
 
-    const getColorForRating = (ratingCode) => {
-        switch (ratingCode) {
-            case 'NC-17':
-                return '#D80032';
-            case 'R':
-                return '#FFCD4B';
-            case 'PG-13':
-                return '#FF9B50';
-            case 'PG':
-                return '#7A9D54';
-            case 'G':
-                return '#1A5D1A';
-            default:
-                return '#f50';
-        }
-    };
-
     const scrollToTop = () => {
         scroll.scrollTo(0);
     };
@@ -207,10 +190,7 @@ function MovieDetailsListMovieRight() {
                                                 </div>
                                             </Col>
                                             <Col lg={16} className="tw-leading-normal tw-text-left tw-mt-[-10px]">
-                                                <Tag
-                                                    className={cx('tag-overlay')}
-                                                    color={getColorForRating(value.movie.mpaaRating.ratingCode)}
-                                                >
+                                                <Tag color={value.movie.mpaaRating.colorCode}>
                                                     {value.movie.mpaaRating.ratingCode}
                                                 </Tag>
                                                 <br />
@@ -227,13 +207,15 @@ function MovieDetailsListMovieRight() {
                                                     </p>
                                                 </span>
 
-                                                {value.movie.rating > 0 ? <div className="tw-mt-1">
-                                                    <FontAwesomeIcon
-                                                        icon={faStar}
-                                                        className="tw-text-yellow-500 tw-text-lg"
-                                                    />
-                                                    <span className="tw-text-gray-500 "> {value.movie.rating}</span>
-                                                </div> : null}
+                                                {value.movie.rating > 0 ? (
+                                                    <div className="tw-mt-1">
+                                                        <FontAwesomeIcon
+                                                            icon={faStar}
+                                                            className="tw-text-yellow-500 tw-text-lg"
+                                                        />
+                                                        <span className="tw-text-gray-500 "> {value.movie.rating}</span>
+                                                    </div>
+                                                ) : null}
                                             </Col>
                                         </Row>
                                     </Link>
@@ -243,7 +225,7 @@ function MovieDetailsListMovieRight() {
                     ) : (
                         <div>
                             <img src={img.notFoundLogo} alt="" className="tw-ml-[120px]" />
-                            <span className="tw-text-gray-400 tw-leading-normal tw-ml-[-230px]">
+                            <span className="tw-text-gray-400 tw-text-xl tw-leading-normal tw-ml-[-230px]">
                                 Không tìm thấy thể loại này trong phim đang chiếu
                             </span>
                         </div>

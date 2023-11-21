@@ -4,7 +4,7 @@ import React from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
-import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
+import { Avatar, Breadcrumb, Divider, Dropdown, notification } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
@@ -20,11 +20,25 @@ import {
     faTicket,
 } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from 'react-router-dom';
+import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 
 const Header = () => {
+
     const navigate = useNavigate();
 
     const location = useLocation();
+
+    const handleLogout = async () => {
+        try {
+            authApi.logout();
+            localStorage.clear();
+            funcUtils.notify('Đăng Xuất thành công!', 'success');
+            navigate('/')
+        } catch (error) {
+            funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
+        }
+    };
 
     const allowedPaths = [
         '/su-kien/khuyen-mai',
@@ -70,12 +84,13 @@ const Header = () => {
         {
             key: '4',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="">
+                <a target="_self" onClick={handleLogout} rel="noopener noreferrer" href="">
                     Đăng xuất
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
-        },
+        }
+        
     ];
 
     const scrollToShowTimes = () => {
@@ -105,7 +120,7 @@ const Header = () => {
                             </div>
                             <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div>
                             <img src={img.logoHome} />
-                            <div className="tw-hidden tw-leading-4 tw-text-pink-700 lg:tw-block">
+                            <div className="tw-hidden tw-leading-4 tw-text-[var(--red-color)] lg:tw-block">
                                 <div>
                                     <div>Đặt vé</div>
                                     <div className="tw-mt-[5px]">Xem phim</div>
@@ -136,7 +151,7 @@ const Header = () => {
                         </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] ">
                             <a href="/review" className="tw-text-gray-700">
-                               Review Phim
+                                Review Phim
                             </a>
                         </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">

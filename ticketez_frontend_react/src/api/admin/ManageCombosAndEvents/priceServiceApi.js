@@ -21,10 +21,10 @@ class PriceServiceApi extends BaseApi {
             throw error;
         }
     }
-    async put(id, data, serviceId, cinemaComplexId) {
+    async put(id, data, serviceId,) {
         try {
-            const [service, cinemaComplex] = await Promise.all([serviceApi.getById(serviceId), cinemaComplexApi.getId(cinemaComplexId)]);
-            const values = { id: id, ...data, service: service.data, cinemaComplex: cinemaComplex.data };
+            const [service] = await Promise.all([serviceApi.getById(serviceId)]);
+            const values = { id: id, ...data, service: service.data};
             console.log('values', values);
             return axiosClient.put(url + '/' + id, values);
         } catch (error) {

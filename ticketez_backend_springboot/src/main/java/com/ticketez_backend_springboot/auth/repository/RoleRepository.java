@@ -10,6 +10,6 @@ import com.ticketez_backend_springboot.auth.models.SecurityRole;
 
 
 
-public interface RoleRepository extends JpaRepository<SecurityRole, String> {
+public interface RoleRepository extends JpaRepository<SecurityRole, Long> {
     Optional<SecurityRole> findByName(SecurityERole name);
 }
