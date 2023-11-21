@@ -43,7 +43,7 @@ public class Event {
 	private Integer typeEvent;
 
 	@ManyToOne
-	@JoinColumn(name = "account")
+	@JoinColumn(name = "account_id")
 	private Account account;
 
 }

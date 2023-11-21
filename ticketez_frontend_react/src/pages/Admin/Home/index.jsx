@@ -85,6 +85,8 @@ const AdminIndex = () => {
     const [dataRevenueStatistics, setDataRevenueStatistics] = useState([]);
     const [dataYear, setDataYear] = useState([]);
     const [valueSelectYear, setValueSelectYear] = useState(2023);
+    const [totalRevenueForSelectedYear, setTotalRevenueForSelectedYear] = useState(0);
+
     useEffect(() => {
         const getList = async () => {
             try {
@@ -106,16 +108,6 @@ const AdminIndex = () => {
         getList();
     }, []);
 
-    const totalTickets = dataTotalMovieAndTicket[0]?.total_tickets;
-    const totalMovies = dataTotalMovieAndTicket[0]?.total_movies;
-    const totalUsers = dataTotalUser[0]?.total_user;
-
-    const onChangeSelectYearRevenue = (value) => {
-        setValueSelectYear(value);
-    };
-
-    const [totalRevenueForSelectedYear, setTotalRevenueForSelectedYear] = useState(0);
-
     useEffect(() => {
         // Tính tổng tiền theo năm đã chọn
         const calculateTotalRevenueForSelectedYear = () => {
@@ -130,7 +122,6 @@ const AdminIndex = () => {
         // Gọi hàm tính tổng khi có thay đổi trong valueSelectYear hoặc dataRevenueStatistics
         calculateTotalRevenueForSelectedYear();
     }, [valueSelectYear, dataRevenueStatistics]);
-
 
     const monthlyRevenue = {};
     dataRevenueStatistics.forEach((entry) => {
@@ -157,18 +148,18 @@ const AdminIndex = () => {
         'Tháng 12',
     ];
 
-     const revenueData = months.map((month, index) => {
-         const key = `${valueSelectYear}-${index + 1}`;
-         const revenueInVND = monthlyRevenue[key] || 0;
+    const revenueData = months.map((month, index) => {
+        const key = `${valueSelectYear}-${index + 1}`;
+        const revenueInVND = monthlyRevenue[key] || 0;
 
-         // Chuyển đổi giá trị thành VNĐ và định dạng số
-         const formattedRevenue = revenueInVND.toLocaleString('vi-VN', {
-             style: 'currency',
-             currency: 'VND',
-         });
+        // Chuyển đổi giá trị thành VNĐ và định dạng số
+        const formattedRevenue = revenueInVND.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        });
 
-         return formattedRevenue;
-     });
+        return formattedRevenue;
+    });
 
     // Cập nhật options và series cho biểu đồ
     const apexChartOptions = {
@@ -215,6 +206,14 @@ const AdminIndex = () => {
             data: revenueData,
         },
     ];
+
+    const totalTickets = dataTotalMovieAndTicket[0]?.total_tickets;
+    const totalMovies = dataTotalMovieAndTicket[0]?.total_movies;
+    const totalUsers = dataTotalUser[0]?.total_user;
+
+    const onChangeSelectYearRevenue = (value) => {
+        setValueSelectYear(value);
+    };
     return (
         <>
             {/* 4 card thống kê  */}
@@ -338,7 +337,7 @@ const AdminIndex = () => {
                                 <br />
                                 <span className={cx('title-card-top')}>trong năm </span>
                                 <span className={cx('char-card-top')}>
-                                    {valueSelectYear} · {' '}
+                                    {valueSelectYear} ·{' '}
                                     {totalRevenueForSelectedYear.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') +
                                         ' VNĐ'}
                                 </span>

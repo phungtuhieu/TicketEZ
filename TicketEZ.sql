@@ -1041,11 +1041,11 @@ VALUES
 GO
 INSERT INTO Cinema_Chains ([name],[image],[description])
 VALUES
-(N'CGV',N'6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
 (N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[longitude],[latitude], [cinema_chain_id],[province_id])
@@ -1247,11 +1247,11 @@ GO
  -- 10. Chèn dữ liệu vào bảng MPAA_Rating
 INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon],[color_code], [description])
 VALUES
-    ('G', 'G_icon.png', '#1A5D1A',N'Phù hợp cho mọi đối tượng.'),
-    ('PG', 'PG_icon.png','#7A9D54', N'Cần có sự hướng dẫn của cha mẹ hoặc người trưởng thành.'),
-    ('PG-13', 'PG-13_icon.png','#FF9B50', N'Không phù hợp cho trẻ dưới 13 tuổi.'),
-    ('R', 'R_icon.png','#FFCD4B', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
-    ('NC-17', 'NC-17_icon.png','#D80032', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
+    ('G', '0dd95ef9-1453-46f3-9577-1b1db03dd536_RATED_G.svg.png', '#1A5D1A',N'Phù hợp cho mọi đối tượng.'),
+    ('PG', 'e534d759-e88e-4d5b-9c7c-3c9b2dc751ca_RATED_PG.svg.png','#7A9D54', N'Cần có sự hướng dẫn của cha mẹ hoặc người trưởng thành.'),
+    ('PG-13', 'a7a2d7d7-20fd-4aeb-a0c9-c8ced2721697_RATED_PG-13.svg.png','#FF9B50', N'Không phù hợp cho trẻ dưới 13 tuổi.'),
+    ('R', 'efccadb4-d926-4f81-a47c-1175aac38bc8_RATED_R.svg.png','#FFCD4B', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
+    ('NC-17', '6a0f27bc-34f4-46d6-9e3e-517686a183fc_Nc-17.svg.png','#D80032', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
 GO
 INSERT INTO Movies (title, poster,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
 VALUES

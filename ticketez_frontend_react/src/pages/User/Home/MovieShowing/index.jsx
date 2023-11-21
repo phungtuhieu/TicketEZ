@@ -109,22 +109,6 @@ const MovieShowing = () => {
         prevArrow: <SamplePrevArrow />,
     };
 
-    const getColorForRating = (ratingCode) => {
-        switch (ratingCode) {
-            case 'NC-17':
-                return '#D80032';
-            case 'R':
-                return '#FFCD4B';
-            case 'PG-13':
-                return '#FF9B50';
-            case 'PG':
-                return '#7A9D54';
-            case 'G':
-                return '#1A5D1A';
-            default:
-                return '#f50';
-        }
-    };
     const CustomCloseIcon = ({ onClick }) => (
         <CloseCircleOutlined
             onClick={onClick}
@@ -173,10 +157,7 @@ const MovieShowing = () => {
                                 <>
                                     <Link to={`/movie-details/${slide.movie.id}`}>
                                         <div key={slide.movie.id} className={cx('container')}>
-                                            <Tag
-                                                className={cx('tag-overlay')}
-                                                color={getColorForRating(slide.movie.mpaaRating.ratingCode)}
-                                            >
+                                            <Tag className={cx('tag-overlay')} color={slide.movie.mpaaRating.colorCode}>
                                                 {slide.movie.mpaaRating.ratingCode}
                                             </Tag>
 

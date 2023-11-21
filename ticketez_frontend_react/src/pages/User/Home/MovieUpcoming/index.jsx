@@ -108,22 +108,6 @@ const MovieShowing = () => {
         prevArrow: <SamplePrevArrow />,
     };
 
-    const getColorForRating = (ratingCode) => {
-        switch (ratingCode) {
-            case 'NC-17':
-                return '#D80032';
-            case 'R':
-                return '#FFCD4B';
-            case 'PG-13':
-                return '#FF9B50';
-            case 'PG':
-                return '#7A9D54';
-            case 'G':
-                return '#1A5D1A';
-            default:
-                return '#f50';
-        }
-    };
     const CustomCloseIcon = ({ onClick }) => (
         <CloseCircleOutlined
             onClick={onClick}
@@ -163,10 +147,7 @@ const MovieShowing = () => {
                             <>
                                 <Link to={`/movie-details/${slide.movie.id}`}>
                                     <div key={slide.movie.id} className={cx('container')}>
-                                        <Tag
-                                            className={cx('tag-overlay')}
-                                            color={getColorForRating(slide.movie.mpaaRating.ratingCode)}
-                                        >
+                                        <Tag className={cx('tag-overlay')} color={slide.movie.mpaaRating.colorCode}>
                                             {slide.movie.mpaaRating.ratingCode}
                                         </Tag>
 
@@ -220,9 +201,12 @@ const MovieShowing = () => {
                                     <div>
                                         <Title level={5} className={cx('name-movie')} style={{ color: '#000' }}>
                                             {slide.movie.title} <br />
-                                            <span className={cx('the-loai-phim')} style={{ color: '#000' }}>
+                                            <span className={cx('the-loai-phim')}>
                                                 {slide.genres.map((valueGenre, index) => (
-                                                    <span className={cx('span')} key={index}>
+                                                    <span
+                                                        className={cx('span')}
+                                                        key={index}
+                                                    >
                                                         {valueGenre.name}
                                                     </span>
                                                 ))}
@@ -236,7 +220,7 @@ const MovieShowing = () => {
                     ) : (
                         <div>
                             <img src={img.notFoundLogo} alt="" style={{ marginLeft: '100px' }} />
-                            <span className='tw-text-gray-600 '>Không tìm thấy phim chiếu ngày hôm nay</span>
+                            <span className="tw-text-gray-600 ">Không tìm thấy phim chiếu ngày hôm nay</span>
                         </div>
                     )}
                 </Slider>
