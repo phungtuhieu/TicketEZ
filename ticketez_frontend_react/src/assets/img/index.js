@@ -5,6 +5,7 @@ import tagDatTruoc from './logo-dat-truoc.svg';
 import event from './event.jpg';
 import logoHome from './logoHome.svg';
 import logoAdmin from './logoAdmin.png';
+import anhReview from './hinhanhReview.webp';
 
 //
 import logoComment from './logo-cmt.webp';
@@ -58,6 +59,7 @@ const img = {
     bgAuth,
     datrungphuongnam,
     tagDatTruoc,
+    anhReview,
     //
     notFoundLogo,
     gifLoading,

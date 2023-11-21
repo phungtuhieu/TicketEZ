@@ -38,7 +38,7 @@ public class Showtime {
 	@Column(name = "end_time")
 	private Date endTime;
 
-	private int status;
+	private Integer status;
 
 	@ManyToOne
 	@JoinColumn(name = "format_movie_id")

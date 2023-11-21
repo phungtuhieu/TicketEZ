@@ -2,4 +2,4 @@
 .vscode/
 .metadata/
 .node_modules/
-.ckeditor5/
+# .ckeditor5/

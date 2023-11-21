@@ -1,5 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, Pagination } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    Upload,
+    Image,
+    Pagination,
+    Tag,
+    ColorPicker,
+} from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import BaseTable from '~/components/common/BaseTable/BaseTable';
 import BaseModal from '~/components/common/BaseModal/BaseModal';
@@ -162,6 +176,15 @@ const AdminMpaaRating = () => {
             ...getColumnSearchProps('ratingCode'),
         },
         {
+            title: 'Mã màu',
+            dataIndex: 'colorCode',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Tag color={record.colorCode}>{record.colorCode}</Tag>
+                </Space>
+            ),
+        },
+        {
             title: 'Mô tả',
             dataIndex: 'description',
             ...getColumnSearchProps('description'),
@@ -223,9 +246,9 @@ const AdminMpaaRating = () => {
         try {
             const res = await mpaaRatingApi.delete(record.id);
             if (res.status === 200) {
-                 if (fileList.length > 0) {
-                     await uploadApi.delete(record.icon);
-                 }
+                if (fileList.length > 0) {
+                    await uploadApi.delete(record.icon);
+                }
                 funcUtils.notify(res.data, 'success');
             }
         } catch (error) {
@@ -258,8 +281,10 @@ const AdminMpaaRating = () => {
             let values = await form.validateFields();
             if (fileList.length > 0) {
                 if (editData) {
+                    console.log(editData);
                     let putData = {
                         id: editData.id,
+                        colorCode: editData.colorCode,
                         ...values,
                     };
                     if (putData.icon.file) {
@@ -270,7 +295,6 @@ const AdminMpaaRating = () => {
                             icon: images,
                         };
                     }
-
                     try {
                         const resPut = await mpaaRatingApi.update(putData.id, putData);
                         if (resPut.status === 200) {
@@ -288,11 +312,10 @@ const AdminMpaaRating = () => {
                         const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
+                            colorCode : values.colorCode.toHexString() ,
                             icon: images,
                         };
-                        console.log(postData);
                         const resPost = await mpaaRatingApi.create(postData);
-                        console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm phân loại thành công', 'success');
                         }
@@ -371,14 +394,15 @@ const AdminMpaaRating = () => {
         fileList,
     };
 
+
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    <h1 >Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button type="primary" className={cx('button-title , tw-mt-[20px]' )} icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
                 </Col>
@@ -405,22 +429,56 @@ const AdminMpaaRating = () => {
                     <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
                         <Form.Item
                             {...formItemLayout}
-                            name="ratingCode"
-                            label="Phân loại"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                        >
-                            <Input placeholder="Please input your name" />
-                        </Form.Item>
-
-                        <Form.Item
-                            {...formItemLayout}
-                            name="description"
-                            label="Mô tả"
+                            name="colorCode"
+                            label="Chọn mã màu"
                             rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
                         >
-                            <TextArea />
+                            <ColorPicker
+                                showText
+                                trigger="hover"
+                                presets={[
+                                    {
+                                        label: 'Recommended',
+                                        colors: [
+                                            '#000000',
+                                            '#000000E0',
+                                            '#000000A6',
+                                            '#00000073',
+                                            '#00000040',
+                                            '#00000026',
+                                            '#0000001A',
+                                            '#00000012',
+                                            '#0000000A',
+                                            '#00000005',
+                                            '#F5222D',
+                                            '#FA8C16',
+                                            '#FADB14',
+                                            '#8BBB11',
+                                            '#52C41A',
+                                            '#13A8A8',
+                                            '#1677FF',
+                                            '#2F54EB',
+                                            '#722ED1',
+                                            '#EB2F96',
+                                            '#F5222D4D',
+                                            '#FA8C164D',
+                                            '#FADB144D',
+                                            '#8BBB114D',
+                                            '#52C41A4D',
+                                            '#13A8A84D',
+                                            '#1677FF4D',
+                                            '#2F54EB4D',
+                                            '#722ED14D',
+                                            '#EB2F964D',
+                                        ],
+                                    },
+                                    {
+                                        label: 'Recent',
+                                        colors: [],
+                                    },
+                                ]}
+                            />
                         </Form.Item>
-
                         <Form.Item
                             {...formItemLayout}
                             label="icon"
@@ -438,6 +496,24 @@ const AdminMpaaRating = () => {
                             >
                                 {fileList.length < 2 && '+ Upload'}
                             </Upload>
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="ratingCode"
+                            label="Phân loại"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                        >
+                            <Input placeholder="Vui lòng nhập tên phân loại" />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                        >
+                            <TextArea placeholder="Vui lòng nhập mô tả phân loại" />
                         </Form.Item>
                     </Form>
                 </BaseModal>

@@ -2,11 +2,15 @@ package com.ticketez_backend_springboot.modules.event;
 
 import java.util.Date;
 
+import com.ticketez_backend_springboot.modules.account.Account;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -33,9 +37,13 @@ public class Event {
 
 	private String banner;
 	
-	private boolean status;
+	private Boolean status;
 
 	@Column(name = "type_event")
-	private int typeEvent;
+	private Integer typeEvent;
+
+	@ManyToOne
+	@JoinColumn(name = "account_id")
+	private Account account;
 
 }

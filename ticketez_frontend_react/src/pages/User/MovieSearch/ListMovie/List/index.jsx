@@ -40,12 +40,10 @@ function List({ data }) {
                     <div className=" tw-flex tw-items-center tw-justify-center">
                         <div className="tw-w-[200px] tw-h-[300px] `tw-overflow-hidden` tw-rounded ">
                             <div className="tag-overlay ">
-                                <div className={'tw-mr-3 ' + getColorForRating.name(data.movie.mpaaRating.ratingCode)}>
-                                    {data.movie.mpaaRating.ratingCode === 'R' ||
-                                    data.movie.mpaaRating.ratingCode === 'SS'
-                                        ? ''
-                                        : data.movie.mpaaRating.ratingCode}
-                                </div>
+                                
+                                <Tag color={data.movie.mpaaRating.colorCode}>
+                                                {data.movie.mpaaRating.ratingCode}
+                                            </Tag>
                             </div>
                             <img
                                 className="img-overlay"

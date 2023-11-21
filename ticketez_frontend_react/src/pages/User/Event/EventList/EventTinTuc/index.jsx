@@ -38,9 +38,7 @@ const EventListTinTuc = () => {
                 console.log(json);
                 setDataCardLoadMore((pre) => [...pre, ...json.data]);
                 setTotalPage(json.totalPages);
-                setTimeout(() => {
-                    SetLoadingCard(false);
-                }, 3000);
+                SetLoadingCard(false);
             } catch (error) {
                 console.log(error);
             }
@@ -66,7 +64,7 @@ const EventListTinTuc = () => {
                     <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
                         {moment(dataEventByNew[0]?.startDate).format('DD-MM-YYYY ')}
                     </div>
-                    <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] ">
+                    <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] hover:tw-text-pink-500 ">
                         {dataEventByNew[0]?.name}
                     </h1>
                 </>

@@ -42,10 +42,8 @@ const EventDetailsBottom = (props) => {
         getEventByNew();
     }, [ location.pathname]);
 
-    console.log("fuck",dataEventByNews);
     return (
         <>
-            <>
                 {dataEventByNews && dataEventByNews.length > 0 && (
                     <Row gutter={[1, 10]} className="tw-mb-[50px]">
                         {dataEventByNews.slice(0, 3).map((event, index) => (
@@ -112,7 +110,6 @@ const EventDetailsBottom = (props) => {
                         ))}
                     </Row>
                 )}
-            </>
         </>
     );
 };

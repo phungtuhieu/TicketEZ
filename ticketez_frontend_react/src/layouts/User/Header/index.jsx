@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
-import './header.css';
+import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown, notification } from 'antd';
@@ -120,7 +120,7 @@ const Header = () => {
                             </div>
                             <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div>
                             <img src={img.logoHome} />
-                            <div className="tw-hidden tw-leading-4 tw-text-pink-700 lg:tw-block">
+                            <div className="tw-hidden tw-leading-4 tw-text-[var(--red-color)] lg:tw-block">
                                 <div>
                                     <div>Đặt vé</div>
                                     <div className="tw-mt-[5px]">Xem phim</div>
@@ -147,6 +147,11 @@ const Header = () => {
                         <div className="tw-xl:tw-hidden tw-mr-[20px] ">
                             <a href="/su-kien/tin-tuc" className="tw-text-gray-700">
                                 Sự kiện
+                            </a>
+                        </div>
+                        <div className="tw-xl:tw-hidden tw-mr-[20px] ">
+                            <a href="/review" className="tw-text-gray-700">
+                                Review Phim
                             </a>
                         </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">
@@ -198,12 +203,13 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                                (location.pathname === '/su-kien/tin-tuc' ||
-                                                    /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
-                                            }`,
+                                        }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -217,12 +223,13 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                                (location.pathname === '/su-kien/khuyen-mai' ||
-                                                    /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-pink-500'
                                                 : ''
-                                            }`,
+                                        }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />

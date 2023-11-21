@@ -10,7 +10,7 @@ import { movieApi } from "~/api/admin";
 import { useParams } from 'react-router-dom';
 import funcUtils from './../../../../../utils/funcUtils';
 import reviewApi from "~/api/user/review/reviewApi";
-import { Card, Avatar, Typography } from 'antd';
+import { Card, Avatar, Typography, Image } from 'antd';
 import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
@@ -43,7 +43,7 @@ const ActorSlider = () => {
     const settings = {
         dots: false,
         infinite: false,
-        speed: 700,
+        speed: 500,
         slidesToShow: 4,
         slidesToScroll: 3,
         initialSlide: 1,
@@ -90,7 +90,7 @@ const ActorSlider = () => {
                     directors: res.data.actorAndDirectorsObj.directors,
                   });
                 setLoading(false);
-                console.log("123", res);
+                // console.log("123", res);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     funcUtils.notify(error.response.data, 'error');
@@ -101,7 +101,7 @@ const ActorSlider = () => {
         };
         getList();
     }, []);
-    console.log("1", data);
+    // console.log("1", data);
     return (
 
         <div className={cx('body')}>
@@ -110,9 +110,11 @@ const ActorSlider = () => {
 >
         {data.actors?.map((person, index) => (
           <div key={index}  style={{ marginRight: '10px' }}>
-            <Card style={{ width: "inherit" }}>
-              <Avatar size={55} src={uploadApi.get(person.avatar)}>
-                {/* Nếu person.avatarUrl chưa có giá trị, bạn có thể sử dụng một ảnh mặc định */}
+            <Card className="tw-w-inherit tw-border-none tw-!important">
+              <Avatar 
+              
+               size={55} src={uploadApi.get(person.avatar)}>
+            
               </Avatar>
               <Typography>{person.fullname}</Typography>
             </Card>
@@ -120,7 +122,7 @@ const ActorSlider = () => {
         ))}
         {data.directors?.map((person, index) => (
           <div key={index}  style={{ marginRight: '10px' }}>
-            <Card style={{ width: "inherit" }}>
+            <Card className="tw-w-inherit tw-border-none tw-!important">
               <Avatar size={55} src={uploadApi.get(person.avatar)}>
                 {/* Nếu person.avatarUrl chưa có giá trị, bạn có thể sử dụng một ảnh mặc định */}
               </Avatar>

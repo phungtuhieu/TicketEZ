@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './movieShowing.module.scss';
 import Slider from 'react-slick';
-import { Col, Modal, Rate, Row,  Tag, Typography } from 'antd';
+import { Col, Modal, Rate, Row, Tag, Typography } from 'antd';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
 import funcUtils from '~/utils/funcUtils';
-import { Link, } from 'react-router-dom';
-import { CloseCircleOutlined,  LoadingOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import img from '~/assets/img';
 
 const cx = classNames.bind(style);
@@ -109,34 +109,18 @@ const MovieShowing = () => {
         prevArrow: <SamplePrevArrow />,
     };
 
-    const getColorForRating = (ratingCode) => {
-        switch (ratingCode) {
-            case 'NC-17':
-                return '#D80032';
-            case 'R':
-                return '#FFCD4B';
-            case 'PG-13':
-                return '#FF9B50';
-            case 'PG':
-                return '#7A9D54';
-            case 'G':
-                return '#1A5D1A';
-            default:
-                return '#f50';
-        }
-    };
     const CustomCloseIcon = ({ onClick }) => (
         <CloseCircleOutlined
             onClick={onClick}
             style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
         />
     );
-     const [isLoadingPage, setIsLoading] = useState(true);
-     useEffect(() => {
-         setTimeout(() => {
-             setIsLoading(false);
-         }, 1000);
-     }, []);
+    const [isLoadingPage, setIsLoading] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    }, []);
     return (
         <div className={cx('body')}>
             <p className={cx('name-card')}>
@@ -173,10 +157,7 @@ const MovieShowing = () => {
                                 <>
                                     <Link to={`/movie-details/${slide.movie.id}`}>
                                         <div key={slide.movie.id} className={cx('container')}>
-                                            <Tag
-                                                className={cx('tag-overlay')}
-                                                color={getColorForRating(slide.movie.mpaaRating.ratingCode)}
-                                            >
+                                            <Tag className={cx('tag-overlay')} color={slide.movie.mpaaRating.colorCode}>
                                                 {slide.movie.mpaaRating.ratingCode}
                                             </Tag>
 

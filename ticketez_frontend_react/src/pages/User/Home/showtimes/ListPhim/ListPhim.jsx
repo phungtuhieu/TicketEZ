@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Modal } from 'antd';
+import { Button, Row, Col, Modal, Alert, Tag } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import classNames from 'classnames/bind';
@@ -201,7 +201,10 @@ function ListPhim({ cinemaComplex }) {
                             <Col span={20} className={cx('col2-movie')}>
                                 <Row>
                                     <Col span={24} className={cx('container-thong-tin-phim')}>
-                                        <div className={cx('k')}>{data.movie.mpaaRating.ratingCode}</div>
+                                            <Tag color={data.movie.mpaaRating.colorCode}>
+                                                {data.movie.mpaaRating.ratingCode}
+                                            </Tag>
+
                                         <div className={cx('ten-phim')}>{data.movie.title}</div>
                                         <div className={cx('the-loai-phim')}>
                                             {data.genres.map((valueGenre, index) => (

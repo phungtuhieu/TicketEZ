@@ -30,6 +30,7 @@ import com.ticketez_backend_springboot.dto.MovieDTO;
 import com.ticketez_backend_springboot.dto.MovieShowtimeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.SearchMovieDTO;
+import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.actor.Actor;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovieDAO;
@@ -684,5 +685,18 @@ public class MovieAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    @GetMapping("/get/total-movie-ticket")
+    public ResponseEntity<?> getTotalTicketsAndTotalMovies() {
+        try {
+            List<TotalDashboardAdmin> movie = dao.getTotalTicketsAndTotalMovies();
+            return ResponseEntity.ok(movie);
+            
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

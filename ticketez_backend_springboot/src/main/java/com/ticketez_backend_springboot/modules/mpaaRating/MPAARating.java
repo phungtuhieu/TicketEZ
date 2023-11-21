@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,8 +22,12 @@ public class MPAARating {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "rating_code")
 	private String ratingCode;
 	private String icon;
+	
+	@Column(name = "color_code")
+	private String colorCode;
 	private String description;
 
 	@JsonIgnore

@@ -144,7 +144,7 @@ export default function SeatGenerator() {
 
             const resp = await axiosClient.post(`seatchart`, data);
             setIdSeatChart(resp.data.id);
-            // createSeatDB(resp.data.id);
+            createSeatDB(resp.data.id);
             setShowInfo('success');
         } catch (error) {
             console.error(error);

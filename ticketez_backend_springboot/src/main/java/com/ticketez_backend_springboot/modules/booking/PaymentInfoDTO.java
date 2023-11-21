@@ -16,5 +16,5 @@ public class PaymentInfoDTO {
     PaymentInfo paymentInfo;
     List<SeatBooking> seatBookings;
     String pageInvoiceUrl;
-    Boolean status;
+    Integer status;
 }
