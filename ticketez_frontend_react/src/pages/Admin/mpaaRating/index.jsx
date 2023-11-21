@@ -26,6 +26,7 @@ import TextArea from 'antd/es/input/TextArea';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
+import { logDOM } from '@testing-library/react';
 
 const cx = classNames.bind(style);
 
@@ -279,12 +280,13 @@ const AdminMpaaRating = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
+
             if (fileList.length > 0) {
                 if (editData) {
-                    console.log(editData);
+                    // Kiểm tra nếu colorCode là một đối tượng và có thuộc tính toHexString
+
                     let putData = {
                         id: editData.id,
-                        colorCode: editData.colorCode,
                         ...values,
                     };
                     if (putData.icon.file) {
@@ -293,6 +295,24 @@ const AdminMpaaRating = () => {
                         putData = {
                             ...putData,
                             icon: images,
+                        };
+                    }
+                    if (
+                        values.colorCode &&
+                        typeof values.colorCode === 'object' &&
+                        typeof values.colorCode.toHexString === 'function'
+                    ) {
+                        var newColorCode = values.colorCode.toHexString();
+                        putData = {
+                            ...putData,
+                            colorCode: newColorCode,
+                        };
+                    } else {
+                        // Nếu không phải đối tượng có toHexString, giữ nguyên giá trị colorCode
+                        var newColorCode1 = values.colorCode;
+                        putData = {
+                            ...putData,
+                            colorCode: newColorCode1,
                         };
                     }
                     try {
@@ -312,7 +332,7 @@ const AdminMpaaRating = () => {
                         const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
-                            colorCode : values.colorCode.toHexString() ,
+                            colorCode: values.colorCode.toHexString(),
                             icon: images,
                         };
                         const resPost = await mpaaRatingApi.create(postData);
@@ -394,15 +414,19 @@ const AdminMpaaRating = () => {
         fileList,
     };
 
-
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 >Bảng dữ liệu</h1>
+                    <h1>Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title , tw-mt-[20px]' )} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button
+                        type="primary"
+                        className={cx('button-title , tw-mt-[20px]')}
+                        icon={<PlusOutlined />}
+                        onClick={showModal}
+                    >
                         Thêm
                     </Button>
                 </Col>
