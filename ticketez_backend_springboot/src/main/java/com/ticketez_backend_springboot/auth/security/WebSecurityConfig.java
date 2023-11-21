@@ -85,16 +85,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/api/account/**", "/api/actor/**", "/api/booking/**", "/api/cinema/**",
+            .requestMatchers("/api/account/**", "/api/actor/**", "/api/booking/**", "/api/cinema/**",
                 "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
                 "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
                 "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
                 "/api/movie-studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
                 "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
-                "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
+                "/api/seatchart/**", "/api/seat-choose/**", "/api /seatType/**", "/api/servicecombo/**",
                 "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**")
             .permitAll()
-            .requestMatchers("/api/test/**").permitAll()
+
+            .requestMatchers("/api/auth/**").permitAll()
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());
