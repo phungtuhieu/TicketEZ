@@ -377,7 +377,7 @@ function SeatChart(props) {
     };
 
     const deleteSeatChoose = async () => {
-        const resp = await axiosClient.delete(`seat-choose/deleteMultiple`, seatChoose);
+        const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
     };
 
     useEffect(() => {

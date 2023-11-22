@@ -49,7 +49,7 @@ public class SeatChooseAPI {
         dao.saveAll(seats);
         return ResponseEntity.ok(seats);
     }
-    @DeleteMapping("/deleteMultiple")
+    @PostMapping("/deleteMultiple")
     public ResponseEntity<Void> deleteMultiple(@RequestBody List<SeatChoose> seatChooseList) {
         // for (SeatChoose seatChoose : seatChooseList) {
         //     if (!dao.existsById(seatChoose.getId())) {
