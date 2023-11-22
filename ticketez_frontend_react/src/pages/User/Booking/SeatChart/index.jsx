@@ -20,6 +20,8 @@ function SeatChart(props) {
         setIsModalOpenBooking(false);
     };
     const handleCancel = () => {
+        console.log(seatChoose);
+        deleteSeatChoose();
         setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
@@ -346,6 +348,7 @@ function SeatChart(props) {
         fetchData();
     }, [seatState ? seatState.seatReserved : null]);
 
+    const [seatChoose, setSeatChoose] = useState([]);
     const onCreateDaTaSeatChoose = async () => {
         try {
             console.log(duplicateSeat);
@@ -363,6 +366,7 @@ function SeatChart(props) {
             await Promise.all([]);
             try {
                 const resp = await axiosClient.post(`seat-choose`, data);
+                setSeatChoose(resp.data);
                 console.log(data);
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu từ server', error);
@@ -370,6 +374,10 @@ function SeatChart(props) {
         } catch (error) {
             console.error('Lỗi khi lấy dữ liệu từ server', error);
         }
+    };
+
+    const deleteSeatChoose = async () => {
+        const resp = await axiosClient.delete(`seat-choose/deleteMultiple`, seatChoose);
     };
 
     useEffect(() => {
