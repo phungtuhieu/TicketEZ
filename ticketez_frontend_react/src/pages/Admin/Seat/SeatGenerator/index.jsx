@@ -13,6 +13,8 @@ import FirstSeat from '../FirstSeat';
 const cx = classNames.bind(style);
 
 export default function SeatGenerator() {
+    // Dữ liệu chuỗi rạp chiếu
+    const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
     // Dữ liệu cụm rạp
     const [cinemaComplexDaTa, setCinemaComplexDaTa] = useState([]);
     // Dữ liệu rạp
@@ -26,7 +28,8 @@ export default function SeatGenerator() {
 
     const [row, setRow] = useState(5);
     const [col, setCol] = useState(5);
-
+    // ẩn hiện chọn cụm rạp là phải check lúc bấm vào chuỗi rạp
+    const [selectedCinemaChain, setSelectedCinemaChain] = useState(false);
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
     const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
@@ -35,15 +38,28 @@ export default function SeatGenerator() {
     // Sử dụng một biến state để theo dõi sự thay đổi của row và col
     const [firstChartDataChanged, setFirstChartDataChanged] = useState(false);
 
-    // Lấy cụm rạp
-    const fetchDataCinemaComplex = async () => {
-        const cinemaComplexApi = new BaseApi('cinemaComplex');
+    const [isInputDisabled, setIsInputDisabled] = useState(false);
 
+    // Lấy dữ liệu chuỗi rạp
+    const fetchDataCinemaChain = async () => {
         try {
-            const resp = await cinemaComplexApi.getAll();
+            const resp = await axiosClient.get(`cinemaChain/get/all`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const dataCinemaChain = resp.data;
+            setCinemaChainDaTa(dataCinemaChain);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // Lấy cụm rạp
+    const fetchDataCinemaComplex = async (idCinemaChain) => {
+        try {
+            const resp = await axiosClient.get(`cinemaComplex/bycimemaChain/${idCinemaChain}`);
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
+            setSelectedCinemaChain(true);
         } catch (error) {
             console.error(error);
         }
@@ -144,7 +160,7 @@ export default function SeatGenerator() {
 
             const resp = await axiosClient.post(`seatchart`, data);
             setIdSeatChart(resp.data.id);
-            createSeatDB(resp.data.id);
+            // createSeatDB(resp.data.id);
             setShowInfo('success');
         } catch (error) {
             console.error(error);
@@ -160,7 +176,7 @@ export default function SeatGenerator() {
     }, [showInfo]);
 
     useEffect(() => {
-        fetchDataCinemaComplex();
+        fetchDataCinemaChain();
     }, []);
 
     useEffect(() => {
@@ -168,6 +184,29 @@ export default function SeatGenerator() {
         // createSeatArray();
         setFirstChartDataChanged(!firstChartDataChanged);
     }, [row, col, idSeatChart]);
+
+    // Chuỗi rạp ----------------------------------------------------
+    const optionsCinemaChain = cinemaChainDaTa.map((cinemaChain) => ({
+        value: cinemaChain.id,
+        label: cinemaChain.name,
+    }));
+
+    const onChangeCinemaChain = (value) => {
+        fetchDataCinemaComplex(value);
+        setSelectedCinemaChain(false);
+        setSelectedCinemaComplex(false);
+        setSelectedOptionCinema(false);
+
+        console.log(`selected ${value}`);
+    };
+    const onSearchCinemaChain = (value) => {
+        console.log('search:', value);
+    };
+    // Cụm rạp----------------------------------------------------------
+
+    useEffect(() => {
+        fetchDataCinemaChain();
+    }, []);
 
     const options = cinemaComplexDaTa.map((cinema) => ({
         value: cinema.id,
@@ -178,7 +217,6 @@ export default function SeatGenerator() {
         fetchDataCinema(value);
         setSelectedCinemaComplex(false);
         setSelectedOptionCinema(false);
-        console.log(`selected ${value}`);
     };
     const onSearchCinemaComplex = (value) => {
         console.log('search:', value);
@@ -220,6 +258,7 @@ export default function SeatGenerator() {
     // Thêm sơ đồ
 
     const handelCreate = () => {
+        setIsInputDisabled(true);
         postDataSeatChart();
     };
 
@@ -228,19 +267,36 @@ export default function SeatGenerator() {
             <Row className={cx('container')} style={{ width: '100%' }}>
                 <Col style={{ backgroundColor: 'transparent' }} className={cx('col-first')} span={8}>
                     <Card className={cx('card')} title="chỗ nhập liệu" bordered={true} style={{ width: 300 }}>
-                        <p>Chọn cụm rạp:</p>
+                        <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
                         <Select
                             className={cx('select')}
                             showSearch
-                            placeholder="Chọn cụm rạp"
+                            placeholder="Chọn chuỗi rạp"
                             optionFilterProp="children"
-                            onChange={onChangeCinemaComplex}
-                            onSearch={onSearchCinemaComplex}
+                            onChange={onChangeCinemaChain}
+                            onSearch={onSearchCinemaChain}
                             filterOption={(input, option) =>
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
-                            options={options}
+                            options={optionsCinemaChain}
                         />
+                        {selectedCinemaChain && (
+                            <>
+                                <p className="tw-font-medium tw-mb-3">Chọn cụm rạp :</p>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Chọn cụm rạp"
+                                    optionFilterProp="children"
+                                    onChange={onChangeCinemaComplex}
+                                    onSearch={onSearchCinemaComplex}
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    options={options}
+                                />
+                            </>
+                        )}
                         {selectedCinemaComplex && (
                             <>
                                 <p>Chọn rạp:</p>
@@ -262,7 +318,13 @@ export default function SeatGenerator() {
                             <>
                                 <div className={cx('select')}>
                                     <p>Nhập số hàng ghế:</p>
-                                    <InputNumber min={1} max={20} defaultValue={5} onChange={onChangeRow} />
+                                    <InputNumber
+                                        min={1}
+                                        max={20}
+                                        defaultValue={5}
+                                        onChange={onChangeRow}
+                                        disabled={isInputDisabled}
+                                    />
                                 </div>
                             </>
                         )}
@@ -270,7 +332,13 @@ export default function SeatGenerator() {
                             <>
                                 <div className={cx('select')}>
                                     <p>Nhập số cột ghế:</p>
-                                    <InputNumber min={1} max={20} defaultValue={5} onChange={onChangeCol} />
+                                    <InputNumber
+                                        min={1}
+                                        max={20}
+                                        defaultValue={5}
+                                        onChange={onChangeCol}
+                                        disabled={isInputDisabled}
+                                    />
                                 </div>
                             </>
                         )}
@@ -288,7 +356,7 @@ export default function SeatGenerator() {
                             <>
                                 <div className={cx('select')} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button type="primary" onClick={handelCreate}>
-                                        Thêm ghế
+                                        Tạo sơ đồ 
                                     </Button>
                                 </div>
                             </>

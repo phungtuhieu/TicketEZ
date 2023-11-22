@@ -77,6 +77,12 @@ public class CinemaComplexAPI {
         return ResponseEntity.ok(seats);
     }
 
+    @GetMapping("/bycimemaChain/{idCinemaChain}")
+    public ResponseEntity<List<CinemaComplex>> findAllByCinemaChain(@PathVariable("idCinemaChain") Long id) {
+        List<CinemaComplex> seats = cinemaComplexDao.findByCinemaChainId(id);
+        return ResponseEntity.ok(seats);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         try {
@@ -154,8 +160,7 @@ public class CinemaComplexAPI {
         }
     }
 
-
-    //hiển thị tổng cinema theo cinemacomplex
+    // hiển thị tổng cinema theo cinemacomplex
     @GetMapping("/getTotalCinemaToCinemaComplex")
     public ResponseEntity<?> getTotalCinemaToCinemaComplex() {
         List<CinemaToCinemaComplexDTO> distinctMovieIds = cinemaComplexDao.getTotalCinemaToCinemaComplex();
@@ -178,6 +183,7 @@ public class CinemaComplexAPI {
         }
 
     }
+
     // @GetMapping("/get/gettesst")
     @GetMapping("/get/ccx-format-showtime-by-movie")
     public ResponseEntity<?> getDuLiea(

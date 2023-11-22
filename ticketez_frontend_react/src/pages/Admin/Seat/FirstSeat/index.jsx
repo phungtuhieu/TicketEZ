@@ -119,12 +119,7 @@ function SeatChart(props) {
     };
 
     const onClickUpdate = async () => {
-        console.log(idSeatChart);
-        console.log(allSeats);
-        console.log('------------------------------------');
-
         let check = 0;
-
         const dataArray = seatState.seatHeader.map((header, rowIndex) =>
             seatState.seat[rowIndex].map((seat_no) => ({
                 name: seat_no,
@@ -229,8 +224,13 @@ function SeatChart(props) {
                                         </Col>
                                         <Col span={24} style={{ marginTop: 30 }}>
                                             <div className={cx('custom-btn')}>
-                                                <Button className={cx('btn')} type="primary" onClick={onClickUpdate}>
-                                                    Thêm đường đi
+                                                <Button
+                                                    className={cx('btn')}
+                                                    style={{ height: '50px', whiteSpace: 'normal' }}
+                                                    type="primary"
+                                                    onClick={onClickUpdate}
+                                                >
+                                                    Tạo ghế và đường đi
                                                 </Button>
                                             </div>
                                         </Col>
