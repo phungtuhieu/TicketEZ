@@ -219,15 +219,23 @@ GO
 GO
     CREATE TABLE Price (
         id BIGINT IDENTITY(1, 1) NOT NULL,
-        weekday_price FLOAT NOT NULL,
-        weekend_price FLOAT NOT NULL,
         [start_date] DATETIME NOT NULL,
         end_date DATETIME NOT NULL,
         [status] BIT NOT NULL,
-        seat_type_id BIGINT NOT NULL,
         movie_id BIGINT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
+
+GO
+  CREATE TABLE Price_Seat_Types (
+        id BIGINT IDENTITY(1, 1) NOT NULL,
+        weekday_price FLOAT NOT NULL,
+        weekend_price FLOAT NOT NULL,
+        seat_type_id BIGINT NOT NULL,
+		price_id BIGINT NOT NULL
+    )
+
+
 GO
     CREATE TABLE Events (
         id BIGINT IDENTITY(1, 1) NOT NULL,
@@ -560,7 +568,12 @@ ALTER TABLE
     Seats_Choose
 ADD
     CONSTRAINT PK_Seats_Choose PRIMARY KEY (id);
-	go
+GO
+ALTER TABLE
+     Price_Seat_Types
+ADD
+    CONSTRAINT PK_ Price_Seat_Types PRIMARY KEY (id);
+
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
     Verification
