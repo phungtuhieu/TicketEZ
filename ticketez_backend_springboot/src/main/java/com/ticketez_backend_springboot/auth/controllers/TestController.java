@@ -27,6 +27,13 @@ public class TestController {
     return "SCHEDULING_PRICING_ADMIN.";
   }
 
+    @GetMapping("/USER")
+  @PreAuthorize("hasRole('USER')")
+  public String USER() {
+    return "USERs";
+  }
+
+
   @GetMapping("/mma")
   @PreAuthorize("hasRole('MOVIE_MANAGEMENT_ADMIN')")
   public String MOVIE_MANAGEMENT_ADMIN() {

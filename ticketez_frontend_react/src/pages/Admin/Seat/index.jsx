@@ -12,6 +12,8 @@ import SeatGenerator from './SeatGenerator';
 const cx = classNames.bind(style);
 
 function AdminSeat() {
+    // Dữ liệu chuỗi rạp chiếu
+    const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
     // Dữ liệu cụm rạp
     const [cinemaComplexDaTa, setCinemaComplexDaTa] = useState([]);
     // Dữ liệu rạp
@@ -30,6 +32,8 @@ function AdminSeat() {
     // Dữ liệu tên ghế đã đặt
     const [nameSeat, setNameSeat] = useState([]);
 
+    // ẩn hiện chọn cụm rạp là phải check lúc bấm vào chuỗi rạp
+    const [selectedCinemaChain, setSelectedCinemaChain] = useState(false);
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
     const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
@@ -49,21 +53,40 @@ function AdminSeat() {
         setIsModalOpen(true);
     };
     const handleOk = () => {
+        fetchDataSeatChart(idCinema);
+        setSelectedOptionCinema(false);
+        setSelectedOption(false);
+        setSelectedOptionShowTime(false);
         setIsModalOpen(false);
     };
     const handleCancel = () => {
+        fetchDataSeatChart(idCinema);
+        setSelectedOptionCinema(false);
+        setSelectedOption(false);
+        setSelectedOptionShowTime(false);
         setIsModalOpen(false);
     };
 
-    // Lấy cụm rạp
-    const fetchDataCinemaComplex = async () => {
-        const cinemaComplexApi = new BaseApi('cinemaComplex');
-
+    // Lấy dữ liệu chuỗi rạp
+    const fetchDataCinemaChain = async () => {
         try {
-            const resp = await cinemaComplexApi.getAll();
+            const resp = await axiosClient.get(`cinemaChain/get/all`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const dataCinemaChain = resp.data;
+            setCinemaChainDaTa(dataCinemaChain);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // Lấy cụm rạp
+    const fetchDataCinemaComplex = async (idCinemaChain) => {
+        try {
+            const resp = await axiosClient.get(`cinemaComplex/bycimemaChain/${idCinemaChain}`);
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
+            setSelectedCinemaChain(true);
         } catch (error) {
             console.error(error);
         }
@@ -145,7 +168,6 @@ function AdminSeat() {
             });
 
             setSelectedOption(true);
-            console.log('----------------------------------------------------------------');
         } catch (error) {
             console.error(error);
         }
@@ -173,10 +195,29 @@ function AdminSeat() {
         setSeatChartDataChanged(!seatChartDataChanged);
     }, [row, col, seatBookingData, idSeatChart]);
 
+    // Chuỗi rạp ----------------------------------------------------
+    const optionsCinemaChain = cinemaChainDaTa.map((cinemaChain) => ({
+        value: cinemaChain.id,
+        label: cinemaChain.name,
+    }));
+
+    const onChangeCinemaChain = (value) => {
+        fetchDataCinemaComplex(value);
+        setSelectedCinemaChain(false);
+        setSelectedCinemaComplex(false);
+        setSelectedOptionCinema(false);
+        setSelectedOption(false);
+        setSelectedOptionShowTime(false);
+
+        console.log(`selected ${value}`);
+    };
+    const onSearchCinemaChain = (value) => {
+        console.log('search:', value);
+    };
     // Cụm rạp----------------------------------------------------------
 
     useEffect(() => {
-        fetchDataCinemaComplex();
+        fetchDataCinemaChain();
     }, []);
 
     const options = cinemaComplexDaTa.map((cinema) => ({
@@ -190,8 +231,6 @@ function AdminSeat() {
         setSelectedOptionCinema(false);
         setSelectedOption(false);
         setSelectedOptionShowTime(false);
-
-        console.log(`selected ${value}`);
     };
     const onSearchCinemaComplex = (value) => {
         console.log('search:', value);
@@ -199,19 +238,18 @@ function AdminSeat() {
 
     // Rạp-----------------------------------------------------
 
-    useEffect(() => {}, [cinemaDaTa]);
-
     const optionsCinema = cinemaDaTa.map((cinema) => ({
         value: cinema.id,
         label: cinema.name,
     }));
 
+    const [idCinema, setIdCinema] = useState('');
     const onChangeCinema = (value) => {
+        setIdCinema(value);
         fetchDataSeatChart(value);
         setSelectedOptionCinema(false);
         setSelectedOption(false);
         setSelectedOptionShowTime(false);
-        console.log(`selected ${value}`);
     };
     const onSearchCinema = (value) => {
         console.log('search:', value);
@@ -267,19 +305,37 @@ function AdminSeat() {
             <Row className={cx('container')} style={{ width: '100%' }}>
                 <Col style={{ backgroundColor: 'transparent' }} className={cx('col-first')} span={8}>
                     <Card className={cx('card')} title="Ghế" bordered={true} style={{ width: 300 }}>
-                        <p className="tw-font-medium tw-mb-3">Chọn cụm rạp :</p>
+                        <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
                         <Select
                             className={cx('select')}
                             showSearch
-                            placeholder="Chọn cụm rạp"
+                            placeholder="Chọn chuỗi rạp"
                             optionFilterProp="children"
-                            onChange={onChangeCinemaComplex}
-                            onSearch={onSearchCinemaComplex}
+                            onChange={onChangeCinemaChain}
+                            onSearch={onSearchCinemaChain}
                             filterOption={(input, option) =>
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
-                            options={options}
+                            options={optionsCinemaChain}
                         />
+                        {selectedCinemaChain && (
+                            <>
+                                <p className="tw-font-medium tw-mb-3">Chọn cụm rạp :</p>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Chọn cụm rạp"
+                                    optionFilterProp="children"
+                                    onChange={onChangeCinemaComplex}
+                                    onSearch={onSearchCinemaComplex}
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    options={options}
+                                />
+                            </>
+                        )}
+
                         {selectedCinemaComplex && (
                             <>
                                 <p className="tw-font-medium tw-mb-3">Chọn rạp :</p>
@@ -299,9 +355,14 @@ function AdminSeat() {
                         )}
                         {selectedOptionCinema && (
                             <>
-                                <div className="tw-flex tw-items-center">
+                                <div className="tw-flex tw-items-center tw-mb-4">
                                     <p className="tw-font-medium tw-mb-3 tw-mr-4">Chọn sơ đồ :</p>
-                                    <Button className='tw-ms-8' type="primary" icon={<PlusOutlined />} onClick={showModal}>
+                                    <Button
+                                        className="tw-ms-6"
+                                        type="primary"
+                                        icon={<PlusOutlined />}
+                                        onClick={showModal}
+                                    >
                                         Thêm sơ đồ
                                     </Button>
                                 </div>
@@ -312,6 +373,7 @@ function AdminSeat() {
                                     onOk={handleOk}
                                     onCancel={handleCancel}
                                     width={1000}
+                                    footer={null}
                                 >
                                     <div className={cx('modal-content')}>
                                         <SeatGenerator />

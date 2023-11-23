@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { getRolesFromLocalStorage } from '~/utils/authUtils';
+
 import { Button, Checkbox, Form, Input, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
@@ -19,17 +21,20 @@ const LoginForm = () => {
                 password: values.password,
             });
             console.log(response);
-            if (authApi) {
-                console.log(authApi.getToken());
-                console.log(authApi.getUser());
+            const roles = getRolesFromLocalStorage();
 
+            if (roles.includes('SUPER_ADMIN')) {
+                funcUtils.notify('Đăng nhập thành công!', 'success');
+                navigate('/admin/index');
+            } else {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/');
             }
         } catch (error) {
             funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
         }
-    };
+    }
+
 
     return (
         <Form
