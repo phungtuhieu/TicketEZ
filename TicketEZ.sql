@@ -575,7 +575,7 @@ GO
 ALTER TABLE
      Price_Seat_Types
 ADD
-    CONSTRAINT PK_ Price_Seat_Types PRIMARY KEY (id);
+    CONSTRAINT PK_Price_Seat_Types PRIMARY KEY (id);
 
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
@@ -652,11 +652,12 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Price_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
 GO
-ALTER TABLE
+/*ALTER TABLE
     Price
 ADD
     CONSTRAINT FK_Price_SeatTypes FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 GO
+*/
 ALTER TABLE
     Price
 ADD
@@ -1279,13 +1280,7 @@ VALUES
 (N'Siêu Nhân Trái Đất', N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
 (N'Tinh Hoa Đất Việt', N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
--- Chèn dữ liệu mẫu cho bảng Price
-INSERT INTO Price (weekday_price, weekend_price, [start_date], end_date, [status], seat_type_id, movie_id, cinema_complex_id)
-VALUES
-    (65000, 75000, '2023-01-01', '2024-01-10', 1, 1, 1, 1),
-	(80000, 10000, '2023-01-01', '2024-01-10', 1, 2, 1, 1),
-    (75000, 89000, '2023-02-01', '2024-02-10', 1, 2, 2, 1);
-GO
+
   -- 13. Thêm dữ liệu cho bảng Discounts
 INSERT INTO [TicketEZ].[dbo].[Discounts] 
     ([title], [coupon_code], [amount], [start_date], [end_date], [status], [discount_type], [cinema_complex_id])
@@ -1496,14 +1491,20 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
-
 -- Inserting sample data into the Price table
-INSERT INTO Price (weekday_price, weekend_price, start_date, end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+INSERT INTO Price ([start_date], [end_date], [status], movie_id, cinema_complex_id)
 VALUES
-    (10.00, 15.00, '2023-11-20', '2023-11-27', 1, 1, 2, 1),
-    (12.00, 18.00, '2023-11-20', '2023-11-27', 1, 2, 2, 1),
-    (20.00, 12.00, '2023-11-20', '2023-11-27', 1, 4, 2, 1)
+    ('2023-11-20', '2023-11-27', 1, 2, 1),
+    ( '2023-11-20', '2023-11-27', 1, 2, 1),
+    ('2023-11-20', '2023-11-27', 1, 2, 1)
 
+
+INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)
+VALUES
+    (70000, 85000, 1, 1),
+    ( 90000, 100000, 2, 1),
+    (100000, 120000, 3, 1)
+  
 --thêm dữ liệu cho bảng booking
 INSERT INTO Booking (id, account_id, create_date, showtime_id, [status],[ticket_status])
 VALUES

@@ -141,10 +141,9 @@ public class BookingAPI {
 			return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 					HttpStatus.CONFLICT);
 		}
-		pmIDao.save(paymentInfo);
-		if (paymentStatus >= 0) {
-			String urlRedirect = "/booking-paid";
-			return ResponseEntity.status(HttpStatus.OK).body(urlRedirect);
+		PaymentInfo pInfo = pmIDao.save(paymentInfo);
+		if (paymentStatus >= 0) { // String urlRedirect = "/booking-info";
+			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
 		} else if (paymentStatus == 0) {
 			return new ResponseEntity<>("Giao dịch thất bại",
 					HttpStatus.CONFLICT);
@@ -152,6 +151,20 @@ public class BookingAPI {
 			return new ResponseEntity<>("Thông tin giao dịch không chính xác",
 					HttpStatus.CONFLICT);
 		}
+	}
+
+	@GetMapping("/payment-info/{id}")
+	public ResponseEntity<?> getPaymentInfoById(@PathVariable("id") String pInfoId) {
+		PaymentInfo pInfoDb = pmIDao.findById(pInfoId).orElse(null);
+		if (pInfoDb == null) {
+			return new ResponseEntity<>("Không tìm thấy thông tin giao dịch", HttpStatus.NOT_FOUND);
+		}
+		Booking bookingDb = pInfoDb.getBooking();
+		PaymentInfoDTO pInfoDTO = new PaymentInfoDTO();
+		pInfoDTO.setPaymentInfo(pInfoDb);
+		pInfoDTO.setBooking(bookingDb);
+		pInfoDTO.setSeatBookings(bookingDb.getSeatsBookings());
+		return ResponseEntity.status(HttpStatus.OK).body(pInfoDTO);
 	}
 
 	@PutMapping("/{id}")
@@ -175,17 +188,15 @@ public class BookingAPI {
 		return ResponseEntity.noContent().build();
 	}
 
-
-
 	@GetMapping("/get/Revenue-statistics")
-    public ResponseEntity<?> getRevenueStatisticsDTO() {
-        try {
-            List<RevenueStatisticsDTO> booking = dao.getRevenueStatisticsDTO();
-            return ResponseEntity.ok(booking);
-            
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+	public ResponseEntity<?> getRevenueStatisticsDTO() {
+		try {
+			List<RevenueStatisticsDTO> booking = dao.getRevenueStatisticsDTO();
+			return ResponseEntity.ok(booking);
 
-    }
+		} catch (Exception e) {
+			return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 }

@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class PaymentInfoDTO {
-    PaymentInfo paymentInfo;
-    List<SeatBooking> seatBookings;
-    String pageInvoiceUrl;
-    Integer status;
+    private PaymentInfo paymentInfo;
+    private Booking booking;
+    private List<SeatBooking> seatBookings;
+    private Integer status;
 }

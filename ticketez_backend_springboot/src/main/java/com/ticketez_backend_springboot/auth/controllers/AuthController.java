@@ -63,9 +63,10 @@ public class AuthController {
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-    SecurityAccount securityAccount = accountRepository.findByIdAndPassword(loginRequest.getId(),encoder.encode(loginRequest.getPassword()));
+    SecurityAccount securityAccount = accountRepository.findByIdAndPassword(loginRequest.getId(),
+        encoder.encode(loginRequest.getPassword()));
     // if (securityAccount == null) {
-    //   return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
+    // return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
 
     // }
     Authentication authentication = authenticationManager.authenticate(
@@ -74,7 +75,6 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
 
     String jwt = jwtUtils.generateJwtToken(authentication);
     List<String> roles = userDetails.getAuthorities().stream()

@@ -89,7 +89,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
                 "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
                 "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
-                "/api/movie-studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
+                "/api/movie-studio/**", "/api/mpaaRating/**", "/api/payment-info/**", "/api/price/**",
                 "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
                 "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
                 "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**",

@@ -5,8 +5,11 @@ class BookingApi extends BaseApi {
     constructor() {
         super('booking');
     }
-    async getPaymentInfo(params) {
+    async getPaymentInfoParams(params) {
         return axiosClient.get(`/booking/vnpay-payment`, { params });
+    }
+    async getPaymentInfoById(id) {
+        return axiosClient.get(`/booking/payment-info/${id}`);
     }
 }
 const bookingApi = new BookingApi();

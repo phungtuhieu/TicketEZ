@@ -42,14 +42,21 @@ function ConnectorPage() {
                 vnp_SecureHash,
                 bookingId,
             };
+            const page = '/booking-info';
             try {
-                const resp = await bookingApi.getPaymentInfo(params);
-                const page = resp.data;
+                const resp = await bookingApi.getPaymentInfoParams(params);
+
                 navigate(page, {
-                    state: { paymentInfo: resp.data },
+                    state: { paymentInfoId: resp.data },
+                    replace: true,
                 });
+
                 setLoading(false);
             } catch (error) {
+                navigate(page, {
+                    state: { paymentInfoId: null },
+                    replace: true,
+                });
                 setLoading(false);
             }
         };

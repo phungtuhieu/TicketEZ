@@ -4,28 +4,17 @@ import style from './TicketDetails.module.scss';
 import { Col, QRCode, Row, Tag } from 'antd';
 import datrungphuongnamImg from '../../../assets/img/datrungphuongnam.jpg';
 import logorap from '../../../assets/img/lotte.jpg';
+import { useEffect } from 'react';
 const cx = classNames.bind(style);
 
-function TicketDetails() {
+function TicketDetails({ paymentInfoDTO }) {
     // const location = useLocation();
-    const getColorForRating = (ratingCode) => {
-        switch (ratingCode) {
-            case 'NC-17':
-                return '#D80032';
-            case 'R':
-                return '#FFCD4B';
-            case 'PG-13':
-                return '#FF9B50';
-            case 'PG':
-                return '#7A9D54';
-            case 'G':
-                return '#1A5D1A';
-            default:
-                return '#f50';
-        }
-    };
+    const { booking, paymentInfo, seatBookings } = paymentInfoDTO;
     // Lấy dữ liệu từ state
     // const paymentInfo = location.state?.paymentInfo;
+    useEffect(() => {
+        console.log('paymentInfo', paymentInfoDTO);
+    }, []);
     return (
         <>
             <div className={cx('wrapper')}>
@@ -42,9 +31,7 @@ function TicketDetails() {
                                 </Col>
                                 <Col span={17} className={cx('wrapp-movie-info')}>
                                     <ul className={cx('info-movie')}>
-                                        <li>
-                                            <Tag color={getColorForRating('PG-13')}>G-13</Tag>
-                                        </li>
+                                        <li>{/* <Tag color={getColorForRating('PG-13')}>G-13</Tag> */}</li>
                                         <li className={cx('movie-name')}>
                                             <span>Đất rừng phương nam</span>
                                         </li>
