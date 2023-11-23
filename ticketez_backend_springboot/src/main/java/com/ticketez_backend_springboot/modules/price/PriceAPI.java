@@ -41,26 +41,26 @@ public class PriceAPI {
         return ResponseEntity.ok(priceDAO.findById(id).get());
     }
 
-    @GetMapping("/find-by-id-cinema-compex-movie/{cinemaComplexId}/{movieId}")
-    public ResponseEntity<List<Price>> findByIdCinemaComplexAndMovie(
-            @PathVariable("cinemaComplexId") Long CinemaComplexId, @PathVariable("movieId") Long movieId) {
+    // @GetMapping("/find-by-id-cinema-compex-movie/{cinemaComplexId}/{movieId}")
+    // public ResponseEntity<List<Price>> findByIdCinemaComplexAndMovie(
+    //         @PathVariable("cinemaComplexId") Long CinemaComplexId, @PathVariable("movieId") Long movieId) {
 
-        return ResponseEntity.ok(priceDAO.findPricesByCinemaComplexIdAndMovieId(CinemaComplexId, movieId));
-    }
+    //     return ResponseEntity.ok(priceDAO.findPricesByCinemaComplexIdAndMovieId(CinemaComplexId, movieId));
+    // }
 
-    @PostMapping("/get/price-by-seattype")
-    public ResponseEntity<?> getPriceListBySeatTypeIds(@RequestBody PriceFindDTO priceFindDTO) {
-        try {
-            List<Price> listPrice = priceDAO.getPriceListBySeatTypeIds(priceFindDTO.getSeatTypeIds(),
-                    priceFindDTO.getCinemaClxId(), priceFindDTO.getMovieId());
-            if (listPrice == null) {
-                return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
-            }
-            return ResponseEntity.ok(listPrice);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
-        }
-    }
+    // @PostMapping("/get/price-by-seattype")
+    // public ResponseEntity<?> getPriceListBySeatTypeIds(@RequestBody PriceFindDTO priceFindDTO) {
+    //     try {
+    //         List<Price> listPrice = priceDAO.getPriceListBySeatTypeIds(priceFindDTO.getSeatTypeIds(),
+    //                 priceFindDTO.getCinemaClxId(), priceFindDTO.getMovieId());
+    //         if (listPrice == null) {
+    //             return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
+    //         }
+    //         return ResponseEntity.ok(listPrice);
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>("Không tìm thấy giá của các này", HttpStatus.CONFLICT);
+    //     }
+    // }
 
     @PostMapping
     public ResponseEntity<Price> post(@RequestBody Price price) {
