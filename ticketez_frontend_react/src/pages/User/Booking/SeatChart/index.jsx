@@ -236,7 +236,6 @@ function SeatChart(props) {
     };
 
     // Lấy price từ ghế
-
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
         let result = null;
 
