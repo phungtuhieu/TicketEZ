@@ -688,10 +688,22 @@ public class MovieAPI {
     }
 
 
-    @GetMapping("/get/total-movie-ticket")
-    public ResponseEntity<?> getTotalTicketsAndTotalMovies() {
+    @GetMapping("/get/total-ticket")
+    public ResponseEntity<?> getTotalTickets() {
         try {
-            List<TotalDashboardAdmin> movie = dao.getTotalTicketsAndTotalMovies();
+            List<TotalDashboardAdmin> movie = dao.getTotalTickets();
+            return ResponseEntity.ok(movie);
+            
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+     @GetMapping("/get/total-movie")
+    public ResponseEntity<?> getTotalMovies() {
+        try {
+            List<TotalDashboardAdmin> movie = dao.getTotalMovies();
             return ResponseEntity.ok(movie);
             
         } catch (Exception e) {

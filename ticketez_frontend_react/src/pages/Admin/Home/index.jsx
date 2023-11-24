@@ -80,7 +80,8 @@ const optionsBieuDoTron = {
 
 const AdminIndex = () => {
     const [size, setSize] = useState('large');
-    const [dataTotalMovieAndTicket, setDataTotalMovieAndTicket] = useState(1);
+    const [dataTotalMovie, setDataTotalMovie] = useState(1);
+     const [dataTotalTicket, setDataTotalTicket] = useState(1);
     const [dataTotalUser, setDataTotalUser] = useState(1);
     const [dataRevenueStatistics, setDataRevenueStatistics] = useState([]);
     const [dataYear, setDataYear] = useState([]);
@@ -90,12 +91,14 @@ const AdminIndex = () => {
     useEffect(() => {
         const getList = async () => {
             try {
-                const [totalMovieAndTicket, totalUser, getRevenueStatistics] = await Promise.all([
-                    AdminDashboardApi.getTotalMovieAndTicket(),
+                const [totalMovie, totalTicket, totalUser, getRevenueStatistics] = await Promise.all([
+                    AdminDashboardApi.getTotalMovies(),
+                    AdminDashboardApi.getTotalTickets(),
                     AdminDashboardApi.getTotalUser(),
                     AdminDashboardApi.getRevenueStatistics(),
                 ]);
-                setDataTotalMovieAndTicket(totalMovieAndTicket.data);
+                setDataTotalMovie(totalMovie.data);
+                setDataTotalTicket(totalTicket.data);
                 setDataTotalUser(totalUser.data);
                 setDataRevenueStatistics(getRevenueStatistics.data);
 
@@ -207,8 +210,8 @@ const AdminIndex = () => {
         },
     ];
 
-    const totalTickets = dataTotalMovieAndTicket[0]?.total_tickets;
-    const totalMovies = dataTotalMovieAndTicket[0]?.total_movies;
+    const totalTickets = dataTotalTicket[0]?.total_tickets;
+    const totalMovies = dataTotalMovie[0]?.total_movies;
     const totalUsers = dataTotalUser[0]?.total_user;
 
     const onChangeSelectYearRevenue = (value) => {

@@ -5,8 +5,11 @@ const urlAccount= 'account';
 const urlBooking = 'booking';
 
 const AdminDashboardApi = {
-    getTotalMovieAndTicket: async () => {
-        return axiosClient.get(urlMovie + '/get/total-movie-ticket');
+    getTotalTickets: async () => {
+        return axiosClient.get(urlMovie + '/get/total-ticket');
+    },
+    getTotalMovies: async () => {
+        return axiosClient.get(urlMovie + '/get/total-movie');
     },
     getTotalUser: async () => {
         return axiosClient.get(urlAccount + '/get/total-user');

@@ -336,11 +336,29 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
+             let account = {
+                 id: 'admin',
+                 phone: '0987654321',
+                 fullname: 'Nguyễn Văn A',
+                 address: '123 Đường ABC, Quận 1, TP.HCM',
+                 email: 'nguyen.va@gmail.com',
+                 password: 'admin',
+                 birthday: '1990-01-14T17:00:00.000+00:00',
+                 gender: true,
+                 image: 'image1.jpg',
+                 status: 1,
+                 createdDate: '2023-01-01T01:00:00.000+00:00',
+                 verified: true,
+                 points: 0,
+             };
+                    
             if (fileList.length > 0) {
                 if (editData) {
+                    
                     let putData = {
                         id: editData.id,
                         ...values,
+                        account: account,
                         startDate: new Date(dataStartTime),
                         endDate: new Date(dataEndTime),
                     };
@@ -369,8 +387,10 @@ const AdminShowtime = () => {
                     try {
                         const file = values.banner.fileList[0].originFileObj;
                         const images = await uploadApi.post(file);
+                       
                         const postData = {
                             ...values,
+                            account : account,
                             startDate: new Date(dataStartTime),
                             endDate: new Date(dataEndTime),
                             banner: images,
