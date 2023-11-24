@@ -840,9 +840,18 @@ ADD
     [Seats_Choose]
 ADD
     CONSTRAINT FK_Choose_Seat_showtime FOREIGN KEY (showtime_id) REFERENCES Showtimes(id)
-    -- /Payment_Info
+    -- /seatChoose
+
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_price FOREIGN KEY (price_id) REFERENCES Price(id)
 
 
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_Seat_Type FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 
 
 
@@ -1423,7 +1432,7 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
 VALUES
-  ('2023-11-16 10:00:00', '2023-11-16 12:00:00', 1, 1, 4,4),
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 4,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
   ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
   ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
@@ -1577,6 +1586,7 @@ SELECT * FROM Seats_Choose
 SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
+SELECT * FROM Price_Seat_Types
 SELECT * FROM Events
 SELECT * FROM Services
 SELECT * FROM Price_Services

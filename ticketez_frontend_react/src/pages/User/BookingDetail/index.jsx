@@ -26,93 +26,93 @@ function BookingDetail(props) {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     // Load table
-    useEffect(() => {
-        console.log('seatBooking2a', seatBooking);
+    // useEffect(() => {
+    //     console.log('seatBooking2a', seatBooking);
 
-        const fetchData = async () => {
-            if (showtime != null) {
-                if (seatBooking != null) {
-                    const weekends = {
-                        SUN: 0,
-                        FRI: 5,
-                        SAT: 6,
-                    };
+    //     const fetchData = async () => {
+    //         if (showtime != null) {
+    //             if (seatBooking != null) {
+    //                 const weekends = {
+    //                     SUN: 0,
+    //                     FRI: 5,
+    //                     SAT: 6,
+    //                 };
 
-                    const dateNow = moment();
-                    const today = dateNow.toDate().getDay();
-                    console.log('seatBooking1', seatBooking);
-                    console.log('today', dateNow.toDate().getDay());
-                    const seatTypeIds = seatBooking.map((item) => item.seatType.id);
-                    const getPriceListBySeatTypeIdsAsync = async () => {
-                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatTypeIds({
-                            seatTypeIds,
-                            cinemaClxId: showtime.cinema.cinemaComplex.id,
-                            movieId: showtime.formatMovie.movie.id,
-                        });
-                        return listPriceDb;
-                    };
-                    const listPriceResp = await getPriceListBySeatTypeIdsAsync();
-                    console.log('listPriceResp', listPriceResp);
-                    let listPr = [];
-                    const totalAmount = seatBooking.reduce((total, item) => {
-                        const seatTypeAndPrice = {
-                            seatTypeId: 0,
-                            price: 0.0,
-                        };
-                        const seatTypePrice = listPriceResp.data.find(
-                            (price) => item.seatType.id === price.seatType.id,
-                        );
-                        seatTypeAndPrice.seatTypeId = item.seatType.id;
-                        if (seatTypePrice) {
-                            const amountPrice =
-                                weekends[today] !== undefined ? seatTypePrice.weekendPrice : seatTypePrice.weekdayPrice;
-                            seatTypeAndPrice.price = amountPrice;
-                            listPr.push(seatTypeAndPrice);
-                            return total + amountPrice;
-                        } else {
-                            funcUtils.notify('Không tìm thấy giá của loại ghế này', 'error');
-                            return (total = 0);
-                        }
-                    }, 0);
+    //                 const dateNow = moment();
+    //                 const today = dateNow.toDate().getDay();
+    //                 console.log('seatBooking1', seatBooking);
+    //                 console.log('today', dateNow.toDate().getDay());
+    //                 const seatTypeIds = seatBooking.map((item) => item.seatType.id);
+    //                 const getPriceListBySeatTypeIdsAsync = async () => {
+    //                     const listPriceDb = await priceSeatApi.getListPriceDbBySeatTypeIds({
+    //                         seatTypeIds,
+    //                         cinemaClxId: showtime.cinema.cinemaComplex.id,
+    //                         movieId: showtime.formatMovie.movie.id,
+    //                     });
+    //                     return listPriceDb;
+    //                 };
+    //                 const listPriceResp = await getPriceListBySeatTypeIdsAsync();
+    //                 console.log('listPriceResp', listPriceResp);
+    //                 let listPr = [];
+    //                 const totalAmount = seatBooking.reduce((total, item) => {
+    //                     const seatTypeAndPrice = {
+    //                         seatTypeId: 0,
+    //                         price: 0.0,
+    //                     };
+    //                     const seatTypePrice = listPriceResp.data.find(
+    //                         (price) => item.seatType.id === price.seatType.id,
+    //                     );
+    //                     seatTypeAndPrice.seatTypeId = item.seatType.id;
+    //                     if (seatTypePrice) {
+    //                         const amountPrice =
+    //                             weekends[today] !== undefined ? seatTypePrice.weekendPrice : seatTypePrice.weekdayPrice;
+    //                         seatTypeAndPrice.price = amountPrice;
+    //                         listPr.push(seatTypeAndPrice);
+    //                         return total + amountPrice;
+    //                     } else {
+    //                         funcUtils.notify('Không tìm thấy giá của loại ghế này', 'error');
+    //                         return (total = 0);
+    //                     }
+    //                 }, 0);
 
-                    setListPrice(listPr);
-                    const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                    }).format(totalAmount);
-                    const seatInfo = {
-                        listSeat: seatBooking,
-                        totalAmount: formattedTotalAmount,
-                    };
-                    console.log('totalAmount', totalAmount);
-                    const infoS = {
-                        ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
-                        movieTitle: showtime.formatMovie.movie.title,
-                        format: showtime.formatMovie.format.name,
-                        time: {
-                            startTime: moment(showtime.startTime).format('HH:mm'),
-                            endTime: moment(showtime.endTime).format('HH:mm'),
-                            showDate: moment(showtime.startDate).format('DD/MM/YYYY'),
-                        },
-                        seatInfo,
-                        cinemaClx: {
-                            name: showtime.cinema.cinemaComplex.name,
-                            address: showtime.cinema.cinemaComplex.address,
-                        },
-                        cinemaName: showtime.cinema.name,
-                    };
+    //                 setListPrice(listPr);
+    //                 const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
+    //                     style: 'currency',
+    //                     currency: 'VND',
+    //                 }).format(totalAmount);
+    //                 const seatInfo = {
+    //                     listSeat: seatBooking,
+    //                     totalAmount: formattedTotalAmount,
+    //                 };
+    //                 console.log('totalAmount', totalAmount);
+    //                 const infoS = {
+    //                     ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
+    //                     movieTitle: showtime.formatMovie.movie.title,
+    //                     format: showtime.formatMovie.format.name,
+    //                     time: {
+    //                         startTime: moment(showtime.startTime).format('HH:mm'),
+    //                         endTime: moment(showtime.endTime).format('HH:mm'),
+    //                         showDate: moment(showtime.startDate).format('DD/MM/YYYY'),
+    //                     },
+    //                     seatInfo,
+    //                     cinemaClx: {
+    //                         name: showtime.cinema.cinemaComplex.name,
+    //                         address: showtime.cinema.cinemaComplex.address,
+    //                     },
+    //                     cinemaName: showtime.cinema.name,
+    //                 };
 
-                    console.log('showtime', showtime);
-                    console.log('seatBooking', seatBooking);
+    //                 console.log('showtime', showtime);
+    //                 console.log('seatBooking', seatBooking);
 
-                    setShowtimeInfo(infoS);
-                    setLoading(false);
-                }
-            }
-        };
+    //                 setShowtimeInfo(infoS);
+    //                 setLoading(false);
+    //             }
+    //         }
+    //     };
 
-        fetchData();
-    }, [showtime, seatBooking]);
+    //     fetchData();
+    // }, [showtime, seatBooking]);
 
     const handlePurchase = async () => {
         const values = await form.getFieldsValue();

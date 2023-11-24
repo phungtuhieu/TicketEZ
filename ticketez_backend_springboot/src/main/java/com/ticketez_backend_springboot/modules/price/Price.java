@@ -11,6 +11,7 @@ import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.seatType.SeatType;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,19 +28,11 @@ public class Price {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	// private Double weekdayPrice;
-	// private Double weekendPrice;
 	private Date startDate;
 	private Date endDate;
 	private Boolean status;
-
-	// @ManyToOne
-	// @JoinColumn(name = "seat_type_id")
-	// private SeatType seatType;
-
 	@JsonIgnore
-	@OneToMany(mappedBy = "price")
+	@OneToMany(mappedBy = "price", fetch = FetchType.EAGER)
 	private List<PriceSeatType> priceSeatTypes;
 
 	@ManyToOne
