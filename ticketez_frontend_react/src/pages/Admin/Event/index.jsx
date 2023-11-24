@@ -241,7 +241,7 @@ const AdminShowtime = () => {
         },
 
         {
-            title: 'Action',
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -450,7 +450,7 @@ const AdminShowtime = () => {
             {
                 type: 'array',
                 required: true,
-                message: 'Please select time!',
+                message: 'Vui lòng chọn ngày giờ',
             },
         ],
     };
@@ -552,6 +552,14 @@ const AdminShowtime = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
+                            name="typeEvent"
+                            label="Thể loại"
+                           
+                        >
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
                             label="Chọn ảnh"
                             name="banner"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
@@ -565,18 +573,18 @@ const AdminShowtime = () => {
                                 name="icon"
                                 maxCount={1}
                             >
-                                {fileList.length < 2 && '+ Upload'}
+                                {fileList.length < 2 && '+ Tải lên'}
                             </Upload>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="name"
                             label="Nhập tên sự kiện"
-                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện' }]}
                         >
                             <Input placeholder="Nhập tên phim..." />
                         </Form.Item>
-                        <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
+                        <Form.Item name="range-time-picker" label="Chọn ngày giờ"  {...rangeConfig}>
                             <RangePicker
                                 disabledDate={disabledDate}
                                 showTime
@@ -588,17 +596,9 @@ const AdminShowtime = () => {
 
                         <Form.Item
                             {...formItemLayout}
-                            name="typeEvent"
-                            label="Chọn thể loại"
-                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
-                        >
-                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
                             name="description"
                             label="Nhập nội dung"
-                            rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}
                         >
                             <CustomCKEditor value={editorData} onChange={handleEditorChange} />
                         </Form.Item>

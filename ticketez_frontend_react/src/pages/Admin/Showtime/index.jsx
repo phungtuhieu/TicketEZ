@@ -293,32 +293,34 @@ const AdminShowtime = () => {
 
     const columns = [
         {
-            title: 'Mã',
+            title: '#',
             dataIndex: 'id',
-            width: '10%',
+            width: '7%',
             defaultSortOrder: 'sorting',
             align: 'center',
             sorter: (a, b) => a.id - b.id,
         },
         {
-            title: 'Giờ bắt đầu',
-            dataIndex: 'startTime',
+            title: 'Xuất chiếu',
             align: 'center',
-            render: (startTime) => {
-                return startTime ? moment(startTime).format('DD-MM-YYYY HH:mm:ss') : '';
-            },
+            render: (_, record) => (
+                <Button key={record.id} className={cx('btn-suat-chieu')}>
+                    <span className={cx('gio-bat-dau')}>{moment(record.startTime).format('HH:mm')}</span>
+                    <span className={cx('gio-ket-thuc')}>{moment(record.endTime).format('HH:mm')}</span>
+                </Button>
+            ),
         },
         {
-            title: 'Giờ kết thúc',
+            title: 'Ngày Chiếu',
             dataIndex: 'endTime',
             align: 'center',
             render: (endTime) => {
-                return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
+                return endTime ? moment(endTime).format('DD-MM-YYYY') : '';
             },
         },
 
         {
-            title: 'Tên rạp chiếu',
+            title: 'Rạp chiếu',
             dataIndex: 'cinema',
             align: 'center',
             render: (cinema) => (cinema ? cinema.name : ''),
@@ -387,7 +389,7 @@ const AdminShowtime = () => {
             filterMultiple: false,
         },
         {
-            title: 'Action',
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -801,6 +803,12 @@ const AdminShowtime = () => {
         return ` ${value.format('HH:mm')} ~ ${valueEndtimeByTimeMovieAndStartime}`;
     };
 
+      const disabledDate = (current) => {
+          // Can not select days before today and today
+          return current && current < dayjs().startOf('day');
+      };
+
+
     return (
         <div>
             <Row>
@@ -1013,6 +1021,7 @@ const AdminShowtime = () => {
                                 <Col xs={24} sm={24} lg={9}>
                                     <Form.Item name="date" label="Chọn ngày chiếu" {...configDate}>
                                         <DatePicker
+                                         disabledDate={disabledDate}
                                             placeholder="Chọn ngày"
                                             style={{ width: 170 }}
                                             format={'DD-MM-YYYY'}

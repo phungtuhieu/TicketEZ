@@ -26,7 +26,6 @@ import TextArea from 'antd/es/input/TextArea';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
-import { logDOM } from '@testing-library/react';
 
 const cx = classNames.bind(style);
 
@@ -164,34 +163,14 @@ const AdminMpaaRating = () => {
 
     const columns = [
         {
-            title: 'Mã',
+            title: '#',
             dataIndex: 'id',
-            width: '10%',
+            width: '6%',
             defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Biểu tượng phân loại',
-            dataIndex: 'ratingCode',
-            width: '20%',
-            ...getColumnSearchProps('ratingCode'),
-        },
-        {
-            title: 'Mã màu',
-            dataIndex: 'colorCode',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Tag color={record.colorCode}>{record.colorCode}</Tag>
-                </Space>
-            ),
-        },
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            ...getColumnSearchProps('description'),
-        },
-        {
-            title: 'icon',
             dataIndex: 'icon',
             render: (_, record) => (
                 <Space size="middle">
@@ -206,7 +185,28 @@ const AdminMpaaRating = () => {
             ),
         },
         {
-            title: 'Action',
+            title: 'Tên phân loại',
+            dataIndex: 'ratingCode',
+            width: '15%',
+            ...getColumnSearchProps('ratingCode'),
+        },
+        {
+            title: 'Mã màu',
+            dataIndex: 'colorCode',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Tag color={record.colorCode}>{record.colorCode}</Tag>
+                </Space>
+            ),
+        },
+
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            ...getColumnSearchProps('description'),
+        },
+        {
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -455,7 +455,7 @@ const AdminMpaaRating = () => {
                             {...formItemLayout}
                             name="colorCode"
                             label="Chọn mã màu"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn mã màu' }]}
                         >
                             <ColorPicker
                                 showText
@@ -505,7 +505,7 @@ const AdminMpaaRating = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            label="icon"
+                            label="Ảnh"
                             name="icon"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                         >
@@ -518,14 +518,14 @@ const AdminMpaaRating = () => {
                                 name="icon"
                                 maxCount={1}
                             >
-                                {fileList.length < 2 && '+ Upload'}
+                                {fileList.length < 2 && '+ Tải lên'}
                             </Upload>
                         </Form.Item>
 
                         <Form.Item
                             {...formItemLayout}
                             name="ratingCode"
-                            label="Phân loại"
+                            label="Tên phân loại"
                             rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                         >
                             <Input placeholder="Vui lòng nhập tên phân loại" />
