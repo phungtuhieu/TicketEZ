@@ -106,16 +106,14 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
         Page<Movie> findMovieByRandom(Pageable pageable);
 
         @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
-                        " COUNT(DISTINCT k.id) AS total_tickets, " +
-                        " COUNT(DISTINCT m.id) AS total_movies ) " +
+                        " COUNT( k.id) AS total_tickets ) " +
                         " FROM Booking k " +
-                        " JOIN " +
-                        " k.showtime s" +
-                        " JOIN " +
-                        " s.formatMovie fm" +
-                        " JOIN " +
-                        " fm.movie m" + 
                         " WHERE k.ticketStatus = 1")
-        List<TotalDashboardAdmin> getTotalTicketsAndTotalMovies();
+        List<TotalDashboardAdmin> getTotalTickets();
+
+        @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
+                        " COUNT( m.id) AS total_movies ) " +
+                        " FROM Movie m ")
+        List<TotalDashboardAdmin> getTotalMovies();
 
 }
