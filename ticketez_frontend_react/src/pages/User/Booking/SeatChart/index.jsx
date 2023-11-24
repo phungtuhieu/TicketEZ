@@ -7,6 +7,7 @@ import axiosClient from '~/api/global/axiosClient';
 import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
+import { sassFalse } from 'sass';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -187,12 +188,12 @@ function SeatChart(props) {
             });
 
             const respPrice = await axiosClient.get(
-                `price/find-by-id-cinema-compex-movie/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
+                `price/findByCinemaComplexIdAndMovieId/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
             );
             const newPrices = respPrice.data.map((price) => price);
             setPrices(newPrices);
 
-            console.log(listWay);
+            console.log(newPrices);
             // console.log(listSeatNormal);
             // console.log(listSeatVip);
             // console.log(allSeats);
@@ -229,24 +230,29 @@ function SeatChart(props) {
         }
     }, [showInfo]);
 
-    const handelUpdate = async (idSeat, dataSeat) => {
-        let data = dataSeat;
-
-        const respVip = await axiosClient.put(`seat/${idSeat}`, data);
-    };
-
     // Lấy price từ ghế
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
         let result = null;
-
+        let finalRS = null;
         seatStateArray.forEach((seatItem) => {
             if (seatItem === seat) {
-                result = prices.find((price) => price.seatType.id === seatTypeId);
-                return;
+                const price = prices.find((price) => {
+                    return price.newPriceSeatTypeDTOs.some((seatType) => seatType.seatTypeId === seatTypeId);
+                });
+
+                if (price) {
+                    result = price.newPriceSeatTypeDTOs;
+                    result.map((newPriceSeatTypeDTO, index) => {
+                        console.log(newPriceSeatTypeDTO);
+                        if (newPriceSeatTypeDTO.seatTypeId === seatTypeId) {
+                            finalRS = newPriceSeatTypeDTO;
+                        }
+                    });
+                }
             }
         });
 
-        return result;
+        return finalRS;
     };
 
     // Check giá theo ngày

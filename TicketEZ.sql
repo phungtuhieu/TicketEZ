@@ -572,7 +572,7 @@ GO
 ALTER TABLE
      Price_Seat_Types
 ADD
-    CONSTRAINT PK_ Price_Seat_Types PRIMARY KEY (id);
+    CONSTRAINT PK_Price_Seat_Types PRIMARY KEY (id);
 
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
@@ -648,11 +648,6 @@ ALTER TABLE
     Price
 ADD
     CONSTRAINT FK_Price_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
-GO
-ALTER TABLE
-    Price
-ADD
-    CONSTRAINT FK_Price_SeatTypes FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 GO
 ALTER TABLE
     Price
@@ -836,9 +831,18 @@ ADD
     [Seats_Choose]
 ADD
     CONSTRAINT FK_Choose_Seat_showtime FOREIGN KEY (showtime_id) REFERENCES Showtimes(id)
-    -- /Payment_Info
+    -- /seatChoose
+
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_price FOREIGN KEY (price_id) REFERENCES Price(id)
 
 
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_Seat_Type FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 
 
 
@@ -1276,13 +1280,7 @@ VALUES
 (N'Siêu Nhân Trái Đất', N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
 (N'Tinh Hoa Đất Việt', N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
--- Chèn dữ liệu mẫu cho bảng Price
-INSERT INTO Price (weekday_price, weekend_price, [start_date], end_date, [status], seat_type_id, movie_id, cinema_complex_id)
-VALUES
-    (65000, 75000, '2023-01-01', '2024-01-10', 1, 1, 1, 1),
-	(80000, 10000, '2023-01-01', '2024-01-10', 1, 2, 1, 1),
-    (75000, 89000, '2023-02-01', '2024-02-10', 1, 2, 2, 1);
-GO
+
   -- 13. Thêm dữ liệu cho bảng Discounts
 INSERT INTO [TicketEZ].[dbo].[Discounts] 
     ([title], [coupon_code], [amount], [start_date], [end_date], [status], [discount_type], [cinema_complex_id])
@@ -1425,7 +1423,7 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
 VALUES
-  ('2023-11-16 10:00:00', '2023-11-16 12:00:00', 1, 1, 4,4),
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 4,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
   ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
   ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
@@ -1495,11 +1493,18 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 
 
 -- Inserting sample data into the Price table
-INSERT INTO Price (weekday_price, weekend_price, start_date, end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+INSERT INTO Price (start_date, end_date, [status], movie_id, cinema_complex_id)
 VALUES
-    (10.00, 15.00, '2023-11-20', '2023-11-27', 1, 1, 2, 1),
-    (12.00, 18.00, '2023-11-20', '2023-11-27', 1, 2, 2, 1),
-    (20.00, 12.00, '2023-11-20', '2023-11-27', 1, 4, 2, 1)
+    ( '2023-11-20', '2023-11-27', 1, 2, 1)
+
+	-- Inserting sample data into the Price_Seat_Types table
+
+	INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id, price_id)
+VALUES (70000,90000,1,1),
+(90000,110000,2,1),
+(200000,220000,4,1)
+
+
 
 SELECT * FROM Accounts
 SELECT * FROM Verification
@@ -1524,6 +1529,7 @@ SELECT * FROM Seats_Choose
 SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
+SELECT * FROM Price_Seat_Types
 SELECT * FROM Events
 SELECT * FROM Services
 SELECT * FROM Price_Services
