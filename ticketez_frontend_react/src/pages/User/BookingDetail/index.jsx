@@ -177,7 +177,7 @@ function BookingDetail(props) {
 
     return (
         <>
-            {showtime != null && (
+            {showtime == true && (
                 <Modal
                     {...props}
                     title="Thanh toán"

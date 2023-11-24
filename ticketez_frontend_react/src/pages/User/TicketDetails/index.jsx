@@ -9,7 +9,7 @@ const cx = classNames.bind(style);
 
 function TicketDetails({ paymentInfoDTO }) {
     // const location = useLocation();
-    const { booking, paymentInfo, seatBookings } = paymentInfoDTO;
+    const { booking, paymentInfo, seatBookings, showtime } = paymentInfoDTO;
     // Lấy dữ liệu từ state
     // const paymentInfo = location.state?.paymentInfo;
     useEffect(() => {

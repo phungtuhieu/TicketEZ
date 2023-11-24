@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import style from './BookingInfo.module.scss';
 import { TicketDetails } from '..';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-import { Button, Col, QRCode, Row, Tag } from 'antd';
+import { Button, Col, QRCode, Row, Spin, Tag } from 'antd';
 import datrungphuongnamImg from '../../../assets/img/datrungphuongnam.jpg';
 import logorap from '../../../assets/img/lotte.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,13 +12,16 @@ import bookingApi from '~/api/user/booking/bookingApi';
 const cx = classNames.bind(style);
 function BookingInfo() {
     const location = useLocation();
-    const [paymentStatus, setPaymentStatus] = useState('fail');
+    const [paymentStatus, setPaymentStatus] = useState(true);
     const paymentInfoId = location.state?.paymentInfoId;
+    const [spin, setSpin] = useState(true);
     const [paymentInfoDTO, setPaymentInfoDTO] = useState({
         paymentInfo: {},
         booking: {},
+        showtime: {},
         seatBookings: [],
     });
+    const [currentStatusConfig, setCurrentStatusConfig] = useState({});
     const statusConfig = {
         success: {
             title: 'Thành công!',
@@ -37,19 +40,25 @@ function BookingInfo() {
     };
     // Lấy dữ liệu từ state
     // let paymentStatus = 'success';
-    const currentStatusConfig = statusConfig[paymentStatus];
+    // const currentStatusConfig = statusConfig[paymentStatus];
     useEffect(() => {
         if (paymentInfoId !== null) {
             const loadData = async () => {
                 try {
                     const resp = await bookingApi.getPaymentInfoById('14194939');
+                    setSpin(false);
                     console.log('resp', resp);
                     const booking = resp.data.booking;
                     const paymentInfo = resp.data.paymentInfo;
                     const seatBookings = resp.data.seatBookings;
-                    setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
+                    const showtime = resp.data.booking.showtime;
+                    setPaymentInfoDTO({ booking, paymentInfo, seatBookings, showtime });
                     setPaymentStatus('success');
+                    setCurrentStatusConfig(statusConfig['success']);
                 } catch (error) {
+                    setPaymentStatus('error');
+                    setSpin(false);
+                    setCurrentStatusConfig(statusConfig['error']);
                     console.log('error', error);
                 }
             };
@@ -63,6 +72,7 @@ function BookingInfo() {
             <div className={cx('wrapper')}>
                 <div className={cx('container')}>
                     <div style={{ display: 'flex' }}>
+                        <Spin spinning={spin} />
                         <div className={cx('wrapper-box-status', 'light')}>
                             <div className={cx('wrapp-icon')}>
                                 <FontAwesomeIcon
