@@ -124,7 +124,7 @@ function SeatChart(props) {
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatBooking();
-        }, 5000);
+        }, 1000);
 
         // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
         return () => {

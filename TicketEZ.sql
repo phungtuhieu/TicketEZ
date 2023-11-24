@@ -1504,9 +1504,7 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 -- Inserting sample data into the Price table
 INSERT INTO Price ([start_date], [end_date], [status], movie_id, cinema_complex_id)
 VALUES
-    ('2023-11-20', '2023-11-27', 1, 2, 1),
-    ( '2023-11-20', '2023-11-27', 1, 2, 1),
-    ('2023-11-20', '2023-11-27', 1, 2, 1)
+    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 
 INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)

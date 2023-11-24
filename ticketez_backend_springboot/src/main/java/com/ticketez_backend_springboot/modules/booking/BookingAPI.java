@@ -74,6 +74,7 @@ public class BookingAPI {
 
 		bookingDto.getBooking().setTicketStatus(TicketStatus.UNUSED);
 		Booking createdBooking = dao.save(bookingDto.getBooking());
+
 		List<SeatBooking> seatBookings = bookingDto.getSeats().stream().map(seat -> {
 			SeatBooking seatBooking = new SeatBooking();
 			seatBooking.setBooking(createdBooking);
@@ -91,6 +92,7 @@ public class BookingAPI {
 		for (SeatBooking s : seatBookings) {
 			total += s.getPrice().intValue();
 		}
+		System.out.println("-=-------------------toal: " + total);
 		seatBookingDao.saveAll(seatBookings);
 		String payUrl = vnPayService.createOrder(total, "Thanh toan ve xem phim ", createdBooking.getId());
 		// VNPayDTO vnPayDTO = new VNPayDTO();
@@ -116,6 +118,8 @@ public class BookingAPI {
 		String paymentTime = request.getParameter("vnp_PayDate");
 		String transactionId = request.getParameter("vnp_TransactionNo");
 		String totalPrice = request.getParameter("vnp_Amount");
+		System.out.println("------------- totalPrice: " + totalPrice);
+		System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
 		String bankCode = request.getParameter("vnp_BankCode");
 		String transactionStatus = request.getParameter("vnp_TransactionStatus");
 
@@ -130,7 +134,8 @@ public class BookingAPI {
 
 			paymentInfo.setTransactionId(transactionId);
 			paymentInfo.setBooking(booking);
-			paymentInfo.setAmount(Double.valueOf(totalPrice));
+			// chia 100 vì vnpay đã mặc định 100
+			paymentInfo.setAmount(Double.valueOf(totalPrice) / 100);
 			paymentInfo.setBankCode(bankCode);
 			paymentInfo.setTmnCode(tmnCode);
 			paymentInfo.setOrderInfo(orderInfo);

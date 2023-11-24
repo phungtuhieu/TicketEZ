@@ -45,14 +45,13 @@ function BookingInfo() {
         if (paymentInfoId !== null) {
             const loadData = async () => {
                 try {
-                    const resp = await bookingApi.getPaymentInfoById('14194939');
+                    const resp = await bookingApi.getPaymentInfoById(paymentInfoId);
                     setSpin(false);
                     console.log('resp', resp);
                     const booking = resp.data.booking;
                     const paymentInfo = resp.data.paymentInfo;
                     const seatBookings = resp.data.seatBookings;
-                    const showtime = resp.data.booking.showtime;
-                    setPaymentInfoDTO({ booking, paymentInfo, seatBookings, showtime });
+                    setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
                     setPaymentStatus('success');
                     setCurrentStatusConfig(statusConfig['success']);
                 } catch (error) {
@@ -72,8 +71,8 @@ function BookingInfo() {
             <div className={cx('wrapper')}>
                 <div className={cx('container')}>
                     <div style={{ display: 'flex' }}>
-                        <Spin spinning={spin} />
                         <div className={cx('wrapper-box-status', 'light')}>
+                            <Spin spinning={spin} />
                             <div className={cx('wrapp-icon')}>
                                 <FontAwesomeIcon
                                     icon={currentStatusConfig.icon}
