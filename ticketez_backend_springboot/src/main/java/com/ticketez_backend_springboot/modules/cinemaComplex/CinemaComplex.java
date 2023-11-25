@@ -42,8 +42,8 @@ public class CinemaComplex {
 	@Column(name = "closing_time")
 	private Time closingTime;
 
-	private float longitude;
-	private float latitude;
+	private Double longitude;
+	private Double latitude;
 	
 	@ManyToOne
 	@JoinColumn(name = "province_id")
