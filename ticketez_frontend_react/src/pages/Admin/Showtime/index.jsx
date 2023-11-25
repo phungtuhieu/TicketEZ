@@ -424,11 +424,13 @@ const AdminShowtime = () => {
     const handleDelete = async (record) => {
         try {
             const res = await showtimeApi.delete(record.id);
+            console.log('kết quả nè', res.response);
             if (res.status === 200) {
                 funcUtils.notify(res.data, 'success');
             }
         } catch (error) {
             console.log(error);
+              funcUtils.notify(error.response.data, 'error');
         }
 
         setWorkSomeThing(!workSomeThing);
@@ -734,23 +736,17 @@ const AdminShowtime = () => {
 
             const gio1Gio = moment1.hours();
             const gio1Phut = moment1.minutes();
-            const gio1Giay = moment1.seconds();
             const gio2Gio = moment2.hours();
             const gio2Phut = moment2.minutes();
-            const gio2Giay = moment2.seconds();
 
             let tongGio = gio1Gio + gio2Gio;
             let tongPhut = gio1Phut + gio2Phut;
-            let tongGiay = gio1Giay + gio2Giay;
-            if (tongGiay >= 60) {
-                tongPhut += Math.floor(tongGiay / 60);
-                tongGiay %= 60;
-            }
+
             if (tongPhut >= 60) {
                 tongGio += Math.floor(tongPhut / 60);
                 tongPhut %= 60;
             }
-            const resultEndtime = moment().hours(tongGio).minutes(tongPhut).seconds(tongGiay).format('HH:mm:ss');
+            const resultEndtime = moment().hours(tongGio).minutes(tongPhut).format('HH:mm');
             setValueEndtimeByTimeMovieAndStartime(resultEndtime);
         }
     };
@@ -804,7 +800,6 @@ const AdminShowtime = () => {
     };
 
       const disabledDate = (current) => {
-          // Can not select days before today and today
           return current && current < dayjs().startOf('day');
       };
 
