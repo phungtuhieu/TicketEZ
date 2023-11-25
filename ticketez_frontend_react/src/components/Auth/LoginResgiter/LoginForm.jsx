@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
-import { getRolesFromLocalStorage } from '~/utils/authUtils';
-
-import { Button, Checkbox, Form, Input, notification } from 'antd';
+import { Layout, Form, Input, Button, Checkbox } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
-import classNames from 'classnames/bind';
+import img from '~/assets/img';
 import authApi from '~/api/user/Security/authApi';
+import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
+import { validateId, validatePassword } from './Custom';
+const { Header, Content } = Layout;
 
-const cx = classNames.bind(styles);
 
 const LoginForm = () => {
+
+    // const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
 
+
     const onFinish = async (values) => {
+        if (!validateId(values.id)) return;
+        if (!validatePassword(values.password)) return;
         try {
             const response = await authApi.getLogin({
                 id: values.id,
@@ -33,52 +39,97 @@ const LoginForm = () => {
         } catch (error) {
             funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
         }
-    }
+    };
 
 
     return (
-        <Form
-            name="basic"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            autoComplete="off"
-            className={cx('login-form')}
-        >
-            <h1 className={cx('login-title')}>Đăng nhập</h1>
+        <Layout className="layout">
 
-            {loginError && <p className={cx('login-error')}>{loginError}</p>}
+            <Content className={styles.content}>
+                <div className={styles.wrapper}>
+                    <div className={styles.loginContainer}>
+                        <h1 className={styles.title}>Sign in</h1>
+                        <p className={styles.welcomeText}>Chào mừng bạn đến giao diện người dùng TicketEZ Vui lòng nhập thông tin của bạn dưới đây để đăng nhập.</p>
+                        <Form
+                            name="basic"
+                            className={styles.loginForm}
+                            initialValues={{ remember: true }}
+                            onFinish={onFinish}
+                            autoComplete="off"
+                        >
+                            <div className=''>
 
-            <Form.Item
-                label="Tài khoản"
-                name="id"
-                rules={[{ required: true, message: 'Vui lòng nhập tài khoản của bạn!' }]}
-            >
-                <Input />
-            </Form.Item>
+                            </div>
+                            <Form.Item
+                                // label="Tên tài khoản"
+                                name="id"
+                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản !' }]}
+                                className={styles.formItem}
+                            >
+                                <Input placeholder="Tên Tài khoản" className={styles.input} />
+                            </Form.Item>
 
-            <Form.Item
-                label="Mật khẩu"
-                name="password"
-                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu của bạn!' }]}
-            >
-                <Input.Password />
-            </Form.Item>
+                            <Form.Item
+                                // label="Mật khẩu"
+                                name="password"
+                                rules={[{ required: true, message: 'Không được bỏ trống mật khẩu !' }]}
+                                className={styles.formItem}
+                            >
+                                <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />
 
-            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8 }}>
-                <Checkbox>Nhớ tôi</Checkbox>
-            </Form.Item>
+                            </Form.Item>
+                            <Form.Item className={styles.formItem}>
+                                <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
+                                <a className={styles.forgot} href="">
+                                    Quên mât khẩu
+                                </a>
 
-            <Form.Item
-                wrapperCol={{ offset: 8, span: 16 }}
-            >
-                <Button type="primary" htmlType="submit" block>
-                    Đăng nhập
-                </Button>
-            </Form.Item>
+                            </Form.Item>
+                            <Form.Item className={styles.formItem}>
+                                <Button type="primary" htmlType="submit" block className={styles.loginButton}>
+                                    Log in
+                                </Button>
+                                <p className={styles.signup}>
+                                    Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>
+                                </p>
+                            </Form.Item>
 
-        </Form>
+                        </Form>
+                    </div>
+                </div>
+                <div className={styles.rightContainer}>
+                    <img src={img.logoLogin1} alt="Login" className={styles.imageStyle} />
+                </div>
+            </Content>
 
+        </Layout>
     );
 };
 
 export default LoginForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

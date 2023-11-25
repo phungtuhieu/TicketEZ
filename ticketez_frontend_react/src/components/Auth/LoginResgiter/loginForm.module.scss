@@ -1,39 +1,111 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-.body {
-    background-color: #ffffff;
-    font-family: var(--font-family);
+// loginForm.module.scss
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
+
+
+.loginContainer {
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.12);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.header {
+  background: #fff;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.welcomeText {
+  margin-bottom: 40px;
+  color: #666;
+  font-size: 14px;
+}
+
+.loginLayout {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .content {
+    display: flex;
+    flex-grow: 1;
+  }
+  
+  .leftContainer {
+    flex-basis: 50%; 
+  }
+  
+  .rightContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ECECEC;
+  }
+  
+  .imageStyle {
+    max-width: 100%;
+    height: 630px;
+    border-radius: 8px;
+  }
+  
+
 .loginForm {
-    margin-top: 20px;
-}
-.name-login {
-    margin-top: -40px;
-    margin-bottom: 10px;
-    margin-left: 140px;
-}
-.des-name-login {
-    margin-top: -10px;
-    color: #a4a2a2;
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .input {
+    padding: 4px 11px;
+    height: 40px; // Set height of your inputs
+  }
+
+  .loginButton {
+    width: 100%;
+    height: 40px;
+  }
+
+  .checkbox {
+    float: left;
+  }
+
+  .forgot {
+    float: right;
+  }
+
+  .signup {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+  
 }
 
-.buttonSubmit {
-    background: #e50813;
-    outline: none;
-    border: none;
-    color: #fff;
-    padding: 12px 40px;
-    font-weight: 500;
-    font-size: 17px;
-    height: 40px;
+
+
+// Add responsive styles if needed
+@media (max-width: 768px) {
+  .loginContainer {
+    margin: 10px;
+  }
+
+  
 }
 
-.buttonSubmit:hover {
-    background: #e50813;
-    outline: none;
-    border: none;
-    color: #fff;
-    padding: 12px 40px;
-    font-weight: 500;
-    font-size: 17px;
-    height: 40px;
-}
+

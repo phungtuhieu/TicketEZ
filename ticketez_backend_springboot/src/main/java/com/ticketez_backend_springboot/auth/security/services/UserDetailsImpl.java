@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.auth.models.SecurityAccount;
+import com.ticketez_backend_springboot.modules.role.Role;
 
 import lombok.Data;
 
@@ -20,22 +21,22 @@ public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
 
   private String id;
-
   private String phone;
   private String fullname;
-
   private String address;
   private String email;
   @JsonIgnore
   private String password;
   private Date birthday;
-  private boolean gender;
+  private String gender;
   private String image;
+  private Date createdDate;
 
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserDetailsImpl(String id, String phone, String fullname, String address, String email, String password,
-      Date birthday, boolean gender, String image, Collection<? extends GrantedAuthority> authorities) {
+      Date birthday, String gender, String image, Date createdDate,
+      Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.phone = phone;
     this.fullname = fullname;
@@ -44,6 +45,7 @@ public class UserDetailsImpl implements UserDetails {
     this.birthday = birthday;
     this.gender = gender;
     this.image = image;
+    this.createdDate = createdDate;
     this.authorities = authorities;
   }
 
@@ -52,19 +54,25 @@ public class UserDetailsImpl implements UserDetails {
         .map(role -> new SimpleGrantedAuthority(role.getName().name()))
         .collect(Collectors.toList());
 
-        System.out.println("log1: "+authorities);
+
     return new UserDetailsImpl(
-      account.getId(),
+        account.getId(),
         account.getPhone(),
         account.getFullname(),
         account.getEmail(),
         account.getAddress(),
         account.getPassword(),
         account.getBirthday(),
-        account.isGender(),
+        account.getGender(),
         account.getImage(),
+        account.getCreatedDate(),
         authorities);
   }
+
+  // @Override
+  // public Role seveRole(Role role){
+  // return
+  // }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

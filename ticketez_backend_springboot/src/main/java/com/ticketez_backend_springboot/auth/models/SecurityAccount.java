@@ -30,7 +30,7 @@ public class SecurityAccount {
     private String email;
     private String password;
     private Date birthday;
-    private boolean gender;
+    private String gender;
     private String image;
     private Integer status;
 
@@ -41,7 +41,9 @@ public class SecurityAccount {
     private int points;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "Accounts_Roles", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "Accounts_Roles", 
+    joinColumns = @JoinColumn(name = "account_id"), 
+    inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<SecurityRole> roles = new HashSet<>();
 
 	@JsonIgnore
