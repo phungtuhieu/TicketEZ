@@ -2,8 +2,8 @@ import UserContact from '~/pages/User/Contact';
 import * as PageAdmin from '~/pages/Admin';
 import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
-import RegisterForm from '~/components/Auth/LoginResgiter/RegisterForm';
-import LoginForm from '~/components/Auth/LoginResgiter/LoginForm';
+import RegisterForm from '~/components/Auth/Register/RegisterForm';
+import LoginForm from '~/components/Auth/Login/LoginForm';
 
 const publicRoutes = [
     //Admin

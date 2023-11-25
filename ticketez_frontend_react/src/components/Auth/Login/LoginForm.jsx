@@ -6,7 +6,8 @@ import img from '~/assets/img';
 import authApi from '~/api/user/Security/authApi';
 import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
-import { validateId, validatePassword } from './Custom';
+import { validateId, validatePassword } from '../Custom';
+
 const { Header, Content } = Layout;
 
 
@@ -48,7 +49,7 @@ const LoginForm = () => {
             <Content className={styles.content}>
                 <div className={styles.wrapper}>
                     <div className={styles.loginContainer}>
-                        <h1 className={styles.title}>Sign in</h1>
+                        <h1 className={styles.title}>Đăng Nhập</h1>
                         <p className={styles.welcomeText}>Chào mừng bạn đến giao diện người dùng TicketEZ Vui lòng nhập thông tin của bạn dưới đây để đăng nhập.</p>
                         <Form
                             name="basic"
@@ -57,8 +58,8 @@ const LoginForm = () => {
                             onFinish={onFinish}
                             autoComplete="off"
                         >
-                            <div className=''>
-
+                            <div className='formLabel'>
+                                <p className={styles.formLabel}><h4>Tên Tài khoản:</h4></p>
                             </div>
                             <Form.Item
                                 // label="Tên tài khoản"
@@ -69,6 +70,9 @@ const LoginForm = () => {
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
                             </Form.Item>
 
+                            <div className='formLabel'>
+                                <p className={styles.formLabelPassword}><h4>Mật khẩu:</h4></p>
+                            </div>
                             <Form.Item
                                 // label="Mật khẩu"
                                 name="password"
