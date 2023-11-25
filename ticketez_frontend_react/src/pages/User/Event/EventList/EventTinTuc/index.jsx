@@ -50,23 +50,25 @@ const EventListTinTuc = () => {
         <>
             {dataEventByNew && dataEventByNew.length > 0 ? (
                 <>
-                    <div className=" tw-text-pink-500 tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
-                        Tin tức
-                    </div>
                     <Link to={`/su-kien/tin-tuc/${dataEventByNew[0]?.id}`}>
-                        <img
-                            src={uploadApi.get(dataEventByNew[0]?.banner)}
-                            width="100%"
-                            height={344}
-                            className="tw-rounded-md "
-                        />
+                        <div className="tw-text-[var(--primary-background-color)] tw-text-left tw-text-5xl tw-mt-[13px] tw-mb-[10px] tw-font-[var(--font-family)]">
+                            Tin tức
+                        </div>
+                        <Link to={`/su-kien/tin-tuc/${dataEventByNew[0]?.id}`}>
+                            <img
+                                src={uploadApi.get(dataEventByNew[0]?.banner)}
+                                width="100%"
+                                height={344}
+                                className="tw-rounded-md "
+                            />
+                        </Link>
+                        <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
+                            {moment(dataEventByNew[0]?.startDate).format('DD-MM-YYYY ')}
+                        </div>
+                        <h1 className="tw-font-[var(--font-family)] tw-text-black tw-text-left tw-text-4xl tw-mt-[-20px] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer ">
+                            {dataEventByNew[0]?.name}
+                        </h1>
                     </Link>
-                    <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-40px]  tw-mb-[25px] tw-font-[var(--font-family)]">
-                        {moment(dataEventByNew[0]?.startDate).format('DD-MM-YYYY ')}
-                    </div>
-                    <h1 className="tw-font-[var(--font-family)]  tw-text-left tw-text-4xl tw-mt-[-20px] hover:tw-text-pink-500 ">
-                        {dataEventByNew[0]?.name}
-                    </h1>
                 </>
             ) : null}
             <div>
@@ -94,7 +96,7 @@ const EventListTinTuc = () => {
                     {page < totalPage && (
                         <Button
                             onClick={() => setPage(page + 1)}
-                            className="tw-rounded-full tw-border tw-w-[140px] tw-h-[33px] tw-border-pink-600 tw-py-1 tw-pl-4 tw-pr-6 tw-mb-[30px] tw-font-semibold tw-text-pink-500 tw-transition-all hover:tw-bg-pink-50 hover:tw-text-pink-800"
+                            className="tw-rounded-full tw-border tw-w-[140px] tw-h-[33px] tw-border-[var(--primary-background-color)] tw-py-1 tw-pl-4 tw-pr-6 tw-mb-[30px] tw-font-semibold tw-text-[var(--primary-background-color)] tw-transition-all hover:tw-bg-[#053b5035] hover:tw-text-[var(--primary--text-color)]"
                         >
                             {loadingCard ? (
                                 'Đang tải...'
@@ -102,7 +104,7 @@ const EventListTinTuc = () => {
                                 <>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="tw-mr-2 tw-inline-block tw-h-5 tw-w-[10px] tw-animate-bounce tw-fill-pink-500 hover:tw-fill-pink-800"
+                                        className="tw-mr-2 tw-inline-block tw-h-5 tw-w-[10px] tw-animate-bounce tw-fill-[var(--primary-background-color)] hover:tw-fill-[var(--primary-background-color)]"
                                         height="1em"
                                         viewBox="0 0 384 512"
                                     >

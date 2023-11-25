@@ -73,7 +73,7 @@ const EventDetails = () => {
                             height={344}
                             className="tw-rounded-md tw-mt-[59px]"
                         />
-                        <div className="tw-font-bold tw-text-pink-500 tw-text-left tw-text-4xl tw-mt-[-40px] tw-mb-[25px]">
+                        <div className="tw-font-bold tw-text-[var(--primary-background-color)] tw-text-left tw-text-4xl tw-mt-[-40px] tw-mb-[25px]">
                             {dataEventDetails?.name}
                         </div>
                         <div className=" tw-text-gray-500 tw-text-left tw-text-xl tw-mt-[-20px]  tw-mb-[25px] tw-font-[var(--font-family)]"></div>
@@ -116,7 +116,7 @@ const EventDetails = () => {
                         }}
                         className="tw-sticky tw-top-0  overflow-y-auto"
                     >
-                        <p className="tw-font-semibold tw-text-pink-500 tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
+                        <p className="tw-font-semibold tw-text-[var(--primary-background-color)] tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
                             <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl mr-1" />
                             {location.pathname === '/su-kien/tin-tuc' ||
                             /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname)
@@ -128,7 +128,7 @@ const EventDetails = () => {
                     </Col>
                 </Row>
                 <div>
-                    <p className="tw-font-semibold tw-text-pink-500 tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
+                    <p className="tw-font-semibold tw-text-[var(--primary-background-color)] tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
                         <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl tw-mr-2" />
                         {location.pathname === '/su-kien/tin-tuc' || /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname)
                             ? ' Khuyến mãi '
