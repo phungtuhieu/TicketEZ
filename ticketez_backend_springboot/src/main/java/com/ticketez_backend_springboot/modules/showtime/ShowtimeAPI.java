@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.cinema.CinemaDAO;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
@@ -113,12 +114,23 @@ public class ShowtimeAPI {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
-            showtimeDAO.deleteById(id);
-            return ResponseEntity.ok().body("Xoá xuất chiếu thành công");
+            // Kiểm tra xem có Booking nào liên quan đến Showtime không
+        Showtime showtime = showtimeDAO.findById(id).orElse(null);
+        if (showtime == null) {
+            return new ResponseEntity<>("Không tìm thấy xuất chiếu để xoá", HttpStatus.NOT_FOUND);
+        }
+
+        List<Booking> bookings = showtime.getBookings();
+        if (!bookings.isEmpty()) {
+            return new ResponseEntity<>("Không thể xoá vì xuất chiếu đã có được đặt", HttpStatus.CONFLICT);
+        }
+
+        // Nếu không có Booking liên quan, tiến hành xóa Showtime
+        showtimeDAO.deleteById(id);
+        return ResponseEntity.ok().body("Xoá xuất chiếu thành công");
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xoá vì dính khoá ngoại", HttpStatus.CONFLICT);
         }
-
     }
 
     //
