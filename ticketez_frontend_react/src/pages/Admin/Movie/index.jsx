@@ -438,7 +438,7 @@ function AdminMovie() {
                     releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
                 setList(dataFormat);
-                setTotalItems(movieResp.totalItem);
+                setTotalItems(movieResp.totalItems);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
