@@ -27,9 +27,10 @@ const LoginForm = () => {
                 id: values.id,
                 password: values.password,
             });
-            console.log(response);
-            const roles = getRolesFromLocalStorage();
 
+            const user = await authApi.getUser();
+            console.log(user);
+            const roles = getRolesFromLocalStorage();
             if (roles.includes('SUPER_ADMIN')) {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/admin/index');

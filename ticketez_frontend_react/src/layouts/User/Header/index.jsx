@@ -34,7 +34,7 @@ const Header = () => {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
-            navigate('/')
+            navigate('/login')
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
