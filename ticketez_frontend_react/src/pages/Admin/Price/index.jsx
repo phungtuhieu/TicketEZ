@@ -48,7 +48,7 @@ const AdminPrice = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await axiosClient.get(`price/price-seat-type-dto`);
+                const res = await axiosClient.get(`price/price-price-seat-type-dto`);
                 console.log(res);
 
                 const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);

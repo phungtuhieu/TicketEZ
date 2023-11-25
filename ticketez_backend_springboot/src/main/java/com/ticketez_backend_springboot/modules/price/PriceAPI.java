@@ -74,7 +74,7 @@ public class PriceAPI {
                 newSeatType.setId(priceSeatType.getId());
                 newSeatType.setWeekdayPrice(priceSeatType.getWeekdayPrice());
                 newSeatType.setWeekendPrice(priceSeatType.getWeekendPrice());
-                newSeatType.setSeatTypeId(priceSeatType.getSeatType().getId());
+                newSeatType.setSeatType(priceSeatType.getSeatType());
                 newSeatTypes.add(newSeatType);
             }
 
@@ -104,6 +104,7 @@ public class PriceAPI {
                 newSeatType.setId(priceSeatType.getId());
                 newSeatType.setWeekdayPrice(priceSeatType.getWeekdayPrice());
                 newSeatType.setWeekendPrice(priceSeatType.getWeekendPrice());
+                newSeatType.setSeatType(priceSeatType.getSeatType());
                 newSeatTypes.add(newSeatType);
             }
 
