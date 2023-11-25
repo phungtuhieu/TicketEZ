@@ -136,6 +136,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -148,6 +149,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -1370,25 +1372,25 @@ VALUES
 GO
 -- 18. thêm dữ liệu bảng actor
 
-  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday], [avatar])
-VALUES (N'Nguyễn Văn Thanh', '1990-01-01', 'actor_image1.jpg'),
- (N'Nguyễn Tuấn', '1993-01-01', 'actor_image1.jpg'),
-  (N'Trấn Thành', '1989-01-01', 'actor_image1.jpg'),
-  (N'Trương Thế Vinh', '1988-01-01', 'actor_image1.jpg'),
-   (N'Võ Thành Tâm ', '1994-01-01', 'actor_image1.jpg'),
-    (N'Thanh Trúc', '1995-01-01', 'actor_image1.jpg'),
-	 (N'Hứa Minh Đạt', '1990-01-01', 'actor_image1.jpg'),
-	  (N'Lâm Chấn Khang', '1996-01-01', 'actor_image1.jpg'),
-	   (N'Chris Hemsworth', '1996-01-01', 'actor_image1.jpg'),
-	    (N'Tom Hiddleston ', '1999-01-01', 'actor_image1.jpg'),
-		 (N'Benedict Cumberbatch', '2000-01-01', 'actor_image1.jpg'),
-		  (N'Scarlett Johansson', '2000-01-01', 'actor_image1.jpg'),
-		   (N'NTom Holland', '2000-01-01', 'actor_image1.jpg'),
-		    (N'Chadwick Boseman', '1990-01-01', 'actor_image1.jpg'),
-			 (N'Brie Larson', '1990-01-01', 'actor_image1.jpg'),
-			  (N'Sebastian Stan', '1990-01-01', 'actor_image1.jpg'),
-			   (N'Anthony Mackie ', '1990-01-01', 'actor_image1.jpg'),
-			    (N'Idris Elba', '1990-01-01', 'actor_image1.jpg');
+  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday],[country], [avatar])
+VALUES (N'Nguyễn Văn Thanh', '1990-01-01','VN', 'actor_image1.jpg'),
+ (N'Nguyễn Tuấn', '1993-01-01','VN', 'actor_image1.jpg'),
+  (N'Trấn Thành', '1989-01-01','VN', 'actor_image1.jpg'),
+  (N'Trương Thế Vinh', '1988-01-01','VN', 'actor_image1.jpg'),
+   (N'Võ Thành Tâm ', '1994-01-01','VN', 'actor_image1.jpg'),
+    (N'Thanh Trúc', '1995-01-01','VN', 'actor_image1.jpg'),
+	 (N'Hứa Minh Đạt', '1990-01-01','VN', 'actor_image1.jpg'),
+	  (N'Lâm Chấn Khang', '1996-01-01','VN',  'actor_image1.jpg'),
+	   (N'Chris Hemsworth', '1996-01-01','VN',  'actor_image1.jpg'),
+	    (N'Tom Hiddleston ', '1999-01-01','VN',  'actor_image1.jpg'),
+		 (N'Benedict Cumberbatch', '2000-01-01','VN',  'actor_image1.jpg'),
+		  (N'Scarlett Johansson', '2000-01-01','VN',  'actor_image1.jpg'),
+		   (N'NTom Holland', '2000-01-01','VN',  'actor_image1.jpg'),
+		    (N'Chadwick Boseman', '1990-01-01','VN',  'actor_image1.jpg'),
+			 (N'Brie Larson', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			  (N'Sebastian Stan', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			   (N'Anthony Mackie ', '1990-01-01','VN',  'actor_image1.jpg'),
+			    (N'Idris Elba', '1990-01-01', 'VN', 'actor_image1.jpg');
 GO
 -- 19. thêm dữ liệu  actors_movie
  INSERT INTO [TicketEZ].[dbo].[Actors_Movies] ([actor_id], [movie_id])
@@ -1456,11 +1458,11 @@ VALUES (2,1, 1),
 go
 */
 --25. thêm dữ liệu bảng Directors
-    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
+    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday],[country], [avatar])
 VALUES
-  ('Nguyễn Thị A', '1980-05-15', 'director_avatar1.jpg'),
-  ('Trần Văn B', '1975-08-20', 'director_avatar2.jpg'),
-  ('Lê Thị C', '1990-03-10', 'director_avatar3.jpg');
+  ('Nguyễn Thị A', '1980-05-15','VN' , 'director_avatar1.jpg'),
+  ('Trần Văn B', '1975-08-20','VN' , 'director_avatar2.jpg'),
+  ('Lê Thị C', '1990-03-10','VN' , 'director_avatar3.jpg');
 GO
 -- 26. thêm dữ liệu bảng [Directors_Movies]
 

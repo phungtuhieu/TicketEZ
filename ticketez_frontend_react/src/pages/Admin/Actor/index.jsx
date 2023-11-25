@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Select } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,6 +15,7 @@ import uploadApi from '~/api/service/uploadApi';
 import classNames from 'classnames/bind';
 import style from './Actor.module.scss';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
+import countriesJson from '~/data/countries.json';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -187,6 +188,16 @@ const AdminActor = () => {
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
+        },
+        {
+            title: 'Quốc gia',
+            dataIndex: 'country',
+            key: 'country',
+            ...getColumnSearchProps('country'),
+            render: (_, record) => {
+                let i = countriesJson.findIndex((item) => item.code === record.country);
+                return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
+            },
         },
         {
             title: 'Ảnh đại diện',
@@ -377,6 +388,22 @@ const AdminActor = () => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
+
+    const validateBirthday = (rule, value, callback) => {
+        if (value) {
+            // Tính tuổi dựa trên ngày sinh
+            const today = new Date();
+            const birthday = new Date(value);
+            const age = today.getFullYear() - birthday.getFullYear();
+
+            // Kiểm tra tuổi
+            if (age < 13) {
+                callback('Ngày sinh diễn viên phải lớn hơn 13 tuổi');
+            } else {
+                callback();
+            }
+        } 
+    };
     return (
         <>
             <Row>
@@ -422,10 +449,38 @@ const AdminActor = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="birthday"
-                            label="Ngày sinh"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            label="Quốc gia"
+                            rules={[
+                                { required: true, message: 'Vui lòng chọn ngày sinh' },
+                                { validator: validateBirthday }
+                            ]}
                         >
                             <DatePicker placeholder="Ngày sinh" format="DD-MM-YYYY" style={{ width: '100%' }} />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="country"
+                            label="Quốc gia"
+                            rules={[{ required: true, message: 'Vui lòng chọn quốc gia' }]}
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Tìm kiếm và chọn quốc gia"
+                                allowClear
+                                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                                filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? '')
+                                        .toLowerCase()
+                                        .localeCompare((optionB?.label ?? '').toLowerCase())
+                                }
+                                options={[
+                                    ...countriesJson.map((item) => ({
+                                        value: item.code,
+                                        label: item.name,
+                                    })),
+                                ]}
+                            />
                         </Form.Item>
 
                         <Form.Item
