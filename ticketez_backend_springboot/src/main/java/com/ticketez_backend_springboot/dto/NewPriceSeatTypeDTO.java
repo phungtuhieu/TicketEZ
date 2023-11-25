@@ -19,5 +19,5 @@ public class NewPriceSeatTypeDTO {
     private Long id;
     private Double weekdayPrice;
     private Double weekendPrice;
-    private Long seatTypeId;
+    private SeatType seatType;
 }
