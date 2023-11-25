@@ -40,8 +40,8 @@ function Mapbox({latitude, longitude, address }) {
         </Popup>
       )}
       <Marker
-        latitude={10.76317169124285}
-        longitude={106.65670151096185}
+        latitude={latitude}
+        longitude={longitude}
         offsetLeft={-20}
         offsetTop={-10}
       >
