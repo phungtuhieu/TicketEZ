@@ -14,6 +14,7 @@ import {
     Tag,
     Select,
     Switch,
+    Radio,
 } from 'antd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -72,7 +73,7 @@ const AdminAccount = () => {
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
-                console.log(res.data);
+                // console.log(res.data);
             } catch (error) {
                 console.log(error);
                 // funcUtils.notify(error.response, 'error');
@@ -279,6 +280,18 @@ const AdminAccount = () => {
         console.log(`selected ${value}`);
         setStatus(value);
     };
+
+    const optionsWithDisabled = [
+        {
+            value: true,
+            label: 'Nam',
+        },
+        {
+            value: false,
+            label: 'Nữ',
+        },
+    ];
+    
     return (
         <>
             <Row>
@@ -347,8 +360,9 @@ const AdminAccount = () => {
                             <DatePicker placeholder="Ngày sinh..." format={'DD-MM-YYYY'} style={{ width: '100%' }} />
                         </Form.Item>
 
-                        <Form.Item {...formItemLayout} name="gender" label="Giới tính" valuePropName="checked">
-                            <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked />
+                        <Form.Item {...formItemLayout} name="gender" label="Giới tính" >
+                            {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
 
                         <Form.Item
