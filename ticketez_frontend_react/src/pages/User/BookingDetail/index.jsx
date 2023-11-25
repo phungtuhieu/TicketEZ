@@ -62,7 +62,7 @@ function BookingDetail(props) {
                             price: 0.0,
                         };
                         const seatTypePrice = listPriceResp.data[0].newPriceSeatTypeDTOs.find(
-                            (prStype) => item.seatType.id === prStype.seatTypeId,
+                            (prStype) => item.seatType.id === prStype.seatType.id,
                         );
                         seatTypeAndPrice.seatTypeId = item.seatType.id;
                         if (seatTypePrice) {
