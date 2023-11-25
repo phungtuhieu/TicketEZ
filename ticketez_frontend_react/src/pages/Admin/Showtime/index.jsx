@@ -68,6 +68,7 @@ const AdminShowtime = () => {
     const [dataFormatMovieByFormatAndMovie, setDataFormatMovieByFormatAndMovie] = useState(null);
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
     const [valueEndtimeByTimeMovieAndStartime, setValueEndtimeByTimeMovieAndStartime] = useState(null);
+    const [valueStartTimeEdit, setValueStartTimeEdit] = useState(null);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
@@ -265,32 +266,6 @@ const AdminShowtime = () => {
         }
     }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema, valueSelectDate]);
 
-    const handleReset = () => {
-        form.setFieldsValue({
-            province: null,
-            cinemaComplex: null,
-            cinema: null,
-            movie: null,
-            format: null,
-            seatChart: null,
-            time: null,
-            date: null,
-        });
-        setSelectedOption1(null);
-        setSelectedOption2(null);
-        setSelectedOption3(null);
-        setSelectedOption4(null);
-        setSelectedOption5(null);
-        setSelectedOption6(null);
-        setValueSelectProvince(null);
-        setValueCinema(null);
-        setValueFormat(null);
-        setvalueShowtimeByEndtime(null);
-        setValueSelectCinemaComplex(null);
-        setValueSelectDate(null);
-        setValueTimeMovie(null);
-    };
-
     const columns = [
         {
             title: '#',
@@ -413,32 +388,53 @@ const AdminShowtime = () => {
             ),
         },
     ];
-
+    const handleReset = () => {
+        form.resetFields();
+        setSelectedOption1(null);
+        setSelectedOption2(null);
+        setSelectedOption3(null);
+        setSelectedOption4(null);
+        setSelectedOption5(null);
+        setSelectedOption6(null);
+        setValueSelectProvince(null);
+        setValueCinema(null);
+        setValueFormat(null);
+        setvalueShowtimeByEndtime(null);
+        setValueSelectCinemaComplex(null);
+        setValueSelectDate(null);
+        setValueTimeMovie(null);
+        setEditData(null);
+        onChangSelectProvince(null);
+        onChangSelectCinemaConplex(null);
+        onChangSelectCinema(null);
+        onChangSelectFormatMovie(null);
+        onChangSelectFormat(null);
+        onChangSelectDate(null);
+        setDataTimeMovie();
+        setValueStartTimeEdit();
+        setValueEndtimeByTimeMovieAndStartime();
+        setValueSeatChartByCinema(null);
+    };
     const showModal = () => {
         handleReset();
-        setEditData(null);
         setOpen(true);
-        form.resetFields();
     };
 
     const handleDelete = async (record) => {
         try {
             const res = await showtimeApi.delete(record.id);
-            console.log('kết quả nè', res.response);
             if (res.status === 200) {
                 funcUtils.notify(res.data, 'success');
             }
         } catch (error) {
             console.log(error);
-              funcUtils.notify(error.response.data, 'error');
+            funcUtils.notify(error.response.data, 'error');
         }
 
         setWorkSomeThing(!workSomeThing);
     };
 
     const handleEditData = (record) => {
-        console.log(record);
-        handleReset();
         let time = moment(record.endTime).format('HH:mm');
         onChangSelectProvince(record.cinema.cinemaComplex.province.id);
         onChangSelectCinemaConplex(record.cinema.cinemaComplex.id);
@@ -458,6 +454,7 @@ const AdminShowtime = () => {
             time: dayjs(record.startTime, { format: 'HH:mm:ss' }),
         });
         setDataTimeMovie(record.formatMovie.movie.duration);
+        setValueStartTimeEdit(record.endTime);
         setValueEndtimeByTimeMovieAndStartime(time);
         setSelectedOption1(record.cinema.cinemaComplex.province ? record.cinema.cinemaComplex.province.id : null);
         setSelectedOption2(record.cinema.cinemaComplex ? record.cinema.cinemaComplex.id : null);
@@ -484,20 +481,45 @@ const AdminShowtime = () => {
             const newCurrentDateADd = new Date(endTime);
             // Cộng thêm 10 ngày vào newCurrentDateADd
             newCurrentDateADd.setDate(currentTime.getDate() + 10);
-
             //tạo mảng lưu endtime HH:mm của xuất chiếu
             const endtimeFormatHHmm = [];
             for (const showtime of valueShowtimeByEndtime) {
                 endtimeFormatHHmm.push(moment(showtime.endTime).format('HH:mm'));
             }
-
             //lấy ra giờ cuối cùng
             const lastArrayEndtime = endtimeFormatHHmm[endtimeFormatHHmm.length - 1];
-
             //lấy ra giờ cuối cùng cộng thêm 15 phút
             const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
+
+
+
+            let previousData = null;
+            const formatValue = moment(valueStartTimeEdit).format('HH:mm');
+            for (let i = 0; i < endtimeFormatHHmm.length; i++) {
+                if (endtimeFormatHHmm[i] === formatValue) {
+                    // Nếu tìm thấy giá trị trùng khớp, lấy dữ liệu trước đó (nếu có)
+                    if (i > 0) {
+                        previousData = endtimeFormatHHmm[i - 1];
+                    }
+                    break;
+                }
+            }
+            // Lấy ra giờ kế cuối thứ hai từ cuối cùng
+            const secondToLastArrayEndtime = previousData;
+            //lấy ra kế giờ cuối cùng cộng thêm 15 phút
+            const lastTwoEndTimeWithExtra15Minutes = moment(secondToLastArrayEndtime, 'HH:mm')
+                .add(15, 'minutes')
+                .format('HH:mm');
+
             if (time < lastArrayEndtime && editData == null) {
                 funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
+                setOpen(true);
+                setLoading(false);
+            } else if (time < secondToLastArrayEndtime && editData != null) {
+                funcUtils.notify(
+                    `Thời gian phải hơn thời gian cuối cùng trong ngày là : ${secondToLastArrayEndtime}`,
+                    'error',
+                );
                 setOpen(true);
                 setLoading(false);
             } else {
@@ -509,21 +531,16 @@ const AdminShowtime = () => {
                             endTime: endTime,
                             status: 2, // Công chiếu
                         };
-                    } else if (startTime > currentTime && startTime <= newCurrentDateADd) {
+                    }
+                    if ( startTime >= currentTime && startTime <= newCurrentDateADd ) {
                         values = {
                             ...values,
                             startTime: startTime,
                             endTime: endTime,
                             status: 1, // sắp chiếu
                         };
-                    } else if (currentTime > startTime) {
-                        values = {
-                            ...values,
-                            startTime: startTime,
-                            endTime: endTime,
-                            status: 3, //Kết thúc chiếu
-                        };
-                    } else {
+                    }
+                    if (startTime > newCurrentDateADd) {
                         values = {
                             ...values,
                             startTime: startTime,
@@ -537,7 +554,6 @@ const AdminShowtime = () => {
                             ...values,
                             startTime: startTime,
                             endTime: endTime,
-                            status: editData.status,
                         };
                         try {
                             const resPut = await showtimeApi.put(
@@ -586,6 +602,10 @@ const AdminShowtime = () => {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
+                    } else if (time < lastTwoEndTimeWithExtra15Minutes && editData != null) {
+                        funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${secondToLastArrayEndtime}`, 'error');
+                        setOpen(true);
+                        setLoading(false);
                     } else {
                         if (currentTime.toDateString() === startTime.toDateString()) {
                             values = {
@@ -594,21 +614,16 @@ const AdminShowtime = () => {
                                 endTime: endTime,
                                 status: 2, // Công chiếu
                             };
-                        } else if (startTime > currentTime && startTime <= newCurrentDateADd) {
+                        }
+                        if (startTime < newCurrentDateADd && startTime > currentTime) {
                             values = {
                                 ...values,
                                 startTime: startTime,
                                 endTime: endTime,
                                 status: 1, // sắp chiếu
                             };
-                        } else if (currentTime > startTime) {
-                            values = {
-                                ...values,
-                                startTime: startTime,
-                                endTime: endTime,
-                                status: 3, //Kết thúc chiếu
-                            };
-                        } else {
+                        }
+                        if (startTime > newCurrentDateADd) {
                             values = {
                                 ...values,
                                 startTime: startTime,
@@ -617,56 +632,55 @@ const AdminShowtime = () => {
                             };
                         }
 
-                         if (editData) {
-                             let putData = {
-                                 id: editData.id,
-                                 ...values,
-                                 startTime: startTime,
-                                 endTime: endTime,
-                                 status: editData.status,
-                             };
-                             try {
-                                 const resPut = await showtimeApi.put(
-                                     putData.id,
-                                     putData,
-                                     putData.cinema,
-                                     dataFormatMovieByFormatAndMovie,
-                                     valueSeatChartByCinema,
-                                 );
-                                 if (resPut.status === 200) {
-                                     funcUtils.notify('Cập nhật xuất chiếu thành công', 'success');
-                                     setOpen(false);
-                                     form.resetFields();
-                                     setLoading(false);
-                                     setWorkSomeThing([!workSomeThing]);
-                                 }
-                             } catch (error) {
-                                 if (error.status === 500) {
-                                     funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
-                                     setLoading(false);
-                                 }
-                                 console.log(error);
-                             }
-                         } else {
-                             try {
-                                 const resp = await showtimeApi.post(
-                                     values,
-                                     values.cinema,
-                                     dataFormatMovieByFormatAndMovie,
-                                     valueSeatChartByCinema,
-                                 );
-                                 if (resp.status === 200) {
-                                     funcUtils.notify('Thêm thành công', 'success');
-                                     setOpen(false);
-                                     form.resetFields();
-                                     setLoading(false);
-                                     setWorkSomeThing([!workSomeThing]);
-                                 }
-                             } catch (error) {
-                                 console.log(error);
-                                 funcUtils.notify(error.response.data, 'error');
-                             }
-                         }
+                        if (editData) {
+                            let putData = {
+                                id: editData.id,
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                            };
+                            try {
+                                const resPut = await showtimeApi.put(
+                                    putData.id,
+                                    putData,
+                                    putData.cinema,
+                                    dataFormatMovieByFormatAndMovie,
+                                    valueSeatChartByCinema,
+                                );
+                                if (resPut.status === 200) {
+                                    funcUtils.notify('Cập nhật xuất chiếu thành công', 'success');
+                                    setOpen(false);
+                                    form.resetFields();
+                                    setLoading(false);
+                                    setWorkSomeThing([!workSomeThing]);
+                                }
+                            } catch (error) {
+                                if (error.status === 500) {
+                                    funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
+                                    setLoading(false);
+                                }
+                                console.log(error);
+                            }
+                        } else {
+                            try {
+                                const resp = await showtimeApi.post(
+                                    values,
+                                    values.cinema,
+                                    dataFormatMovieByFormatAndMovie,
+                                    valueSeatChartByCinema,
+                                );
+                                if (resp.status === 200) {
+                                    funcUtils.notify('Thêm thành công', 'success');
+                                    setOpen(false);
+                                    form.resetFields();
+                                    setLoading(false);
+                                    setWorkSomeThing([!workSomeThing]);
+                                }
+                            } catch (error) {
+                                console.log(error);
+                                funcUtils.notify(error.response.data, 'error');
+                            }
+                        }
                     }
                 }
             }
@@ -676,6 +690,7 @@ const AdminShowtime = () => {
         }
     };
     const handleCancel = () => {
+        handleReset();
         setOpen(false);
     };
 
@@ -799,19 +814,23 @@ const AdminShowtime = () => {
         return ` ${value.format('HH:mm')} ~ ${valueEndtimeByTimeMovieAndStartime}`;
     };
 
-      const disabledDate = (current) => {
-          return current && current < dayjs().startOf('day');
-      };
-
+    const disabledDate = (current) => {
+        return current && current < dayjs().startOf('day');
+    };
 
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    <h1>Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button
+                        type="primary"
+                        className={cx('button-title', 'tw-mt-9')}
+                        icon={<PlusOutlined />}
+                        onClick={showModal}
+                    >
                         Thêm
                     </Button>
                 </Col>
@@ -1016,7 +1035,7 @@ const AdminShowtime = () => {
                                 <Col xs={24} sm={24} lg={9}>
                                     <Form.Item name="date" label="Chọn ngày chiếu" {...configDate}>
                                         <DatePicker
-                                         disabledDate={disabledDate}
+                                            disabledDate={disabledDate}
                                             placeholder="Chọn ngày"
                                             style={{ width: 170 }}
                                             format={'DD-MM-YYYY'}
@@ -1047,7 +1066,20 @@ const AdminShowtime = () => {
                                                 <Button
                                                     key={valueShowtime.id}
                                                     className={cx('btn-suat-chieu')}
-                                                    style={{ marginBottom: '25px', marginRight: '5px' }}
+                                                    style={{
+                                                        marginBottom: '25px',
+                                                        marginRight: '5px',
+                                                        borderColor:
+                                                            moment(valueShowtime.endTime).format('HH:mm') ===
+                                                            moment(valueStartTimeEdit).format('HH:mm')
+                                                                ? '#9ADE7B'
+                                                                : '#38bdf8',
+                                                        color:
+                                                            moment(valueShowtime.endTime).format('HH:mm') ===
+                                                            moment(valueStartTimeEdit).format('HH:mm')
+                                                                ? '#9ADE7B'
+                                                                : '#38bdf8',
+                                                    }}
                                                 >
                                                     <span className={cx('gio-bat-dau')}>
                                                         {moment(valueShowtime.startTime).format('HH:mm')}

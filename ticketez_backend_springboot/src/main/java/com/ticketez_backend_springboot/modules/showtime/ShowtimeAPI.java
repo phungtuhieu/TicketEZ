@@ -114,7 +114,7 @@ public class ShowtimeAPI {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
-            // Kiểm tra xem có Booking nào liên quan đến Showtime không
+        // Kiểm tra xem có Booking nào liên quan đến Showtime không
         Showtime showtime = showtimeDAO.findById(id).orElse(null);
         if (showtime == null) {
             return new ResponseEntity<>("Không tìm thấy xuất chiếu để xoá", HttpStatus.NOT_FOUND);
@@ -122,7 +122,7 @@ public class ShowtimeAPI {
 
         List<Booking> bookings = showtime.getBookings();
         if (!bookings.isEmpty()) {
-            return new ResponseEntity<>("Không thể xoá vì xuất chiếu đã có được đặt", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Không thể xoá vì xuất chiếu đã được đặt", HttpStatus.CONFLICT);
         }
 
         // Nếu không có Booking liên quan, tiến hành xóa Showtime

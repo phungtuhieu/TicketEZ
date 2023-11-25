@@ -50,7 +50,6 @@ const showtimeApi = {
                formatMovie: formatMovie.data,
                seatChart: seatChart.data,
            };
-           console.log("123 ",values);
         return axiosClient.put(url + '/' + id, values);
     },
     delete: async (actorId) => {
