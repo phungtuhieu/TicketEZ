@@ -129,9 +129,9 @@ function ViTri() {
                         </Row>
                     </Modal>
 
-                    <Button className={cx('btn-second')} icon={<AimOutlined />}>
+                    {/* <Button className={cx('btn-second')} icon={<AimOutlined />}>
                         Gần bạn
-                    </Button>
+                    </Button> */}
                 </div>
             </Col>
             <Col span={24} style={{ height: 642.8 }}>

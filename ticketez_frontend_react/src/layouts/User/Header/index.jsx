@@ -24,7 +24,6 @@ import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
 
 const Header = () => {
-
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -34,7 +33,7 @@ const Header = () => {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
-            navigate('/')
+            navigate('/');
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
@@ -89,8 +88,7 @@ const Header = () => {
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
-        }
-        
+        },
     ];
 
     const scrollToShowTimes = () => {
@@ -155,7 +153,9 @@ const Header = () => {
                             </a>
                         </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">
-                            <FontAwesomeIcon icon={faSearch} />
+                            <a href="/movie-search" className="tw-text-gray-700">
+                                <FontAwesomeIcon icon={faSearch} />
+                            </a>
                         </div>
                         <Divider type="vertical" />
                         <Dropdown
