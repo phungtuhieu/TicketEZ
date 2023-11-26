@@ -37,7 +37,7 @@ const EventDetailsRight = (props) => {
                                                 className="
                                     tw-leading-normal 
                                     tw-text-left tw-line-clamp-3 tw-max-w-[180px]
-                                    tw-mt-2 text-2xl tw-text-black tw-font-semibold tw-no-underline  hover:tw-underline"
+                                    tw-mt-2 text-2xl tw-text-[var(--primary-background-color)] tw-font-semibold tw-no-underline  hover:tw-underline"
                                             >
                                                 {event.name}
                                             </div>
@@ -63,7 +63,7 @@ const EventDetailsRight = (props) => {
                                                 className="
                                     tw-leading-normal 
                                     tw-text-left tw-line-clamp-3 tw-max-w-[180px]
-                                    tw-mt-2 text-2xl tw-text-black tw-font-semibold tw-no-underline  hover:tw-underline"
+                                    tw-mt-2 text-2xl tw-text-[var(--primary-background-color)] tw-font-semibold tw-no-underline  hover:tw-underline"
                                             >
                                                 {event.name}
                                             </div>

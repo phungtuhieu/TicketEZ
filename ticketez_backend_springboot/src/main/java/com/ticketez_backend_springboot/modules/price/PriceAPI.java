@@ -54,7 +54,7 @@ public class PriceAPI {
     }
 
     // Tìm kiếm PriceAndPriceSeatTypeDTO theo id cinemacomplex và movie id
-    @GetMapping("findByCinemaComplexIdAndMovieId/{cinemacomplexId}/{movieId}")
+    @GetMapping("/findByCinemaComplexIdAndMovieId/{cinemacomplexId}/{movieId}")
     public ResponseEntity<List<PriceAndPriceSeatTypeDTO>> findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
             @PathVariable("cinemacomplexId") Long idCinemaComPlex,
             @PathVariable("movieId") Long idMovie) {

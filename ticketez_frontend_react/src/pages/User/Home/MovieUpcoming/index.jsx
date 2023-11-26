@@ -122,7 +122,7 @@ const MovieShowing = () => {
     }, []);
     return (
         <div className={cx('body')}>
-            <h1 className="tw-text-pink-600">Phim sắp chiếu</h1>
+            <h1 className="tw-text-[var(--primary--text-color)]">Phim sắp chiếu</h1>
 
             {isLoadingPage && (
                 <div style={{ height: '100px' }}>
@@ -203,10 +203,7 @@ const MovieShowing = () => {
                                             {slide.movie.title} <br />
                                             <span className={cx('the-loai-phim')}>
                                                 {slide.genres.map((valueGenre, index) => (
-                                                    <span
-                                                        className={cx('span')}
-                                                        key={index}
-                                                    >
+                                                    <span className={cx('span')} key={index}>
                                                         {valueGenre.name}
                                                     </span>
                                                 ))}
