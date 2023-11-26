@@ -54,36 +54,39 @@ public class PriceAPI {
     }
 
     // Tìm kiếm PriceAndPriceSeatTypeDTO theo id cinemacomplex và movie id
-    @GetMapping("/findByCinemaComplexIdAndMovieId/{cinemacomplexId}/{movieId}")
-    public ResponseEntity<List<PriceAndPriceSeatTypeDTO>> findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
-            @PathVariable("cinemacomplexId") Long idCinemaComPlex,
-            @PathVariable("movieId") Long idMovie) {
-        List<Price> prices = priceDAO.findByCinemaComplexIdAndMovieId(idCinemaComPlex, idMovie);
+    // @GetMapping("/findByCinemaComplexIdAndMovieId/{cinemacomplexId}/{movieId}")
+    // public ResponseEntity<List<PriceAndPriceSeatTypeDTO>>
+    // findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
+    // @PathVariable("cinemacomplexId") Long idCinemaComPlex,
+    // @PathVariable("movieId") Long idMovie) {
+    // List<Price> prices =
+    // priceDAO.findByCinemaComplexIdAndMovieId(idCinemaComPlex, idMovie);
 
-        List<PriceAndPriceSeatTypeDTO> rspList = new ArrayList<>();
+    // List<PriceAndPriceSeatTypeDTO> rspList = new ArrayList<>();
 
-        for (Price price : prices) {
-            PriceAndPriceSeatTypeDTO dto = new PriceAndPriceSeatTypeDTO();
-            dto.setPrice(price);
+    // for (Price price : prices) {
+    // PriceAndPriceSeatTypeDTO dto = new PriceAndPriceSeatTypeDTO();
+    // dto.setPrice(price);
 
-            List<PriceSeatType> priceSeatTypes = priceSeatTypeDAO.findByPriceId(price.getId());
-            List<NewPriceSeatTypeDTO> newSeatTypes = new ArrayList<>();
+    // List<PriceSeatType> priceSeatTypes =
+    // priceSeatTypeDAO.findByPriceId(price.getId());
+    // List<NewPriceSeatTypeDTO> newSeatTypes = new ArrayList<>();
 
-            for (PriceSeatType priceSeatType : priceSeatTypes) {
-                NewPriceSeatTypeDTO newSeatType = new NewPriceSeatTypeDTO();
-                newSeatType.setId(priceSeatType.getId());
-                newSeatType.setWeekdayPrice(priceSeatType.getWeekdayPrice());
-                newSeatType.setWeekendPrice(priceSeatType.getWeekendPrice());
-                newSeatType.setSeatType(priceSeatType.getSeatType());
-                newSeatTypes.add(newSeatType);
-            }
+    // for (PriceSeatType priceSeatType : priceSeatTypes) {
+    // NewPriceSeatTypeDTO newSeatType = new NewPriceSeatTypeDTO();
+    // newSeatType.setId(priceSeatType.getId());
+    // newSeatType.setWeekdayPrice(priceSeatType.getWeekdayPrice());
+    // newSeatType.setWeekendPrice(priceSeatType.getWeekendPrice());
+    // newSeatType.setSeatType(priceSeatType.getSeatType());
+    // newSeatTypes.add(newSeatType);
+    // }
 
-            dto.setNewPriceSeatTypeDTOs(newSeatTypes);
-            rspList.add(dto);
-        }
+    // dto.setNewPriceSeatTypeDTOs(newSeatTypes);
+    // rspList.add(dto);
+    // }
 
-        return ResponseEntity.ok(rspList);
-    }
+    // return ResponseEntity.ok(rspList);
+    // }
 
     // Tìm price và mảng PriceSeatType
     @GetMapping("/price-price-seat-type-dto")

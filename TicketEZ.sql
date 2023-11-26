@@ -623,11 +623,11 @@ GO
 -- ADD
 --     CONSTRAINT FK_Child_Seat_Chart_Showtimes FOREIGN KEY (seat_chart_id) REFERENCES Showtimes(id)
 -- GO
-ALTER TABLE
-    Formats_Movies
-ADD
-    CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
-GO  
+-- ALTER TABLE
+--     Formats_Movies
+-- ADD
+--     CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+-- GO  
 ALTER TABLE
     Account_Lock_History
 ADD

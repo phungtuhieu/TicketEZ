@@ -33,7 +33,7 @@ public class Price {
 	private Date endDate;
 	private Boolean status;
 	@JsonIgnore
-	@OneToMany(mappedBy = "price", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "price")
 	private List<PriceSeatType> priceSeatTypes;
 
 	@ManyToOne

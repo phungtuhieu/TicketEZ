@@ -80,7 +80,4 @@ public class Movie implements Serializable {
 	@OneToMany(mappedBy = "movie")
 	private List<ActorMovie> actorsMovies;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "movie")
-	private List<Price> prices;
 }
