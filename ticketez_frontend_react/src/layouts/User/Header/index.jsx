@@ -24,7 +24,6 @@ import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
 import uploadApi from '~/api/service/uploadApi';
 
-
 const Header = () => {
     const [userData, setUserData] = useState();
 
@@ -42,32 +41,23 @@ const Header = () => {
         fetchData();
     }, []);
 
-
-
     const navigate = useNavigate();
 
     const location = useLocation();
 
-
     const handleLogin = async () => {
-        navigate('/login')
+        navigate('/login');
     };
     const handleProfile = async () => {
-        navigate('/profile')
+        navigate('/profile');
     };
-
-
 
     const handleLogout = async () => {
         try {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
-<<<<<<< HEAD
-            navigate('/login')
-=======
             navigate('/');
->>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
@@ -123,12 +113,7 @@ const Header = () => {
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
-<<<<<<< HEAD
-        }
-
-=======
         },
->>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
     ];
 
     const scrollToShowTimes = () => {
@@ -198,7 +183,6 @@ const Header = () => {
                             </a>
                         </div>
 
-
                         <Divider type="vertical" />
                         {userData ? (
                             <Dropdown
@@ -210,17 +194,10 @@ const Header = () => {
                             >
                                 <a className="tw-text-gray-700 flex items-center">
                                     <span className="name-short">Xin chào, {userData.fullname}</span>
-                                    <Avatar src={
-                                        uploadApi.get(userData.image)
-                                    } alt={`${userData.id}'s avatar`} />
+                                    <Avatar src={uploadApi.get(userData.image)} alt={`${userData.id}'s avatar`} />
                                 </a>
-
-
-
-
                             </Dropdown>
                         ) : (
-
                             <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
                                 Đăng nhập
                                 <Avatar
@@ -229,8 +206,6 @@ const Header = () => {
                                     icon={<UserOutlined />}
                                 />
                             </a>
-
-
                         )}
                     </div>
                 </div>
@@ -259,14 +234,6 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
-<<<<<<< HEAD
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                            (location.pathname === '/su-kien/tin-tuc' ||
-                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
-                                            ? ' tw-text-pink-500'
-                                            : ''
-                                            }`,
-=======
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
                                             isEventPage &&
                                             (location.pathname === '/su-kien/tin-tuc' ||
@@ -274,7 +241,6 @@ const Header = () => {
                                                 ? 'tw-text-[var(--primary-background-color)]'
                                                 : ''
                                         }`,
->>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -288,14 +254,6 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
-<<<<<<< HEAD
-                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                            (location.pathname === '/su-kien/khuyen-mai' ||
-                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
-                                            ? ' tw-text-pink-500'
-                                            : ''
-                                            }`,
-=======
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
                                             isEventPage &&
                                             (location.pathname === '/su-kien/khuyen-mai' ||
@@ -303,7 +261,6 @@ const Header = () => {
                                                 ? ' tw-text-[var(--primary--text-color)]'
                                                 : ''
                                         }`,
->>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />
