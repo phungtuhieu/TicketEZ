@@ -163,34 +163,14 @@ const AdminMpaaRating = () => {
 
     const columns = [
         {
-            title: 'Mã',
+            title: '#',
             dataIndex: 'id',
-            width: '10%',
+            width: '6%',
             defaultSortOrder: 'sorting',
             sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Biểu tượng phân loại',
-            dataIndex: 'ratingCode',
-            width: '20%',
-            ...getColumnSearchProps('ratingCode'),
-        },
-        {
-            title: 'Mã màu',
-            dataIndex: 'colorCode',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Tag color={record.colorCode}>{record.colorCode}</Tag>
-                </Space>
-            ),
-        },
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            ...getColumnSearchProps('description'),
-        },
-        {
-            title: 'icon',
             dataIndex: 'icon',
             render: (_, record) => (
                 <Space size="middle">
@@ -205,7 +185,28 @@ const AdminMpaaRating = () => {
             ),
         },
         {
-            title: 'Action',
+            title: 'Tên phân loại',
+            dataIndex: 'ratingCode',
+            width: '15%',
+            ...getColumnSearchProps('ratingCode'),
+        },
+        {
+            title: 'Mã màu',
+            dataIndex: 'colorCode',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Tag color={record.colorCode}>{record.colorCode}</Tag>
+                </Space>
+            ),
+        },
+
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            ...getColumnSearchProps('description'),
+        },
+        {
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -279,12 +280,13 @@ const AdminMpaaRating = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
+
             if (fileList.length > 0) {
                 if (editData) {
-                    console.log(editData);
+                    // Kiểm tra nếu colorCode là một đối tượng và có thuộc tính toHexString
+
                     let putData = {
                         id: editData.id,
-                        colorCode: editData.colorCode,
                         ...values,
                     };
                     if (putData.icon.file) {
@@ -293,6 +295,24 @@ const AdminMpaaRating = () => {
                         putData = {
                             ...putData,
                             icon: images,
+                        };
+                    }
+                    if (
+                        values.colorCode &&
+                        typeof values.colorCode === 'object' &&
+                        typeof values.colorCode.toHexString === 'function'
+                    ) {
+                        var newColorCode = values.colorCode.toHexString();
+                        putData = {
+                            ...putData,
+                            colorCode: newColorCode,
+                        };
+                    } else {
+                        // Nếu không phải đối tượng có toHexString, giữ nguyên giá trị colorCode
+                        var newColorCode1 = values.colorCode;
+                        putData = {
+                            ...putData,
+                            colorCode: newColorCode1,
                         };
                     }
                     try {
@@ -312,7 +332,7 @@ const AdminMpaaRating = () => {
                         const images = await uploadApi.post(file);
                         const postData = {
                             ...values,
-                            colorCode : values.colorCode.toHexString() ,
+                            colorCode: values.colorCode.toHexString(),
                             icon: images,
                         };
                         const resPost = await mpaaRatingApi.create(postData);
@@ -394,15 +414,19 @@ const AdminMpaaRating = () => {
         fileList,
     };
 
-
     return (
         <div>
             <Row>
                 <Col span={22}>
-                    <h1 >Bảng dữ liệu</h1>
+                    <h1>Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title , tw-mt-[20px]' )} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button
+                        type="primary"
+                        className={cx('button-title , tw-mt-[20px]')}
+                        icon={<PlusOutlined />}
+                        onClick={showModal}
+                    >
                         Thêm
                     </Button>
                 </Col>
@@ -431,7 +455,7 @@ const AdminMpaaRating = () => {
                             {...formItemLayout}
                             name="colorCode"
                             label="Chọn mã màu"
-                            rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn mã màu' }]}
                         >
                             <ColorPicker
                                 showText
@@ -481,7 +505,7 @@ const AdminMpaaRating = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            label="icon"
+                            label="Ảnh"
                             name="icon"
                             rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                         >
@@ -494,14 +518,14 @@ const AdminMpaaRating = () => {
                                 name="icon"
                                 maxCount={1}
                             >
-                                {fileList.length < 2 && '+ Upload'}
+                                {fileList.length < 2 && '+ Tải lên'}
                             </Upload>
                         </Form.Item>
 
                         <Form.Item
                             {...formItemLayout}
                             name="ratingCode"
-                            label="Phân loại"
+                            label="Tên phân loại"
                             rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                         >
                             <Input placeholder="Vui lòng nhập tên phân loại" />

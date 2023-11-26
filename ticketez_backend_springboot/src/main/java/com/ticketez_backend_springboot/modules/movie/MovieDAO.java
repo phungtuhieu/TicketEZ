@@ -102,20 +102,34 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         @Param("search") String search,
                         Pageable pageable);
 
-        @Query("SELECT m FROM Movie m WHERE m.releaseDate >= GETDATE() ORDER BY m.releaseDate ASC")
-        Page<Movie> findMovieByRandom(Pageable pageable);
+        // đổ những bộ phim hiện tại có suất chiếu và đổ lên từ cao tới thấp theo rating
+        @Query("SELECT m FROM Movie m WHERE EXISTS"
+                        + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
+                        + "AND st.startTime >= CURRENT_TIMESTAMP "
+                        + ") ORDER BY m.rating DESC")
+        Page<Movie> findMovieShowtimePresent(Pageable pageable);
+
+         @Query("SELECT m FROM Movie m WHERE EXISTS"
+                        + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
+                        + "AND st.startTime >= CURRENT_TIMESTAMP "
+                        + ") " 
+                        + "AND NOT EXISTS "
+                        + "(SELECT b FROM Booking b JOIN b.showtime st WHERE m.id = st.formatMovie.movie.id AND b.status = 0 AND b.ticketStatus = 1 "
+                        + "AND  b.account.id = :userId   )"
+                        +"ORDER BY m.rating DESC")
+        Page<Movie> findMovieShowtimePresentNotExistsByUser(Pageable pageable,String userId );
+
+
 
         @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
-                        " COUNT(DISTINCT k.id) AS total_tickets, " +
-                        " COUNT(DISTINCT m.id) AS total_movies ) " +
+                        " COUNT( k.id) AS total_tickets ) " +
                         " FROM Booking k " +
-                        " JOIN " +
-                        " k.showtime s" +
-                        " JOIN " +
-                        " s.formatMovie fm" +
-                        " JOIN " +
-                        " fm.movie m" + 
                         " WHERE k.ticketStatus = 1")
-        List<TotalDashboardAdmin> getTotalTicketsAndTotalMovies();
+        List<TotalDashboardAdmin> getTotalTickets();
+
+        @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
+                        " COUNT( m.id) AS total_movies ) " +
+                        " FROM Movie m ")
+        List<TotalDashboardAdmin> getTotalMovies();
 
 }

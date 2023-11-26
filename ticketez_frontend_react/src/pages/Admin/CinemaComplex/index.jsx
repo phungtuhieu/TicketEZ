@@ -17,6 +17,9 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { TimePicker } from 'antd';
 import cinemaChainsApi from '~/api/admin/managementCinema/cinemaChainApi';
+import Mapbox from '~/components/Mapbox';
+import MapboxCcx from './MapboxCcx/mapbox';
+
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -46,7 +49,18 @@ const AdminCinemaComplex = () => {
     const [province, setProvince] = useState([]);
     const [cinemaChains, setCinemaChains] = useState([]);
     const [openingTime, setOpeningTime] = useState(null);
-const [closingTime, setClosingTime] = useState(null);
+    const [closingTime, setClosingTime] = useState(null);
+
+
+    const [popupInfoFromMapbox, setPopupInfoFromMapbox] = useState({ latitude: 0, longitude: 0, address: "" });
+
+    const handlePopupInfoChange = (newPopupInfo) => {
+        // Update the state in App.js
+        setPopupInfoFromMapbox(newPopupInfo);
+    };
+
+    // console.log(popupInfoFromMapbox);
+
 
     //call api
     useEffect(() => {
@@ -57,7 +71,7 @@ const [closingTime, setClosingTime] = useState(null);
                 const [province, cinemaChains] = await Promise.all([provinceApi.get(), cinemaChainsApi.get()]);
                 setProvince(province.data);
                 setCinemaChains(cinemaChains.data)
-    
+
                 console.log(res);
                 //    console.log(resType);
                 setTotalItems(res.totalItems);
@@ -73,7 +87,7 @@ const [closingTime, setClosingTime] = useState(null);
         };
         getList();
     }, [currentPage, pageSize, workSomeThing])
-    
+
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -193,29 +207,20 @@ const [closingTime, setClosingTime] = useState(null);
         {
             title: 'Cụm rạp',
             dataIndex: 'name',
-            width: '10%',
+            width: '25%',
             ...getColumnSearchProps('name'),
         },
         {
             title: 'Địa chỉ',
             dataIndex: 'address',
-            width: '20%',
+            width: '30%',
             ...getColumnSearchProps('address'),
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
+            with: '10%',
             ...getColumnSearchProps('phone'),
-        },
-        {
-            title: 'Giờ mở cửa',
-            dataIndex: 'openingTime',
-            width: '10%',
-        },
-        {
-            title: 'Giờ đóng cửa',
-            dataIndex: 'closingTime',
-            width: '10%',
         },
         {
             title: 'Thuộc tỉnh',
@@ -242,7 +247,7 @@ const [closingTime, setClosingTime] = useState(null);
 
                     <Popconfirm
                         title="Bạn có chắc"
-                        description="Muốn xoá hay không?"                    
+                        description="Muốn xoá hay không?"
                         okText="Yes"
                         cancelText="No"
                         onConfirm={() => handleDelete(record)}
@@ -254,7 +259,7 @@ const [closingTime, setClosingTime] = useState(null);
         },
     ];
 
-   
+
     const showModal = () => {
         form.resetFields();
         setEditData(null);
@@ -276,16 +281,20 @@ const [closingTime, setClosingTime] = useState(null);
             }
         }
         setWorkSomeThing(!workSomeThing);
-        
-    };
 
+    };
+    const [mapCinema, setMapCinema] = useState({ longitude: 105.72801667411835, latitude: 9.296098750825891, address: "" })
     const handleEditData = (record) => {
+        setMapCinema({ longitude: record.longitude, latitude: record.latitude, address: record.address })
         const formattedStartime = dayjs(record.openingTime, 'HH:mm:ss');
         const formattedEndtime = dayjs(record.closingTime, 'HH:mm:ss');
         setOpen(true);
         setResetForm(false);
         setEditData(record);
-        //  message.success(record.id);
+        // console.log(record.longitude);
+        // console.log(record.latitude);
+        // console.log(record.address);
+        console.log(mapCinema);
         form.setFieldsValue({
             ...record,
             openingTime: formattedStartime,
@@ -295,6 +304,7 @@ const [closingTime, setClosingTime] = useState(null);
         });
     };
 
+
     const handleOk = async () => {
         setLoading(true);
         try {
@@ -302,11 +312,22 @@ const [closingTime, setClosingTime] = useState(null);
             console.log(values.province);
             console.log(values.cinemaChain);
 
+            const startTime = values.openingTime.format('HH:mm:ss');
+            const endTime = values.closingTime.format('HH:mm:ss');
+
+            if (startTime >= endTime) {
+                message.error('Giờ kết thúc phải sau giờ bắt đầu');
+                setLoading(false);
+                return;
+            }
             if (editData) {
-                values ={
+                values = {
                     ...values,
                     openingTime: values.openingTime.format('HH:mm:ss'),
                     closingTime: values.closingTime.format('HH:mm:ss'),
+                    latitude: popupInfoFromMapbox.latitude,
+                    longitude: popupInfoFromMapbox.longitude,
+                    address: popupInfoFromMapbox.address,
                 }
                 const resp = await cinemaComplexApi.put(editData.id, values, values.province, values.cinemaChain);
                 console.log(resp);
@@ -315,10 +336,13 @@ const [closingTime, setClosingTime] = useState(null);
             console.log(values);
             if (!editData) {
                 try {
-                    values ={
+                    values = {
                         ...values,
                         openingTime: values.openingTime.format('HH:mm:ss'),
                         closingTime: values.closingTime.format('HH:mm:ss'),
+                        latitude: popupInfoFromMapbox.latitude,
+                        longitude: popupInfoFromMapbox.longitude,
+                        address: popupInfoFromMapbox.address,
                     }
                     console.log(values);
                     const resp = await cinemaComplexApi.post(values, values.province, values.cinemaChain);
@@ -341,10 +365,13 @@ const [closingTime, setClosingTime] = useState(null);
     };
     const handleCancel = () => {
         setOpen(false);
+        setMapCinema({
+            longitude: 105.72801667411835, latitude: 9.296098750825891, address: ""
+        })
     };
 
     useEffect(() => {
-      
+
     }, []);
 
     //form
@@ -357,96 +384,165 @@ const [closingTime, setClosingTime] = useState(null);
         setPageSize(pageSize);
     };
     dayjs.extend(customParseFormat);
-const onChangeStartTime = (time, timeString) => {
-    setOpeningTime(timeString);
-    console.log(setOpeningTime);
-};
-const onChangeEndTime = (time, timeString) => {
-    setClosingTime(timeString);
-    console.log(setClosingTime)
-};
+    const onChangeStartTime = (time, timeString) => {
+        setOpeningTime(timeString);
+        console.log(setOpeningTime);
+    };
+    const onChangeEndTime = (time, timeString) => {
+        setClosingTime(timeString);
+        console.log(setClosingTime)
+    };
 
+    const expandedRowRender = (record) => {
+        return (
+            <div>
+                <ul className={cx('wrapp-more-info')}>
+                    <li>
+                        <span>
+                            <b>Giờ mở cửa: </b> {record.openingTime}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Giờ đóng cửa: </b> {record.closingTime}
+                        </span>
+                    </li>
+
+                    <Mapbox
+                        className="tw-h-[50px] tw-w-[70px]"
+                        latitude={record.latitude}
+                        longitude={record.longitude}
+                        address={record.address}
+                    />
+                    <li>
+                        <span>
+                            <b>Kinh độ: </b> {record.longitude}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Vĩ độ: </b> {record.latitude}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>địa chỉ: </b> {record.address}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        );
+    };
 
     return (
-        <>    
-                <Row>
-                    <Col span={22}>
-                        <h1 className={cx('title')}>Bảng dữ liệu</h1>
-                    </Col>
-                    <Col span={2}>
-                        <Button
-                            type="primary"
-                            className={cx('button-title')}
-                            icon={<PlusOutlined />}
-                          
-                            onClick={showModal}
-                        >
-                            Thêm
-                        </Button>
-                    </Col>
-                    <BaseModal
-                        open={open}
-                        width={'60%'}
-                        title={editData ? 'Cập nhật' : 'Thêm mới'}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Thoát
-                            </Button>,
-                            resetForm && ( // Conditionally render the "Làm mới" button only when editing
-                                <Button key="reset" onClick={handleResetForm}>
-                                    Làm mới
-                                </Button>
-                            ),
-                            <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                                {editData ? 'Cập nhật' : 'Thêm mới'}
-                            </Button>,
-                        ]}
+        <>
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button
+                        type="primary"
+                        className={cx('button-title')}
+                        icon={<PlusOutlined />}
+
+                        onClick={showModal}
                     >
-                        <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
-                        
-                            <Form.Item
-                                {...formItemLayout}
-                                name="name"
-                                label="Cụm rạp"
-                                rules={[{ required: true, message: 'Vui lòng nhập cụm rạp' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="address"
-                                label="Địa chỉ"
-                                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
-                            <Form.Item
-                                {...formItemLayout}
-                                name="phone"
-                                label="Số điện thoại"
-                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
-                            >
-                                <Input placeholder="Please input your name" />
-                            </Form.Item>
-                            <Form.Item 
-                              {...formItemLayout}
-                              name="openingTime"
-                              label="Giờ bắt đầu"
-                              rules={[{ required: true, message: 'Vui lòng nhập' }]}
-                             >
+                        Thêm
+                    </Button>
+                </Col>
+                <BaseModal
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && ( // Conditionally render the "Làm mới" button only when editing
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        ),
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="name"
+                            label="Cụm rạp"
+                            rules={[{ required: true, message: 'Vui lòng nhập cụm rạp' }]}
+                        >
+                            <Input placeholder="Please input your name" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                        // name="address"
+                        // label="Địa chỉ"
+                        // rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                        >
+                            {/* <Input placeholder="Please input your name" /> */}
+                            <MapboxCcx onPopupInfoChange={handlePopupInfoChange} latitude={mapCinema.latitude} longitude={mapCinema.longitude} address={mapCinema.address} />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="phone"
+                            label="Số điện thoại"
+                            rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
+                        >
+                            <Input placeholder="Please input your name" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="openingTime"
+                            label="Giờ bắt đầu"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập' },
+                                () => ({
+                                    validator(_, value) {
+                                        const startTime = value.format('HH:mm:ss');
+                                        const endTime = form.getFieldValue('closingTime')?.format('HH:mm:ss');
+    
+                                        if (endTime && startTime >= endTime) {
+                                            return Promise.reject('Giờ kết thúc phải sau giờ bắt đầu');
+                                        }
+    
+                                        return Promise.resolve();
+                                    },
+                                }),
+                            ]}
+                        >
 
                             <TimePicker value={openingTime} onChange={onChangeStartTime} defaultOpenValue={dayjs('00:00', 'HH:mm')} />
-                            </Form.Item>
-                        <Form.Item 
-                          {...formItemLayout}
-                          name="closingTime" 
-                          label="Giờ kết thúc"
-                          rules={[{ required: true, message: 'Vui lòng nhập' }]}
-                      >
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="closingTime"
+                            label="Giờ kết thúc"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập' },
+                                () => ({
+                                    validator(_, value) {
+                                        const startTime = form.getFieldValue('openingTime')?.format('HH:mm:ss');
+                                        const endTime = value.format('HH:mm:ss');
+    
+                                        if (startTime && startTime >= endTime) {
+                                            return Promise.reject('Giờ kết thúc phải sau giờ bắt đầu');
+                                        }
+    
+                                        return Promise.resolve();
+                                    },
+                                }),
+                            ]}
+                        >
 
-                        <TimePicker value={closingTime} onChange={onChangeEndTime} defaultOpenValue={dayjs('00:00', 'HH:mm')} />
+                            <TimePicker value={closingTime} onChange={onChangeEndTime} defaultOpenValue={dayjs('00:00', 'HH:mm')} />
 
                         </Form.Item>
                         <Form.Item
@@ -503,21 +599,22 @@ const onChangeEndTime = (time, timeString) => {
                                 allowClear
                             />
                         </Form.Item>
-                        </Form>
-                    </BaseModal>
-                </Row>
+                    </Form>
+                </BaseModal>
+            </Row>
 
-                <BaseTable
-                    columns={columns}
-                    onClick={() => {
-                        handleDelete();
-                    }}
-                    // dataSource={posts}Pagination = false 
-                    pagination={false}
-                    dataSource={posts.map((post) => ({ ...post, key: post.id }))}
-                   
-                />
-                <div className={cx('wrapp-pagination')}>
+            <BaseTable
+                columns={columns}
+                onClick={() => {
+                    handleDelete();
+                }}
+                // dataSource={posts}Pagination = false 
+                pagination={false}
+                expandable={{ expandedRowRender }}
+                dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+
+            />
+            <div className={cx('wrapp-pagination')}>
                 <Pagination
                     showSizeChanger={false}
                     current={currentPage}

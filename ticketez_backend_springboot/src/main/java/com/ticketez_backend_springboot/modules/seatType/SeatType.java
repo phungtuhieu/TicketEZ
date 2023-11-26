@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.price.Price;
+import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 
 import jakarta.persistence.Entity;
@@ -32,6 +33,6 @@ public class SeatType {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "seatType")
-	private List<Price> prices;
+	private List<PriceSeatType> priceSeatTypes;
 
 }

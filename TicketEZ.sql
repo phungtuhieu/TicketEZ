@@ -31,6 +31,15 @@ CREATE TABLE Accounts (
     points INT  
 )
 GO
+CREATE TABLE Account_Lock_History(
+    id BIGINT IDENTITY(1,1) NOT NULL,
+    event_type BIT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
+    event_date DATETIME NOT NULL, 
+    reason NVARCHAR(MAX) NOT NULL, -- lý do unlock hoặc lock 
+	account_id NVARCHAR(20) NOT NULL,
+)
+GO
+
 CREATE TABLE Accounts_Roles (
 	account_id NVARCHAR(20) NOT NULL,
 	role_id BIGINT NOT NULL,
@@ -108,6 +117,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         title NVARCHAR (500) NOT NULL,
         poster NVARCHAR(MAX) NOT NULL,
+        banner NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX) NOT NULL,
         duration TIME(0) NOT NULL,
         release_date DATE NOT NULL,
@@ -135,6 +145,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -147,6 +158,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -220,15 +232,23 @@ GO
 GO
     CREATE TABLE Price (
         id BIGINT IDENTITY(1, 1) NOT NULL,
-        weekday_price FLOAT NOT NULL,
-        weekend_price FLOAT NOT NULL,
         [start_date] DATETIME NOT NULL,
         end_date DATETIME NOT NULL,
         [status] BIT NOT NULL,
-        seat_type_id BIGINT NOT NULL,
-        movie_id BIGINT NOT NULL,
+        format_movie_id BIGINT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
+
+GO
+  CREATE TABLE Price_Seat_Types (
+        id BIGINT IDENTITY(1, 1) NOT NULL,
+        weekday_price FLOAT NOT NULL,
+        weekend_price FLOAT NOT NULL,
+        seat_type_id BIGINT NOT NULL,
+		price_id BIGINT NOT NULL
+    )
+
+
 GO
     CREATE TABLE Events (
         id BIGINT IDENTITY(1, 1) NOT NULL,
@@ -342,6 +362,10 @@ GO
 
 ALTER TABLE Accounts_Roles
 ADD CONSTRAINT PK_Accounts_Roles PRIMARY KEY(account_id, role_id)
+GO
+
+ALTER TABLE Account_Lock_History
+ADD CONSTRAINT PK_Account_Lock_History PRIMARY KEY(id)
 GO
 
 ALTER TABLE Activity_Logs
@@ -563,7 +587,12 @@ ALTER TABLE
     Seats_Choose
 ADD
     CONSTRAINT PK_Seats_Choose PRIMARY KEY (id);
-	go
+GO
+ALTER TABLE
+     Price_Seat_Types
+ADD
+    CONSTRAINT PK_Price_Seat_Types PRIMARY KEY (id);
+
     -- TẠO KHOÁ NGOẠI
 ALTER TABLE
     Verification
@@ -594,11 +623,16 @@ GO
 -- ADD
 --     CONSTRAINT FK_Child_Seat_Chart_Showtimes FOREIGN KEY (seat_chart_id) REFERENCES Showtimes(id)
 -- GO
+-- ALTER TABLE
+--     Formats_Movies
+-- ADD
+--     CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+-- GO  
 ALTER TABLE
-    Formats_Movies
+    Account_Lock_History
 ADD
-    CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
-GO  
+    CONSTRAINT FK_Account_Lock_History_Accounts FOREIGN KEY (account_id) REFERENCES Accounts(id)
+GO 
 ALTER TABLE
     Formats_Movies
 ADD
@@ -637,13 +671,14 @@ GO
 ALTER TABLE
     Price
 ADD
-    CONSTRAINT FK_Price_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+    CONSTRAINT FK_Price_FormatMovies FOREIGN KEY (format_movie_id) REFERENCES Formats_Movies(id)
 GO
-ALTER TABLE
+/*ALTER TABLE
     Price
 ADD
     CONSTRAINT FK_Price_SeatTypes FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 GO
+*/
 ALTER TABLE
     Price
 ADD
@@ -826,9 +861,18 @@ ADD
     [Seats_Choose]
 ADD
     CONSTRAINT FK_Choose_Seat_showtime FOREIGN KEY (showtime_id) REFERENCES Showtimes(id)
-    -- /Payment_Info
+    -- /seatChoose
+
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_price FOREIGN KEY (price_id) REFERENCES Price(id)
 
 
+		ALTER TABLE
+    [Price_Seat_Types]
+ADD
+    CONSTRAINT FK_Price_Seat_Types_Seat_Type FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
 
 
 
@@ -1048,23 +1092,23 @@ VALUES
 (N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
-  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[longitude],[latitude], [cinema_chain_id],[province_id])
+  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
 VALUES
-    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',9.606043206497885,105.97480616466075,1, 2),
-    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00',9.604932472586011,105.97232780342735, 2,2),
-    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00',9.606773115369991,105.9696563231368, 3,5),
-    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00',9.608730109651306,105.97046098587491, 4,5),
-    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00',9.608084831706202,105.97164115789083, 5,54),
-    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00',9.607439552530897,105.97330412754958, 2,54),
-    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00',9.60557775654029,105.97298226245434, 3,55),
-    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00',9.60557775654029,105.97298226245434, 1,55),
-    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',9.60557775654029,105.97298226245434,4, 1),
-    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',9.60557775654029,105.97298226245434,5, 1),
-    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 9.60557775654029,105.97298226245434,1,42),
-    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00',9.60557775654029,105.97298226245434, 3,42),
-    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00',9.60557775654029,105.97298226245434, 2,42),
-    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00',9.60557775654029,105.97298226245434, 1,42),
-    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00',9.60557775654029,105.97298226245434, 4,42);
+    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',10.789879751872588,106.67766713500747,1, 2),
+    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00',11.942648947844194, 108.46757489149324, 2,2),
+    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00',12.683889984028019, 108.00538470578515, 3,5),
+    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00',13.98730117822659, 107.99614634146174, 4,5),
+    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00',16.086851807997597, 108.16118439891675, 5,54),
+    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00',17.486183473488236, 106.57067083008025, 2,54),
+    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00',18.26987469201251, 105.91811624097883, 3,55),
+    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00',18.66776727182012, 105.69282952514989, 1,55),
+    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',18.34362799541733, 105.88704221120933,4, 1),
+    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',18.675126921754565, 105.66175549538038,5, 1),
+    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 19.49003763234295, 105.33547818280053,1,42),
+    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00',19.91423237112507, 105.70836655042983, 3,42),
+    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00',20.555664689128083, 106.10456042999107, 2,42),
+    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00',21.078481525791283, 105.79382013229598, 1,42),
+    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00',21.049483918957133, 105.84043116882903, 4,42);
 GO
 
 
@@ -1253,26 +1297,20 @@ VALUES
     ('R', 'efccadb4-d926-4f81-a47c-1175aac38bc8_RATED_R.svg.png','#FFCD4B', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
     ('NC-17', '6a0f27bc-34f4-46d6-9e3e-517686a183fc_Nc-17.svg.png','#D80032', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
 GO
-INSERT INTO Movies (title, poster,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
+INSERT INTO Movies (title, poster,banner,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
 VALUES
-(N'Người Tình', N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5, 1, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Nữ Đại Gia', N'imaage.img' ,N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2, 2, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Biệt Đội Mật Mã', N'imaage.img' ,N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Rừng Xà Nu', N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1, 4, 4, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 5, 5, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
-(N'Bão Tố Trái Đất', N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5, 1, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Tình Yêu Hồi Sinh', N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7, 2, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Cậu Bé Thần Thánh', N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Siêu Nhân Trái Đất', N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Tinh Hoa Đất Việt', N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
+(N'Người Tình', N'imaage.img',N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5, 1, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Nữ Đại Gia', N'imaage.img',N'imaage.img',N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2, 2, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Biệt Đội Mật Mã', N'imaage.img',N'imaage.img',N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Rừng Xà Nu', N'imaage.img',N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1, 4, 4, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 5, 5, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
+(N'Bão Tố Trái Đất', N'imaage.img',N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5, 1, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Tình Yêu Hồi Sinh', N'imaage.img',N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7, 2, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Cậu Bé Thần Thánh', N'imaage.img',N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Siêu Nhân Trái Đất', N'imaage.img',N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Tinh Hoa Đất Việt', N'imaage.img',N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
--- Chèn dữ liệu mẫu cho bảng Price
-INSERT INTO Price (weekday_price, weekend_price, [start_date], end_date, [status], seat_type_id, movie_id, cinema_complex_id)
-VALUES
-    (65000, 75000, '2023-01-01', '2024-01-10', 1, 1, 1, 1),
-	(80000, 10000, '2023-01-01', '2024-01-10', 1, 2, 1, 1),
-    (75000, 89000, '2023-02-01', '2024-02-10', 1, 2, 2, 1);
-GO
+
   -- 13. Thêm dữ liệu cho bảng Discounts
 INSERT INTO [TicketEZ].[dbo].[Discounts] 
     ([title], [coupon_code], [amount], [start_date], [end_date], [status], [discount_type], [cinema_complex_id])
@@ -1352,25 +1390,25 @@ VALUES
 GO
 -- 18. thêm dữ liệu bảng actor
 
-  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday], [avatar])
-VALUES (N'Nguyễn Văn Thanh', '1990-01-01', 'actor_image1.jpg'),
- (N'Nguyễn Tuấn', '1993-01-01', 'actor_image1.jpg'),
-  (N'Trấn Thành', '1989-01-01', 'actor_image1.jpg'),
-  (N'Trương Thế Vinh', '1988-01-01', 'actor_image1.jpg'),
-   (N'Võ Thành Tâm ', '1994-01-01', 'actor_image1.jpg'),
-    (N'Thanh Trúc', '1995-01-01', 'actor_image1.jpg'),
-	 (N'Hứa Minh Đạt', '1990-01-01', 'actor_image1.jpg'),
-	  (N'Lâm Chấn Khang', '1996-01-01', 'actor_image1.jpg'),
-	   (N'Chris Hemsworth', '1996-01-01', 'actor_image1.jpg'),
-	    (N'Tom Hiddleston ', '1999-01-01', 'actor_image1.jpg'),
-		 (N'Benedict Cumberbatch', '2000-01-01', 'actor_image1.jpg'),
-		  (N'Scarlett Johansson', '2000-01-01', 'actor_image1.jpg'),
-		   (N'NTom Holland', '2000-01-01', 'actor_image1.jpg'),
-		    (N'Chadwick Boseman', '1990-01-01', 'actor_image1.jpg'),
-			 (N'Brie Larson', '1990-01-01', 'actor_image1.jpg'),
-			  (N'Sebastian Stan', '1990-01-01', 'actor_image1.jpg'),
-			   (N'Anthony Mackie ', '1990-01-01', 'actor_image1.jpg'),
-			    (N'Idris Elba', '1990-01-01', 'actor_image1.jpg');
+  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday],[country], [avatar])
+VALUES (N'Nguyễn Văn Thanh', '1990-01-01','VN', 'actor_image1.jpg'),
+ (N'Nguyễn Tuấn', '1993-01-01','VN', 'actor_image1.jpg'),
+  (N'Trấn Thành', '1989-01-01','VN', 'actor_image1.jpg'),
+  (N'Trương Thế Vinh', '1988-01-01','VN', 'actor_image1.jpg'),
+   (N'Võ Thành Tâm ', '1994-01-01','VN', 'actor_image1.jpg'),
+    (N'Thanh Trúc', '1995-01-01','VN', 'actor_image1.jpg'),
+	 (N'Hứa Minh Đạt', '1990-01-01','VN', 'actor_image1.jpg'),
+	  (N'Lâm Chấn Khang', '1996-01-01','VN',  'actor_image1.jpg'),
+	   (N'Chris Hemsworth', '1996-01-01','VN',  'actor_image1.jpg'),
+	    (N'Tom Hiddleston ', '1999-01-01','VN',  'actor_image1.jpg'),
+		 (N'Benedict Cumberbatch', '2000-01-01','VN',  'actor_image1.jpg'),
+		  (N'Scarlett Johansson', '2000-01-01','VN',  'actor_image1.jpg'),
+		   (N'NTom Holland', '2000-01-01','VN',  'actor_image1.jpg'),
+		    (N'Chadwick Boseman', '1990-01-01','VN',  'actor_image1.jpg'),
+			 (N'Brie Larson', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			  (N'Sebastian Stan', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			   (N'Anthony Mackie ', '1990-01-01','VN',  'actor_image1.jpg'),
+			    (N'Idris Elba', '1990-01-01', 'VN', 'actor_image1.jpg');
 GO
 -- 19. thêm dữ liệu  actors_movie
  INSERT INTO [TicketEZ].[dbo].[Actors_Movies] ([actor_id], [movie_id])
@@ -1415,7 +1453,7 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
 VALUES
-  ('2023-11-16 10:00:00', '2023-11-16 12:00:00', 1, 1, 4,4),
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 4,1),
   ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
   ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
   ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
@@ -1438,11 +1476,11 @@ VALUES (2,1, 1),
 go
 */
 --25. thêm dữ liệu bảng Directors
-    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
+    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday],[country], [avatar])
 VALUES
-  ('Nguyễn Thị A', '1980-05-15', 'director_avatar1.jpg'),
-  ('Trần Văn B', '1975-08-20', 'director_avatar2.jpg'),
-  ('Lê Thị C', '1990-03-10', 'director_avatar3.jpg');
+  ('Nguyễn Thị A', '1980-05-15','VN' , 'director_avatar1.jpg'),
+  ('Trần Văn B', '1975-08-20','VN' , 'director_avatar2.jpg'),
+  ('Lê Thị C', '1990-03-10','VN' , 'director_avatar3.jpg');
 GO
 -- 26. thêm dữ liệu bảng [Directors_Movies]
 
@@ -1483,14 +1521,18 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
-
 -- Inserting sample data into the Price table
-INSERT INTO Price (weekday_price, weekend_price, start_date, end_date, [status], seat_type_id, movie_id, cinema_complex_id)
+INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
 VALUES
-    (10.00, 15.00, '2023-11-20', '2023-11-27', 1, 1, 2, 1),
-    (12.00, 18.00, '2023-11-20', '2023-11-27', 1, 2, 2, 1),
-    (20.00, 12.00, '2023-11-20', '2023-11-27', 1, 4, 2, 1)
+    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
+
+INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)
+VALUES
+    (70000, 85000, 1, 1),
+    ( 90000, 100000, 2, 1),
+    (100000, 120000, 3, 1)
+  
 --thêm dữ liệu cho bảng booking
 INSERT INTO Booking (id, account_id, create_date, showtime_id, [status],[ticket_status])
 VALUES
@@ -1563,6 +1605,7 @@ SELECT * FROM Seats_Choose
 SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
+SELECT * FROM Price_Seat_Types
 SELECT * FROM Events
 SELECT * FROM Services
 SELECT * FROM Price_Services

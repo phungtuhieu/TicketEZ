@@ -14,12 +14,14 @@ import bookingApi from '~/api/user/booking/bookingApi';
 import httpStatus from '~/api/global/httpStatus';
 import funcUtils from '~/utils/funcUtils';
 import { useNavigate } from 'react-router-dom';
+import authApi from '~/api/user/Security/authApi';
 const cx = classNames.bind(style);
 
 function BookingDetail(props) {
     const { showtime, seatBooking } = props;
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
+    const [account, setAccount] = useState({});
     const [loading, setLoading] = useState(true);
     const [listPrice, setListPrice] = useState([]);
     const [ellipsis, setEllipsis] = useState(true);
@@ -42,11 +44,11 @@ function BookingDetail(props) {
                     const today = dateNow.toDate().getDay();
                     console.log('seatBooking1', seatBooking);
                     console.log('today', dateNow.toDate().getDay());
-                    const seatTypeIds = seatBooking.map((item) => item.seatType.id);
+                    // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
+                    console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
                     const getPriceListBySeatTypeIdsAsync = async () => {
-                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatTypeIds({
-                            seatTypeIds,
-                            cinemaClxId: showtime.cinema.cinemaComplex.id,
+                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatType({
+                            cinemaCplxId: showtime.cinema.cinemaComplex.id,
                             movieId: showtime.formatMovie.movie.id,
                         });
                         return listPriceDb;
@@ -59,8 +61,8 @@ function BookingDetail(props) {
                             seatTypeId: 0,
                             price: 0.0,
                         };
-                        const seatTypePrice = listPriceResp.data.find(
-                            (price) => item.seatType.id === price.seatType.id,
+                        const seatTypePrice = listPriceResp.data[0].newPriceSeatTypeDTOs.find(
+                            (prStype) => item.seatType.id === prStype.seatType.id,
                         );
                         seatTypeAndPrice.seatTypeId = item.seatType.id;
                         if (seatTypePrice) {
@@ -80,6 +82,8 @@ function BookingDetail(props) {
                         style: 'currency',
                         currency: 'VND',
                     }).format(totalAmount);
+                    console.log('totalAmount', totalAmount);
+                    console.log('formattedTotalAmount', formattedTotalAmount);
                     const seatInfo = {
                         listSeat: seatBooking,
                         totalAmount: formattedTotalAmount,
@@ -101,10 +105,16 @@ function BookingDetail(props) {
                         },
                         cinemaName: showtime.cinema.name,
                     };
-
+                    const acc = authApi.getUser();
+                    console.log('acc', acc);
                     console.log('showtime', showtime);
                     console.log('seatBooking', seatBooking);
-
+                    // const acc = authApi.getUser();
+                    // form.setFieldValue({
+                    //     fullname: acc.fullname,
+                    //     email: acc.email,
+                    //     phone: acc.phone,
+                    // });
                     setShowtimeInfo(infoS);
                     setLoading(false);
                 }
@@ -122,6 +132,7 @@ function BookingDetail(props) {
         const id = generateRandomId();
         try {
             const accResp = await accountApi.getById('user2');
+
             const booking = {
                 id,
                 account: accResp.data,

@@ -39,8 +39,8 @@ const { RangePicker } = DatePicker;
 const cx = classNames.bind(style);
 
 const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 20 },
+    labelCol: { span: 3 },
+    wrapperCol: { span: 21 },
 };
 
 const AdminShowtime = () => {
@@ -196,7 +196,7 @@ const AdminShowtime = () => {
             },
         },
         {
-            title: 'Banner',
+            title: 'Ảnh',
             dataIndex: 'banner',
             width: '10%',
             render: (_, record) => (
@@ -241,7 +241,7 @@ const AdminShowtime = () => {
         },
 
         {
-            title: 'Action',
+            title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -336,11 +336,29 @@ const AdminShowtime = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
+             let account = {
+                 id: 'admin',
+                 phone: '0987654321',
+                 fullname: 'Nguyễn Văn A',
+                 address: '123 Đường ABC, Quận 1, TP.HCM',
+                 email: 'nguyen.va@gmail.com',
+                 password: 'admin',
+                 birthday: '1990-01-14T17:00:00.000+00:00',
+                 gender: true,
+                 image: 'image1.jpg',
+                 status: 1,
+                 createdDate: '2023-01-01T01:00:00.000+00:00',
+                 verified: true,
+                 points: 0,
+             };
+                    
             if (fileList.length > 0) {
                 if (editData) {
+                    
                     let putData = {
                         id: editData.id,
                         ...values,
+                        account: account,
                         startDate: new Date(dataStartTime),
                         endDate: new Date(dataEndTime),
                     };
@@ -369,8 +387,10 @@ const AdminShowtime = () => {
                     try {
                         const file = values.banner.fileList[0].originFileObj;
                         const images = await uploadApi.post(file);
+                       
                         const postData = {
                             ...values,
+                            account : account,
                             startDate: new Date(dataStartTime),
                             endDate: new Date(dataEndTime),
                             banner: images,
@@ -430,7 +450,7 @@ const AdminShowtime = () => {
             {
                 type: 'array',
                 required: true,
-                message: 'Please select time!',
+                message: 'Vui lòng chọn ngày giờ',
             },
         ],
     };
@@ -501,8 +521,9 @@ const AdminShowtime = () => {
                     </Button>
                 </Col>
                 <BaseModal
+                    style={{ marginTop: '-50px' }}
                     open={open}
-                    width={'60%'}
+                    width={'95%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
                     onOk={handleOk}
                     onCancel={handleCancel}
@@ -520,16 +541,7 @@ const AdminShowtime = () => {
                         </Button>,
                     ]}
                 >
-                    <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
-                        <Form.Item label="Trạng thái" name="status">
-                            <Switch
-                                checked={statusValue === true}
-                                onChange={(checked) => setStatusValue(checked ? true : false)}
-                                checkedChildren={'Đang hoạt động'}
-                                unCheckedChildren={'Kết Thúc '}
-                                defaultChecked
-                            />
-                        </Form.Item>
+                    <Form form={form} style={{ minWidth: 1000 }} {...formItemLayout}>
                         <Form.Item
                             {...formItemLayout}
                             label="Chọn ảnh"
@@ -545,16 +557,16 @@ const AdminShowtime = () => {
                                 name="icon"
                                 maxCount={1}
                             >
-                                {fileList.length < 2 && '+ Upload'}
+                                {fileList.length < 2 && '+ Tải lên'}
                             </Upload>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="name"
                             label="Nhập tên sự kiện"
-                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện' }]}
                         >
-                            <Input placeholder="Nhập tên phim..." />
+                            <Input placeholder="Nhập tên sự kiện..." />
                         </Form.Item>
                         <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
                             <RangePicker
@@ -565,20 +577,23 @@ const AdminShowtime = () => {
                                 onChange={onChangeDate}
                             />
                         </Form.Item>
-
-                        <Form.Item
-                            {...formItemLayout}
-                            name="typeEvent"
-                            label="Chọn thể loại"
-                            rules={[{ required: true, message: 'Vui lòng chọn phim' }]}
-                        >
+                        <Form.Item label="Trạng thái" name="status">
+                            <Switch
+                                checked={statusValue === true}
+                                onChange={(checked) => setStatusValue(checked ? true : false)}
+                                checkedChildren={'Đang hoạt động'}
+                                unCheckedChildren={'Kết Thúc '}
+                                defaultChecked
+                            />
+                        </Form.Item>
+                        <Form.Item {...formItemLayout} name="typeEvent" label="Thể loại">
                             <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="description"
                             label="Nhập nội dung"
-                            rules={[{ required: true, message: 'Vui lòng chọn rạp' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}
                         >
                             <CustomCKEditor value={editorData} onChange={handleEditorChange} />
                         </Form.Item>

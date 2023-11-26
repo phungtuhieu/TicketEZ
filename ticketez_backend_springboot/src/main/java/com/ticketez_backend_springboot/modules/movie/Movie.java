@@ -42,6 +42,7 @@ public class Movie implements Serializable {
 	private String description;
 
 	private String poster;
+	private String banner;
 	private Time duration;
 	@Column(name = "release_date")
 	@Temporal(TemporalType.DATE)
@@ -79,7 +80,4 @@ public class Movie implements Serializable {
 	@OneToMany(mappedBy = "movie")
 	private List<ActorMovie> actorsMovies;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "movie")
-	private List<Price> prices;
 }

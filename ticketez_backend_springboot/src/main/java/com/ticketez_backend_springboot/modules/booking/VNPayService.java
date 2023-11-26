@@ -26,6 +26,8 @@ public class VNPayService {
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(total * 100));
+        // System.out.println("=-=-=-==--=-=-=-=- total-VnpayService: " +
+        // String.valueOf(90000.0 * 100));
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_BankCode", bankCode);

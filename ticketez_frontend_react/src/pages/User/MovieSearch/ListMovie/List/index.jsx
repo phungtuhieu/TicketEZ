@@ -103,8 +103,8 @@ function List({ data }) {
                                     {data.movie.title}
                                 </div>
                                 <div className="the-loai-phim tw-mt-1 tw-font-bold group-hover:tw-text-[#FEA0CE]">
-                                    {data.genres.map((genre) => (
-                                        <span className="span tw-font-normal">{genre.name}</span>
+                                    {data.genres.map((genre,index) => (
+                                        <span key={index} className="span tw-font-normal">{genre.name}</span>
                                     ))}
                                 </div>
                             </div>

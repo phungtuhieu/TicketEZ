@@ -71,7 +71,10 @@ public class BookingAPI {
 		if (bookingDto == null) {
 			return new ResponseEntity<>("Không có dữ liệu để thêm", HttpStatus.BAD_REQUEST);
 		}
+
+		bookingDto.getBooking().setTicketStatus(TicketStatus.UNUSED);
 		Booking createdBooking = dao.save(bookingDto.getBooking());
+
 		List<SeatBooking> seatBookings = bookingDto.getSeats().stream().map(seat -> {
 			SeatBooking seatBooking = new SeatBooking();
 			seatBooking.setBooking(createdBooking);
@@ -89,6 +92,7 @@ public class BookingAPI {
 		for (SeatBooking s : seatBookings) {
 			total += s.getPrice().intValue();
 		}
+		System.out.println("-=-------------------toal: " + total);
 		seatBookingDao.saveAll(seatBookings);
 		String payUrl = vnPayService.createOrder(total, "Thanh toan ve xem phim ", createdBooking.getId());
 		// VNPayDTO vnPayDTO = new VNPayDTO();
@@ -107,19 +111,22 @@ public class BookingAPI {
 			return new ResponseEntity<>("Không thể tìm thấy booking",
 					HttpStatus.NOT_FOUND);
 		}
-		List<SeatBooking> seatBookings = seatBookingDao.findByBooking(booking);
+		// List<SeatBooking> seatBookings = seatBookingDao.findByBooking(booking);
 
 		String orderInfo = request.getParameter("vnp_OrderInfo");
 		String tmnCode = request.getParameter("vnp_TmnCode");
 		String paymentTime = request.getParameter("vnp_PayDate");
 		String transactionId = request.getParameter("vnp_TransactionNo");
 		String totalPrice = request.getParameter("vnp_Amount");
+		System.out.println("------------- totalPrice: " + totalPrice);
+		System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
 		String bankCode = request.getParameter("vnp_BankCode");
 		String transactionStatus = request.getParameter("vnp_TransactionStatus");
 
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		PaymentInfo paymentInfo = new PaymentInfo();
+
 		try {
 			Date date = inputFormat.parse(paymentTime);
 			String outputDateString = dateFormat.format(date);
@@ -127,7 +134,8 @@ public class BookingAPI {
 
 			paymentInfo.setTransactionId(transactionId);
 			paymentInfo.setBooking(booking);
-			paymentInfo.setAmount(Double.valueOf(totalPrice));
+			// chia 100 vì vnpay đã mặc định 100
+			paymentInfo.setAmount(Double.valueOf(totalPrice) / 100);
 			paymentInfo.setBankCode(bankCode);
 			paymentInfo.setTmnCode(tmnCode);
 			paymentInfo.setOrderInfo(orderInfo);
@@ -138,14 +146,30 @@ public class BookingAPI {
 			return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 					HttpStatus.CONFLICT);
 		}
-		pmIDao.save(paymentInfo);
-		if (paymentStatus >= 0) {
-			String urlRedirect = "/booking-paid";
-			return ResponseEntity.status(HttpStatus.OK).body(urlRedirect);
+		PaymentInfo pInfo = pmIDao.save(paymentInfo);
+		if (paymentStatus >= 0) { // String urlRedirect = "/booking-info";
+			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
+		} else if (paymentStatus == 0) {
+			return new ResponseEntity<>("Giao dịch thất bại",
+					HttpStatus.CONFLICT);
 		} else {
-			return new ResponseEntity<>(paymentStatus,
+			return new ResponseEntity<>("Thông tin giao dịch không chính xác",
 					HttpStatus.CONFLICT);
 		}
+	}
+
+	@GetMapping("/payment-info/{id}")
+	public ResponseEntity<?> getPaymentInfoById(@PathVariable("id") String pInfoId) {
+		PaymentInfo pInfoDb = pmIDao.findById(pInfoId).orElse(null);
+		if (pInfoDb == null) {
+			return new ResponseEntity<>("Không tìm thấy thông tin giao dịch", HttpStatus.NOT_FOUND);
+		}
+		Booking bookingDb = pInfoDb.getBooking();
+		PaymentInfoDTO pInfoDTO = new PaymentInfoDTO();
+		pInfoDTO.setPaymentInfo(pInfoDb);
+		pInfoDTO.setBooking(bookingDb);
+		pInfoDTO.setSeatBookings(bookingDb.getSeatsBookings());
+		return ResponseEntity.status(HttpStatus.OK).body(pInfoDTO);
 	}
 
 	@PutMapping("/{id}")
@@ -169,17 +193,15 @@ public class BookingAPI {
 		return ResponseEntity.noContent().build();
 	}
 
-
-
 	@GetMapping("/get/Revenue-statistics")
-    public ResponseEntity<?> getRevenueStatisticsDTO() {
-        try {
-            List<RevenueStatisticsDTO> booking = dao.getRevenueStatisticsDTO();
-            return ResponseEntity.ok(booking);
-            
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+	public ResponseEntity<?> getRevenueStatisticsDTO() {
+		try {
+			List<RevenueStatisticsDTO> booking = dao.getRevenueStatisticsDTO();
+			return ResponseEntity.ok(booking);
 
-    }
+		} catch (Exception e) {
+			return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 }

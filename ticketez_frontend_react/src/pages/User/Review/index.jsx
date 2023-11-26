@@ -87,17 +87,18 @@ function ReviewMovie() {
                 </Col>
                 <Col
                     span={24}
-                    style={{ display: 'flex', justifyContent: 'center', background: 'gray', minHeight: 1000 }}
+                    style={{ display: 'flex', justifyContent: 'center', background: '#C0C0C0', minHeight: 1000 }}
                 >
                     <Row style={{ width: 1088, height: 'auto' }}>
                         <Col span={24}>
-                            <Row>
-                                <Col span={24} style={{ backgroundColor: '#ffffff', display: 'flex', marginTop: 50, minHeight: 600, }}>
-                         <h1 className="tw-text-[32px] tw-font-bold tw-text-gray-900 tw-mt-2 tw-mx-auto tw-float-center">
-                          Bình luận nổi bật
-                         </h1>
-                         <br />       
-                         <ReviewCard/>                      
+                            <Row gutter={[16, 16]}>
+                                <Col span={24} style={{ backgroundColor: '#C0C0C0', display: 'flex', marginTop: 30, minHeight: 600, }}>
+                                
+                         <div className="tw-flex tw-justify-start tw-text-gray-900 tw-mt-2">                
+                         <ReviewCard/>      
+                         </div>
+                       
+                                          
                            </Col>
                             </Row>
                         </Col>

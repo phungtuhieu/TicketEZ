@@ -44,45 +44,17 @@ const EventDetailsBottom = (props) => {
 
     return (
         <>
-                {dataEventByNews && dataEventByNews.length > 0 && (
-                    <Row gutter={[1, 10]} className="tw-mb-[50px]">
-                        {dataEventByNews.slice(0, 3).map((event, index) => (
-                            <Col key={index} span={8}>
-                                {location.pathname === '/su-kien/khuyen-mai' ||
-                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname) ? (
-                                    <>
-                                        <div
-                                            className={`tw-relative tw-w-[90%] tw-h-[330px] tw-bg-white tw-shadow-lg tw-shadow-slate-300-500/50  tw-rounded-[20px]`}
-                                        >
-                                            <Link to={`/su-kien/tin-tuc/${event.id}`} onClick={scrollToMovieShowing}>
-                                                <img
-                                                    src={uploadApi.get(event.banner)}
-                                                    width="100%"
-                                                    height={184}
-                                                    className="tw-mr-[20px] tw-rounded-t-[20px]"
-                                                />
-                                                <h2
-                                                    className={`tw-text-left tw-p-[1rem] tw-mt-[-50px] tw-leading-normal tw-line-clamp-1 tw-h-[40px]  tw-w-[300px] tw-text-black hover:tw-text-pink-600 tw-font-[var(--font-family)]`}
-                                                >
-                                                    {event.name}
-                                                </h2>
-                                                <span className="tw-text-left tw-ml-[12px] tw-leading-normal tw-line-clamp-2 tw-text-gray-500 tw-mt-[-0px] tw-font-[var(--font-family)]">
-                                                    {event.name}
-                                                </span>
-                                                <p
-                                                    className={`tw-text-left tw-absolute tw-bottom-0 tw-left-0 tw-p-[1rem] tw-text-pink-500 hover:tw-text-pink-700 tw-font-[var(--font-family)] tw-cursor-pointer`}
-                                                >
-                                                    Xem chi tiết
-                                                    <FontAwesomeIcon icon={faChevronRight} className="tw-text-lg" />
-                                                </p>
-                                            </Link>
-                                        </div>
-                                    </>
-                                ) : (
+            {dataEventByNews && dataEventByNews.length > 0 && (
+                <Row gutter={[1, 10]} className="tw-mb-[50px]">
+                    {dataEventByNews.slice(0, 3).map((event, index) => (
+                        <Col key={index} span={8}>
+                            {location.pathname === '/su-kien/khuyen-mai' ||
+                            /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname) ? (
+                                <>
                                     <div
                                         className={`tw-relative tw-w-[90%] tw-h-[330px] tw-bg-white tw-shadow-lg tw-shadow-slate-300-500/50  tw-rounded-[20px]`}
                                     >
-                                        <Link to={`/su-kien/khuyen-mai/${event.id}`} onClick={scrollToMovieShowing}>
+                                        <Link to={`/su-kien/tin-tuc/${event.id}`} onClick={scrollToMovieShowing}>
                                             <img
                                                 src={uploadApi.get(event.banner)}
                                                 width="100%"
@@ -90,7 +62,7 @@ const EventDetailsBottom = (props) => {
                                                 className="tw-mr-[20px] tw-rounded-t-[20px]"
                                             />
                                             <h2
-                                                className={`tw-text-left tw-p-[1rem] tw-mt-[-50px] tw-leading-normal tw-line-clamp-1 tw-h-[40px]  tw-w-[300px] tw-text-black hover:tw-text-pink-600 tw-font-[var(--font-family)]`}
+                                                className={`tw-text-left tw-p-[1rem] tw-mt-[-50px] tw-leading-normal tw-line-clamp-1 tw-h-[40px]  tw-w-[350px] tw-text-black hover:tw-text-[var(--primary-background-color)] tw-font-[var(--font-family)]`}
                                             >
                                                 {event.name}
                                             </h2>
@@ -98,18 +70,46 @@ const EventDetailsBottom = (props) => {
                                                 {event.name}
                                             </span>
                                             <p
-                                                className={`tw-text-left tw-absolute tw-bottom-0 tw-left-0 tw-p-[1rem] tw-text-pink-500 hover:tw-text-pink-700 tw-font-[var(--font-family)] tw-cursor-pointer`}
+                                                className={`tw-text-left tw-absolute tw-bottom-0 tw-left-0 tw-p-[1rem] tw-text-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-hover-color)] tw-font-[var(--font-family)] tw-cursor-pointer`}
                                             >
                                                 Xem chi tiết
                                                 <FontAwesomeIcon icon={faChevronRight} className="tw-text-lg" />
                                             </p>
                                         </Link>
                                     </div>
-                                )}
-                            </Col>
-                        ))}
-                    </Row>
-                )}
+                                </>
+                            ) : (
+                                <div
+                                    className={`tw-relative tw-w-[90%] tw-h-[330px] tw-bg-white tw-shadow-lg tw-shadow-slate-300-500/50  tw-rounded-[20px]`}
+                                >
+                                    <Link to={`/su-kien/khuyen-mai/${event.id}`} onClick={scrollToMovieShowing}>
+                                        <img
+                                            src={uploadApi.get(event.banner)}
+                                            width="100%"
+                                            height={184}
+                                            className="tw-mr-[20px] tw-rounded-t-[20px]"
+                                        />
+                                        <h2
+                                            className={`tw-text-left tw-p-[1rem] tw-mt-[-50px] tw-leading-normal tw-line-clamp-1 tw-h-[40px]  tw-w-[350px] tw-text-black hover:tw-text-[var(--primary-background-color)] tw-font-[var(--font-family)]`}
+                                        >
+                                            {event.name}
+                                        </h2>
+                                        <span className="tw-text-left tw-ml-[12px] tw-leading-normal tw-line-clamp-2 tw-text-gray-500 tw-mt-[-0px] tw-font-[var(--font-family)]">
+                                            {event.name}
+                                        </span>
+                                        <p
+                                            className={`tw-text-left tw-absolute tw-bottom-0 tw-left-0 tw-p-[1rem] tw-text-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-hover-color)] tw-font-[var(--font-family)] tw-cursor-pointer`}
+                                        >
+                                            Xem chi tiết
+                                            <FontAwesomeIcon icon={faChevronRight} className="tw-text-lg" />
+                                        </p>
+                                    </Link>
+                                </div>
+                            )}
+                        </Col>
+                    ))}
+                </Row>
+            )}
         </>
     );
 };

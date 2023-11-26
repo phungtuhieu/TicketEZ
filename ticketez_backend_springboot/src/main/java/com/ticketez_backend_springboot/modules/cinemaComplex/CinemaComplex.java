@@ -42,13 +42,12 @@ public class CinemaComplex {
 	@Column(name = "closing_time")
 	private Time closingTime;
 
-	private float longitude;
-	private float latitude;
-	
+	private Double longitude;
+	private Double latitude;
+
 	@ManyToOne
 	@JoinColumn(name = "province_id")
 	private Province province;
-
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
@@ -58,7 +57,6 @@ public class CinemaComplex {
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Discount> discounts;
 
-
 	@JsonIgnore
 	@OneToMany(mappedBy = "cinemaComplex")
 	private List<Cinema> cinemas;
@@ -66,7 +64,5 @@ public class CinemaComplex {
 	@ManyToOne
 	@JoinColumn(name = "cinema_chain_id")
 	private CinemaChain cinemaChain;
-
-
 
 }

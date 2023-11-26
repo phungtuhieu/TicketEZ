@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -23,7 +25,9 @@ public class Director {
 	private Long id;
 
 	private String fullname;
+	@Temporal(TemporalType.DATE)
 	private Date birthday;
+	private String country;
 	private String avatar;
 	
 	@JsonIgnore

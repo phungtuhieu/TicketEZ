@@ -7,6 +7,7 @@ import axiosClient from '~/api/global/axiosClient';
 import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
+import { sassFalse } from 'sass';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -20,9 +21,12 @@ function SeatChart(props) {
         setIsModalOpenBooking(false);
     };
     const handleCancel = () => {
+        console.log(seatChoose);
+        deleteSeatChoose();
         setIsModalOpenBooking(false);
     };
     const createSeatArray = () => {
+        console.log(allSeats);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
 
@@ -94,6 +98,7 @@ function SeatChart(props) {
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
     const [seatBookingData, setSeatBookingData] = useState([]);
     const [prices, setPrices] = useState([]);
+    const [filteredPrices, setFilteredPrices] = useState([]);
 
     const fetchDataSeatBooking = async () => {
         try {
@@ -120,7 +125,7 @@ function SeatChart(props) {
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatBooking();
-        }, 5000);
+        }, 1000);
 
         // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
         return () => {
@@ -184,15 +189,20 @@ function SeatChart(props) {
             });
 
             const respPrice = await axiosClient.get(
-                `price/find-by-id-cinema-compex-movie/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
+                `price/findByCinemaComplexIdAndMovieId/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
             );
-            const newPrices = respPrice.data.map((price) => price);
-            setPrices(newPrices);
+            const currentDate = new Date();
 
-            // console.log(listWay);
-            // console.log(listSeatNormal);
-            // console.log(listSeatVip);
-            // console.log(allSeats);
+            // Lọc ra các phần tử có startDate và endDate trong khoảng ngày hiện tại
+            const filteredPrices = respPrice.data.filter((price) => {
+                const startDate = new Date(price.price.startDate);
+                const endDate = new Date(price.price.endDate);
+
+                return startDate <= currentDate && endDate >= currentDate;
+            });
+
+            setPrices(filteredPrices);
+
             if (seatBookingData.length > 0) {
                 setReload(true);
             }
@@ -226,25 +236,29 @@ function SeatChart(props) {
         }
     }, [showInfo]);
 
-    const handelUpdate = async (idSeat, dataSeat) => {
-        let data = dataSeat;
-
-        const respVip = await axiosClient.put(`seat/${idSeat}`, data);
-    };
-
     // Lấy price từ ghế
-
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
         let result = null;
-
+        let finalRS = null;
         seatStateArray.forEach((seatItem) => {
             if (seatItem === seat) {
-                result = prices.find((price) => price.seatType.id === seatTypeId);
-                return;
+                const price = prices.find((price) => {
+                    return price.newPriceSeatTypeDTOs.some((seatType) => seatType.seatType.id === seatTypeId);
+                });
+
+                if (price) {
+                    result = price.newPriceSeatTypeDTOs;
+
+                    result.map((newPriceSeatTypeDTO, index) => {
+                        if (newPriceSeatTypeDTO.seatType.id === seatTypeId) {
+                            finalRS = newPriceSeatTypeDTO;
+                        }
+                    });
+                }
             }
         });
 
-        return result;
+        return finalRS;
     };
 
     // Check giá theo ngày
@@ -345,6 +359,7 @@ function SeatChart(props) {
         fetchData();
     }, [seatState ? seatState.seatReserved : null]);
 
+    const [seatChoose, setSeatChoose] = useState([]);
     const onCreateDaTaSeatChoose = async () => {
         try {
             console.log(duplicateSeat);
@@ -362,6 +377,7 @@ function SeatChart(props) {
             await Promise.all([]);
             try {
                 const resp = await axiosClient.post(`seat-choose`, data);
+                setSeatChoose(resp.data);
                 console.log(data);
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu từ server', error);
@@ -369,6 +385,10 @@ function SeatChart(props) {
         } catch (error) {
             console.error('Lỗi khi lấy dữ liệu từ server', error);
         }
+    };
+
+    const deleteSeatChoose = async () => {
+        const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
     };
 
     useEffect(() => {

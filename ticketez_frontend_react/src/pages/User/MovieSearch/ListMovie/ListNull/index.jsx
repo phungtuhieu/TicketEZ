@@ -3,23 +3,27 @@ import { Row, Col } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { movieUserApi } from '~/api/user/showtime';
 import List from './../List/index';
+import authApi from '~/api/user/Security/authApi';
 
 function ListNull() {
     const [data, setData] = useState([]);
+    const user = authApi.getUser()
+
     useEffect(() => {
         const res = async () => {
             try {
-                const resss = await movieUserApi.getMoviesByGenreNameAndCountryAndYearAndSearch(1, 10, '', '', '', '');
-                setData(resss.listMovieObjResp);
-                console.log('res nè:', resss);
+                const result = await movieUserApi.getMovieShowtimePresentOrByUser(user?.id ?? "");
+                setData(result.listMovieObjResp);
+                // console.log('res nè:', resss);
             } catch (error) {
                 console.log(error);
             }
         };
         res();
-    }, []);
+    }, [user]);
 
-    console.log('datanee', data);
+    // console.log('datanee', data);
+    // console.log(authApi.getUser(),"ádasdasdasd");
 
     return (
         <Row className=" ">
@@ -33,8 +37,8 @@ function ListNull() {
             </h1>
 
             <Col span={24} className="  tw-grid tw-grid-cols-5 tw-gap-3">
-                {data?.map((data) => (
-                    <List data={data} />
+                {data?.map((data,index) => (
+                    <List key={index} data={data} />
                 ))}
             </Col>
         </Row>
