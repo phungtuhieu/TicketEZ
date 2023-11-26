@@ -27,7 +27,7 @@ function ListPhim({ propsValue }) {
     // const parts = path.split('/');
     // const movieId = parts[parts.indexOf('movie-details') + 1];
 
-    const {movieId} = useParams();
+    const { movieId } = useParams();
     console.log(movieId);
 
     useEffect(() => {
@@ -86,16 +86,17 @@ function ListPhim({ propsValue }) {
                                     onCancel={handleCancelModal}
                                     className="modal-map-lg"
                                     footer={
-                                        <Button className={cx('modal-footer-btn-close')} onClick={handleCancelModal}>
+                                        <Button className="modal-footer-btn-close" onClick={handleCancelModal}>
                                             ĐÓNG
                                         </Button>
                                     }
                                 >
                                     <div className="map-lg-content">
                                         <Mapbox
-                                            latitude={10.76317169124285}
-                                            longitude={106.65670151096185}
-                                            address={'Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012'}
+                                            latitude={item.cinemaComplex.latitude}
+                                            longitude={item.cinemaComplex.longitude}
+                                            address={item.cinemaComplex.address}
+                                            title={item.cinemaComplex.name}
                                         />
                                     </div>
                                 </Modal>

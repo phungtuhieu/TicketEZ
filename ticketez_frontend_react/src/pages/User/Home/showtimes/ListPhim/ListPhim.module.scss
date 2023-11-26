@@ -56,10 +56,10 @@
             margin-bottom: 0;
 
             color: #262626;
-            &:hover {
-                cursor: pointer;
-                color: var(--pink) !important;
-            }
+            // &:hover {
+            //     cursor: pointer;
+            //     color: var(--pink) !important;
+            // }
         }
 
         .container-info {
@@ -219,6 +219,7 @@
                     font-size: 12px;
                     color: #b7b7b7;
                     line-height: 13px;
+                    font-weight: 500;
 
                     .span:not(:last-child)::after {
                         content: ', ';
