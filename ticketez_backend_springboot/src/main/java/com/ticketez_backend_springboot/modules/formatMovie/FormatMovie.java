@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.format.Format;
 import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
 import jakarta.persistence.Entity;
@@ -37,10 +38,12 @@ public class FormatMovie {
 	@JoinColumn(name = "movie_id")
 	private Movie movie;
 
-	@JsonIgnore		
+	@JsonIgnore
 	@OneToMany(mappedBy = "formatMovie")
 	private List<Showtime> showtimes;
 
-	
-	
+	@JsonIgnore
+	@OneToMany(mappedBy = "formatMovie")
+	private List<Price> prices;
+
 }
