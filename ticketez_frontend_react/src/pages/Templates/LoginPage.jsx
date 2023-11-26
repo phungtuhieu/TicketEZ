@@ -1,4 +1,4 @@
-import LoginForm from '~/components/Auth/LoginResgiter';
+import LoginForm from '~/components/Auth/LoginResgiter/LoginForm';
 
 const LoginPage = () => {
     return (

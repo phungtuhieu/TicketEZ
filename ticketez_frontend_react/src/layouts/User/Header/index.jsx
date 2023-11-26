@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
@@ -22,18 +22,52 @@ import {
 import { useLocation } from 'react-router-dom';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
+import uploadApi from '~/api/service/uploadApi';
+
 
 const Header = () => {
+    const [userData, setUserData] = useState();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const user = await authApi.getUser();
+                setUserData(user);
+                console.log(user);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
+
     const navigate = useNavigate();
 
     const location = useLocation();
+
+
+    const handleLogin = async () => {
+        navigate('/login')
+    };
+    const handleProfile = async () => {
+        navigate('/profile')
+    };
+
+
 
     const handleLogout = async () => {
         try {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
+<<<<<<< HEAD
+            navigate('/login')
+=======
             navigate('/');
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
@@ -53,10 +87,11 @@ const Header = () => {
         {
             key: '1',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="">
+                <a onClick={handleProfile} href="">
                     Xem tài khoản
                 </a>
             ),
+
             icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
         },
         {
@@ -88,7 +123,12 @@ const Header = () => {
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
+<<<<<<< HEAD
+        }
+
+=======
         },
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
     ];
 
     const scrollToShowTimes = () => {
@@ -157,25 +197,41 @@ const Header = () => {
                                 <FontAwesomeIcon icon={faSearch} />
                             </a>
                         </div>
+
+
                         <Divider type="vertical" />
-                        <Dropdown
-                            menu={{
-                                items,
-                            }}
-                            placement="bottom"
-                            arrow
-                        >
-                            <a onClick={(e) => e.preventDefault()} className="tw-text-gray-700">
-                                Minh khôi
+                        {userData ? (
+                            <Dropdown
+                                menu={{
+                                    items,
+                                }}
+                                placement="bottom"
+                                arrow
+                            >
+                                <a className="tw-text-gray-700 flex items-center">
+                                    <span className="name-short">Xin chào, {userData.fullname}</span>
+                                    <Avatar src={
+                                        uploadApi.get(userData.image)
+                                    } alt={`${userData.id}'s avatar`} />
+                                </a>
+
+
+
+
+                            </Dropdown>
+                        ) : (
+
+                            <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
+                                Đăng nhập
                                 <Avatar
-                                    style={{
-                                        backgroundColor: '#87d068',
-                                    }}
+                                    style={{ backgroundColor: '#87d068' }}
                                     className="tw-ml-2"
                                     icon={<UserOutlined />}
                                 />
                             </a>
-                        </Dropdown>
+
+
+                        )}
                     </div>
                 </div>
                 {isEventPage && ( // Render additional code only if isEventPage is true
@@ -203,6 +259,14 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
+<<<<<<< HEAD
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                            ? ' tw-text-pink-500'
+                                            : ''
+                                            }`,
+=======
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
                                             isEventPage &&
                                             (location.pathname === '/su-kien/tin-tuc' ||
@@ -210,6 +274,7 @@ const Header = () => {
                                                 ? 'tw-text-[var(--primary-background-color)]'
                                                 : ''
                                         }`,
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -223,6 +288,14 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
+<<<<<<< HEAD
+                                        className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                            ? ' tw-text-pink-500'
+                                            : ''
+                                            }`,
+=======
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
                                             isEventPage &&
                                             (location.pathname === '/su-kien/khuyen-mai' ||
@@ -230,6 +303,7 @@ const Header = () => {
                                                 ? ' tw-text-[var(--primary--text-color)]'
                                                 : ''
                                         }`,
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />

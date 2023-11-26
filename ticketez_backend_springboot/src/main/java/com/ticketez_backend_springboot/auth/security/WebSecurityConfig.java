@@ -85,7 +85,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/account/**", "/api/auth/**", "/api/actor/**", "/api/booking/**", "/api/cinema/**",
+            .requestMatchers("/api/account/**", "/api/auth/**", "/api/booking/**", "/api/cinema/**",
                 "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
                 "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
                 "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
@@ -95,9 +95,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**",
                 "/api/price_seat_type/**")
             .permitAll()
-
-            // .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/actor/**").hasAuthority("SUPER_ADMIN")
             .anyRequest().authenticated());
+        
+            
 
     http.authenticationProvider(authenticationProvider());
 

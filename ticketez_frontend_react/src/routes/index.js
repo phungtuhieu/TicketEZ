@@ -2,11 +2,12 @@ import UserContact from '~/pages/User/Contact';
 import * as PageAdmin from '~/pages/Admin';
 import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
-import LoginSignin from '~/components/Auth/LoginResgiter';
+import RegisterForm from '~/components/Auth/Register/RegisterForm';
+import LoginForm from '~/components/Auth/Login/LoginForm';
 
 const publicRoutes = [
     //Admin
-    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout },
+    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout ,roles: ['SUPER_ADMIN']},
     { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout },
     { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout },
     { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout },
@@ -32,7 +33,8 @@ const publicRoutes = [
     // User
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
-    { path: '/login', component: LoginSignin, layout: DefaultLayout },
+    { path: '/login', component: LoginForm, layout: DefaultLayout },
+    { path: '/register', component: RegisterForm, layout: DefaultLayout },
     //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
     { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },
@@ -48,6 +50,9 @@ const publicRoutes = [
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
 ];
 
-const privateRoutes = [];
+const privateRoutes = [
+
+
+];
 
 export { publicRoutes, privateRoutes };

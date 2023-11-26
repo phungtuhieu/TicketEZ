@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Transactional
   public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
     SecurityAccount account = dao.findById(id)
-        .orElseThrow(() -> new UsernameNotFoundException("User Not Found with Id: " + id));
+        .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng có Id: " + id));
 
     return UserDetailsImpl.build(account);
   }

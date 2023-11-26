@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.auth.controllers;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,12 +64,13 @@ public class AuthController {
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-    SecurityAccount securityAccount = accountRepository.findByIdAndPassword(loginRequest.getId(),
-        encoder.encode(loginRequest.getPassword()));
-    // if (securityAccount == null) {
-    // return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
+    // SecurityAccount securityAccount =
+    // accountRepository.findByIdAndPassword(loginRequest.getId(),
+    // encoder.encode(loginRequest.getPassword()));
+    // // if (securityAccount == null) {
+    // // return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
 
-    // }
+    // // }
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.getId(), loginRequest.getPassword()));
 
@@ -88,7 +90,7 @@ public class AuthController {
         userDetails.getEmail(),
         userDetails.getAddress(),
         userDetails.getBirthday(),
-        userDetails.isGender(),
+        userDetails.getGender(),
         userDetails.getImage(),
         jwt,
         "Bearer",
@@ -105,6 +107,11 @@ public class AuthController {
     }
 
     if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
+    }
+    if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
       return ResponseEntity
           .badRequest()
           .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
@@ -157,6 +164,8 @@ public class AuthController {
         }
       });
     }
+    // ngay tao
+    account.setCreatedDate(new Date());
 
     account.setRoles(roles);
     accountRepository.save(account);
