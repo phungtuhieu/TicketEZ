@@ -406,8 +406,8 @@ public class MovieAPI {
 
     // }
 
-    @GetMapping("/get/movies-by-cinemaComplexTest")
-    public ResponseEntity<?> gettest(
+    @GetMapping("/get/movies-by-cinemaComplex")
+    public ResponseEntity<?> moviesByCinemaComplex(
             @RequestParam("cinemaComplexId") Long cinemaComplexId,
             @RequestParam("date") Optional<LocalDate> date) {
         try {
@@ -489,13 +489,14 @@ public class MovieAPI {
             if (pageNo.isPresent() && pageNo.get() == 0) {
                 return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
             }
-            if (genreName.isPresent() && genreName.get().equalsIgnoreCase("tất cả") ) {
+            if (genreName.isPresent() && genreName.get().equalsIgnoreCase("tất cả")) {
                 genreName = Optional.empty();
             }
-            if (country.isPresent() && country.get().equalsIgnoreCase("tất cả") || country.get().equalsIgnoreCase("tc") ) {
+            if (country.isPresent() && country.get().equalsIgnoreCase("tất cả")
+                    || country.get().equalsIgnoreCase("tc")) {
                 country = Optional.empty();
             }
-            if (year.isPresent() && year.get().equalsIgnoreCase("tất cả") ) {
+            if (year.isPresent() && year.get().equalsIgnoreCase("tất cả")) {
                 year = Optional.empty();
             }
 
@@ -527,12 +528,19 @@ public class MovieAPI {
         }
     }
 
-
     @GetMapping("/get/movie-suggest")
-    public ResponseEntity<?> getMovieByRandom(@RequestParam("limit") Optional<Integer> limit) {
+    public ResponseEntity<?> getMovieByRandom(@RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("userId") String userId) {
         try {
             Pageable pageable = PageRequest.of(0, limit.orElse(10));
-            Page<Movie> page = dao.findMovieByRandom( pageable);
+            Page<Movie> page;
+            if (userId.isEmpty()) {
+                page = dao.findMovieShowtimePresent(pageable);
+
+            } else {
+                page = dao.findMovieShowtimePresentNotExistsByUser(pageable, userId);
+            }
+
             MovieByShowtimeShowingDTO movieShowingDTO = new MovieByShowtimeShowingDTO();
             List<MovieByShowtimeShowingDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
             for (Movie movie : page.getContent()) {
@@ -552,7 +560,6 @@ public class MovieAPI {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     // lấy actor và director theo id của movie
     @GetMapping("/get/actor-director-by-movie/{id}")
@@ -687,25 +694,24 @@ public class MovieAPI {
         }
     }
 
-
     @GetMapping("/get/total-ticket")
     public ResponseEntity<?> getTotalTickets() {
         try {
             List<TotalDashboardAdmin> movie = dao.getTotalTickets();
             return ResponseEntity.ok(movie);
-            
+
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
-     @GetMapping("/get/total-movie")
+    @GetMapping("/get/total-movie")
     public ResponseEntity<?> getTotalMovies() {
         try {
             List<TotalDashboardAdmin> movie = dao.getTotalMovies();
             return ResponseEntity.ok(movie);
-            
+
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }

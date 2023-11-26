@@ -136,6 +136,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -148,6 +149,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
         birthday DATE NOT NULL,
+        country NVARCHAR(150) NOT NULL,
         avatar NVARCHAR(255) NOT NULL
     )
 GO
@@ -1072,23 +1074,23 @@ VALUES
 (N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
-  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[longitude],[latitude], [cinema_chain_id],[province_id])
+  INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
 VALUES
-    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',9.606043206497885,105.97480616466075,1, 2),
-    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00',9.604932472586011,105.97232780342735, 2,2),
-    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00',9.606773115369991,105.9696563231368, 3,5),
-    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00',9.608730109651306,105.97046098587491, 4,5),
-    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00',9.608084831706202,105.97164115789083, 5,54),
-    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00',9.607439552530897,105.97330412754958, 2,54),
-    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00',9.60557775654029,105.97298226245434, 3,55),
-    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00',9.60557775654029,105.97298226245434, 1,55),
-    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',9.60557775654029,105.97298226245434,4, 1),
-    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',9.60557775654029,105.97298226245434,5, 1),
-    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 9.60557775654029,105.97298226245434,1,42),
-    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00',9.60557775654029,105.97298226245434, 3,42),
-    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00',9.60557775654029,105.97298226245434, 2,42),
-    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00',9.60557775654029,105.97298226245434, 1,42),
-    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00',9.60557775654029,105.97298226245434, 4,42);
+    (N'Standard Cinema Complex', N'123 Park Street, Quận 1, Thành phố Hồ Chí Minh', '0192949422', '08:00:00', '22:00:00',10.789879751872588,106.67766713500747,1, 2),
+    (N'3D Cinema Complex', N'CM tháng 8, Quận 12, Thành phố Hồ Chí Minh', '0945586789', '09:00:00', '23:00:00',11.942648947844194, 108.46757489149324, 2,2),
+    (N'IMAX Cinema Complex', N'Đường Võ Văn Kiệt, Bình Thủy, Cần Thơ', '0111285634', '07:00:00', '21:00:00',12.683889984028019, 108.00538470578515, 3,5),
+    (N'VIP Cinema Complex', N'Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', '09897774444', '10:00:00', '23:00:00',13.98730117822659, 107.99614634146174, 4,5),
+    (N'Multiplex Cinema Complex', N'Quốc Lộ 1A, Châu Thành, Sóc Trăng', '0908903495', '11:00:00', '23:50:00',16.086851807997597, 108.16118439891675, 5,54),
+    (N'Independent Cinema Complex', N'Đường Võ Văn Kiệt, Thành phố Sóc Trăng', '06848829533', '06:00:00', '20:00:00',17.486183473488236, 106.57067083008025, 2,54),
+    (N'Boutique Cinema Complex', N'39 Điện Biên Phủ, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu ', '09993447999', '08:30:00', '22:30:00',18.26987469201251, 105.91811624097883, 3,55),
+    (N'Family Cinema Complex', N'Tầng 3, TTTM Vincom Plaza Bạc Liêu, số 18 Hồ Xuân Hương, Phường 1, Thành phố Bạc Liêu, tỉnh Bạc Liêu', '0380008090', '09:30:00', '23:30:00',18.66776727182012, 105.69282952514989, 1,55),
+    (N'Sports Cinema Complex', N'CGV Vincom Center Bà Triệu: Tầng 6, Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', '03419392939', '07:30:00', '21:30:00',18.34362799541733, 105.88704221120933,4, 1),
+    (N'Art House Cinema Complex', N'Tầng 5, Keangnam Hanoi Landmark Tower, Phạm Hùng, Từ Liêm, Hà Nội', '0984557777', '10:30:00', '00:30:00',18.675126921754565, 105.66175549538038,5, 1),
+    (N'Digital Cinema Complex', N' Tầng 4, Mipec Tower, 229 Tây Sơn, Đống Đa, Hà Nội', '0981237415', '11:30:00', '01:30:00', 19.49003763234295, 105.33547818280053,1,42),
+    (N'Live Cinema Complex', N'Tầng 5, Vincom Plaza Biên Hòa, đường Đồng Khởi, Phường Trung Dũng, TP. Biên Hòa, Đồng Nai', '09412367842', '07:30:00', '23:00:00',19.91423237112507, 105.70836655042983, 3,42),
+    (N'High-Tech Cinema Complex', N'Tầng 4, TTTM Long Khánh, 104A Trần Hưng Đạo, Phường Long Bình, TP. Long Khánh, Đồng Nai', '0945768900', '08:00:00', '22:00:00',20.555664689128083, 106.10456042999107, 2,42),
+    (N'Community Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0945515456', '09:00:00', '23:00:00',21.078481525791283, 105.79382013229598, 1,42),
+    (N'Anime Cinema Complex', N'TP. Biên Hòa, Đồng Nai', '0383834578', '07:00:00', '21:00:00',21.049483918957133, 105.84043116882903, 4,42);
 GO
 
 
@@ -1370,25 +1372,25 @@ VALUES
 GO
 -- 18. thêm dữ liệu bảng actor
 
-  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday], [avatar])
-VALUES (N'Nguyễn Văn Thanh', '1990-01-01', 'actor_image1.jpg'),
- (N'Nguyễn Tuấn', '1993-01-01', 'actor_image1.jpg'),
-  (N'Trấn Thành', '1989-01-01', 'actor_image1.jpg'),
-  (N'Trương Thế Vinh', '1988-01-01', 'actor_image1.jpg'),
-   (N'Võ Thành Tâm ', '1994-01-01', 'actor_image1.jpg'),
-    (N'Thanh Trúc', '1995-01-01', 'actor_image1.jpg'),
-	 (N'Hứa Minh Đạt', '1990-01-01', 'actor_image1.jpg'),
-	  (N'Lâm Chấn Khang', '1996-01-01', 'actor_image1.jpg'),
-	   (N'Chris Hemsworth', '1996-01-01', 'actor_image1.jpg'),
-	    (N'Tom Hiddleston ', '1999-01-01', 'actor_image1.jpg'),
-		 (N'Benedict Cumberbatch', '2000-01-01', 'actor_image1.jpg'),
-		  (N'Scarlett Johansson', '2000-01-01', 'actor_image1.jpg'),
-		   (N'NTom Holland', '2000-01-01', 'actor_image1.jpg'),
-		    (N'Chadwick Boseman', '1990-01-01', 'actor_image1.jpg'),
-			 (N'Brie Larson', '1990-01-01', 'actor_image1.jpg'),
-			  (N'Sebastian Stan', '1990-01-01', 'actor_image1.jpg'),
-			   (N'Anthony Mackie ', '1990-01-01', 'actor_image1.jpg'),
-			    (N'Idris Elba', '1990-01-01', 'actor_image1.jpg');
+  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday],[country], [avatar])
+VALUES (N'Nguyễn Văn Thanh', '1990-01-01','VN', 'actor_image1.jpg'),
+ (N'Nguyễn Tuấn', '1993-01-01','VN', 'actor_image1.jpg'),
+  (N'Trấn Thành', '1989-01-01','VN', 'actor_image1.jpg'),
+  (N'Trương Thế Vinh', '1988-01-01','VN', 'actor_image1.jpg'),
+   (N'Võ Thành Tâm ', '1994-01-01','VN', 'actor_image1.jpg'),
+    (N'Thanh Trúc', '1995-01-01','VN', 'actor_image1.jpg'),
+	 (N'Hứa Minh Đạt', '1990-01-01','VN', 'actor_image1.jpg'),
+	  (N'Lâm Chấn Khang', '1996-01-01','VN',  'actor_image1.jpg'),
+	   (N'Chris Hemsworth', '1996-01-01','VN',  'actor_image1.jpg'),
+	    (N'Tom Hiddleston ', '1999-01-01','VN',  'actor_image1.jpg'),
+		 (N'Benedict Cumberbatch', '2000-01-01','VN',  'actor_image1.jpg'),
+		  (N'Scarlett Johansson', '2000-01-01','VN',  'actor_image1.jpg'),
+		   (N'NTom Holland', '2000-01-01','VN',  'actor_image1.jpg'),
+		    (N'Chadwick Boseman', '1990-01-01','VN',  'actor_image1.jpg'),
+			 (N'Brie Larson', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			  (N'Sebastian Stan', '1990-01-01', 'VN', 'actor_image1.jpg'),
+			   (N'Anthony Mackie ', '1990-01-01','VN',  'actor_image1.jpg'),
+			    (N'Idris Elba', '1990-01-01', 'VN', 'actor_image1.jpg');
 GO
 -- 19. thêm dữ liệu  actors_movie
  INSERT INTO [TicketEZ].[dbo].[Actors_Movies] ([actor_id], [movie_id])
@@ -1456,11 +1458,11 @@ VALUES (2,1, 1),
 go
 */
 --25. thêm dữ liệu bảng Directors
-    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday], [avatar])
+    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday],[country], [avatar])
 VALUES
-  ('Nguyễn Thị A', '1980-05-15', 'director_avatar1.jpg'),
-  ('Trần Văn B', '1975-08-20', 'director_avatar2.jpg'),
-  ('Lê Thị C', '1990-03-10', 'director_avatar3.jpg');
+  ('Nguyễn Thị A', '1980-05-15','VN' , 'director_avatar1.jpg'),
+  ('Trần Văn B', '1975-08-20','VN' , 'director_avatar2.jpg'),
+  ('Lê Thị C', '1990-03-10','VN' , 'director_avatar3.jpg');
 GO
 -- 26. thêm dữ liệu bảng [Directors_Movies]
 

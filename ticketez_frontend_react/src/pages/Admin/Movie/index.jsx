@@ -970,7 +970,7 @@ function AdminMovie() {
                             placeholder="Tìm kiếm và chọn quốc gia"
                             // onChange={onGenderChange}
                             allowClear
-                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }

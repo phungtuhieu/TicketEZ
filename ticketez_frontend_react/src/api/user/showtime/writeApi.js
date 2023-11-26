@@ -66,7 +66,7 @@ export const movieUserApi = {
                     cinemaComplexId,
                     date,
                 };
-                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplexTest', { params });
+                const result = await axiosClient.get(urlMovie + '/get/movies-by-cinemaComplex', { params });
                 return result.data;
             }
             return funcUtils.notify('CinemaComplexId không tồn tại', 'error');
@@ -79,6 +79,18 @@ export const movieUserApi = {
         try {
             const params = { page, limit, genreName, country, year, search };
             const result = await axiosClient.get(urlMovie + '/get/find-movie-by-genre-country-year-search', { params });
+            return result.data;
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    },
+    getMovieShowtimePresentOrByUser: async ( userId ) => {
+        try {
+            const params = {
+                userId
+            };
+            const result = await axiosClient.get(urlMovie + '/get/movie-suggest', { params });
             return result.data;
         } catch (error) {
             console.log(error);
