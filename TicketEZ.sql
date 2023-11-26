@@ -31,6 +31,15 @@ CREATE TABLE Accounts (
     points INT  
 )
 GO
+CREATE TABLE Account_Lock_History(
+    id BIGINT IDENTITY(1,1) NOT NULL,
+    event_type BIT NOT NULL,
+    event_date DATETIME NOT NULL,
+    reason NVARCHAR(MAX) NOT NULL,
+	account_id NVARCHAR(20) NOT NULL,
+)
+GO
+
 CREATE TABLE Accounts_Roles (
 	account_id NVARCHAR(20) NOT NULL,
 	role_id BIGINT NOT NULL,
@@ -226,7 +235,7 @@ GO
         [start_date] DATETIME NOT NULL,
         end_date DATETIME NOT NULL,
         [status] BIT NOT NULL,
-        movie_id BIGINT NOT NULL,
+        format_movie_id BIGINT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
 
@@ -653,7 +662,7 @@ GO
 ALTER TABLE
     Price
 ADD
-    CONSTRAINT FK_Price_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
+    CONSTRAINT FK_Price_FormatMovies FOREIGN KEY (format_movie_id) REFERENCES Formats_Movies(id)
 GO
 /*ALTER TABLE
     Price
@@ -1504,7 +1513,7 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
 -- Inserting sample data into the Price table
-INSERT INTO Price ([start_date], [end_date], [status], movie_id, cinema_complex_id)
+INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
 VALUES
     ('2023-11-20', '2023-12-27', 1, 1, 1)
 
