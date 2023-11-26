@@ -37,7 +37,7 @@ function Showtime() {
     };
 
     //
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const { ccxId } = useParams();
     // console.log('ccxId', ccxId);
     const [data, setData] = useState([]);

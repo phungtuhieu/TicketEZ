@@ -92,21 +92,21 @@ function ViTri() {
     const [dataMovieByID, setDataMovieByID] = useState([]);
     const { movieId } = useParams();
     useEffect(() => {
-          if (movieId) {
-              const getList = async () => {
-                  try {
-                      const res = await movieApi.getById(movieId);
-                      setDataMovieByID(res.data);
-                  } catch (error) {
-                      if (error.hasOwnProperty('response')) {
-                          funcUtils.notify(error.response.data, 'error');
-                      } else {
-                          console.log(error);
-                      }
-                  }
-              };
-              getList();
-          }
+        if (movieId) {
+            const getList = async () => {
+                try {
+                    const res = await movieApi.getById(movieId);
+                    setDataMovieByID(res.data);
+                } catch (error) {
+                    if (error.hasOwnProperty('response')) {
+                        funcUtils.notify(error.response.data, 'error');
+                    } else {
+                        console.log(error);
+                    }
+                }
+            };
+            getList();
+        }
         const getCinemaChain = async () => {
             try {
                 const res = await cinemaChainApi.get();
@@ -122,13 +122,12 @@ function ViTri() {
         getCinemaChain();
     }, [movieId]);
 
-
     // value props
     const value = {
         chooseDay,
         cinemaChainName,
-        provinces
-    }
+        provinces,
+    };
 
     return (
         <Row style={{ display: 'flex', paddingTop: 15 }}>
@@ -172,6 +171,8 @@ function ViTri() {
                                         className={cx('modal-header-col1-inputSearch')}
                                         suffix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
                                         placeholder="Tìm địa điểm ..."
+                                        onChange={(e) => setSearchName(e.target.value)}
+                                        value={searchName}
                                     />
                                 </Col>
                                 <Col span={24} className={cx('modal-header-col2')}>
@@ -196,9 +197,9 @@ function ViTri() {
                             </Row>
                         </Modal>
 
-                        <Button className={cx('btn-second')} icon={<AimOutlined />}>
+                        {/* <Button className={cx('btn-second')} icon={<AimOutlined />}>
                             Gần bạn
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
             </Col>
