@@ -37,6 +37,7 @@ const LoginForm = () => {
             } else {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/');
+                window.location.reload();
             }
         } catch (error) {
             funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
@@ -92,7 +93,7 @@ const LoginForm = () => {
                             </Form.Item>
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton}>
-                                    Log in
+                                  Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>

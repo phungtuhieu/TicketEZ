@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ticketez_backend_springboot.auth.models.SecurityAccount;
 
-
 public interface AccountRepository extends JpaRepository<SecurityAccount, String> {
 
     List<SecurityAccount> findAllByOrderByCreatedDateDesc();
@@ -18,8 +17,8 @@ public interface AccountRepository extends JpaRepository<SecurityAccount, String
 
     Boolean existsByEmail(String email);
 
-    SecurityAccount findByIdAndPassword (String id , String password);
+    Boolean existsByFullname(String fullname);
 
-
+    SecurityAccount findByIdAndPassword(String id, String password);
 
 }

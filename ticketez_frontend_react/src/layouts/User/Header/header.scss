@@ -6,6 +6,17 @@
 // ul {
 //     list-style-type: none;
 // }
+
+.name-short {
+    margin-top: 5px;
+    display: inline-block;
+    max-width: 150px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+ 
+  }
+  
 .flexSB {
     display: flex;
     justify-content: space-between;

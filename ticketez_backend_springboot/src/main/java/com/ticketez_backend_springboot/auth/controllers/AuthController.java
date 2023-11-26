@@ -64,8 +64,9 @@ public class AuthController {
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-    // SecurityAccount securityAccount = accountRepository.findByIdAndPassword(loginRequest.getId(),
-    //     encoder.encode(loginRequest.getPassword()));
+    // SecurityAccount securityAccount =
+    // accountRepository.findByIdAndPassword(loginRequest.getId(),
+    // encoder.encode(loginRequest.getPassword()));
     // // if (securityAccount == null) {
     // // return new ResponseEntity<>("sai thông tin",HttpStatus.UNAUTHORIZED);
 
@@ -106,6 +107,11 @@ public class AuthController {
     }
 
     if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
+    }
+    if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
       return ResponseEntity
           .badRequest()
           .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
@@ -158,7 +164,7 @@ public class AuthController {
         }
       });
     }
-    //ngay tao
+    // ngay tao
     account.setCreatedDate(new Date());
 
     account.setRoles(roles);

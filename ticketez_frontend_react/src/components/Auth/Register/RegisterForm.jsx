@@ -154,7 +154,7 @@ const RegisterForm = () => {
                             </Form.Item> */}
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton}>
-                                    Log in
+                                 Đăng ký
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản <a href="http://localhost:3000/Login">Đăng Nhập</a>
