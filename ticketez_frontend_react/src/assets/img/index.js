@@ -1,4 +1,5 @@
 import logoLogin from './logo-login.png';
+import logoLogin1 from '../img/logoLogin1.png';
 import bgAuth from './bg-auth.jpeg';
 import datrungphuongnam from './datrungphuongnam.jpg';
 import tagDatTruoc from './logo-dat-truoc.svg';
@@ -32,6 +33,7 @@ import icon2 from '../icon/icon2.png';
 import icon3 from '../icon/icon3.png';
 import momo from '../icon/momo.png';
 
+
 import check from '../icon/check-solid.svg';
 
 
@@ -60,6 +62,7 @@ const img = {
     datrungphuongnam,
     tagDatTruoc,
     anhReview,
+    logoLogin1,
     //
     notFoundLogo,
     gifLoading,

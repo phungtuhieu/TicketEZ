@@ -17,7 +17,7 @@ public class JwtResponse {
   private String fullname;
   private String address;
   private String email;
-  // private String password; 
+  // private String password;
   private Date birthday;
   private String gender;
   private String image;
@@ -26,19 +26,18 @@ public class JwtResponse {
   private String type = "Bearer";
 
   public JwtResponse(String jwt, String id, String phone, String fullname, String email,
-      String address, Date birthday, boolean gender, String image, String accessToken, String type, List<String> roles) {
+      String address, Date birthday, String gender, String image, String accessToken, String type, List<String> roles) {
 
     this.id = id;
     this.phone = phone;
     this.fullname = fullname;
     this.email = email;
     this.birthday = birthday;
-    this.gender = gender ? "nam" : "nữ"; 
+    this.gender = gender;
     this.image = image;
     this.roles = roles;
     this.token = accessToken;
     this.type = type;
   }
 
- 
 }
