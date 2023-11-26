@@ -33,9 +33,9 @@ CREATE TABLE Accounts (
 GO
 CREATE TABLE Account_Lock_History(
     id BIGINT IDENTITY(1,1) NOT NULL,
-    event_type BIT NOT NULL,
-    event_date DATETIME NOT NULL,
-    reason NVARCHAR(MAX) NOT NULL,
+    event_type BIT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
+    event_date DATETIME NOT NULL, 
+    reason NVARCHAR(MAX) NOT NULL, -- lý do unlock hoặc lock 
 	account_id NVARCHAR(20) NOT NULL,
 )
 GO
@@ -364,6 +364,10 @@ ALTER TABLE Accounts_Roles
 ADD CONSTRAINT PK_Accounts_Roles PRIMARY KEY(account_id, role_id)
 GO
 
+ALTER TABLE Account_Lock_History
+ADD CONSTRAINT PK_Account_Lock_History PRIMARY KEY(id)
+GO
+
 ALTER TABLE Activity_Logs
 ADD CONSTRAINT PK_Activity_Logs PRIMARY KEY(id)
 GO
@@ -624,6 +628,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_FormatsMovies_Movies FOREIGN KEY (movie_id) REFERENCES Movies(id)
 GO  
+ALTER TABLE
+    Account_Lock_History
+ADD
+    CONSTRAINT FK_Account_Lock_History_Accounts FOREIGN KEY (account_id) REFERENCES Accounts(id)
+GO 
 ALTER TABLE
     Formats_Movies
 ADD
