@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
-import { Avatar, Breadcrumb, Divider, Dropdown, notification } from 'antd';
+import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
@@ -63,7 +63,11 @@ const Header = () => {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
+<<<<<<< HEAD
             navigate('/login')
+=======
+            navigate('/');
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }
@@ -119,8 +123,12 @@ const Header = () => {
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
+<<<<<<< HEAD
         }
 
+=======
+        },
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
     ];
 
     const scrollToShowTimes = () => {
@@ -150,7 +158,7 @@ const Header = () => {
                             </div>
                             <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div>
                             <img src={img.logoHome} />
-                            <div className="tw-hidden tw-leading-4 tw-text-[var(--red-color)] lg:tw-block">
+                            <div className="tw-hidden tw-leading-4 tw-text-[var(--primary--text-color)] lg:tw-block">
                                 <div>
                                     <div>Đặt vé</div>
                                     <div className="tw-mt-[5px]">Xem phim</div>
@@ -185,7 +193,9 @@ const Header = () => {
                             </a>
                         </div>
                         <div className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl">
-                            <FontAwesomeIcon icon={faSearch} />
+                            <a href="/movie-search" className="tw-text-gray-700">
+                                <FontAwesomeIcon icon={faSearch} />
+                            </a>
                         </div>
 
 
@@ -249,12 +259,22 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
+<<<<<<< HEAD
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
                                             (location.pathname === '/su-kien/tin-tuc' ||
                                                 /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                             ? ' tw-text-pink-500'
                                             : ''
                                             }`,
+=======
+                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                                ? 'tw-text-[var(--primary-background-color)]'
+                                                : ''
+                                        }`,
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -268,12 +288,22 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
+<<<<<<< HEAD
                                         className: `focus:tw-text-pink-500 hover:tw-text-pink-500 tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
                                             (location.pathname === '/su-kien/khuyen-mai' ||
                                                 /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                             ? ' tw-text-pink-500'
                                             : ''
                                             }`,
+=======
+                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
+                                            isEventPage &&
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                                ? ' tw-text-[var(--primary--text-color)]'
+                                                : ''
+                                        }`,
+>>>>>>> 4a529c9139d221218b33da565abc37f482b0a857
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />

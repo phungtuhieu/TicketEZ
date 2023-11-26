@@ -14,105 +14,115 @@ import bookingApi from '~/api/user/booking/bookingApi';
 import httpStatus from '~/api/global/httpStatus';
 import funcUtils from '~/utils/funcUtils';
 import { useNavigate } from 'react-router-dom';
+import authApi from '~/api/user/Security/authApi';
 const cx = classNames.bind(style);
 
 function BookingDetail(props) {
     const { showtime, seatBooking } = props;
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
+    const [account, setAccount] = useState({});
     const [loading, setLoading] = useState(true);
     const [listPrice, setListPrice] = useState([]);
     const [ellipsis, setEllipsis] = useState(true);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     // Load table
-    // useEffect(() => {
-    //     console.log('seatBooking2a', seatBooking);
+    useEffect(() => {
+        console.log('seatBooking2a', seatBooking);
 
-    //     const fetchData = async () => {
-    //         if (showtime != null) {
-    //             if (seatBooking != null) {
-    //                 const weekends = {
-    //                     SUN: 0,
-    //                     FRI: 5,
-    //                     SAT: 6,
-    //                 };
+        const fetchData = async () => {
+            if (showtime != null) {
+                if (seatBooking != null) {
+                    const weekends = {
+                        SUN: 0,
+                        FRI: 5,
+                        SAT: 6,
+                    };
 
-    //                 const dateNow = moment();
-    //                 const today = dateNow.toDate().getDay();
-    //                 console.log('seatBooking1', seatBooking);
-    //                 console.log('today', dateNow.toDate().getDay());
-    //                 const seatTypeIds = seatBooking.map((item) => item.seatType.id);
-    //                 const getPriceListBySeatTypeIdsAsync = async () => {
-    //                     const listPriceDb = await priceSeatApi.getListPriceDbBySeatTypeIds({
-    //                         seatTypeIds,
-    //                         cinemaClxId: showtime.cinema.cinemaComplex.id,
-    //                         movieId: showtime.formatMovie.movie.id,
-    //                     });
-    //                     return listPriceDb;
-    //                 };
-    //                 const listPriceResp = await getPriceListBySeatTypeIdsAsync();
-    //                 console.log('listPriceResp', listPriceResp);
-    //                 let listPr = [];
-    //                 const totalAmount = seatBooking.reduce((total, item) => {
-    //                     const seatTypeAndPrice = {
-    //                         seatTypeId: 0,
-    //                         price: 0.0,
-    //                     };
-    //                     const seatTypePrice = listPriceResp.data.find(
-    //                         (price) => item.seatType.id === price.seatType.id,
-    //                     );
-    //                     seatTypeAndPrice.seatTypeId = item.seatType.id;
-    //                     if (seatTypePrice) {
-    //                         const amountPrice =
-    //                             weekends[today] !== undefined ? seatTypePrice.weekendPrice : seatTypePrice.weekdayPrice;
-    //                         seatTypeAndPrice.price = amountPrice;
-    //                         listPr.push(seatTypeAndPrice);
-    //                         return total + amountPrice;
-    //                     } else {
-    //                         funcUtils.notify('Không tìm thấy giá của loại ghế này', 'error');
-    //                         return (total = 0);
-    //                     }
-    //                 }, 0);
+                    const dateNow = moment();
+                    const today = dateNow.toDate().getDay();
+                    console.log('seatBooking1', seatBooking);
+                    console.log('today', dateNow.toDate().getDay());
+                    // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
+                    console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
+                    const getPriceListBySeatTypeIdsAsync = async () => {
+                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatType({
+                            cinemaCplxId: showtime.cinema.cinemaComplex.id,
+                            movieId: showtime.formatMovie.movie.id,
+                        });
+                        return listPriceDb;
+                    };
+                    const listPriceResp = await getPriceListBySeatTypeIdsAsync();
+                    console.log('listPriceResp', listPriceResp);
+                    let listPr = [];
+                    const totalAmount = seatBooking.reduce((total, item) => {
+                        const seatTypeAndPrice = {
+                            seatTypeId: 0,
+                            price: 0.0,
+                        };
+                        const seatTypePrice = listPriceResp.data[0].newPriceSeatTypeDTOs.find(
+                            (prStype) => item.seatType.id === prStype.seatType.id,
+                        );
+                        seatTypeAndPrice.seatTypeId = item.seatType.id;
+                        if (seatTypePrice) {
+                            const amountPrice =
+                                weekends[today] !== undefined ? seatTypePrice.weekendPrice : seatTypePrice.weekdayPrice;
+                            seatTypeAndPrice.price = amountPrice;
+                            listPr.push(seatTypeAndPrice);
+                            return total + amountPrice;
+                        } else {
+                            funcUtils.notify('Không tìm thấy giá của loại ghế này', 'error');
+                            return (total = 0);
+                        }
+                    }, 0);
 
-    //                 setListPrice(listPr);
-    //                 const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
-    //                     style: 'currency',
-    //                     currency: 'VND',
-    //                 }).format(totalAmount);
-    //                 const seatInfo = {
-    //                     listSeat: seatBooking,
-    //                     totalAmount: formattedTotalAmount,
-    //                 };
-    //                 console.log('totalAmount', totalAmount);
-    //                 const infoS = {
-    //                     ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
-    //                     movieTitle: showtime.formatMovie.movie.title,
-    //                     format: showtime.formatMovie.format.name,
-    //                     time: {
-    //                         startTime: moment(showtime.startTime).format('HH:mm'),
-    //                         endTime: moment(showtime.endTime).format('HH:mm'),
-    //                         showDate: moment(showtime.startDate).format('DD/MM/YYYY'),
-    //                     },
-    //                     seatInfo,
-    //                     cinemaClx: {
-    //                         name: showtime.cinema.cinemaComplex.name,
-    //                         address: showtime.cinema.cinemaComplex.address,
-    //                     },
-    //                     cinemaName: showtime.cinema.name,
-    //                 };
+                    setListPrice(listPr);
+                    const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND',
+                    }).format(totalAmount);
+                    console.log('totalAmount', totalAmount);
+                    console.log('formattedTotalAmount', formattedTotalAmount);
+                    const seatInfo = {
+                        listSeat: seatBooking,
+                        totalAmount: formattedTotalAmount,
+                    };
+                    console.log('totalAmount', totalAmount);
+                    const infoS = {
+                        ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
+                        movieTitle: showtime.formatMovie.movie.title,
+                        format: showtime.formatMovie.format.name,
+                        time: {
+                            startTime: moment(showtime.startTime).format('HH:mm'),
+                            endTime: moment(showtime.endTime).format('HH:mm'),
+                            showDate: moment(showtime.startDate).format('DD/MM/YYYY'),
+                        },
+                        seatInfo,
+                        cinemaClx: {
+                            name: showtime.cinema.cinemaComplex.name,
+                            address: showtime.cinema.cinemaComplex.address,
+                        },
+                        cinemaName: showtime.cinema.name,
+                    };
+                    const acc = authApi.getUser();
+                    console.log('acc', acc);
+                    console.log('showtime', showtime);
+                    console.log('seatBooking', seatBooking);
+                    // const acc = authApi.getUser();
+                    // form.setFieldValue({
+                    //     fullname: acc.fullname,
+                    //     email: acc.email,
+                    //     phone: acc.phone,
+                    // });
+                    setShowtimeInfo(infoS);
+                    setLoading(false);
+                }
+            }
+        };
 
-    //                 console.log('showtime', showtime);
-    //                 console.log('seatBooking', seatBooking);
-
-    //                 setShowtimeInfo(infoS);
-    //                 setLoading(false);
-    //             }
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, [showtime, seatBooking]);
+        fetchData();
+    }, [showtime, seatBooking]);
 
     const handlePurchase = async () => {
         const values = await form.getFieldsValue();
@@ -122,6 +132,7 @@ function BookingDetail(props) {
         const id = generateRandomId();
         try {
             const accResp = await accountApi.getById('user2');
+
             const booking = {
                 id,
                 account: accResp.data,

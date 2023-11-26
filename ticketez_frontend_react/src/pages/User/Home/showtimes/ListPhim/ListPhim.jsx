@@ -148,11 +148,10 @@ function ListPhim({ cinemaComplex }) {
                                                 >
                                                     <div className="map-lg-content">
                                                         <Mapbox
-                                                            latitude={10.76317169124285}
-                                                            longitude={106.65670151096185}
-                                                            address={
-                                                                'Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012'
-                                                            }
+                                                            latitude={cinemaComplex.latitude}
+                                                            longitude={cinemaComplex.longitude}
+                                                            address={cinemaComplex.address}
+                                                            title={cinemaComplex.name}
                                                         />
                                                     </div>
                                                 </Modal>
@@ -201,9 +200,9 @@ function ListPhim({ cinemaComplex }) {
                             <Col span={20} className={cx('col2-movie')}>
                                 <Row>
                                     <Col span={24} className={cx('container-thong-tin-phim')}>
-                                            <Tag color={data.movie.mpaaRating.colorCode}>
-                                                {data.movie.mpaaRating.ratingCode}
-                                            </Tag>
+                                        <Tag color={data.movie.mpaaRating.colorCode}>
+                                            {data.movie.mpaaRating.ratingCode}
+                                        </Tag>
 
                                         <div className={cx('ten-phim')}>{data.movie.title}</div>
                                         <div className={cx('the-loai-phim')}>

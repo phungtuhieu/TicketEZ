@@ -32,12 +32,12 @@ const Event = () => {
                         )}
                     </Col>
                     <Col lg={8} style={{ borderLeft: '1px solid #D4D4D4' }} className="tw-sticky tw-t-0">
-                        <p className="tw-font-semibold tw-text-pink-500 tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
+                        <p className="tw-font-semibold tw-text-[var(--primary--text-color)] tw-text-left tw-text-3xl tw-mt-[19px] tw-mb-[10px]">
                             <FontAwesomeIcon icon={faFireFlameCurved} className="text-2xl tw-mr-2" />
                             {location.pathname === '/su-kien/tin-tuc' ||
                             /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname)
                                 ? ' Khuyến mãi '
-                                :  'Tin tức '}
+                                : 'Tin tức '}
                             mới nhất
                         </p>
                         <EventRight />

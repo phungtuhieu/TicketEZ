@@ -78,6 +78,10 @@ const Binhluan = () => {
         getAccount();
     }, []);
     const handleAdd = async () => {
+        if (!comment.trim()) {
+            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+            return;
+        }
         setLoading(true);
         try {
             const user = await accountApi.getById('user17');

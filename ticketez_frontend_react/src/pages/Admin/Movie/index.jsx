@@ -55,6 +55,7 @@ function AdminMovie() {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [fileList, setFileList] = useState([]);
+    const [fileListBanner, setFileListBanner] = useState([]);
     const [list, setList] = useState([]);
     const [movieStudios, setMovieStudios] = useState([]);
     const [formatOptions, setFormatOptions] = useState([]);
@@ -134,15 +135,17 @@ function AdminMovie() {
         // setLoadingButton(true);
         try {
             const values = await form.getFieldsValue();
-            console.log(values);
+            console.log(values, 'values');
             const { genres, formats, directors, actors, poster, ...movieData } = values;
             console.log('movieData', movieData);
             // return;
-            if (fileList.length > 0) {
+            if (fileList.length > 0 && fileListBanner.length > 0) {
                 if (!dataEdit) {
                     try {
                         let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
                         console.log(imageName);
+                        let bannerName = await uploadApi.post(values.banner.fileList[0].originFileObj);
+                        console.log(bannerName);
                         let dataCreate = {
                             genres: selectedValue.genres,
                             formats: selectedValue.formats,
@@ -157,6 +160,7 @@ function AdminMovie() {
                                 movieProducer: selectedValue.movieProducer,
                                 mpaaRating: selectedValue.mpaaRating,
                                 poster: imageName,
+                                banner: bannerName,
                             },
                         };
                         console.log('dataCreate', dataCreate);
@@ -179,51 +183,17 @@ function AdminMovie() {
                     }
                 } else {
                     console.log('Cập nhật', dataEdit);
-
                     try {
                         let imageName = null;
+                        let bannerName = null;
+
                         if (fileList[0].hasOwnProperty('originFileObj')) {
                             imageName = await uploadApi.put(dataEdit.poster, fileList[0].originFileObj);
                         }
-                        // const typesNoneSelect = [];
-                        // if (selectedValue.actors.length <= 0) {
-                        //     typesNoneSelect.push('actor');
-                        // }
-                        // if (selectedValue.directors.length <= 0) {
-                        //     typesNoneSelect.push('director');
-                        // }
-                        // if (selectedValue.formats.length <= 0) {
-                        //     typesNoneSelect.push('format');
-                        // }
-                        // if (selectedValue.genres.length <= 0) {
-                        //     typesNoneSelect.push('genre');
-                        // }
-
-                        // if (Object.keys(selectedValue.mpaaRating).length === 0) {
-                        //     typesNoneSelect.push('mpaa');
-                        // }
-
-                        // if (Object.keys(selectedValue.movieProducer).length === 0) {
-                        //     typesNoneSelect.push('movie-producer');
-                        // }
-                        // if (Object.keys(selectedValue.movieStudio).length === 0) {
-                        //     typesNoneSelect.push('movie-studio');
-                        // }
-
-                        // if (typesNoneSelect.length > 0) {
-                        // await Promise.all([
-                        //     typesNoneSelect.includes('actor') && handleSelectOption(actors, 'actor'),
-                        //     typesNoneSelect.includes('format') && handleSelectOption(formats, 'format'),
-                        //     typesNoneSelect.includes('genre') && handleSelectOption(genres, 'genre'),
-                        //     typesNoneSelect.includes('director') && handleSelectOption(directors, 'director'),
-                        //     typesNoneSelect.includes('mpaa') && handleSelectOption(movieData.mpaaRating, 'mpaa'),
-                        //     typesNoneSelect.includes('movie-producer') &&
-                        //         handleSelectOption(movieData.movieProducer, 'movie-producer'),
-                        //     typesNoneSelect.includes('movie-studio') &&
-                        //         handleSelectOption(movieData.movieStudio, 'movie-studio'),
-                        // ]);
-                        // typesNoneSelect = [];
-                        // }
+                        if (fileListBanner[0].hasOwnProperty('originFileObj')) {
+                            bannerName = await uploadApi.put(dataEdit.banner, fileListBanner[0].originFileObj);
+                        }
+                        console.log('dataEdit.banner', dataEdit.banner);
 
                         let dataUpdate = {
                             genres: selectedValue.genres,
@@ -265,6 +235,7 @@ function AdminMovie() {
                                 movieProducer: selectedValue.movieProducer,
                                 mpaaRating: selectedValue.mpaaRating,
                                 poster: imageName != null ? imageName : values.poster,
+                                banner: bannerName != null ? bannerName : values.banner,
                                 id: dataEdit.id,
                             },
                         };
@@ -323,6 +294,13 @@ function AdminMovie() {
                     uid: record.id.toString(),
                     name: record.poster,
                     url: uploadApi.get(record.poster),
+                },
+            ]);
+            setFileListBanner([
+                {
+                    uid: record.id.toString(),
+                    name: record.banner,
+                    url: uploadApi.get(record.banner),
                 },
             ]);
             const actsOpNotExist = actors.reduce((totals, item) => {
@@ -460,7 +438,7 @@ function AdminMovie() {
                     releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
                 setList(dataFormat);
-                setTotalItems(movieResp.totalItem);
+                setTotalItems(movieResp.totalItems);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
@@ -590,6 +568,10 @@ function AdminMovie() {
         setFileList(newFileList);
         console.log('newFileList', newFileList);
     };
+    const onChangeUploadBanner = async ({ fileList: newFileList }) => {
+        setFileListBanner(newFileList);
+        console.log('newFileList', newFileList);
+    };
 
     const columns = [
         {
@@ -615,6 +597,23 @@ function AdminMovie() {
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
                         src={uploadApi.get(record.poster)}
+                    />
+                </Space>
+            ),
+            // ...getColumnSearchProps('duration'),
+        },
+        {
+            title: 'Banner',
+            dataIndex: 'banner',
+            key: 'banner',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={uploadApi.get(record.banner)}
                     />
                 </Space>
             ),
@@ -913,7 +912,10 @@ function AdminMovie() {
                         rules={[{ required: true, message: 'Vui lòng chọn poster' }]}
                     >
                         <Upload
-                            action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                            beforeUpload={(file) => {
+                                console.log({ file });
+                                return false;
+                            }}
                             accept=".png, .jpg"
                             listType="picture-card"
                             onChange={onChangeUpload}
@@ -925,6 +927,29 @@ function AdminMovie() {
                             {fileList.length < 1 && '+ Upload'}
                         </Upload>
                     </Form.Item>
+                    <Form.Item
+                        {...formItemLayout}
+                        label="Banner"
+                        name="banner"
+                        rules={[{ required: true, message: 'Vui lòng chọn banner' }]}
+                    >
+                        <Upload
+                            beforeUpload={(file) => {
+                                console.log({ file });
+                                return false;
+                            }}
+                            accept=".png, .jpg"
+                            listType="picture-card"
+                            onChange={onChangeUploadBanner}
+                            onPreview={handlePreview}
+                            fileList={fileListBanner}
+                            name="banner"
+                            maxCount={1}
+                        >
+                            {fileListBanner.length < 1 && '+ Upload'}
+                        </Upload>
+                    </Form.Item>
+
                     <Form.Item name="duration" label="Thời lượng" {...config}>
                         <TimePicker style={{ width: 150 }} placeholder="Chọn thời lượng" />
                     </Form.Item>
@@ -945,7 +970,7 @@ function AdminMovie() {
                             placeholder="Tìm kiếm và chọn quốc gia"
                             // onChange={onGenderChange}
                             allowClear
-                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }

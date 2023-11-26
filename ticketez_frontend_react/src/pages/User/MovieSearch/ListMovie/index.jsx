@@ -114,7 +114,7 @@ function ListMovie() {
 
     const [data, setData] = useState([]);
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         const res = async () => {
             try {
                 const resss = await movieUserApi.getMoviesByGenreNameAndCountryAndYearAndSearch(
@@ -128,7 +128,7 @@ function ListMovie() {
                 setTotalItems(resss.totalItems);
                 setData(resss.listMovieObjResp);
                 console.log('res nè:', resss);
-                setLoading(false)
+                setLoading(false);
             } catch (error) {
                 console.log(error);
             }
@@ -139,10 +139,10 @@ function ListMovie() {
     return (
         <Row className=" tw-relative tw-w-[80%] tw-h-[100%]">
             {loading && (
-                    <div className='loading'>
-                        <LoadingOutlined className='imgL' />
-                    </div>
-                )}
+                <div className="loading">
+                    <LoadingOutlined className="imgL" />
+                </div>
+            )}
             <Col span={24} className=" tw-h-[65px] tw-mb-[25px] ">
                 <Row className="tw-h-[100%] tw-flex tw-items-center tw-justify-center">
                     <Col span={12} className=" tw-flex tw-items-center  tw-h-[100%]">
@@ -175,8 +175,9 @@ function ListMovie() {
                                             Tất cả
                                         </Button>
 
-                                        {dataGenres.map((item) => (
+                                        {dataGenres.map((item,index) => (
                                             <Button
+                                                key={index}
                                                 type="text"
                                                 onClick={() => handleValueTL(item.name)}
                                                 className={valueTL === item.name ? 'btn btn-active' : 'btn btn-text'}
@@ -207,7 +208,7 @@ function ListMovie() {
                                 <DownOutlined className="tw-h-5 tw-w-5  tw-text-gray-500" />
                             </div>
                             {ckQuocGia && (
-                                <div className="tw-absolute tw-p-1 tw-w-[400px] tw-max-h-[420px] tw-rounded tw-bg-[#FFFFFF] tw-right-30 tw-top-[85px] tw-z-50">
+                                <div className="tw-absolute tw-p-1 tw-w-[400px] tw-max-h-[420px] tw-rounded tw-bg-[#FFFFFF] tw-right-30 tw-top-[85px] tw-z-50 ">
                                     <div className=" select-quoc-gia tw-p-2 tw-max-h-[400px]  tw-overflow-auto">
                                         <Button
                                             type="text"
@@ -216,8 +217,9 @@ function ListMovie() {
                                         >
                                             Tất cả
                                         </Button>
-                                        {countriesJson.map((item) => (
+                                        {countriesJson.map((item, index) => (
                                             <Button
+                                                key={index}
                                                 type="text"
                                                 className={
                                                     item.code === valueQG.code ? 'btn btn-active' : 'btn btn-text'
@@ -240,7 +242,7 @@ function ListMovie() {
                                 onClick={() => clickNam(!ckNam)}
                                 className="tw-w-[120px] tw-cursor-pointer tw-bg-white tw-text-[#000000] tw-font-normal tw-text-[14px] tw-p-[9px] tw-rounded  tw-border-[1px] tw-border-slate-300 tw-text-left  "
                             >
-                                {valueN === 'tất cả' ? 'Năm' : valueN }
+                                {valueN === 'tất cả' ? 'Năm' : valueN}
                             </button>
                             <div className="tw-absolute tw-inset-y-0 tw-right-10 tw-pl-3 tw-flex tw-items-center tw-pointer-events-none">
                                 <DownOutlined className="tw-h-5 tw-w-5  tw-text-gray-500" />
@@ -255,8 +257,9 @@ function ListMovie() {
                                         >
                                             Tất cả
                                         </Button>
-                                        {listNam.map((value) => (
+                                        {listNam.map((value,index) => (
                                             <Button
+                                                key={index}
                                                 type="text"
                                                 onClick={() => handleValueN(value)}
                                                 className={value === valueN ? 'btn btn-active' : 'btn btn-text'}
@@ -288,15 +291,14 @@ function ListMovie() {
             </Col>
             {data !== null && (
                 <Col span={24} className="tw-bg-[#FAFAFA] tw-grid tw-grid-cols-5">
-                    {data?.map((data) => (
-                        <List data={data} />
+                    {data?.map((data, index) => (
+                        <List key={index} data={data} />
                     ))}
                 </Col>
             )}
             {data === null && (
                 <Col span={24} className="tw-bg-[#FAFAFA] tw-h-[100%] tw-mb-[25px] ">
                     <ListNull />
-                   
                 </Col>
             )}
             {data !== null && (

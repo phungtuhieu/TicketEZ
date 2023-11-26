@@ -6,9 +6,10 @@ import { useParams } from 'react-router-dom';
 import uploadApi from '~/api/service/uploadApi';
 import classNames from 'classnames/bind';
 import style from './Banner.module.scss';
-import { Col, Modal, Row, Typography } from 'antd';
+import { Col, Modal, Row, Tag, Typography } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
 const cx = classNames.bind(style);
 const BannerDetail = () => {
@@ -140,7 +141,9 @@ const BannerDetail = () => {
                             <Col span={19}>
                                 <div className="tw-mt-20 tw-ms-20 text-left">
                                     <div className=" tw-ms-20 tw-mt-2 tw-text-2xl tw-font-bold tw-text-white tw-md:text-4xl">
-                                        13+
+                                        <Tag color={dataMovie?.movie.mpaaRating.colorCode}>
+                                            {dataMovie?.movie.mpaaRating.ratingCode}
+                                        </Tag>
                                     </div>
 
                                     <div className=" tw-text-5xl tw-ms-20 tw-mt-2  tw-font-bold tw-text-white tw-md:text-4xl">
@@ -202,7 +205,9 @@ const BannerDetail = () => {
                                             <Col span={4}>
                                                 <div>Ngày chiếu</div>
                                                 <div className="tw-mt-1 tw-font-bold text-lg tw-text-white tw-text-opacity-90">
-                                                    <li className=""> {dataMovie?.movie.releaseDate}</li>
+                                                    <li className="">
+                                                        {moment(dataMovie?.movie.releaseDate).format('DD-MM-YYYY')}
+                                                    </li>
                                                 </div>
                                             </Col>
                                             <Col span={14}>

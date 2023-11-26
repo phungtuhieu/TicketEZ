@@ -130,9 +130,9 @@ function MovieDetailsListMovieRight() {
                     className="tw-ml-[15px] tw-mt-[-22px]"
                 >
                     <Button
-                        className={`tw-w-[100px] hover:tw-bg-pink-500 hover:tw-text-white hover:tw-border-pink-500 ${
+                        className={`tw-w-[100px] hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
                             selectedButton === null
-                                ? 'tw-bg-pink-500 tw-text-white tw-border-pink-500'
+                                ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
                                 : 'tw-bg-gray-200 tw-border-gray-200'
                         }`}
                         onClick={() => handleButtonClick(null)}
@@ -143,9 +143,9 @@ function MovieDetailsListMovieRight() {
                         ? dataGenres?.map((value) => (
                               <div key={value.id} className=" tw-pr-[10px]">
                                   <Button
-                                      className={`tw-w-[100px] hover:tw-bg-pink-500 hover:tw-text-white hover:tw-border-pink-500 ${
+                                      className={` hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
                                           selectedButton === value.id
-                                              ? 'tw-bg-pink-500 tw-text-white tw-border-pink-500'
+                                              ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
                                               : 'tw-bg-gray-200 tw-border-gray-200'
                                       }`}
                                       onClick={() => handleButtonClick(value.id)}
@@ -194,7 +194,7 @@ function MovieDetailsListMovieRight() {
                                                     {value.movie.mpaaRating.ratingCode}
                                                 </Tag>
                                                 <br />
-                                                <span className="tw-mt-2 tw-line-clamp-2 tw-text-gray-950 tw-font-[var(--font-family)] hover:tw-text-pink-700">
+                                                <span className="tw-mt-2 tw-line-clamp-2 tw-text-gray-950 tw-font-[var(--font-family)] hover:tw-text-[var(--primary--text-color)]">
                                                     {value.movie.title}
                                                 </span>
                                                 <span className={cx('the-loai-phim')} style={{ color: '#ffffff80' }}>

@@ -39,8 +39,8 @@ const { RangePicker } = DatePicker;
 const cx = classNames.bind(style);
 
 const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 20 },
+    labelCol: { span: 3 },
+    wrapperCol: { span: 21 },
 };
 
 const AdminShowtime = () => {
@@ -196,7 +196,7 @@ const AdminShowtime = () => {
             },
         },
         {
-            title: 'Banner',
+            title: 'Ảnh',
             dataIndex: 'banner',
             width: '10%',
             render: (_, record) => (
@@ -521,8 +521,9 @@ const AdminShowtime = () => {
                     </Button>
                 </Col>
                 <BaseModal
+                    style={{ marginTop: '-50px' }}
                     open={open}
-                    width={'60%'}
+                    width={'95%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
                     onOk={handleOk}
                     onCancel={handleCancel}
@@ -540,24 +541,7 @@ const AdminShowtime = () => {
                         </Button>,
                     ]}
                 >
-                    <Form form={form} style={{ maxWidth: 1000 }} {...formItemLayout}>
-                        <Form.Item label="Trạng thái" name="status">
-                            <Switch
-                                checked={statusValue === true}
-                                onChange={(checked) => setStatusValue(checked ? true : false)}
-                                checkedChildren={'Đang hoạt động'}
-                                unCheckedChildren={'Kết Thúc '}
-                                defaultChecked
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="typeEvent"
-                            label="Thể loại"
-                           
-                        >
-                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
-                        </Form.Item>
+                    <Form form={form} style={{ minWidth: 1000 }} {...formItemLayout}>
                         <Form.Item
                             {...formItemLayout}
                             label="Chọn ảnh"
@@ -582,9 +566,9 @@ const AdminShowtime = () => {
                             label="Nhập tên sự kiện"
                             rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện' }]}
                         >
-                            <Input placeholder="Nhập tên phim..." />
+                            <Input placeholder="Nhập tên sự kiện..." />
                         </Form.Item>
-                        <Form.Item name="range-time-picker" label="Chọn ngày giờ"  {...rangeConfig}>
+                        <Form.Item name="range-time-picker" label="Chọn ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 disabledDate={disabledDate}
                                 showTime
@@ -593,7 +577,18 @@ const AdminShowtime = () => {
                                 onChange={onChangeDate}
                             />
                         </Form.Item>
-
+                        <Form.Item label="Trạng thái" name="status">
+                            <Switch
+                                checked={statusValue === true}
+                                onChange={(checked) => setStatusValue(checked ? true : false)}
+                                checkedChildren={'Đang hoạt động'}
+                                unCheckedChildren={'Kết Thúc '}
+                                defaultChecked
+                            />
+                        </Form.Item>
+                        <Form.Item {...formItemLayout} name="typeEvent" label="Thể loại">
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
+                        </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="description"

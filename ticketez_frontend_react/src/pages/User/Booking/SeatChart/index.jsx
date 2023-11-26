@@ -98,6 +98,7 @@ function SeatChart(props) {
     const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
     const [seatBookingData, setSeatBookingData] = useState([]);
     const [prices, setPrices] = useState([]);
+    const [filteredPrices, setFilteredPrices] = useState([]);
 
     const fetchDataSeatBooking = async () => {
         try {
@@ -124,7 +125,7 @@ function SeatChart(props) {
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatBooking();
-        }, 5000);
+        }, 1000);
 
         // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
         return () => {
@@ -190,13 +191,18 @@ function SeatChart(props) {
             const respPrice = await axiosClient.get(
                 `price/findByCinemaComplexIdAndMovieId/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
             );
-            const newPrices = respPrice.data.map((price) => price);
-            setPrices(newPrices);
+            const currentDate = new Date();
 
-            console.log(newPrices);
-            // console.log(listSeatNormal);
-            // console.log(listSeatVip);
-            // console.log(allSeats);
+            // Lọc ra các phần tử có startDate và endDate trong khoảng ngày hiện tại
+            const filteredPrices = respPrice.data.filter((price) => {
+                const startDate = new Date(price.price.startDate);
+                const endDate = new Date(price.price.endDate);
+
+                return startDate <= currentDate && endDate >= currentDate;
+            });
+
+            setPrices(filteredPrices);
+
             if (seatBookingData.length > 0) {
                 setReload(true);
             }
@@ -237,14 +243,14 @@ function SeatChart(props) {
         seatStateArray.forEach((seatItem) => {
             if (seatItem === seat) {
                 const price = prices.find((price) => {
-                    return price.newPriceSeatTypeDTOs.some((seatType) => seatType.seatTypeId === seatTypeId);
+                    return price.newPriceSeatTypeDTOs.some((seatType) => seatType.seatType.id === seatTypeId);
                 });
 
                 if (price) {
                     result = price.newPriceSeatTypeDTOs;
+
                     result.map((newPriceSeatTypeDTO, index) => {
-                        console.log(newPriceSeatTypeDTO);
-                        if (newPriceSeatTypeDTO.seatTypeId === seatTypeId) {
+                        if (newPriceSeatTypeDTO.seatType.id === seatTypeId) {
                             finalRS = newPriceSeatTypeDTO;
                         }
                     });

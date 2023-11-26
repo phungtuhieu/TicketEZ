@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './movieShowing.module.scss';
 import Slider from 'react-slick';
-import { Col, Modal, Rate, Row, Tag, Typography } from 'antd';
+import { Button, Col, Modal, Rate, Row, Tag, Typography } from 'antd';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
@@ -262,7 +262,7 @@ const MovieShowing = () => {
                                 {selectedMovie ? (
                                     <img
                                         width={80}
-                                        height={120}
+                                        height={130}
                                         className={cx('img-modal')}
                                         src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
                                     />
@@ -270,7 +270,7 @@ const MovieShowing = () => {
                                     ''
                                 )}
                             </Col>
-                            <Col lg={21} className={cx('name-video-modal')}>
+                            <Col lg={21} className={cx('name-video-modal', 'tw-pl-[20px]')}>
                                 <Title level={5}>
                                     {selectedMovie ? selectedMovie.movie.title : ''} - {''}
                                     <span className={cx('theloai-modal')}>
@@ -279,14 +279,13 @@ const MovieShowing = () => {
                                                 {valueGenre.name}
                                             </span>
                                         ))}
-                                    </span>{' '}
-                                    <br />
+                                    </span>
                                 </Title>
                                 <Paragraph
                                     ellipsis={
                                         ellipsis
                                             ? {
-                                                  rows: 4,
+                                                  rows: 3,
                                               }
                                             : false
                                     }
@@ -296,6 +295,20 @@ const MovieShowing = () => {
                                 </Paragraph>
                             </Col>
                         </Row>
+                        <div className="tw-mt-[-20px]">
+                            <Button
+                                href={`/movie-details/${selectedMovie?.movie.id}`}
+                                className="tw-bg-[var(--pink)] tw-border-[var(--pink)] tw-text-white tw-font-medium"
+                            >
+                                Đặt vé
+                            </Button>
+                            <Button
+                                onClick={handleCancel}
+                                className="tw-bg-gray-500 tw-border-gray-500 tw-text-white tw-font-medium"
+                            >
+                                Đóng
+                            </Button>
+                        </div>
                     </>,
                 ]}
             >

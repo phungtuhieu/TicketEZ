@@ -24,7 +24,7 @@ function MovieDetails() {
                         <Col span={16}>
                             <Row>
                                 <Col span={24} style={{}}>
-                                    <ViTri  />
+                                    <ViTri />
                                 </Col>
                                 <Col
                                     span={24}
@@ -48,18 +48,10 @@ function MovieDetails() {
                                 >
                                     {/* overflowY: 'auto' */}
                                     <ActorSlider />
-                                   
                                 </Col>
                             </Row>
                         </Col>
-                        <Col
-                            span={8}
-                            className="tw-sticky tw-top-0  overflow-y-auto"
-                            style={{
-                                borderLeft: '1px solid #D4D4D4',
-                                maxHeight: 'calc(100vh - 100px)',
-                            }}
-                        >
+                        <Col span={8}>
                             <MovieDetailsListMovieRight />
                         </Col>
                     </Row>
