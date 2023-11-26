@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 import com.ticketez_backend_springboot.modules.seat.Seat;
@@ -36,8 +37,8 @@ public class Price {
 	private List<PriceSeatType> priceSeatTypes;
 
 	@ManyToOne
-	@JoinColumn(name = "movie_id")
-	private Movie movie;
+	@JoinColumn(name = "format_movie_id")
+	private FormatMovie formatMovie;
 
 	@ManyToOne
 	@JoinColumn(name = "cinema_complex_id")
