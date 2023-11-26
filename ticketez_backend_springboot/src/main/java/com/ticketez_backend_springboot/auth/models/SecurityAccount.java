@@ -14,7 +14,6 @@ import com.ticketez_backend_springboot.modules.review.Review;
 import jakarta.persistence.*;
 import lombok.Data;
 
-
 @Entity
 @Table(name = "Accounts", uniqueConstraints = {
         @UniqueConstraint(columnNames = "id"),
@@ -41,33 +40,34 @@ public class SecurityAccount {
     private int points;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "Accounts_Roles", 
-    joinColumns = @JoinColumn(name = "account_id"), 
-    inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "Accounts_Roles", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<SecurityRole> roles = new HashSet<>();
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	private List<Review> reviews;
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<Review> reviews;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	private List<Booking> bookings;
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<Booking> bookings;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	private List<AccountRole> accountRoles;
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<AccountRole> accountRoles;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	private List<ActivityLog> activityLogs;
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<ActivityLog> activityLogs;
 
-    public SecurityAccount() {}
+    public SecurityAccount() {
+    }
 
-    public SecurityAccount(String id, String email, String password) {
+    public SecurityAccount(String id, String fullname, String email, String password) {
         this.id = id;
+        this.fullname = fullname;
         this.email = email;
         this.password = password;
+
     }
 
 }

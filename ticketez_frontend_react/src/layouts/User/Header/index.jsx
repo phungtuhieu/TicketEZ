@@ -212,7 +212,8 @@ const Header = () => {
                         ) : (
 
                             <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
-                                Đăng nhập
+                          
+                                <span className="name-short">Đăng nhập</span>
                                 <Avatar
                                     style={{ backgroundColor: '#87d068' }}
                                     className="tw-ml-2"
