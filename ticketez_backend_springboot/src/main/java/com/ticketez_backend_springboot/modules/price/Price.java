@@ -6,13 +6,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
-import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
-import com.ticketez_backend_springboot.modules.seat.Seat;
-import com.ticketez_backend_springboot.modules.seatType.SeatType;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;

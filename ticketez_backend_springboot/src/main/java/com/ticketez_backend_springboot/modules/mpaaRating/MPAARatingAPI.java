@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @CrossOrigin("*")
 @RestController
@@ -53,11 +52,12 @@ public class MPAARatingAPI {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @GetMapping("/get/all")
     public ResponseEntity<?> findAll() {
         try {
-           List<MPAARating> list = mpaaRatingDAO.findAll();
-        return ResponseEntity.ok(list);
+            List<MPAARating> list = mpaaRatingDAO.findAll();
+            return ResponseEntity.ok(list);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }

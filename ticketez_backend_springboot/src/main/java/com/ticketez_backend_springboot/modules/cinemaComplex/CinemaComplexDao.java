@@ -10,9 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ticketez_backend_springboot.dto.CinemaToCinemaComplexDTO;
-import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.province.Province;
-import com.ticketez_backend_springboot.modules.format.Format;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 public interface CinemaComplexDao extends JpaRepository<CinemaComplex, Long> {

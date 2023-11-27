@@ -62,16 +62,18 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
         List<Movie> getMovieByShowtimeUpcoming();
 
         // Lấy ra top 5 phim có booking cao nhất
-        @Query("SELECT m, COUNT(b) as bookingCount " +
-                        "FROM Movie m " +
-                        "LEFT JOIN m.formatsMovies fm " +
-                        "LEFT JOIN fm.showtimes st " +
-                        "LEFT JOIN st.bookings b " +
-                        "WHERE st.startTime >= CURRENT_TIMESTAMP " +
-                        "GROUP BY m.id, m.country, m.description, m.duration, m.movieProducer, m.movieStudio, m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title, m.videoTrailer "
-                        +
-                        "ORDER BY bookingCount DESC")
-        List<Movie> findTop5MoviesByBookingCount();
+        // @Query("SELECT m, COUNT(b) as bookingCount " +
+        // "FROM Movie m " +
+        // "LEFT JOIN m.formatsMovies fm " +
+        // "LEFT JOIN fm.showtimes st " +
+        // "LEFT JOIN st.bookings b " +
+        // "WHERE st.startTime >= CURRENT_TIMESTAMP " +
+        // "GROUP BY m.id, m.country, m.description, m.duration, m.movieProducer,
+        // m.movieStudio, m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title,
+        // m.videoTrailer "
+        // +
+        // "ORDER BY bookingCount DESC")
+        // List<Movie> findTop5MoviesByBookingCount();
 
         @Query(value = "SELECT DISTINCT m.* " +
                         "FROM Movies m " +
@@ -109,17 +111,15 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         + ") ORDER BY m.rating DESC")
         Page<Movie> findMovieShowtimePresent(Pageable pageable);
 
-         @Query("SELECT m FROM Movie m WHERE EXISTS"
+        @Query("SELECT m FROM Movie m WHERE EXISTS"
                         + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
                         + "AND st.startTime >= CURRENT_TIMESTAMP "
-                        + ") " 
+                        + ") "
                         + "AND NOT EXISTS "
                         + "(SELECT b FROM Booking b JOIN b.showtime st WHERE m.id = st.formatMovie.movie.id AND b.status = 0 AND b.ticketStatus = 1 "
                         + "AND  b.account.id = :userId   )"
-                        +"ORDER BY m.rating DESC")
-        Page<Movie> findMovieShowtimePresentNotExistsByUser(Pageable pageable,String userId );
-
-
+                        + "ORDER BY m.rating DESC")
+        Page<Movie> findMovieShowtimePresentNotExistsByUser(Pageable pageable, String userId);
 
         @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin( " +
                         " COUNT( k.id) AS total_tickets ) " +

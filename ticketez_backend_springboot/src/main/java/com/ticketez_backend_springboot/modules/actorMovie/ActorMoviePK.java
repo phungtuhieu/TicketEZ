@@ -2,8 +2,6 @@ package com.ticketez_backend_springboot.modules.actorMovie;
 
 import java.io.Serializable;
 
-import com.ticketez_backend_springboot.modules.director.Director;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -25,7 +23,7 @@ public class ActorMoviePK implements Serializable {
     private Long movieId;
 
     // public ActorMoviePK(Long actorId, Long movieId) {
-    //     this.actorId = actorId;
-    //     this.movieId = movieId;
+    // this.actorId = actorId;
+    // this.movieId = movieId;
     // }
 }

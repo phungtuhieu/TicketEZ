@@ -1,4 +1,4 @@
-package com.ticketez_backend_springboot.modules.genreMovie;
+package com.ticketez_backend_springboot.modules.articleMovie;
 
 import java.io.Serializable;
 
@@ -14,12 +14,12 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenreMoviePK implements Serializable {
-
-    @Column(name = "genre_id", insertable = false, updatable = false)
-    private Long genre_id;
+public class ArticleMoviePK implements Serializable {
 
     @Column(name = "movie_id", insertable = false, updatable = false)
     private Long movieId;
+
+    @Column(name = "article_id", insertable = false, updatable = false)
+    private Long articleId;
 
 }

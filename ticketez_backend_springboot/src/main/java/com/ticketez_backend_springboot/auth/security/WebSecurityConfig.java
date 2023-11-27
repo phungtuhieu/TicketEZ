@@ -90,8 +90,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               "/api/account/**", "/api/auth/**", "/api/booking/**", "/api/cinema/**",
               "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**", "/api/actor/**",
               "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
-              "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
-              "/api/movie-studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
+              "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/producer/**",
+              "/api/studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
               "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
               "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
               "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**").permitAll();

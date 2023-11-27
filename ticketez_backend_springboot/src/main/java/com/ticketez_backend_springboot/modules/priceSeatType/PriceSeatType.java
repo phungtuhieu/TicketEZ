@@ -1,9 +1,5 @@
 package com.ticketez_backend_springboot.modules.priceSeatType;
 
-import java.util.Date;
-
-import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
-import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.seatType.SeatType;
 

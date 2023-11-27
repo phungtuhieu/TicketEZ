@@ -4,10 +4,8 @@ package com.ticketez_backend_springboot.modules.cinema;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.cinemaType.CinemaType;
-import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
@@ -44,7 +42,7 @@ public class Cinema {
 	@OneToMany(mappedBy = "cinema")
 	private List<SeatChart> seatCharts;
 
-	@JsonIgnore 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cinema")
 	private List<Showtime> showtimes;
 }

@@ -1,33 +1,32 @@
 package com.ticketez_backend_springboot.modules.movieStudio;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.studio.Studio;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Table(name = "Movies_Studios")
 @Entity
-@Table(name = "Movie_Studio")
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class MovieStudio {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @EmbeddedId
+    MovieStudioPK movieStudioPK;
 
-	private String name;
-	private String country;
-	private String email;
-	private String description;
+    @ManyToOne
+    @JoinColumn(name = "movie_id", insertable = false, updatable = false)
+    private Movie movie;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "movieStudio")
-	private List<Movie> movies;
+    @ManyToOne
+    @JoinColumn(name = "studio_id", insertable = false, updatable = false)
+    private Studio studio;
 
 }

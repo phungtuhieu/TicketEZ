@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.modules.discount.Discount;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +27,7 @@ public class CinemaChainAPI {
 
     // @GetMapping
     // public ResponseEntity<List<CinemaChain>> findAll() {
-    //     return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
+    // return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
     // }
 
     @GetMapping("/{id}")
@@ -45,7 +43,7 @@ public class CinemaChainAPI {
 
     }
 
-      @GetMapping("/get/all")
+    @GetMapping("/get/all")
     public ResponseEntity<List<CinemaChain>> findAll() {
         List<CinemaChain> cinemaChains = cinemaChainDao.findAllByOrderByIdDesc();
         return ResponseEntity.ok(cinemaChains);

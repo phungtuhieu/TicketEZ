@@ -1,9 +1,7 @@
 package com.ticketez_backend_springboot.modules.seatChoose;
 
-
 import java.time.LocalDateTime;
 
-import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
@@ -20,12 +18,12 @@ import lombok.Data;
 @Table(name = "Seats_Choose")
 @Data
 public class SeatChoose {
-    @Id
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private LocalDateTime lastSelectedTime;
-    @ManyToOne
+	@ManyToOne
 	@JoinColumn(name = "seat_id")
 	private Seat seat;
 

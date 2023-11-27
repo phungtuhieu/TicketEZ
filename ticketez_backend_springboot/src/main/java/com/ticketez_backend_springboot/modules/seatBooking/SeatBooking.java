@@ -1,7 +1,5 @@
 package com.ticketez_backend_springboot.modules.seatBooking;
 
-import java.time.LocalDateTime;
-
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 

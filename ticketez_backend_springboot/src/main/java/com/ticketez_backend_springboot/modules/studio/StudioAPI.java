@@ -1,13 +1,8 @@
-package com.ticketez_backend_springboot.modules.movieProducer;
+package com.ticketez_backend_springboot.modules.studio;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,44 +13,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ticketez_backend_springboot.dto.ResponseDTO;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/movie-producer")
-public class MovieProducerAPI {
+@RequestMapping("/api/studio")
+public class StudioAPI {
     @Autowired
-    MovieProducerDAO dao;
+    StudioDAO dao;
 
-    @GetMapping
-    public ResponseEntity<?> findByPage(
-            @RequestParam("page") Optional<Integer> pageNo,
-            @RequestParam("limit") Optional<Integer> limit,
-            @RequestParam("search") Optional<String> search) {
-        try {
-            if (pageNo.isPresent() && pageNo.get() == 0) {
-                return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
-            }
-            Sort sort = Sort.by(Sort.Order.desc("id"));
-            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<MovieProducer> page = dao.findByKeyword(search.orElse(""), pageable);
-            ResponseDTO<MovieProducer> responeDTO = new ResponseDTO<>();
-            responeDTO.setData(page.getContent());
-            responeDTO.setTotalItems(page.getTotalElements());
-            responeDTO.setTotalPages(page.getTotalPages());
-            return ResponseEntity.ok(responeDTO);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @GetMapping
+    // public ResponseEntity<?> findAll(
+    // @RequestParam("page") Optional<Integer> pageNo,
+    // @RequestParam("limit") Optional<Integer> limit,
+    // @RequestParam("search") Optional<String> search) {
+    // try {
+    // if (pageNo.isPresent() && pageNo.get() == 0) {
+    // return new ResponseEntity<>("Tài nguyên không tồn tại",
+    // HttpStatus.BAD_REQUEST);
+    // }
+
+    // Sort sort = Sort.by(Sort.Order.desc("id"));
+
+    // Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10),
+    // sort);
+    // // Page<Studio> page = dao.findByKeyword(search.orElse(""), pageable);
+    // ResponseDTO<Studio> responeDTO = new ResponseDTO<>();
+    // responeDTO.setData(page.getContent());
+    // responeDTO.setTotalItems(page.getTotalElements());
+    // responeDTO.setTotalPages(page.getTotalPages());
+    // return ResponseEntity.ok(responeDTO);
+    // } catch (Exception e) {
+    // return new ResponseEntity<>("Lỗi kết nối server",
+    // HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
+
+    // }
 
     @GetMapping("/get/all")
     public ResponseEntity<?> findAll() {
         try {
-            List<MovieProducer> list = dao.findAll();
+            List<Studio> list = dao.findAll();
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -76,23 +74,23 @@ public class MovieProducerAPI {
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody MovieProducer movieProducer) {
+    public ResponseEntity<?> post(@RequestBody Studio movieStudio) {
         try {
-            dao.save(movieProducer);
-            return ResponseEntity.ok(movieProducer);
+            dao.save(movieStudio);
+            return ResponseEntity.ok(movieStudio);
         } catch (Exception e) {
             return new ResponseEntity<>("Không thể thêm dữ liệu mới", HttpStatus.CONFLICT);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody MovieProducer movieProducer) {
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Studio movieStudio) {
         try {
             if (!dao.existsById(id)) {
                 return new ResponseEntity<>("Không tìm thấy dữ liệu", HttpStatus.NOT_FOUND);
             }
-            dao.save(movieProducer);
-            return ResponseEntity.ok(movieProducer);
+            dao.save(movieStudio);
+            return ResponseEntity.ok(movieStudio);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi khi cập nhật dữ liệu", HttpStatus.CONFLICT);
         }

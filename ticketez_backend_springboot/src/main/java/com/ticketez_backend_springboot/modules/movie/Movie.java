@@ -5,7 +5,6 @@ import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
 import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
@@ -14,8 +13,6 @@ import com.ticketez_backend_springboot.modules.genreMovie.GenreMovie;
 import com.ticketez_backend_springboot.modules.movieProducer.MovieProducer;
 import com.ticketez_backend_springboot.modules.movieStudio.MovieStudio;
 import com.ticketez_backend_springboot.modules.mpaaRating.MPAARating;
-import com.ticketez_backend_springboot.modules.price.Price;
-import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,13 +49,13 @@ public class Movie implements Serializable {
 	@Column(name = "video_trailer")
 	private String videoTrailer;
 
-	@ManyToOne
-	@JoinColumn(name = "movie_studio_id")
-	private MovieStudio movieStudio;
+	// @ManyToOne
+	// @JoinColumn(name = "movie_studio_id")
+	// private Studio movieStudio;
 
-	@ManyToOne
-	@JoinColumn(name = "movie_producer_id")
-	private MovieProducer movieProducer;
+	// @ManyToOne
+	// @JoinColumn(name = "movie_producer_id")
+	// private Producer movieProducer;
 
 	@ManyToOne
 	@JoinColumn(name = "MPAA_rating_id")
@@ -80,4 +77,11 @@ public class Movie implements Serializable {
 	@OneToMany(mappedBy = "movie")
 	private List<ActorMovie> actorsMovies;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "movie")
+	private List<MovieProducer> movieProducers;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "movie")
+	private List<MovieStudio> movieStudios;
 }

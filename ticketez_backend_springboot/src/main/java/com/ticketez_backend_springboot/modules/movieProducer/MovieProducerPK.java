@@ -1,4 +1,4 @@
-package com.ticketez_backend_springboot.modules.genreMovie;
+package com.ticketez_backend_springboot.modules.movieProducer;
 
 import java.io.Serializable;
 
@@ -10,16 +10,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Embeddable
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenreMoviePK implements Serializable {
-
-    @Column(name = "genre_id", insertable = false, updatable = false)
-    private Long genre_id;
-
+@Setter
+@Getter
+public class MovieProducerPK implements Serializable {
     @Column(name = "movie_id", insertable = false, updatable = false)
     private Long movieId;
+    @Column(name = "producer_id", insertable = false, updatable = false)
+    private Long producerId;
 
 }

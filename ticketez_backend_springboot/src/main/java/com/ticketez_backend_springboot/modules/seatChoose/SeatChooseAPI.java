@@ -6,22 +6,16 @@ import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ticketez_backend_springboot.modules.seat.Seat;
 
 @CrossOrigin("*")
 @RestController
@@ -49,18 +43,18 @@ public class SeatChooseAPI {
         dao.saveAll(seats);
         return ResponseEntity.ok(seats);
     }
+
     @PostMapping("/deleteMultiple")
     public ResponseEntity<Void> deleteMultiple(@RequestBody List<SeatChoose> seatChooseList) {
         // for (SeatChoose seatChoose : seatChooseList) {
-        //     if (!dao.existsById(seatChoose.getId())) {
-        //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        //     }
+        // if (!dao.existsById(seatChoose.getId())) {
+        // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        // }
         // }
         dao.deleteAllByIdIn(seatChooseList);
-        
+
         return ResponseEntity.noContent().build();
     }
-    
 
     @Scheduled(fixedDelay = 60000)
     public void checkAndDeleteBookedSeats() {
