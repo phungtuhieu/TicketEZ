@@ -33,7 +33,7 @@ CREATE TABLE Accounts (
 GO
 CREATE TABLE Account_Lock_History(
     id BIGINT IDENTITY(1,1) NOT NULL,
-    event_type BIT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
+    event_type INT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
     event_date DATETIME NOT NULL, 
     reason NVARCHAR(MAX) NOT NULL, -- lý do unlock hoặc lock 
 	account_id NVARCHAR(20) NOT NULL,

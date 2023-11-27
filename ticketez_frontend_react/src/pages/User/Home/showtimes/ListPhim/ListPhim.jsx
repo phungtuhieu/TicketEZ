@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Modal, Alert, Tag } from 'antd';
+import { Button, Row, Col, Modal, Tag } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import classNames from 'classnames/bind';
@@ -123,7 +123,9 @@ function ListPhim({ cinemaComplex }) {
                                     <Col span={22}>
                                         <Row>
                                             <Col span={24} className={cx('ten-rap')}>
-                                                {'Lịch chiếu phim ' + (cinemaComplex?.name ?? '')}
+                                                <Link to={'/movie-cinema-complex/'+ cinemaComplex?.id} className=" tw-text-[#262626] tw-min-w-[100px] hover:tw-text-[var(--pink)] tw-cursor-pointer ">
+                                                    {'Lịch chiếu phim ' + (cinemaComplex?.name ?? '')}
+                                                </Link>
                                             </Col>
                                             <Col span={24} className={cx('container-info')}>
                                                 <div className={cx('chi-tiet-dia-chi')}>
@@ -139,7 +141,7 @@ function ListPhim({ cinemaComplex }) {
                                                     className="modal-map-lg"
                                                     footer={
                                                         <Button
-                                                            className={cx('modal-footer-btn-close')}
+                                                            className="modal-footer-btn-close"
                                                             onClick={handleCancelModal}
                                                         >
                                                             ĐÓNG

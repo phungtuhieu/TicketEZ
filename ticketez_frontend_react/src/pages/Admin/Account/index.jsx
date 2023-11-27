@@ -15,6 +15,8 @@ import {
     Select,
     Switch,
     Radio,
+    Modal,
+    AutoComplete,
 } from 'antd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,9 +36,11 @@ import PaginationCustom from '~/components/Admin/PaginationCustom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useDebounce } from '~/hooks';
+import { rule } from 'postcss';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
+const { TextArea } = Input;
 
 const formItemLayout = {
     labelCol: { span: 4 },
@@ -64,6 +68,47 @@ const AdminAccount = () => {
 
     const valueSearchDelay = useDebounce(search, 500);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const options = [
+        {
+            value: 'Bình luận tiêu cực.',
+        },
+        {
+            value: 'Người dùng đã lạm dụng tính năng bình luận bằng cách chia sẻ thông tin giả mạo, thực hiện spam, hoặc tấn công người dùng khác',
+        },
+        {
+            value: 'Người dùng sử dụng bình luận để quảng cáo sản phẩm hoặc dịch vụ, hoặc thực hiện spam.',
+        },
+        {
+            value: 'Người dùng đã đăng bình luận chứa thông tin xuyên tạc hoặc giả mạo.',
+        },
+        {
+            value: 'Người dùng đã sử dụng ngôn ngữ thiếu tôn trọng, đả kích hoặc vi phạm quy định cộng đồng.',
+        },
+        {
+            value: 'Bình luận của người dùng làm tăng cường không khí tranh cãi đến mức không lành mạnh hoặc gây mất trật tự.',
+        },
+        {
+            value: 'Người dùng đã viết những bình luận gây hấn, đe dọa, hoặc gây lo lắng đối với người dùng khác.',
+        },
+    ];
+    const onChangeReason = (ten) => {
+        setReason(ten);
+    };
+    const onSelect = (value) => {
+        setReason(value);
+    };
+
+    const showModalReason = () => {
+        setIsModalOpen(true);
+        setReason('');
+    };
+
+    const handleCancelReason = () => {
+        setIsModalOpen(false);
+    };
+
     //call api
     useEffect(() => {
         const getList = async () => {
@@ -81,6 +126,9 @@ const AdminAccount = () => {
         };
         getList();
     }, [currentPage, pageSize, workSomeThing, status, valueSearchDelay]);
+
+    const [reason, setReason] = useState('');
+    console.log(reason);
 
     const columns = [
         {
@@ -145,20 +193,54 @@ const AdminAccount = () => {
                             }}
                         />
                     )}
-
+                    {/*  */}
                     <Popconfirm
-                        title={record.status === 1 ? 'Khoá tài khoản' : 'Mở khoá tài khoản'}
-                        description={record.status === 1 ? 'Chắn chắn khoá?' : 'Chắn chắn mở?'}
+                        title={record.status !== 1 && 'Mở khoá tài khoản'}
+                        description={record.status !== 1 && 'Chắn chắn mở?'}
                         okText="Đồng ý"
                         cancelText="Huỷ"
                         onConfirm={() => handleStatus(record)}
                     >
-                        {record.status === 1 ? (
-                            <FontAwesomeIcon icon={faLockOpen} className={cx('icon-trash')} />
-                        ) : (
-                            <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />
-                        )}
+                        {record.status !== 1 && <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />}
                     </Popconfirm>
+                    {/*  */}
+
+                    {record.status === 1 && (
+                        <>
+                            <FontAwesomeIcon icon={faLockOpen} className={cx('icon-trash')} onClick={showModalReason} />
+                            <Modal
+                                title="Lí do khoá tài khoản"
+                                open={isModalOpen}
+                                onOk={() => {
+                                    handleStatus(record);
+                                    handleCancelReason();
+                                }}
+                                okText="Đồng ý"
+                                cancelText="Huỷ"
+                                onCancel={handleCancelReason}
+                            >
+                                <AutoComplete
+                                    options={options}
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    onSelect={onSelect}
+                                    filterOption={(inputValue, option) =>
+                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                    }
+                                >
+                                    <TextArea
+                                        placeholder="Nhập lí do..."
+                                        className="custom"
+                                        style={{
+                                            height: 100,
+                                        }}
+                                        onChange={(e) => onChangeReason(e.target.value)}
+                                    />
+                                </AutoComplete>
+                            </Modal>
+                        </>
+                    )}
                 </Space>
             ),
         },
@@ -172,7 +254,7 @@ const AdminAccount = () => {
         try {
             if (record.id) {
                 const status = record.status === 1 ? 2 : 1;
-                const res = await accountApi.patchStatus(record.id, status);
+                const res = await accountApi.patchStatus(record.id, status, reason);
                 if (res.status === 200 && status === 2) {
                     funcUtils.notify('Khoá tài khoản thành công', 'success');
                 } else {
@@ -291,7 +373,7 @@ const AdminAccount = () => {
             label: 'Nữ',
         },
     ];
-    
+
     return (
         <>
             <Row>
@@ -360,7 +442,7 @@ const AdminAccount = () => {
                             <DatePicker placeholder="Ngày sinh..." format={'DD-MM-YYYY'} style={{ width: '100%' }} />
                         </Form.Item>
 
-                        <Form.Item {...formItemLayout} name="gender" label="Giới tính" >
+                        <Form.Item {...formItemLayout} name="gender" label="Giới tính">
                             {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
                             <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>

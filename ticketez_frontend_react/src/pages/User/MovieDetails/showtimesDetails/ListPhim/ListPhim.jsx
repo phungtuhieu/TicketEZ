@@ -7,6 +7,7 @@ import { cinemaComplexUserApi } from '~/api/user/showtime';
 import moment from 'moment-timezone';
 import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
 import uploadApi from '~/api/service/uploadApi';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import { useParams } from 'react-router-dom';
 import Mapbox from '~/components/Mapbox';
@@ -22,23 +23,28 @@ function ListPhim({ propsValue }) {
         setActiveKey(key);
     };
 
-    // const location = useLocation();
-    // const path = location.pathname;
-    // const parts = path.split('/');
-    // const movieId = parts[parts.indexOf('movie-details') + 1];
-
-    const {movieId} = useParams();
+    const { movieId } = useParams();
     console.log(movieId);
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
+        setLoading(true);
         const get = async () => {
-            const res = await cinemaComplexUserApi.getCcxFormatShowtimeByMovie(
-                movieId,
-                propsValue.provinces.id,
-                propsValue.cinemaChainName,
-                propsValue.chooseDay,
-            );
-            setList(res);
+            try {
+                const res = await cinemaComplexUserApi.getCcxFormatShowtimeByMovie(
+                    movieId,
+                    propsValue.provinces.id,
+                    propsValue.cinemaChainName,
+                    propsValue.chooseDay,
+                );
+                setList(res);
+                setLoading(false);
+
+            } catch (error) {
+                console.log(error);
+                setLoading(false);
+            }
         };
         get();
     }, [movieId, propsValue]);
@@ -86,16 +92,17 @@ function ListPhim({ propsValue }) {
                                     onCancel={handleCancelModal}
                                     className="modal-map-lg"
                                     footer={
-                                        <Button className={cx('modal-footer-btn-close')} onClick={handleCancelModal}>
+                                        <Button className="modal-footer-btn-close" onClick={handleCancelModal}>
                                             ĐÓNG
                                         </Button>
                                     }
                                 >
                                     <div className="map-lg-content">
                                         <Mapbox
-                                            latitude={10.76317169124285}
-                                            longitude={106.65670151096185}
-                                            address={'Tầng 4 Lotte Mart Phú Thọ, Số 96819203120948120984012'}
+                                            latitude={item.cinemaComplex.latitude}
+                                            longitude={item.cinemaComplex.longitude}
+                                            address={item.cinemaComplex.address}
+                                            title={item.cinemaComplex.name}
                                         />
                                     </div>
                                 </Modal>
@@ -150,6 +157,11 @@ function ListPhim({ propsValue }) {
     // console.log(newList);
     return (
         <>
+            {loading && (
+                <div className={cx('loading-ccx')}>
+                    <LoadingOutlined className={cx('imgL-ccx')} />
+                </div>
+            )}
             {list.length !== 0 && (
                 <List
                     dataSource={newList}

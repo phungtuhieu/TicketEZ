@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistory;
 import com.ticketez_backend_springboot.modules.accountRole.AccountRole;
 import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
@@ -61,5 +62,9 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<Event> events;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	private List<AccountLockHistory> accountLockHistory;
 
 }
