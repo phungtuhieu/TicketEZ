@@ -30,6 +30,7 @@ const Binhluan = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedComment, setEditedComment] = useState('');
     const [indexId, setIndexId] = useState();
+    const [userId, setUserId] = useState();
     const [editData, setEditData] = useState();
     const [deleteItem, setDeleteItem] = useState(null);
 
@@ -57,6 +58,16 @@ const Binhluan = () => {
         getList();
     }, [workSomeThing, movieId]);
 
+    //xử lý lấy thông tin
+    useEffect(() => {
+        const accountToken = localStorage.getItem('account');
+        if (accountToken) {
+            const accountData = JSON.parse(accountToken);
+            setAccount(accountData);
+        } else {
+            setAccount(null);
+        }
+    }, []);
     useEffect(() => {
         const getMovie = async () => {
             const movie = await movieApi.getById(movieId);
@@ -67,32 +78,67 @@ const Binhluan = () => {
     }, [movieId])
     //hàm xử lý thêm và update bình luận
     useEffect(() => {
-        const getAccount = async () => {
+        const getAccount = async (userId) => {
             try {
-                const user = await accountApi.getById('user17');
-                setAccount(user.data); // Cập nhật giá trị của account khi có dữ liệu mới
+                const user = await accountApi.getById(userId);
+                setAccount(user.data);
             } catch (error) {
                 console.error('Failed to get account:', error);
+                // Display an error notification
+                funcUtils.notify('Failed to get account information', 'error');
             }
         };
-        getAccount();
-    }, []);
-    const handleAdd = async () => {
-        if (!comment.trim()) {
-            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+
+        
+        if (account && account.id) {
+            getAccount(account.id);
+        }
+    }, [account]);
+    useEffect(() => {
+    const accountToken = localStorage.getItem('account');
+    if (accountToken) {
+        const accountData = JSON.parse(accountToken);
+        setAccount(accountData);
+    } else {
+        setAccount(null);
+    }
+}, []);
+//     try {
+
+//         //lấy token từ local
+//         const token = localStorage.getItem('authToken');
+        
+//       if (token) {
+//         const user = await accountApi.getById(token);
+//         setAccount(user.data); 
+//       }
+//     } catch (error) {
+//         console.error('Failed to get account:', error);
+//     }
+// };
+  
+
+        const handleAdd = async () => {
+        // if (!comment.trim()) {
+        //     funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+        //     return;
+        // }
+        if (!account) {
+            funcUtils.notify('Vui lòng đăng nhập để thêm bình luận', 'warning');
             return;
         }
         setLoading(true);
         try {
-            const user = await accountApi.getById('user17');
-
+            // const userId = account.id;
+            const user = await accountApi.getById('userId');
+            console.log(user);
             const datareview = {
                 comment,
                 rating,
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, 'user17', 1);
+            reviewApi.post(datareview, userId, movieId);
             
             setWorkSomeThing(!workSomeThing);
             setComment("");
