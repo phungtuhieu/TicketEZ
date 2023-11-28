@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, message } from 'antd';
+import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './Profile.module.scss';
 import authApi from '~/api/user/Security/authApi';
 import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
+import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
-import dayjs from 'dayjs';
-import { accountApi } from '~/api/admin';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
@@ -16,13 +15,6 @@ const EditableProfile = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef();
   const [fileList, setFileList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [editData, setEditData] = useState(null);
-  const [workSomeThing, setWorkSomeThing] = useState(false);
-  const [resetForm, setResetForm] = useState(false);
-
-
 
 
   useEffect(() => {
@@ -34,6 +26,7 @@ const EditableProfile = () => {
         form.setFieldsValue({
           ...user,
           birthday: user.birthday ? moment(user.birthday) : null,
+
         });
       } catch (error) {
         console.error(error);
@@ -43,11 +36,23 @@ const EditableProfile = () => {
     fetchData();
   }, []);
 
+  const onSave = async (values) => {
+    try {
 
+      const response = await profileApi.putUser(userData.id, values);
+      setUserData(response);
+      setEditing(false);
+      console.log(response);
+      localStorage.removeItem('user');
+      localStorage.setItem('user', JSON.stringify(response.data));
+      window.location.reload();
+      funcUtils.notify("Cập nhật thành công", 'success');
+    } catch (error) {
+      funcUtils.notify("Cập nhật Thất bại", 'error');
 
-  const onFinish = async (id, userData) => {
-
+    }
   };
+
 
 
 
@@ -55,13 +60,8 @@ const EditableProfile = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedImage(URL.createObjectURL(file));
-
-      setFileList([file]);
     }
   };
-
-
-
 
   const onEditAvatar = () => {
     fileInputRef.current.click();
@@ -71,12 +71,7 @@ const EditableProfile = () => {
     setEditing(true);
   };
 
-
-
-
-
   const onCancel = () => {
-    form.resetFields();
     setEditing(false);
   };
 
@@ -88,6 +83,7 @@ const EditableProfile = () => {
   return (
     <div className={styles.profileFormContainer}>
       <Card className={styles.profileFormCard} title="THÔNG TIN TÀI KHOẢN" bordered={false}>
+        {/* <div className="clsss"> <span>Xin chào, {userData.fullname}</span></div> */}
         <div className={styles.avatarContainer} onClick={editing ? onEditAvatar : undefined}>
           {selectedImage ? (
             <img src={selectedImage} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
@@ -119,7 +115,7 @@ const EditableProfile = () => {
           <Form
             form={form}
             layout="vertical"
-            onFinish={onFinish}
+            onFinish={onSave}
 
           >
             <Row gutter={16}>

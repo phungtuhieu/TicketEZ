@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.auth.controllers;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -176,20 +177,37 @@ public class AuthController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody SecurityAccount securityAccount) {
-      try {
-          if (!accountRepository.existsById(id)) {
-              return new ResponseEntity<>("User không tồn tại", HttpStatus.NOT_FOUND);
-          }
-          SecurityAccount updatedAccount = accountRepository.save(securityAccount);
-          
-          return ResponseEntity.ok(updatedAccount);
-      } catch (Exception e) {
-          return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-  }
-  
+  public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody Map<String, Object> updates) {
+    if (!accountRepository.existsById(id)) {
+      return ResponseEntity.notFound().build();
+    }
 
+    SecurityAccount existingAccount = accountRepository.findById(id).orElse(null);
+    if (existingAccount == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    if (updates.containsKey("phone")) {
+      existingAccount.setPhone((String) updates.get("phone"));
+    }
+    if (updates.containsKey("fullname")) {
+      existingAccount.setFullname((String) updates.get("fullname"));
+    }
+    if (updates.containsKey("email")) {
+      existingAccount.setEmail((String) updates.get("email"));
+    }
+    if (updates.containsKey("address")) {
+      existingAccount.setAddress((String) updates.get("address"));
+    }
+    if (updates.containsKey("gender")) {
+      existingAccount.setGender((String) updates.get("gender"));
+    }
+
+    SecurityAccount updatedAccount = accountRepository.save(existingAccount);
+    return ResponseEntity.ok(updatedAccount);
+
+    
+  }
 
   @GetMapping("/signout")
   public ResponseEntity<?> logoutUser(HttpServletRequest request) {

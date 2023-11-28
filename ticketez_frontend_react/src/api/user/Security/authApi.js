@@ -2,7 +2,6 @@ import { data } from 'autoprefixer';
 import axios from 'axios';
 import axiosClient from '~/api/global/axiosClient';
 
-const updateUserEndpoint = '/api/auth';
 const auth = 'auth/signin'
 const signupSecurity = 'auth/signup'
 const logoutSecurity = 'auth/signup'
@@ -88,16 +87,8 @@ const authApi = {
     },
 
 
-    putUser: async (id, securityAccount) => {
-        try {
-          const response = await axiosClient.put(`${updateUserEndpoint}/${id}`, securityAccount);
-          return response.data; 
-        } catch (error) {
-          console.error('Error updating user:', error);
-          throw error;
-        }
-      },
 
+   
 
 
     logout() {
