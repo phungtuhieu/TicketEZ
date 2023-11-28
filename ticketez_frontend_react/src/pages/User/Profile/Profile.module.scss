@@ -1,65 +1,98 @@
-// Profile.module.scss
+.profileFormContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  min-height: 80vh;
+  padding: 2rem;
+  background-color: #f7f7f7;
 
-.profile-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff; // Assuming a white background
-  border-radius: 8px; // Adjust border-radius to match your design preference
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Simple shadow for a card effect
+  .profileFormCard {
+    box-sizing: border-box;
+    margin-top: 2rem; 
+    padding: 2rem;
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: margin-top 0.3s ease;
 
-  .ant-form-item-label {
-    label {
-      color: #333; // Dark color for text
-      font-size: 14px; // Adjust the font size as needed
+    .profileDisplay {
+      text-align: center;
+
+      p {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+
+      button {
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #1890ff;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #40a9ff;
+        }
+      }
+
+      &.editing {
+        .profileFormCard {
+          margin-top: 1rem; 
+        }
+      }
     }
-  }
 
-  .ant-form-item {
-    margin-bottom: 16px; // Spacing between form items
+    .ant-form {
+      .ant-form-item {
 
-    .ant-form-text {
-      color: #666; // Lighter color for non-editable text
-    }
+        margin-bottom: 1px;
 
-    .ant-input {
-      border-radius: 4px; // Border radius for input fields
-      // Additional styles for the input can be placed here
-    }
+        &.full-name {
+          margin-bottom: 1px;
 
-    .ant-radio-group {
-      .ant-radio-wrapper {
-        margin-right: 20px; // Space between radio buttons
+          .ant-form-item-label {
+            padding-bottom: 0;
+          }
 
-        .ant-radio {
-          // Style the radio buttons as needed
+          .ant-form-item-control {
+            margin: 0;
+          }
         }
 
-        span {
-          color: #333; // Text color for the radio buttons
-          font-size: 14px; // Font size for radio buttons
+
+
+        .ant-input,
+        .ant-picker {
+          border-radius: 4px;
+          border: 1px solid #d9d9d9;
         }
+
+        .ant-radio-group {
+          .ant-radio-button-wrapper {
+            margin-right: 8px;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    .buttonGroup {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1rem;
+
+      button {
+        margin-left: 8px;
       }
     }
   }
 
-  .ant-btn {
-    height: 40px; // Example button height
-    line-height: 38px; // Centers the text vertically in the button
-    padding: 0 20px; // Horizontal padding for button text
-    border-radius: 4px; // Button border radius
-
-    &.ant-btn-default {
-      background-color: #f5f5f5; // Background color for the default button
-      border: 1px solid #d9d9d9; // Border color for the default button
-      color: #333; // Text color for the default button
-      margin-right: 8px; // Spacing between buttons
-    }
-
-    &.ant-btn-primary {
-      background-color: #ff4d4f; // Use your primary color here
-      border-color: #ff4d4f; // Border color for the primary button
-      color: #fff; // Text color for the primary button
-    }
-  }
 }

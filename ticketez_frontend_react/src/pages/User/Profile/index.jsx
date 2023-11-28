@@ -1,215 +1,196 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, Button, Input, Progress, Form, DatePicker, Radio, Select, InputNumber, Switch, Image, Upload } from 'antd';
-// import 'antd/dist/antd.css';
-import './Profile.module.scss';
-import { FacebookFilled, GoogleCircleFilled, UploadOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import styles from './Profile.module.scss';
+import authApi from '~/api/user/Security/authApi';
+import moment from 'moment';
+import uploadApi from '~/api/service/uploadApi';
+import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
+import { accountApi } from '~/api/admin';
 
-const ProfilePage = () => {
-  const [imageUrl, setImageUrl] = useState(null);
+const EditableProfile = () => {
+  const [userData, setUserData] = useState();
+  const [form] = Form.useForm();
+  const [editing, setEditing] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef();
+  const [fileList, setFileList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [workSomeThing, setWorkSomeThing] = useState(false);
+  const [resetForm, setResetForm] = useState(false);
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = await authApi.getUser();
+        setUserData(user);
+        console.log(user);
+        form.setFieldsValue({
+          ...user,
+          birthday: user.birthday ? moment(user.birthday) : null,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+
+  const onFinish = async (id, userData) => {
+
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
-  const handleImageChange = (info) => {
-    if (info.file.status === 'done') {
-      // Ảnh đã được tải lên thành công
-      setImageUrl(URL.createObjectURL(info.file.originFileObj));
+
+
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedImage(URL.createObjectURL(file));
+
+      setFileList([file]);
     }
   };
+
+
+
+
+  const onEditAvatar = () => {
+    fileInputRef.current.click();
+  };
+
+  const onEdit = () => {
+    setEditing(true);
+  };
+
+
+
+
+
+  const onCancel = () => {
+    form.resetFields();
+    setEditing(false);
+  };
+
+
+  const onChangePassword = () => {
+    console.log('Change password clicked');
+  };
+
   return (
-    <div className="container">
-      <div className="main-body">
-        <Row>
-          <Col lg={8}>
-            <Card>
-              <div className="card-body">
-                <div className="d-flex flex-column align-items-left text-left">
-                  <Image width={200} 
-                  src={imageUrl || 'https://scontent.fsgn5-9.fna.fbcdn.net/v/t39.30808-1/358561081_1293432168233582_652710667370024877_n.jpg?stp=dst-jpg_s320x320&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_mhoYnzSwMAAX-9-CO8&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfCnpSIHUEW7K5yPJeT3roUHGSihg3KS5Op_1FrvdVzFcg&oe=652EBC00'}  
-                  alt="Admin" className="rounded-circle p-1 bg-primary"/>
-                  <div className="mt-5">
-                    <h4>Tên tài khoản: Phùng Tự Hiếu</h4>
-                    <h4>Chức vụ: Người dùng</h4>           
-                    <Upload 
-                     name="image"
-                     showUploadList={false}
-                     action="URL_for_image_upload"
-                     onChange={handleImageChange}
-                    >
-                    <Button icon={<UploadOutlined />} type="primary">Cập nhật ảnh</Button>
-                  </Upload>
- 
-                    <Button>Message</Button>
-                  </div>
-                </div>
-                <hr className="my-4" />
-                <ul className="list-group list-group-flush">
-              
-                   <span style={{ fontWeight: 'bold', marginLeft: '8px' }}>  <FacebookFilled/> https://www.facebook.com/PTH.Looper</span>
-              <br />
-                      <span style={{ fontWeight: 'bold', marginLeft: '8px' }}> <GoogleCircleFilled/> https://www.facebook.com/PTH.Looper</span>
-                </ul>
-              </div>
-            </Card>
-          </Col>
-          <Col lg={12}>
-            <Card>
-              <div className="card-body">
-                <h1>Hồ Sơ Cá Nhân</h1>
-                <hr className="my-4" />
-                <Form
-                 labelCol={{
-                  span: 12,
-                }}
-                wrapperCol={{
-                  span: 16,
-                }}
-                  name="basic"
-                  style={{
-                    maxWidth: 800,
-                  }}
-                  initialValues={{
-                    remember: true,
-                  }}
-                  onFinish={onFinish}
-                  onFinishFailed={onFinishFailed}
-                  autoComplete="off"
+    <div className={styles.profileFormContainer}>
+      <Card className={styles.profileFormCard} title="THÔNG TIN TÀI KHOẢN" bordered={false}>
+        <div className={styles.avatarContainer} onClick={editing ? onEditAvatar : undefined}>
+          {selectedImage ? (
+            <img src={selectedImage} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+          ) : (
+            userData?.image ? (
+              <Avatar size={100} src={uploadApi.get(userData.image)} alt={`${userData?.id}'s avatar`} />
+            ) : (
+              <Avatar size={100} icon={<UserOutlined />} />
+            )
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            accept="image/*"
+          />
+        </div>
+
+
+        {!editing ? (
+          <div className={styles.profileDisplay}>
+            <p>Chọn vào để sửa</p>
+            <Button onClick={onEdit} type="primary">
+              Sửa thông tin cá nhân
+            </Button>
+          </div>
+        ) : (
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+
+          >
+            <Row gutter={16}>
+              <Col span={12}>
+                {/* Left Column */}
+                <Form.Item
+                  name="id"
+                  label="Tên Tài khoản"
+                  rules={[{ required: true, message: 'Vui lòng nhập tên tài khoản' }]}
                 >
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        label="Họ và tên"
-                        name="fullname"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please input your full name!',
-                          },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        label="Số điện thoại"
-                        name="phone"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please input your phone!',
-                          },
-                        ]}
-                      >
-                        <InputNumber style={{ width: '100%' }} />
-                      </Form.Item>
-                    </Col>
-                    
-                  </Row>
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        label="Email"
-                        name="email"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please input your email!',
-                          },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        label="Ngày sinh"
-                        name="birthday"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please input your birthday!',
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: '100%' }} />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row gutter={16}>
-                    <Col span={12}>
-                    <Form.Item
-                        label="Số điểm"
-                        name="points"
-                        readOnly 
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please input your points!',
-                          },
-                        ]}
-                      >
-                        <InputNumber style={{ width: '100%' }} />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                    <Form.Item
-                    label="Giới tính"
-                    name="gender"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Please select your gender!',
-                      },
-                    ]}
-                  >
-                    <Switch />
-                  </Form.Item>
-                    </Col>
-                 
-                  </Row>         
-                  <Form.Item
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'flex-start',
-                    }}
-                  >
-                    <Button type="primary" htmlType="submit">
-                      Cập nhật
-                    </Button>
-                  </Form.Item>
-                </Form>
+                  <Input
+                    placeholder="Tên tài khoản"
+                    value={userData?.id} s
+                    disabled
+                    readOnly
+                  />
+                </Form.Item>
 
 
-              </div>
-            </Card>
-            {/* <Row gutter={20}>
-              <Col span={20}>
-                <Card>
-                  <div className="card-body">
-                    <h5 className="d-flex align-items-center mb-3">Project Status</h5>
-                    <p>Web Design</p>
-                    <Progress percent={80} status="active" />
-                    <p>Website Markup</p>
-                    <Progress percent={72} status="active" />
-                    <p>One Page</p>
-                    <Progress percent={89} status="active" />
-                    <p>Mobile Template</p>
-                    <Progress percent={55} status="active" />
-                    <p>Backend API</p>
-                    <Progress percent={66} status="active" />
-                  </div>
-                </Card>
+                <Form.Item
+                  name="fullname"
+                  initialValue={userData.fullname}
+                  label="Họ & Tên"
+                  rules={[{ required: true, message: 'Vui lòng nhập họ và' }]} >
+                  <Input />
+                </Form.Item>
+                <Form.Item initialValue={userData.gender} name="gender" label="Giới tính">
+
+                  <Radio.Group>
+
+                    <Radio value="1">Nam</Radio>
+                    <Radio value="0">Nữ</Radio>
+                  </Radio.Group>
+                </Form.Item>
+                <Form.Item name="address" label="Địa chỉii" rules={[{ required: true }]} initialValue={userData.address}>
+                  <Input />
+                </Form.Item>
               </Col>
-            </Row> */}
-          </Col>
-        </Row>
-      </div>
+              <Col span={12}>
+                {/* Right Column */}
+                <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]} initialValue={userData.phone}>
+                  <Input />
+                </Form.Item>
+                <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
+                  <Input />
+                </Form.Item>
+                <Form.Item name="birthday" label="Ngày sinh" rules={[{ required: true }]}>
+                  <DatePicker format="DD-MM-YYYY" />
+                </Form.Item>
+
+                <Form.Item name="" label="Đổi mật khẩu" >
+                  <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">
+                    Đổi mật khẩu
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item>
+              <Button onClick={onCancel}>
+                Hủy sửa thông tin
+              </Button>
+              <Button type="primary" htmlType="submit" style={{ marginLeft: '8px' }}>
+                Lưu thông tin
+              </Button>
+            </Form.Item>
+
+          </Form>
+        )}
+      </Card>
     </div>
   );
-}
+};
 
-export default ProfilePage;
+export default EditableProfile;
