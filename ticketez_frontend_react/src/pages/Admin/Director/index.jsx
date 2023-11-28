@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Select } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    DatePicker,
+    Upload,
+    Image,
+    Select,
+    Radio,
+} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -18,6 +32,7 @@ import countriesJson from '~/data/countries.json';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { regex } from '~/utils/regex';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
@@ -25,6 +40,7 @@ const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
+const { TextArea } = Input;
 
 const AdminDirector = () => {
     const [loading, setLoading] = useState(false);
@@ -62,13 +78,18 @@ const AdminDirector = () => {
         {
             title: 'Mã',
             dataIndex: 'id',
-            width: '10%',
+            width: '5%',
             sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Họ và tên',
             dataIndex: 'fullname',
-            width: '30%',
+            width: '20%',
+        },
+        {
+            title: 'Giới tính',
+            dataIndex: 'gender',
+            render: (_, record) => (record.gender ? 'Nam' : 'Nữ'),
         },
         {
             title: 'Ngày sinh',
@@ -83,6 +104,10 @@ const AdminDirector = () => {
                 let i = countriesJson.findIndex((item) => item.code === record.country);
                 return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
             },
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
         },
         {
             title: 'Ảnh đại diện',
@@ -122,6 +147,16 @@ const AdminDirector = () => {
                     </Popconfirm>
                 </Space>
             ),
+        },
+    ];
+    const optionsWithDisabled = [
+        {
+            value: true,
+            label: 'Nam',
+        },
+        {
+            value: false,
+            label: 'Nữ',
         },
     ];
 
@@ -233,11 +268,8 @@ const AdminDirector = () => {
     };
     const handleCancel = () => {
         setOpen(false);
+        setLoading(false);
     };
-
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
 
     //form
     const handleResetForm = () => {
@@ -246,49 +278,39 @@ const AdminDirector = () => {
         console.log(form);
     };
 
-    const onPreview = async (file) => {
-        let src = file.url;
-        if (!src) {
-            src = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file.originFileObj);
-                reader.onload = () => resolve(reader.result);
-            });
-        }
-        const image = new Image();
-        image.src = src;
-        const imgWindow = window.open(src);
-        imgWindow?.document.write(image.outerHTML);
-    };
-
     // Xử lý sự kiện thay đổi trang
     const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
-    const validateBirthday = (rule, value, callback) => {
-        if (value) {
-            // Tính tuổi dựa trên ngày sinh
-            const today = new Date();
-            const birthday = new Date(value);
-            const age = today.getFullYear() - birthday.getFullYear();
+    const validateBirthday = (rule, value) => {
+        return new Promise((resolve, reject) => {
+            if (value) {
+                // Tính tuổi dựa trên ngày sinh
+                const today = new Date();
+                const birthday = new Date(value);
+                const age = today.getFullYear() - birthday.getFullYear();
 
-            // Kiểm tra tuổi
-            if (age < 18) {
-                callback('Ngày sinh đạo diễn phải lớn hơn 13 tuổi');
+                // Kiểm tra tuổi
+                if (age < 18) {
+                    reject('Ngày sinh đạo diễn phải lớn hơn 13 tuổi');
+                } else {
+                    resolve();
+                }
             } else {
-                callback();
+                resolve();
             }
-        } 
+        });
     };
+
     return (
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button type="primary"  icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
                 </Col>
@@ -313,12 +335,18 @@ const AdminDirector = () => {
                         </Button>,
                     ]}
                 >
-                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                    <Form form={form} name="dynamic_rule" {...formItemLayout}>
                         <Form.Item
                             {...formItemLayout}
                             name="fullname"
                             label="Họ và tên"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập tên' },
+                                {
+                                    pattern: regex.Vi,
+                                    message: 'Tên không chứa ký tự đặc biệt',
+                                },
+                            ]}
                         >
                             <Input placeholder="Họ và tên" />
                         </Form.Item>
@@ -334,6 +362,15 @@ const AdminDirector = () => {
 
                         <Form.Item
                             {...formItemLayout}
+                            name="gender"
+                            label="Giới tính"
+                            rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+                        >
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
                             name="country"
                             label="Quốc gia"
                             rules={[{ required: true, message: 'Vui lòng chọn quốc gia' }]}
@@ -342,7 +379,9 @@ const AdminDirector = () => {
                                 showSearch
                                 placeholder="Tìm kiếm và chọn quốc gia"
                                 allowClear
-                                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '')
                                         .toLowerCase()
@@ -355,6 +394,21 @@ const AdminDirector = () => {
                                     })),
                                 ]}
                             />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="email"
+                            label="Emai"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập email' },
+                                {
+                                    pattern: regex.Email,
+                                    message: 'Email không hợp lệ.',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="email..." />
                         </Form.Item>
 
                         <Form.Item
@@ -376,6 +430,10 @@ const AdminDirector = () => {
                                 {fileList.length < 2 && '+ Upload'}
                             </Upload>
                         </Form.Item>
+
+                        <Form.Item {...formItemLayout} name="biography" label="Tiểu sử">
+                            <TextArea rows={4} placeholder="Tiểu sử" />
+                        </Form.Item>
                     </Form>
                 </BaseModal>
             </Row>
@@ -390,6 +448,20 @@ const AdminDirector = () => {
                         (new Date(post.birthday).getMonth() + 1)
                     ).slice(-2)}-${new Date(post.birthday).getFullYear()}`,
                 }))}
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <div
+                            className=" tw-flex "
+                            style={{
+                                margin: 0,
+                            }}
+                        >
+                            <h4 className="tw-w-[7%]">Tiểu Sử:</h4>
+                            <span className="tw-w-[90%] ">{record.biography}</span>
+                        </div>
+                    ),
+                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                }}
             />
             <div className={cx('wrapp-pagination')}>
                 <PaginationCustom
