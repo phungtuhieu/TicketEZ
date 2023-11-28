@@ -821,7 +821,7 @@ GO
 ALTER TABLE
     Movies_Producers
 ADD
-    CONSTRAINT FK_MovieProducer_Producer FOREIGN KEY (movie_id) REFERENCES Producers(id)
+    CONSTRAINT FK_MovieProducer_Producer FOREIGN KEY (producer_id) REFERENCES Producers(id)
 GO
     -- /Movies
     -- Seat 
@@ -925,6 +925,16 @@ ALTER TABLE
     [Services_Booking]
 ADD
     CONSTRAINT FK_ServicesBooking_Services FOREIGN KEY (service_id) REFERENCES Services(id)
+GO
+ALTER TABLE
+    [Articles_Movies]
+ADD
+    CONSTRAINT FK_Articles_Movies_Movie FOREIGN KEY (movie_id) REFERENCES Movies(id)
+GO
+ALTER TABLE
+    [Articles_Movies]
+ADD
+    CONSTRAINT FK_Articles_Movies_Articles FOREIGN KEY (article_id) REFERENCES Articles(id)
 GO
     -- /Services_Booking
     -- Payment_Info
@@ -1687,6 +1697,8 @@ SELECT * FROM Reviews
 SELECT * FROM Genres
 SELECT * FROM Genres_Movies
 SELECT * FROM Studios
+SELECT * FROM Movies_Producers
+SELECT * FROM Movies_Studios
 SELECT * FROM MPAA_Rating
 SELECT * FROM Movies
 SELECT * FROM Formats

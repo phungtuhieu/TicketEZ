@@ -79,9 +79,9 @@ public class Movie implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
-	private List<MovieProducer> movieProducers;
+	private List<MovieProducer> moviesProducers;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "movie")
-	private List<MovieStudio> movieStudios;
+	private List<MovieStudio> moviesStudios;
 }
