@@ -1,5 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, DatePicker, Upload, Image, Select } from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Col,
+    Row,
+    Form,
+    message,
+    Popconfirm,
+    DatePicker,
+    Upload,
+    Image,
+    Select,
+    Radio,
+} from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,6 +33,7 @@ import countriesJson from '~/data/countries.json';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import CustomCKEditor from '~/pages/Templates/Ckeditor';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
@@ -27,6 +42,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
+const { TextArea } = Input;
 const AdminActor = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -176,19 +192,26 @@ const AdminActor = () => {
         {
             title: 'Mã',
             dataIndex: 'id',
-            width: '10%',
+            width: '5%',
             sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Họ và tên',
             dataIndex: 'fullname',
-            width: '30%',
-            ...getColumnSearchProps('fullname'),
+            width: '20%',
+
+            // ...getColumnSearchProps('fullname'),
+        },
+        {
+            title: 'Giới tính',
+            dataIndex: 'gender',
+            render: (_, record) => (record.gender ? 'Nam' : 'Nữ'),
         },
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
         },
+
         {
             title: 'Quốc gia',
             dataIndex: 'country',
@@ -198,6 +221,10 @@ const AdminActor = () => {
                 let i = countriesJson.findIndex((item) => item.code === record.country);
                 return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
             },
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
         },
         {
             title: 'Ảnh đại diện',
@@ -214,6 +241,10 @@ const AdminActor = () => {
                 </Space>
             ),
         },
+        // {
+        //     title: 'Tiểu sử',
+        //     dataIndex: 'biography',
+        // },
         {
             title: 'Thao tác',
             render: (_, record) => (
@@ -240,6 +271,17 @@ const AdminActor = () => {
         },
     ];
 
+    const optionsWithDisabled = [
+        {
+            value: true,
+            label: 'Nam',
+        },
+        {
+            value: false,
+            label: 'Nữ',
+        },
+    ];
+
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
@@ -250,6 +292,9 @@ const AdminActor = () => {
         setOpen(true);
         setResetForm(true);
         setFileList([]);
+        form.setFieldsValue({
+            gender: true,
+        });
     };
 
     const handleDelete = async (record) => {
@@ -282,11 +327,13 @@ const AdminActor = () => {
             birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
+   
 
     const handleOk = async () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
+            console.log("ádasd",values);
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
@@ -355,6 +402,7 @@ const AdminActor = () => {
     };
     const handleCancel = () => {
         setOpen(false);
+        setLoading(false);
     };
 
     // useEffect(() => {
@@ -389,29 +437,35 @@ const AdminActor = () => {
         setPageSize(pageSize);
     };
 
-    const validateBirthday = (rule, value, callback) => {
-        if (value) {
-            // Tính tuổi dựa trên ngày sinh
-            const today = new Date();
-            const birthday = new Date(value);
-            const age = today.getFullYear() - birthday.getFullYear();
+    const validateBirthday = (rule, value) => {
+        return new Promise((resolve, reject) => {
+            if (value) {
+                // Tính tuổi dựa trên ngày sinh
+                const today = new Date();
+                const birthday = new Date(value);
+                const age = today.getFullYear() - birthday.getFullYear();
 
-            // Kiểm tra tuổi
-            if (age < 13) {
-                callback('Ngày sinh diễn viên phải lớn hơn 13 tuổi');
+                // Kiểm tra tuổi
+                if (age < 18) {
+                    reject('Ngày sinh đạo diễn phải lớn hơn 13 tuổi');
+                } else {
+                    resolve();
+                }
             } else {
-                callback();
+                resolve();
             }
-        } 
+        });
     };
+    // 
+    
     return (
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                    <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
                     </Button>
                 </Col>
@@ -436,7 +490,7 @@ const AdminActor = () => {
                         </Button>,
                     ]}
                 >
-                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                    <Form form={form} name="dynamic_rule" {...formItemLayout}>
                         <Form.Item
                             {...formItemLayout}
                             name="fullname"
@@ -449,13 +503,22 @@ const AdminActor = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="birthday"
-                            label="Quốc gia"
+                            label="Ngày sinh"
                             rules={[
                                 { required: true, message: 'Vui lòng chọn ngày sinh' },
-                                { validator: validateBirthday }
+                                { validator: validateBirthday },
                             ]}
                         >
                             <DatePicker placeholder="Ngày sinh" format="DD-MM-YYYY" style={{ width: '100%' }} />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="gender"
+                            label="Giới tính"
+                            rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+                        >
+                            <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
 
                         <Form.Item
@@ -468,7 +531,9 @@ const AdminActor = () => {
                                 showSearch
                                 placeholder="Tìm kiếm và chọn quốc gia"
                                 allowClear
-                                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '')
                                         .toLowerCase()
@@ -481,6 +546,21 @@ const AdminActor = () => {
                                     })),
                                 ]}
                             />
+                        </Form.Item>
+
+                        <Form.Item
+                            {...formItemLayout}
+                            name="email"
+                            label="Emai"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập email' },
+                                {
+                                    pattern: /^[A-Za-z0-9._%+-]+@gmail\.com$/,
+                                    message: 'Email không hợp lệ. Phải có đuôi @email.com',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="email..." />
                         </Form.Item>
 
                         <Form.Item
@@ -502,6 +582,10 @@ const AdminActor = () => {
                                 {fileList.length < 2 && '+ Upload'}
                             </Upload>
                         </Form.Item>
+
+                        <Form.Item {...formItemLayout} name="biography" label="Tiểu sử">
+                            <CustomCKEditor  />
+                        </Form.Item>
                     </Form>
                 </BaseModal>
             </Row>
@@ -516,6 +600,22 @@ const AdminActor = () => {
                         (new Date(post.birthday).getMonth() + 1)
                     ).slice(-2)}-${new Date(post.birthday).getFullYear()}`,
                 }))}
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <div
+                            className=" tw-flex "
+                            style={{
+                                margin: 0,
+                            }}
+                        >
+                            <h4 className="tw-w-[7%]">Tiểu Sử:</h4>
+                            {record.description !== null && (
+                                    <span className="tw-w-[90%] " dangerouslySetInnerHTML={{ __html: record.biography }} />
+                                )}
+                        </div>
+                    ),
+                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                }}
             />
             <div className={cx('wrapp-pagination')}>
                 <PaginationCustom
