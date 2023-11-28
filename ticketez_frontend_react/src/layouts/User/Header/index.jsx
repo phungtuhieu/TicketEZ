@@ -151,6 +151,7 @@ const Header = () => {
                             </div>
                         </div>
                     </a>
+                
                     <div className="tw-flex tw-items-center tw-font-medium tw-cursor-pointer">
                         <div className="tw-hidden lg:tw-block tw-mr-[20px] tw-text-gray-700 tw-font-2xl">
                             <a onClick={scrollToShowTimes} className="tw-text-gray-700">
@@ -199,7 +200,6 @@ const Header = () => {
                             </Dropdown>
                         ) : (
                             <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
-                          
                                 <span className="name-short">Đăng nhập</span>
                                 <Avatar
                                     style={{ backgroundColor: '#87d068' }}

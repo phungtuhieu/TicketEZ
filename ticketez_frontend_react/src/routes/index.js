@@ -7,7 +7,7 @@ import LoginForm from '~/components/Auth/Login/LoginForm';
 
 const publicRoutes = [
     //Admin
-    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout ,roles: ['SUPER_ADMIN']},
+    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout, roles: ['SUPER_ADMIN'] },
     { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout },
     { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout },
     { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout },
@@ -48,6 +48,8 @@ const publicRoutes = [
     { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
+    { path: '/movieTop/', component: PageUser.MovieTop, layout: DefaultLayout },
+    { path: '/movieTop/1', component: PageUser.MovieTopDetails, layout: DefaultLayout },
     { path: '/movie-cinema-complex/:ccxId', component: PageUser.MovieCinemaComplex, layout: DefaultLayout },
 ];
 

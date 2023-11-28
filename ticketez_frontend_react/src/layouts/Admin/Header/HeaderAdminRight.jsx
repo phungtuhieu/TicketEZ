@@ -87,7 +87,7 @@ function HeaderAdminRight() {
                         <span className={cx('title-left')}>Home /</span>
                         <span className={cx('name-left')}> Dashboard</span>
                     </div> */}
-                    <span>administrator</span>
+                    <span>Xin chào, Minh khôi</span>
                 </Col>
                 <Col lg={9} xs={24} className={cx('item-hearder-right')} flex={1}>
                     <Input
