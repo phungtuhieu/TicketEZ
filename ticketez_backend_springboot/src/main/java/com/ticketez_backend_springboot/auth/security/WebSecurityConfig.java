@@ -94,7 +94,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               "/api/studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
               "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
               "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
-              "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**").permitAll();
+              "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**","/api/article/**", "/api/upload/**").permitAll();
           // auth.requestMatchers("/test/auth/**").hasAnyRole("USER", "SUPER_ADMIN");
           auth.requestMatchers("/test/auth/**").permitAll();
           auth.anyRequest().authenticated();

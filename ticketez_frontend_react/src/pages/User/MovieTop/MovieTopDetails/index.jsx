@@ -6,33 +6,26 @@ import MovieDetailsListMovieRight from '../../MovieDetails/ListPhimDangChieu';
 const MovieTopDetails = () => {
     return (
         <div className="tw-min-h-[1000px]">
-            <Row>
-                <Col
-                    lg={18}
-                    className="tw-container tw-mx-auto tw-px-[150px] tw-leading-none tw-text-black tw-text-left"
-                >
-                    <h1 className="tw-text-black tw-font-semibold">
-                        Danh sách phim hành động 2023 được khán giả đánh giá cao
-                    </h1>
-                    <span className=" tw-line-clamp-2 tw-text-gray-600  tw-mt-4 tw-mb-4">28/12/2023</span>
-                    <span className="tw-text-gray-600 tw-font-normal tw-text-2xl tw-mb-4">
-                        Năm 2023 đã chứng kiến sự ra mắt của một số bộ phim hành động đỉnh cao, khiến khán giả trên toàn
-                        thế giới không thể rời mắt khỏi màn ảnh. Những tác phẩm này đem đến những cảm xúc mãnh liệt, hấp
-                        dẫn và điều hòa hoàn hảo giữa hành động, phiêu lưu, và câu chuyện lôi cuốn.
-                    </span>
-                </Col>
-                <Col lg={6}></Col>
-            </Row>
-            {/* <div className=" tw-inset-0 tw-left-0 tw-top-[-180px]  tw-grid tw-grid-cols-3 tw-items-center tw-overflow-hidden sm:tw-flex sm:tw-flex-nowrap">
+        
+            <div className=" tw-inset-0 tw-left-0 tw-top-[-180px]  tw-grid tw-grid-cols-3 tw-items-center tw-overflow-hidden sm:tw-flex sm:tw-flex-nowrap">
                 <img alt="" className="tw-aspect-[2/3] tw-w-[450px] tw-h-[400px] " src={img.datrungphuongnam} />
                 <img alt="" className="tw-aspect-[2/3] tw-w-[450px] tw-h-[400px] " src={img.datrungphuongnam} />
                 <img alt="" className="tw-aspect-[2/3] tw-w-[450px] tw-h-[400px] " src={img.datrungphuongnam} />
                 <img alt="" className="tw-aspect-[2/3] tw-w-[450px] tw-h-[400px] " src={img.datrungphuongnam} />
                 <img alt="" className="tw-aspect-[2/3] tw-w-[450px] tw-h-[400px] " src={img.datrungphuongnam} />
-            </div> */}
+            </div>
             <div className="tw-container tw-mx-auto tw-px-[150px] tw-leading-none tw-text-black tw-text-left">
                 <Row gutter={15}>
                     <Col lg={16}>
+                        <h1 className="tw-text-black tw-font-semibold">
+                            Danh sách phim hành động 2023 được khán giả đánh giá cao
+                        </h1>
+                        <span className=" tw-line-clamp-2 tw-text-gray-600  tw-mt-4 tw-mb-4">28/12/2023</span>
+                        <span className="tw-text-gray-600 tw-font-normal tw-text-2xl tw-mb-4">
+                            Năm 2023 đã chứng kiến sự ra mắt của một số bộ phim hành động đỉnh cao, khiến khán giả trên
+                            toàn thế giới không thể rời mắt khỏi màn ảnh. Những tác phẩm này đem đến những cảm xúc mãnh
+                            liệt, hấp dẫn và điều hòa hoàn hảo giữa hành động, phiêu lưu, và câu chuyện lôi cuốn.
+                        </span>
                         <Tag
                             color="#E0E0E0"
                             className="tw-w-[100px] tw-h-[7px] tw-ml-[350px] tw-mt-5  tw-mb-[20px]"
