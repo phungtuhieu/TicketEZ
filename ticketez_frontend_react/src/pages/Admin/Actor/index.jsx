@@ -33,6 +33,7 @@ import countriesJson from '~/data/countries.json';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import CustomCKEditor from '~/pages/Templates/Ckeditor';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
@@ -291,6 +292,9 @@ const AdminActor = () => {
         setOpen(true);
         setResetForm(true);
         setFileList([]);
+        form.setFieldsValue({
+            gender: true,
+        });
     };
 
     const handleDelete = async (record) => {
@@ -323,11 +327,13 @@ const AdminActor = () => {
             birthday: dayjs(record.birthday, 'DD-MM-YYYY'),
         });
     };
+   
 
     const handleOk = async () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
+            console.log("ádasd",values);
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
@@ -450,6 +456,8 @@ const AdminActor = () => {
             }
         });
     };
+    // 
+    
     return (
         <>
             <Row>
@@ -539,6 +547,7 @@ const AdminActor = () => {
                                 ]}
                             />
                         </Form.Item>
+
                         <Form.Item
                             {...formItemLayout}
                             name="email"
@@ -575,7 +584,7 @@ const AdminActor = () => {
                         </Form.Item>
 
                         <Form.Item {...formItemLayout} name="biography" label="Tiểu sử">
-                            <TextArea rows={4} placeholder="Tiểu sử" />
+                            <CustomCKEditor  />
                         </Form.Item>
                     </Form>
                 </BaseModal>
@@ -600,7 +609,9 @@ const AdminActor = () => {
                             }}
                         >
                             <h4 className="tw-w-[7%]">Tiểu Sử:</h4>
-                            <span className="tw-w-[90%] ">{record.biography}</span>
+                            {record.description !== null && (
+                                    <span className="tw-w-[90%] " dangerouslySetInnerHTML={{ __html: record.biography }} />
+                                )}
                         </div>
                     ),
                     rowExpandable: (record) => record.name !== 'Not Expandable',

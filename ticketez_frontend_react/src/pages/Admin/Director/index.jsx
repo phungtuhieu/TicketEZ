@@ -33,6 +33,7 @@ import countriesJson from '~/data/countries.json';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { regex } from '~/utils/regex';
+import CustomCKEditor from '~/pages/Templates/Ckeditor';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
@@ -170,6 +171,9 @@ const AdminDirector = () => {
         setOpen(true);
         setResetForm(true);
         setFileList([]);
+        form.setFieldsValue({
+            gender: true,
+        });
     };
 
     const handleDelete = async (record) => {
@@ -432,7 +436,8 @@ const AdminDirector = () => {
                         </Form.Item>
 
                         <Form.Item {...formItemLayout} name="biography" label="Tiểu sử">
-                            <TextArea rows={4} placeholder="Tiểu sử" />
+                            {/* <TextArea rows={4} placeholder="Tiểu sử" /> */}
+                            <CustomCKEditor  />
                         </Form.Item>
                     </Form>
                 </BaseModal>
@@ -457,7 +462,9 @@ const AdminDirector = () => {
                             }}
                         >
                             <h4 className="tw-w-[7%]">Tiểu Sử:</h4>
-                            <span className="tw-w-[90%] ">{record.biography}</span>
+                            {record.description !== null && (
+                                    <span className="tw-w-[90%] " dangerouslySetInnerHTML={{ __html: record.biography }} />
+                                )}
                         </div>
                     ),
                     rowExpandable: (record) => record.name !== 'Not Expandable',
