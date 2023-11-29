@@ -166,7 +166,7 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${4}`);
+            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${3}`);
             const newCoupleSeats = respCouple.data.map((seat) => seat.name);
             setListSeatcouple((prevState) => {
                 for (const newSeat of newCoupleSeats) {

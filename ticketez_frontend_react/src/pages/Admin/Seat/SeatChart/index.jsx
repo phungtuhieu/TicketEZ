@@ -39,8 +39,8 @@ function SeatChart(props) {
             coupleSeat: listSeatCouple,
             vipSeat: listSeatVip,
             normalSeat: listSeatNormal,
-
             seatUnavailable: nameSeat,
+
         };
         // Tạo mảng chỗ ngồi
         const rowHeader = rowLabels.map((label) => label + ' ');
@@ -127,7 +127,7 @@ function SeatChart(props) {
                 return prevState;
             });
 
-            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${4}`);
+            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${idSeatChart}/${3}`);
             const newCoupleSeats = respCouple.data.map((seat) => seat.name);
             setListSeatcouple((prevState) => {
                 for (const newSeat of newCoupleSeats) {
@@ -173,7 +173,7 @@ function SeatChart(props) {
         const seatVipAndNormal = [
             ...seatState.vipSeat.map((seat) => ({ name: seat, type: 2 })),
             ...seatState.normalSeat.map((seat) => ({ name: seat, type: 1 })),
-            ...seatState.coupleSeat.map((seat) => ({ name: seat, type: 4 })),
+            ...seatState.coupleSeat.map((seat) => ({ name: seat, type: 3 })),
         ];
 
         const updatedSeat = allSeats.map((allSeat) => {

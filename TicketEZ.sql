@@ -1188,11 +1188,11 @@ GO
 INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name], [image], [description])
 VALUES
     (N'Ghế thông thường', 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),
+    (N'Ghế VIP', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
     (N'Ghế hội nghị', 'url_anh_ghehoinghi.jpg', N'Loại ghế hội nghị dành cho các sự kiện, buổi họp, hội nghị.'),
-    (N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
     (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+    (N'Ghế Sofa', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
 	(N'đường đi', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
@@ -1445,7 +1445,7 @@ GO
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
 INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    ( 3, 1),
+    ( 2, 1),
     ( 1, 2),
     ( 2, 1),
     ( 2, 2);
