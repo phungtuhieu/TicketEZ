@@ -137,8 +137,8 @@ const Header = () => {
                     <a href="/" className="tw-text-gray-700">
                         <div className="tw-flex tw-items-center tw-gap-2">
                             <div className="tw-text-xl tw-font-medium tw-text-blue-800">
-                                <span className="tw-font-bold tw-text-blue-900">
-                                    <img src={img.logoAdmin} />
+                                <span className="tw-font-bold tw-text-blue-900 ">
+                                    <img width={56} src={img.logoAdmin} />
                                 </span>
                             </div>
                             <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div>
@@ -199,7 +199,8 @@ const Header = () => {
                             </Dropdown>
                         ) : (
                             <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
-                                Đăng nhập
+                          
+                                <span className="name-short">Đăng nhập</span>
                                 <Avatar
                                     style={{ backgroundColor: '#87d068' }}
                                     className="tw-ml-2"

@@ -112,14 +112,13 @@ public class AuthController {
           .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
     }
     if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
-      return ResponseEntity
-          .badRequest()
-          .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
-    }
 
-    // Create new user's account
-    SecurityAccount account = new SecurityAccount(signUpRequest.getId(),
+    }
+    SecurityAccount account = new SecurityAccount(
+        signUpRequest.getId(),
+        signUpRequest.getFullname(),
         signUpRequest.getEmail(),
+
         encoder.encode(signUpRequest.getPassword()));
 
     Set<String> strRoles = signUpRequest.getRole();

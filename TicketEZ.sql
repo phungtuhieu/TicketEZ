@@ -14,7 +14,7 @@ CREATE TABLE Roles (
 	 [description] NVARCHAR(MAX)
 )
 GO
- 
+	
 CREATE TABLE Accounts (
 	id NVARCHAR(20) NOT NULL,
     phone NVARCHAR(15) ,
@@ -33,7 +33,7 @@ CREATE TABLE Accounts (
 GO
 CREATE TABLE Account_Lock_History(
     id BIGINT IDENTITY(1,1) NOT NULL,
-    event_type BIT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
+    event_type INT NOT NULL, -- unlock hoặc lock tài khoản, lock: true, unlock: false
     event_date DATETIME NOT NULL, 
     reason NVARCHAR(MAX) NOT NULL, -- lý do unlock hoặc lock 
 	account_id NVARCHAR(20) NOT NULL,
@@ -89,22 +89,40 @@ GO
         movie_id BIGINT NOT NULL
     )
 GO
-    CREATE TABLE Movie_Studio (
+    CREATE TABLE Studios (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(250) NOT NULL,
+		[image] NVARCHAR(MAX) NOT NULL,
+        [founded_date] DATE NOT NULL,
         country NVARCHAR(150) NOT NULL,
         email NVARCHAR(350) NOT NULL,
+        [address] NVARCHAR(MAX) NOT NULL,
+        website NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX)
     )
 GO
-    CREATE TABLE Movie_Producers (
+    CREATE TABLE Producers (
         id BIGINT IDENTITY(1, 1) NOT NULL,
-        [name] NVARCHAR(250) NOT NULL,
-        country NVARCHAR(150) NOT NULL,
+		[name] NVARCHAR(250) NOT NULL,
+		[image] NVARCHAR(MAX) NOT NULL,
+		[birthday] DATE NOT NULL,
+        nationality NVARCHAR(150) NOT NULL,
         email NVARCHAR(350) NOT NULL,
-        [description] NVARCHAR(MAX)
+        [biography] NVARCHAR(MAX)
     )
 GO
+
+    CREATE TABLE Movies_Producers (
+        movie_id BIGINT NOT NULL,
+		producer_id BIGINT NOT NULL,
+    )
+GO
+CREATE TABLE Movies_Studios (
+        movie_id BIGINT NOT NULL,
+		studio_id BIGINT NOT NULL,
+    )
+GO
+
     CREATE TABLE MPAA_Rating (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [rating_code] NVARCHAR(10) NOT NULL,
@@ -123,12 +141,29 @@ GO
         release_date DATE NOT NULL,
         country NVARCHAR(150) NOT NULL,
         rating FLOAT NOT NULL,
-        movie_studio_id BIGINT NOT NULL,
-		movie_producer_id BIGINT NOT NULL,
+        --movie_studio_id BIGINT NOT NULL,
+		--movie_producer_id BIGINT NOT NULL,
         video_trailer NVARCHAR(MAX) NOT NULL,
         MPAA_rating_id BIGINT NOT NULL
     )
 GO
+
+-- Lưu các top phim như (Top 10 phim hành động, top 10 phim xem nhiều nhất)
+CREATE TABLE Articles(
+    id BIGINT IDENTITY(1, 1) NOT NULL,
+    title NVARCHAR(255) NOT NULL,
+	banner NVARCHAR(MAX) NOT NULL,
+    content NVARCHAR(MAX) NOT NULL,
+    create_date DATE NOT NULL,
+)
+GO
+
+CREATE TABLE Articles_Movies(
+    movie_id BIGINT NOT NULL,
+    article_id BIGINT NOT NULL,
+)
+GO
+
     CREATE TABLE Formats (      
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(20) NOT NULL,
@@ -144,9 +179,12 @@ GO
     CREATE TABLE Directors (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
+		gender BIT NOT NULL,
         birthday DATE NOT NULL,
         country NVARCHAR(150) NOT NULL,
-        avatar NVARCHAR(255) NOT NULL
+        avatar NVARCHAR(255) NOT NULL,
+		email NVARCHAR(255) NOT NULL,
+		biography NVARCHAR(MAX) -- lưu tiểu sử
     )
 GO
     CREATE TABLE Directors_Movies (
@@ -157,9 +195,12 @@ GO
     CREATE TABLE Actors (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         fullname NVARCHAR(100) NOT NULL,
+		gender BIT NOT NULL,
         birthday DATE NOT NULL,
         country NVARCHAR(150) NOT NULL,
-        avatar NVARCHAR(255) NOT NULL
+        avatar NVARCHAR(255) NOT NULL,
+		email NVARCHAR(255) NOT NULL,
+		biography NVARCHAR(MAX) -- lưu tiểu sử
     )
 GO
     CREATE TABLE Actors_Movies (
@@ -176,6 +217,7 @@ CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
     [image] NVARCHAR(MAX) NOT NULL,
+	[banner] NVARCHAR(MAX) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -192,6 +234,7 @@ GO
         province_id BIGINT NOT NULL
     )
 GO
+
     CREATE TABLE Seat_Types (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
@@ -250,7 +293,7 @@ GO
 
 
 GO
-    CREATE TABLE Events (
+    CREATE TABLE [Events] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
@@ -263,7 +306,7 @@ GO
 
     )
 GO
-    CREATE TABLE Services (
+    CREATE TABLE [Services] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
@@ -384,9 +427,26 @@ ADD
 GO
 
 ALTER TABLE
-    Movie_Producers
+    Producers
 ADD
-    CONSTRAINT PK_Movie_Producers PRIMARY KEY (id);
+    CONSTRAINT PK_Producers PRIMARY KEY (id);
+GO
+ALTER TABLE
+    Movies_Producers
+ADD
+    CONSTRAINT PK_Movies_Producers PRIMARY KEY (movie_id, producer_id);
+GO
+
+
+ALTER TABLE
+    Studios
+ADD
+    CONSTRAINT PK_Studios PRIMARY KEY (id);
+GO
+ALTER TABLE
+    Movies_Studios
+ADD
+    CONSTRAINT PK_Movies_Studios PRIMARY KEY (movie_id, studio_id);
 GO
 ALTER TABLE
     Actors
@@ -411,9 +471,17 @@ ALTER TABLE
     Cinema_Chains
 ADD
     CONSTRAINT PK_Cinema_Chains PRIMARY KEY (id);
-
 GO
-
+ALTER TABLE
+    Articles
+ADD
+    CONSTRAINT PK_Articles PRIMARY KEY (id);
+GO
+ALTER TABLE
+    Articles_Movies
+ADD
+    CONSTRAINT PK_Article_Movies PRIMARY KEY (movie_id, article_id);
+GO
 ALTER TABLE
     Seat_Chart
 ADD
@@ -480,10 +548,10 @@ ADD
     CONSTRAINT PK_Movies PRIMARY KEY (id);
 
 GO
-ALTER TABLE
-    Movie_Studio
-ADD
-    CONSTRAINT PK_Movie_Studio PRIMARY KEY (id);
+-- ALTER TABLE
+--     Studio
+-- ADD
+--     CONSTRAINT PK_Movie_Studio PRIMARY KEY (id);
 
 GO
 ALTER TABLE
@@ -732,15 +800,29 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Movies_MPAArating FOREIGN KEY (MPAA_rating_id) REFERENCES MPAA_Rating(id)
 GO
+
+
 ALTER TABLE
-    Movies
+    Movies_Studios
 ADD
-    CONSTRAINT FK_Movies_MovieStudio FOREIGN KEY (movie_studio_id) REFERENCES Movie_Studio(id)
+    CONSTRAINT FK_MovieStudio_Movie FOREIGN KEY (movie_id) REFERENCES Movies(id)
+GO
+
+ALTER TABLE
+    Movies_Studios
+ADD
+    CONSTRAINT FK_MovieStudios_Studio FOREIGN KEY (studio_id) REFERENCES Studios(id)
+GO
+
+ALTER TABLE
+    Movies_Producers
+ADD
+    CONSTRAINT FK_Movies_Producers_Movie FOREIGN KEY (movie_id) REFERENCES Movies(id)
 GO
 ALTER TABLE
-    Movies
+    Movies_Producers
 ADD
-    CONSTRAINT FK_Movies_MovieProducers FOREIGN KEY (movie_producer_id) REFERENCES Movie_Producers(id)
+    CONSTRAINT FK_MovieProducer_Producer FOREIGN KEY (movie_id) REFERENCES Producers(id)
 GO
     -- /Movies
     -- Seat 
@@ -856,7 +938,7 @@ ALTER TABLE
     [Seats_Choose]
 ADD
     CONSTRAINT FK_Seats_Choose_Seat FOREIGN KEY (seat_id) REFERENCES Seats(id)
-	go
+GO
 	ALTER TABLE
     [Seats_Choose]
 ADD
@@ -867,13 +949,13 @@ ADD
     [Price_Seat_Types]
 ADD
     CONSTRAINT FK_Price_Seat_Types_price FOREIGN KEY (price_id) REFERENCES Price(id)
-
+GO
 
 		ALTER TABLE
     [Price_Seat_Types]
 ADD
     CONSTRAINT FK_Price_Seat_Types_Seat_Type FOREIGN KEY (seat_type_id) REFERENCES Seat_Types(id)
-
+GO
 
 
 SELECT * FROM Accounts
@@ -882,7 +964,7 @@ SELECT * FROM Reviews
 SELECT * FROM Genres
 SELECT * FROM Genres_Movies
 
-SELECT * FROM Movie_Studio
+SELECT * FROM Movies_Studios
 SELECT * FROM MPAA_Rating
 SELECT * FROM Movies
 SELECT * FROM Formats
@@ -900,8 +982,8 @@ SELECT * FROM Seats_Booking
 SELECT * FROM Price
 
 
-SELECT * FROM Events
-SELECT * FROM Services
+SELECT * FROM [Events]
+SELECT * FROM [Services]
 SELECT * FROM Price_Services
 SELECT * FROM Cinema_Types
 SELECT * FROM Cinemas
@@ -1075,21 +1157,22 @@ VALUES
     (N'Ninh Bình');
 GO
 
-INSERT INTO Movie_Producers ([name], country, email, [description])
+INSERT INTO Producers ([name],[image],[birthday], nationality, email, [biography])
 VALUES
-(N'Điện Ảnh Việt', N'Việt Nam', 'info@dienanhviet.vn', N'Nhà sản xuất phim Điện Ảnh Việt tại Việt Nam.'),
-(N'Phim Trần', N'Việt Nam', 'contact@phimtran.vn', N'Nhà sản xuất phim Trần tại Việt Nam.'),
-(N'Xuân Phim', N'Việt Nam', 'contact@xuanphim.com', N'Nhà sản xuất phim Xuân Phim tại Việt Nam.'),
-(N'Quốc Dũng Films', N'Việt Nam', 'info@quocdungfilms.vn', N'Nhà sản xuất phim Quốc Dũng Films tại Việt Nam.'),
-(N'Phim Tây Bắc', N'Việt Nam', 'contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
+(N'Điện Ảnh Việt',N'image','1980-10-03', N'Việt Nam', 'info@dienanhviet.vn', N'Nhà sản xuất phim Điện Ảnh Việt tại Việt Nam.'),
+(N'Phim Trần', N'image','1980-10-05',N'Việt Nam', 'contact@phimtran.vn', N'Nhà sản xuất phim Trần tại Việt Nam.'),
+(N'Xuân Phim',N'image','1980-12-13' , N'Việt Nam','contact@xuanphim.com', N'Nhà sản xuất phim Xuân Phim tại Việt Nam.'),
+(N'Quốc Dũng Films', N'image','1980-02-25',N'Việt Nam', 'info@quocdungfilms.vn', N'Nhà sản xuất phim Quốc Dũng Films tại Việt Nam.'),
+(N'Phim Tây Bắc',N'image','1980-09-08' , N'Việt Nam','contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
 GO
-INSERT INTO Cinema_Chains ([name],[image],[description])
+
+INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png',N'image.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'image.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'image.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg',N'image.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp',N'image.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
@@ -1171,7 +1254,7 @@ VALUES
     (50000, '2023-10-05', '2023-10-31', 1),
     (100000, '2023-10-05', '2023-10-31', 2),
     (20000, '2023-10-05', '2023-10-31', 3),
-    (5000, '2023-10-05', '2023-10-31', 4),
+    (5000, '2023-10-05', '2023-10-31', 4), 
     (70000, '2023-10-05', '2023-10-31', 5),
     (25000, '2023-10-05', '2023-10-31', 6),
     (150000, '2023-10-05', '2023-10-31', 7),
@@ -1277,16 +1360,16 @@ VALUES
     (N'J6', 1, N'Ghế VIP', 2, 1),
     (N'J7', 1, N'Ghế thông thường', 1, 1)
 GO
-  -- 9. Thêm dữ liệu cho bảng Movie_Studio
-INSERT INTO [TicketEZ].[dbo].[Movie_Studio] 
-    ([name], [country], [email], [description])
+  -- 9. Thêm dữ liệu cho bảng Studio
+INSERT INTO [TicketEZ].[dbo].[Studios] 
+    ([name],[image], [founded_date], [country], [email],[address],[website], [description])
 VALUES
-    ('Walt Disney Pictures', N'Hoa Kỳ', 'tuhieu@disney.com', N'Studio sản xuất phim của Disney.'),
-    ('Warner Bros. Pictures', N'Hoa Kỳ', 'phungtuhieut@warnerbros.com', N'Studio sản xuất phim của Warner Bros.'),
-    ('Paramount Pictures', N'Canada', 'hieutuphung@paramount.com', N'Studio sản xuất phim của Paramount.'),
-    ('Universal Pictures', N'Anh', 'nguyenhoangdinh@universal.com', N'Studio sản xuất phim của Universal.'),
-    ('20th Century Studios', N'Anh', 'dinhnguyen@20thcentury.com', N'Studio sản xuất phim của 20th Century.'),
-    ('Sony Pictures Entertainment',	N'Mỹ', 'hieupt@sony.com', N'Studio sản xuất phim của Sony.');
+    ('Walt Disney Pictures',N'Image.img', '2003-02-01', N'Hoa Kỳ', 'tuhieu@disney.com', N'Address1', N'website1', N'Studio sản xuất phim của Disney.'),
+    ('Warner Bros. Pictures', N'Image.img', '2003-02-01',N'Hoa Kỳ', 'phungtuhieut@warnerbros.com',  N'Address1', N'website1',N'Studio sản xuất phim của Warner Bros.'),
+    ('Paramount Pictures',N'Image.img', '2003-02-01', N'Canada', 'hieutuphung@paramount.com',  N'Address1', N'website1',N'Studio sản xuất phim của Paramount.'),
+    ('Universal Pictures', N'Image.img', '2003-02-01',N'Anh', 'nguyenhoangdinh@universal.com',  N'Address1', N'website1',N'Studio sản xuất phim của Universal.'),
+    ('20th Century Studios',N'Image.img', '2003-02-01', N'Anh', 'dinhnguyen@20thcentury.com', N'Address1', N'website1', N'Studio sản xuất phim của 20th Century.'),
+    ('Sony Pictures Entertainment',N'Image.img', '2003-02-01',	N'Mỹ', 'hieupt@sony.com', N'Address1', N'website1', N'Studio sản xuất phim của Sony.');
 GO
  -- 10. Chèn dữ liệu vào bảng MPAA_Rating
 INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon],[color_code], [description])
@@ -1297,20 +1380,37 @@ VALUES
     ('R', 'efccadb4-d926-4f81-a47c-1175aac38bc8_RATED_R.svg.png','#FFCD4B', N'Phim có nội dung cần có sự hướng dẫn của người trưởng thành.'),
     ('NC-17', '6a0f27bc-34f4-46d6-9e3e-517686a183fc_Nc-17.svg.png','#D80032', N'Không phù hợp cho trẻ em dưới 17 tuổi.');
 GO
-INSERT INTO Movies (title, poster,banner,[description], duration, release_date, country, rating, movie_studio_id, movie_producer_id, video_trailer, MPAA_rating_id)
+INSERT INTO Movies (title, poster,banner,[description], duration, release_date, country, rating, video_trailer, MPAA_rating_id)
 VALUES
-(N'Người Tình', N'imaage.img',N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5, 1, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Nữ Đại Gia', N'imaage.img',N'imaage.img',N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2, 2, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Biệt Đội Mật Mã', N'imaage.img',N'imaage.img',N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Rừng Xà Nu', N'imaage.img',N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1, 4, 4, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 5, 5, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
-(N'Bão Tố Trái Đất', N'imaage.img',N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5, 1, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Tình Yêu Hồi Sinh', N'imaage.img',N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7, 2, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Cậu Bé Thần Thánh', N'imaage.img',N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 3, 3, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Siêu Nhân Trái Đất', N'imaage.img',N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5, 4, 2, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Tinh Hoa Đất Việt', N'imaage.img',N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2, 5, 1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
+(N'Người Tình', N'imaage.img',N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Nữ Đại Gia', N'imaage.img',N'imaage.img',N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Biệt Đội Mật Mã', N'imaage.img',N'imaage.img',N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Rừng Xà Nu', N'imaage.img',N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
+(N'Bão Tố Trái Đất', N'imaage.img',N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
+(N'Tình Yêu Hồi Sinh', N'imaage.img',N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
+(N'Cậu Bé Thần Thánh', N'imaage.img',N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
+(N'Siêu Nhân Trái Đất', N'imaage.img',N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
+(N'Tinh Hoa Đất Việt', N'imaage.img',N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
 GO
-
+INSERT INTO [TicketEZ].[dbo].[Movies_Producers](movie_id, producer_id)
+VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 3),
+(3, 2),
+(4, 1)
+GO
+INSERT INTO [TicketEZ].[dbo].[Movies_Studios](movie_id, studio_id)
+VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 3),
+(3, 2),
+(4, 1)
+GO
   -- 13. Thêm dữ liệu cho bảng Discounts
 INSERT INTO [TicketEZ].[dbo].[Discounts] 
     ([title], [coupon_code], [amount], [start_date], [end_date], [status], [discount_type], [cinema_complex_id])
@@ -1390,25 +1490,25 @@ VALUES
 GO
 -- 18. thêm dữ liệu bảng actor
 
-  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [birthday],[country], [avatar])
-VALUES (N'Nguyễn Văn Thanh', '1990-01-01','VN', 'actor_image1.jpg'),
- (N'Nguyễn Tuấn', '1993-01-01','VN', 'actor_image1.jpg'),
-  (N'Trấn Thành', '1989-01-01','VN', 'actor_image1.jpg'),
-  (N'Trương Thế Vinh', '1988-01-01','VN', 'actor_image1.jpg'),
-   (N'Võ Thành Tâm ', '1994-01-01','VN', 'actor_image1.jpg'),
-    (N'Thanh Trúc', '1995-01-01','VN', 'actor_image1.jpg'),
-	 (N'Hứa Minh Đạt', '1990-01-01','VN', 'actor_image1.jpg'),
-	  (N'Lâm Chấn Khang', '1996-01-01','VN',  'actor_image1.jpg'),
-	   (N'Chris Hemsworth', '1996-01-01','VN',  'actor_image1.jpg'),
-	    (N'Tom Hiddleston ', '1999-01-01','VN',  'actor_image1.jpg'),
-		 (N'Benedict Cumberbatch', '2000-01-01','VN',  'actor_image1.jpg'),
-		  (N'Scarlett Johansson', '2000-01-01','VN',  'actor_image1.jpg'),
-		   (N'NTom Holland', '2000-01-01','VN',  'actor_image1.jpg'),
-		    (N'Chadwick Boseman', '1990-01-01','VN',  'actor_image1.jpg'),
-			 (N'Brie Larson', '1990-01-01', 'VN', 'actor_image1.jpg'),
-			  (N'Sebastian Stan', '1990-01-01', 'VN', 'actor_image1.jpg'),
-			   (N'Anthony Mackie ', '1990-01-01','VN',  'actor_image1.jpg'),
-			    (N'Idris Elba', '1990-01-01', 'VN', 'actor_image1.jpg');
+  INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [gender], [birthday],[country], [avatar],[email],[biography])
+VALUES (N'Nguyễn Văn Thanh',1, '1990-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+ (N'Nguyễn Tuấn',0, '1993-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Trấn Thành',0, '1989-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Trương Thế Vinh',0, '1988-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+   (N'Võ Thành Tâm ',0, '1994-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+    (N'Thanh Trúc',1, '1995-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	 (N'Hứa Minh Đạt', 0,'1990-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	  (N'Lâm Chấn Khang', 0,'1996-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	   (N'Chris Hemsworth',0, '1996-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	    (N'Tom Hiddleston ',1, '1999-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		 (N'Benedict Cumberbatch',0, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		  (N'Scarlett Johansson',0, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		   (N'NTom Holland',1, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		    (N'Chadwick Boseman',0, '1990-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			 (N'Brie Larson',1, '1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			  (N'Sebastian Stan',1, '1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			   (N'Anthony Mackie ',0, '1990-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			    (N'Idris Elba', 1,'1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sử');
 GO
 -- 19. thêm dữ liệu  actors_movie
  INSERT INTO [TicketEZ].[dbo].[Actors_Movies] ([actor_id], [movie_id])
@@ -1476,12 +1576,12 @@ VALUES (2,1, 1),
 go
 */
 --25. thêm dữ liệu bảng Directors
-    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname], [birthday],[country], [avatar])
+    INSERT INTO [TicketEZ].[dbo].[Directors] ([fullname],[gender], [birthday],[country], [avatar],[email],[biography])
 VALUES
-  ('Nguyễn Thị A', '1980-05-15','VN' , 'director_avatar1.jpg'),
-  ('Trần Văn B', '1975-08-20','VN' , 'director_avatar2.jpg'),
-  ('Lê Thị C', '1990-03-10','VN' , 'director_avatar3.jpg');
-GO
+  (N'Nguyễn Thị A',1, '1980-05-15','VN' , 'director_avatar1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Trần Văn B',0, '1975-08-20','VN' , 'director_avatar2.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Lê Thị C',1, '1990-03-10','VN' , 'director_avatar3.jpg',N'email123@gmail.com',N'Tiểu sửa');
+  GO
 -- 26. thêm dữ liệu bảng [Directors_Movies]
 
   INSERT INTO [TicketEZ].[dbo].[Directors_Movies] ([director_id], [movie_id])
@@ -1587,7 +1687,7 @@ SELECT * FROM Verification
 SELECT * FROM Reviews
 SELECT * FROM Genres
 SELECT * FROM Genres_Movies
-SELECT * FROM Movie_Studio
+SELECT * FROM Studios
 SELECT * FROM MPAA_Rating
 SELECT * FROM Movies
 SELECT * FROM Formats
@@ -1606,8 +1706,8 @@ SELECT * FROM Seat_Chart
 SELECT * FROM Seats_Booking
 SELECT * FROM Price
 SELECT * FROM Price_Seat_Types
-SELECT * FROM Events
-SELECT * FROM Services
+SELECT * FROM [Events]
+SELECT * FROM [Services]
 SELECT * FROM Price_Services
 SELECT * FROM Cinema_Types
 SELECT * FROM Cinemas

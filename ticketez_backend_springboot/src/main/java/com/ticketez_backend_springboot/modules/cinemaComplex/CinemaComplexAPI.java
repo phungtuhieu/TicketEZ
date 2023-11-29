@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.CinemaToCinemaComplexDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.province.Province;
 import com.ticketez_backend_springboot.modules.province.ProvinceDao;
 import com.ticketez_backend_springboot.dto.CCXShowtimeByMovieDTO;

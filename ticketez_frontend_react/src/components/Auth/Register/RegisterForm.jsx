@@ -14,31 +14,29 @@ const { Header, Content } = Layout;
 
 const RegisterForm = () => {
 
-    const [loginError, setLoginError] = useState('');
+       const [signupError, setSignupError] = useState('');
     const navigate = useNavigate();
 
-
     const onFinish = async (values) => {
-        if (!validateId(values.id)) return;
-        if (!validatePassword(values.password)) return;
         try {
-            const response = await authApi.getLogin({
+            authApi.signup({
                 id: values.id,
+                fullname: values.fullname,
+                email: values.email,
                 password: values.password,
             });
-            console.log(response);
-            const roles = getRolesFromLocalStorage();
 
-            if (roles.includes('SUPER_ADMIN')) {
-                funcUtils.notify('Đăng nhập thành công!', 'success');
-                navigate('/admin/index');
-            } else {
-                funcUtils.notify('Đăng nhập thành công!', 'success');
-                navigate('/');
-            }
+
+            funcUtils.notify('Đăng ký thành công!', 'success');
+            navigate('/login');
         } catch (error) {
-            funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
+            funcUtils.notify('Đăng ký không thành công!', 'error');
         }
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('lỗi', errorInfo);
+        setSignupError('Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.');
     };
 
 

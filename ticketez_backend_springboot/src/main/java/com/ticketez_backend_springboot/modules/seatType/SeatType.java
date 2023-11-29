@@ -3,7 +3,6 @@ package com.ticketez_backend_springboot.modules.seatType;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 

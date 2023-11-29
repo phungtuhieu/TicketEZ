@@ -27,8 +27,11 @@ public class Actor {
 	private String fullname;
 	@Temporal(TemporalType.DATE)
 	private Date birthday;
+	private Boolean gender;
 	private String country;
 	private String avatar;
+	private String email;
+	private String biography;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "actor")

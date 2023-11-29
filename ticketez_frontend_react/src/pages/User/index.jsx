@@ -13,3 +13,6 @@ export { default as Event } from './Event';
 export { default as MovieDetails } from './MovieDetails';
 export { default as MovieSearch } from './MovieSearch';
 export { default as ReviewMovie } from './Review';
+export { default as MovieCinemaComplex } from './MovieCinemaComplex';
+
+

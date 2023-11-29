@@ -30,7 +30,6 @@ const Binhluan = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedComment, setEditedComment] = useState('');
     const [indexId, setIndexId] = useState();
-    const [userId, setUserId] = useState();
     const [editData, setEditData] = useState();
     const [deleteItem, setDeleteItem] = useState(null);
 
@@ -58,16 +57,6 @@ const Binhluan = () => {
         getList();
     }, [workSomeThing, movieId]);
 
-    //xử lý lấy thông tin
-    useEffect(() => {
-        const accountToken = localStorage.getItem('account');
-        if (accountToken) {
-            const accountData = JSON.parse(accountToken);
-            setAccount(accountData);
-        } else {
-            setAccount(null);
-        }
-    }, []);
     useEffect(() => {
         const getMovie = async () => {
             const movie = await movieApi.getById(movieId);
@@ -78,68 +67,54 @@ const Binhluan = () => {
     }, [movieId])
     //hàm xử lý thêm và update bình luận
     useEffect(() => {
-        const getAccount = async (userId) => {
+        const getAccount = async () => {
             try {
-                const user = await accountApi.getById(userId);
+
+                const loggedInUserId = localStorage.getItem('loggedInUser');
+
+
+                if (!loggedInUserId) {
+                    console.error('No user logged in.');
+                    return;
+                }
+
+                const user = await accountApi.getById(loggedInUserId);
                 setAccount(user.data);
             } catch (error) {
                 console.error('Failed to get account:', error);
-                // Display an error notification
-                funcUtils.notify('Failed to get account information', 'error');
             }
         };
 
-        
-        if (account && account.id) {
-            getAccount(account.id);
-        }
-    }, [account]);
-    useEffect(() => {
-    const accountToken = localStorage.getItem('account');
-    if (accountToken) {
-        const accountData = JSON.parse(accountToken);
-        setAccount(accountData);
-    } else {
-        setAccount(null);
-    }
-}, []);
-//     try {
+        getAccount();
+    }, []);
 
-//         //lấy token từ local
-//         const token = localStorage.getItem('authToken');
-        
-//       if (token) {
-//         const user = await accountApi.getById(token);
-//         setAccount(user.data); 
-//       }
-//     } catch (error) {
-//         console.error('Failed to get account:', error);
-//     }
-// };
-  
-
-        const handleAdd = async () => {
-        // if (!comment.trim()) {
-        //     funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
-        //     return;
-        // }
-        if (!account) {
-            funcUtils.notify('Vui lòng đăng nhập để thêm bình luận', 'warning');
+    const handleAdd = async () => {
+        if (!comment.trim()) {
+            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
             return;
         }
         setLoading(true);
         try {
-            // const userId = account.id;
-            const user = await accountApi.getById('userId');
-            console.log(user);
+            // const user = await accountApi.getById('user17');
+            const loggedInUserId = localStorage.getItem('loggedInUser');
+
+            // Kiểm tra xem có thông tin người dùng đăng nhập hay không
+            if (!loggedInUserId) {
+                console.error('No user logged in.');
+                setLoading(false);
+                return;
+            }
+            console.log(loggedInUserId);
+            // Lấy thông tin tài khoản của người dùng đăng nhập
+            const user = await accountApi.getById(loggedInUserId);
             const datareview = {
                 comment,
                 rating,
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, userId, movieId);
-            
+            reviewApi.post(datareview, 'user17', 1);
+
             setWorkSomeThing(!workSomeThing);
             setComment("");
             console.log(datareview);
@@ -247,6 +222,7 @@ const Binhluan = () => {
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
+
                     <Space.Compact
                         style={{
                             width: '80%',
@@ -262,13 +238,15 @@ const Binhluan = () => {
                         <Button
                             onClick={handleAdd}
                             className='tw-btn tw-bg-[#ff1493] tw-text-white'
-                             danger style={{
+                            danger style={{
                                 display: 'block',
 
                             }}>
                             Send
                         </Button>
+
                     </Space.Compact>
+
                 </Col>
                 <Col span={16}>
                     {/* <span style={{color: 'black'}}> Đánh giá</span> <br /> */}
@@ -295,7 +273,7 @@ const Binhluan = () => {
                             // loadMore={loadMore}
                             dataSource={review}
                             renderItem={(item, index) => (
-                                
+
                                 <List.Item>
 
                                     <Row>
@@ -357,31 +335,31 @@ const Binhluan = () => {
                                                         readOnly
                                                     >{item.comment} </p>
 
-<Space>
-    <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
-    <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
+                                                    <Space>
+                                                        <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
+                                                        <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
 
-    {item.account.id === 'user17' && (
-        <Dropdown
-            overlay={(
-                <Menu>
-                    <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
-                    <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
-                </Menu>
-            )}
-            trigger={['click']}
-        >
-            <Button
-                type="text"
-                icon={<DashOutlined
-                    className={cx('col-icon', {
-                        'text-blue-500': isClicked,
-                    })}
-                />}
-            />
-        </Dropdown>
-    )}
-</Space>
+                                                        {item.account.id === 'user17' && (
+                                                            <Dropdown
+                                                                overlay={(
+                                                                    <Menu>
+                                                                        <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
+                                                                        <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
+                                                                    </Menu>
+                                                                )}
+                                                                trigger={['click']}
+                                                            >
+                                                                <Button
+                                                                    type="text"
+                                                                    icon={<DashOutlined
+                                                                        className={cx('col-icon', {
+                                                                            'text-blue-500': isClicked,
+                                                                        })}
+                                                                    />}
+                                                                />
+                                                            </Dropdown>
+                                                        )}
+                                                    </Space>
                                                 </div>
                                             )}
                                         </Col>

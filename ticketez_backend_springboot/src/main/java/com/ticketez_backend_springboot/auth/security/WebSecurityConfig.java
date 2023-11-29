@@ -74,37 +74,35 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   // .authorizeRequests().antMatchers("/api/auth/**").permitAll()
   // .antMatchers("/api/test/**").permitAll()
   // .anyRequest().authenticated();
-  //
+
   // http.addFilterBefore(authenticationJwtTokenFilter(),
   // UsernamePasswordAuthenticationFilter.class);
   // }
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
+    http
+        .csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/account/**", "/api/auth/**", "/api/booking/**", "/api/cinema/**",
-                "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**",
-                "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
-                "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/movie-producer/**",
-                "/api/movie-studio/**", "/api/mpaaRating/**", "/api/payment-info/**", "/api/price/**",
-                "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
-                "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
-                "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**",
-                "/api/price_seat_type/**")
-            .permitAll()
-            .requestMatchers("/api/actor/**").hasAuthority("SUPER_ADMIN")
-            .anyRequest().authenticated());
-        
-            
+        .authorizeHttpRequests(auth -> {
+          auth.requestMatchers(
+              "/api/account/**", "/api/auth/**", "/api/booking/**", "/api/cinema/**",
+              "/api/cinemaChain/**", "/api/cinemaComplex/**", "/api/cinemaType/**", "/api/actor/**",
+              "/api/director/**", "/api/discount/**", "/api/discountsBookings/**", "/api/event/**", "/api/format/**",
+              "/api/formatMovie/**", "/api/genre/**", "/api/genreMovie/**", "/api/movie/**", "/api/producer/**",
+              "/api/studio/**", "/api/mpaaRating/**", "/api/paymentInfo/**", "/api/price/**",
+              "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
+              "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
+              "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/upload/**").permitAll();
+          // auth.requestMatchers("/test/auth/**").hasAnyRole("USER", "SUPER_ADMIN");
+          auth.requestMatchers("/test/auth/**").permitAll();
+          auth.anyRequest().authenticated();
+        });
 
     http.authenticationProvider(authenticationProvider());
-
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
-
 }
