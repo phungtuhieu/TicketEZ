@@ -48,15 +48,15 @@ GO
 
 CREATE TABLE Activity_Logs (
     id BIGINT IDENTITY(1,1) NOT NULL,
-    time_stamp DATETIME NOT NULL,
+    time_stamp DATETIME NOT NULL, -- Thời gian thực hiện
+	[action] NVARCHAR(MAX) NOT NULL, -- Thêm, sửa, xóa, đăng nhập, đăng xuất
 	[description] NVARCHAR(MAX) NOT NULL,
-	[result] NVARCHAR(MAX) NOT NULL,
-	activity_type INT NOT NULL,
 	ip_address NVARCHAR(MAX) NOT NULL,
-	[browser] NVARCHAR(MAX) NOT NULL,
-	operating_system NVARCHAR(MAX) NOT NULL,
-	device NVARCHAR(MAX) NOT NULL,
+	[user_agent] NVARCHAR(MAX) NOT NULL, -- Thông tin của trình duyệt: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+	[result] NVARCHAR(50) NOT NULL, -- Thành công, thất bại
 	account_id NVARCHAR(20) NOT NULL,
+    old_data NVARCHAR(MAX), -- Lưu các thông tin trước khi "xóa", "cập nhật" (Không bắt buộc)
+    new_data NVARCHAR(MAX) -- Lưu các thông tin sau khi "Thêm", "cập nhật" (Không bắt buộc)
 )
 GO
     CREATE TABLE Verification (

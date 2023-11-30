@@ -12,9 +12,12 @@ import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
+import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @Repository
 public interface MovieDAO extends JpaRepository<Movie, Long> {
+        @Query("SELECT o FROM Movie o WHERE o.title LIKE CONCAT('%', :keyword, '%') ")
+        Page<Movie> findByKeyword(@Param("keyword") String search, Pageable pageable);
 
         @Query("SELECT m FROM Movie m WHERE EXISTS"
                         + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "

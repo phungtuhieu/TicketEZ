@@ -4,14 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,6 +61,7 @@ import com.ticketez_backend_springboot.modules.producer.Producer;
 import com.ticketez_backend_springboot.service.UploadImageService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.ticketez_backend_springboot.modules.format.Format;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
@@ -103,12 +101,13 @@ public class MovieAPI {
             @RequestParam("limit") Optional<Integer> limit,
             @RequestParam("search") Optional<String> search) {
         try {
+
             if (pageNo.isPresent() && pageNo.get() == 0) {
                 return new ResponseEntity<>("Số trang không tồn tại!", HttpStatus.BAD_REQUEST);
             }
             Sort sort = Sort.by(Sort.Order.desc("id"));
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-            Page<Movie> page = dao.findAll(pageable);
+            Page<Movie> page = dao.findByKeyword(search.orElse(""), pageable);
             ResponseDTO<Movie> responeDTO = new ResponseDTO<>();
             responeDTO.setData(page.getContent());
             responeDTO.setTotalItems(page.getTotalElements());
@@ -345,10 +344,12 @@ public class MovieAPI {
                 }
             }
             if (!movieDTO.getActors().isEmpty()) {
+                // Tìm kiếm Actor trong Movie ở database
                 List<Actor> listActorsInMovie = movieDb.getActorsMovies().stream()
                         .map(ActorMovie::getActor)
                         .collect(Collectors.toList());
 
+                // Trên form xóa đi các actor ban đầu của movie
                 List<ActorMovie> listActorMovieDel = movieDb.getActorsMovies().stream()
                         .filter(f -> movieDTO.getActors().stream()
                                 .noneMatch(form -> {
@@ -356,6 +357,7 @@ public class MovieAPI {
                                 }))
                         .collect(Collectors.toList());
 
+                // Trên form đã thêm các actor mới
                 List<ActorMovie> listActorMovieCreate = movieDTO.getActors().stream()
                         .filter(f -> listActorsInMovie.stream().noneMatch(fInM -> {
                             return fInM.getId() == f.getId();
