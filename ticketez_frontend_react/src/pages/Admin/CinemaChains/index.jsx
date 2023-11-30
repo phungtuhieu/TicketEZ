@@ -427,7 +427,7 @@ const AdminCinemaChains = () =>  {
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu Loại cụm Rạp</h1>
+                    <h1 className={cx('title')}>Bảng dữ liệu Loại chuỗi Rạp</h1>
                 </Col>
                 <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>

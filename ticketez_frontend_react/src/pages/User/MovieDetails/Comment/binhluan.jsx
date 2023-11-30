@@ -11,6 +11,7 @@ import uploadApi from '~/api/service/uploadApi';
 import { comment } from 'postcss';
 import moment from 'moment-timezone';
 import { data } from 'autoprefixer';
+import authApi from './../../../../api/user/Security/authApi';
 
 const cx = classNames.bind(style);
 const Binhluan = () => {
@@ -33,6 +34,8 @@ const Binhluan = () => {
     const [editData, setEditData] = useState();
     const [deleteItem, setDeleteItem] = useState(null);
 
+
+    const user = authApi.getUser();
 
     useEffect(() => {
         const getList = async () => {
@@ -66,54 +69,40 @@ const Binhluan = () => {
         getMovie();
     }, [movieId])
     //hàm xử lý thêm và update bình luận
-    useEffect(() => {
-        const getAccount = async () => {
-            try {
 
-                const loggedInUserId = localStorage.getItem('loggedInUser');
+    
+    // useEffect(() => {
+    //     const getAccount = async () => {
+    //         try {
+               
+    //             console.log('1234',users);
 
+    //             // const user = await accountApi.getById(users.id);
+                
+    //             // setAccount(user.data); // Cập nhật giá trị của account khi có dữ liệu mới
 
-                if (!loggedInUserId) {
-                    console.error('No user logged in.');
-                    return;
-                }
-
-                const user = await accountApi.getById(loggedInUserId);
-                setAccount(user.data);
-            } catch (error) {
-                console.error('Failed to get account:', error);
-            }
-        };
-
-        getAccount();
-    }, []);
-
+    //         } catch (error) {
+    //             console.error('Failed to get account:', error);
+    //         }
+    //     };
+    //     getAccount();
+    // }, []);
     const handleAdd = async () => {
-        if (!comment.trim()) {
-            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
-            return;
-        }
+        // if (!comment.trim()) {
+        //     funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+        //     return;
+        // }
         setLoading(true);
         try {
-            // const user = await accountApi.getById('user17');
-            const loggedInUserId = localStorage.getItem('loggedInUser');
+            const userAdd = await accountApi.getById(user.id);
 
-            // Kiểm tra xem có thông tin người dùng đăng nhập hay không
-            if (!loggedInUserId) {
-                console.error('No user logged in.');
-                setLoading(false);
-                return;
-            }
-            console.log(loggedInUserId);
-            // Lấy thông tin tài khoản của người dùng đăng nhập
-            const user = await accountApi.getById(loggedInUserId);
             const datareview = {
                 comment,
                 rating,
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, 'user17', 1);
+            reviewApi.post(datareview, 'minhkhoi', 1);
 
             setWorkSomeThing(!workSomeThing);
             setComment("");
@@ -215,14 +204,13 @@ const Binhluan = () => {
                 </Col>
                 <Col span={16}>
 
-                    <Typography>xin chào bạn: {account.fullname} </Typography>
+                    <Typography>xin chào bạn: {user.fullname} </Typography>
                     <Avatar
                         size={50}
-                        src={uploadApi.get(account.image)}
+                        src={uploadApi.get(user.image)}
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
-
                     <Space.Compact
                         style={{
                             width: '80%',
@@ -244,9 +232,7 @@ const Binhluan = () => {
                             }}>
                             Send
                         </Button>
-
                     </Space.Compact>
-
                 </Col>
                 <Col span={16}>
                     {/* <span style={{color: 'black'}}> Đánh giá</span> <br /> */}
