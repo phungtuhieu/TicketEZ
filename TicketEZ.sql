@@ -1195,7 +1195,9 @@ VALUES
     (N'Ghế tựa','reclinerSeat','#0891B2' ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
     (N'Ghế trẻ em','kidSeat','#10B785', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
     (N'Ghế Sofa','sofaSeat','#C58B0B', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
-	(N'đường đi','way','#121B2B' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi');
+	(N'đường đi','way','#121B2B' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
+	(N'Màu ghế đã đặt','seatUnavailable','#404040' ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
+	(N'Màu ghế chọn','seatReserved','#16A34A' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
