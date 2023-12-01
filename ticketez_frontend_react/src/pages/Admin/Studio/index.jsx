@@ -443,11 +443,7 @@ function AdminMovieStudio() {
                 </Col>
                 <Col span={24}>
                     <Search
-<<<<<<< HEAD:ticketez_frontend_react/src/pages/Admin/MovieStudio/index.jsx
                         placeholder="Nhập tên hãng phim vào đây..."
-=======
-                        placeholder="Nhập tên phim vào đây..."
->>>>>>> d29388bcdf81e492a7c62f34a70c1e7ea6163463:ticketez_frontend_react/src/pages/Admin/Studio/index.jsx
                         allowClear
                         // enterButton={false}
                         onChange={(e) => onSearchStudio(e.target.value)}
