@@ -217,6 +217,7 @@ CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
     [image] NVARCHAR(MAX) NOT NULL,
+	[banner] NVARCHAR(MAX) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -1175,13 +1176,13 @@ VALUES
 (N'Phim Tây Bắc',N'image','1980-09-08' , N'Việt Nam','contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
 GO
 
-INSERT INTO Cinema_Chains ([name],[image],[description])
+INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png',N'image.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'image.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'image.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg',N'image.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp',N'image.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])

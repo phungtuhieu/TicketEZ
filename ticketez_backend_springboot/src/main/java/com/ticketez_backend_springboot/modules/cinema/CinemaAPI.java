@@ -124,12 +124,41 @@ public class CinemaAPI {
     public ResponseEntity<?> getDuLie(@PathVariable("cinemaComplexId") long cinemaComplexId) {
         try {
             // if (cinemaComplexId) {
-            //     return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+            // return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
             // }
             CinemaComplex complex = cinemaComplexDAO.findById(cinemaComplexId).get();
             if (complex != null) {
                 List<Cinema> cinema = cinemaDAO.getCinemaByCinemaComplex(complex);
                 return ResponseEntity.ok(cinema);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/get/cinema-by-cinemaComplexId")
+    public ResponseEntity<?> getCinemaByCinemaComplexId(
+            @RequestParam("cinemaComplexId") long cinemaComplexId,
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+            }
+            CinemaComplex complex = cinemaComplexDAO.findById(cinemaComplexId).get();
+            if (complex != null) {
+                Sort sort = Sort.by(Sort.Order.desc("id"));
+                Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+                Page<Cinema> page = cinemaDAO.getCinemaByCinemaComplexID(pageable, complex);
+                ResponseDTO<Cinema> responseDTO = new ResponseDTO<>();
+                responseDTO.setData(page.getContent());
+                responseDTO.setTotalItems(page.getTotalElements());
+                responseDTO.setTotalPages(page.getTotalPages());
+                return ResponseEntity.ok(responseDTO);
             }
             return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
 

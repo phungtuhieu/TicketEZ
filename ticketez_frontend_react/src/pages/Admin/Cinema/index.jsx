@@ -27,6 +27,7 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { cinemaApi, cinemaComplexApi } from '~/api/admin';
 import { cinemaTypeApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
+import authApi from '~/api/user/Security/authApi';
 
 
 const cx = classNames.bind(style);
@@ -36,7 +37,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminCinema = () => {
+const AdminCinema = ({cinemaComplexId}) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -55,22 +56,26 @@ const AdminCinema = () => {
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [cinemaType, setCinemaType] = useState([]);
     const [cinemaComplex, setCinemaComplex] = useState([]);
+    // console.log(cinemaComplexId);
+    // const user = authApi.getUser();
     //api
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await cinemaApi.getPage(currentPage, pageSize);
+                const res = await cinemaApi.getCinemaByComplexId(cinemaComplexId.id, currentPage, pageSize);
                 const [cinemaType, cinemaComplex] = await Promise.all([cinemaTypeApi.get(), cinemaComplexApi.get()]);
                 setCinemaType(cinemaType.data);
                 setCinemaComplex(cinemaComplex.data);
                 //    const resType = await cinemaTypeApi.getCinemaType();
-                console.log(cinemaType)
-                console.log(cinemaComplex);
-                console.log(res);
+                // console.log(cinemaType)
+                // console.log(cinemaComplex);
+                // console.log(res);
                 //    console.log(resType);
+                console.log('text',res);
                 setTotalItems(res.totalItems);
-                setPosts(res.data);
+               
+                setPosts(res.data.data);
                 setLoading(false);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
@@ -81,14 +86,14 @@ const AdminCinema = () => {
             }
         };
         getList();
-    }, [currentPage, pageSize, workSomeThing]);
+    }, [cinemaComplexId,currentPage, pageSize, workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
-
+ 
     const handleReset = (clearFilters) => {
         clearFilters();
         setSearchText('');
@@ -223,13 +228,13 @@ const AdminCinema = () => {
             ...getColumnSearchProps('name'),
             render: (cinemaType) => <span>{cinemaType.typeName}</span>,
         },
-        {
-            title: 'Cụm rạp',
-            dataIndex: 'cinemaComplex',
-            width: '30%',
-            ...getColumnSearchProps('name'),
-            render: (cinemaComplex) => <span>{cinemaComplex.name}</span>,
-        },
+        // {
+        //     title: 'Cụm rạp',
+        //     dataIndex: 'cinemaComplex',
+        //     width: '30%',
+        //     ...getColumnSearchProps('name'),
+        //     render: (cinemaComplex) => <span>{cinemaComplex.name}</span>,
+        // },
         {
             title: 'Action',
             render: (_, record) => (
@@ -295,7 +300,7 @@ const AdminCinema = () => {
             console.log(values.cinemaType);
             console.log(values.cinemaComplex);
             if (editData) {
-                const resp = await cinemaApi.put(editData.id, values, values.cinemaType, values.cinemaComplex);
+                const resp = await cinemaApi.put(editData.id, values, values.cinemaType, cinemaComplexId.id);
                 console.log(resp);
                 funcUtils.notify('Cập nhật thành công', 'success');
             }
@@ -303,7 +308,7 @@ const AdminCinema = () => {
             if (!editData) {
                 try {
                     console.log(values);
-                    const resp = await cinemaApi.post(values, values.cinemaType, values.cinemaComplex);
+                    const resp = await cinemaApi.post(values, values.cinemaType, cinemaComplexId.id);
                     // message.success('Thêm thành công');
                     funcUtils.notify('Thêm thành công', 'success');
                 } catch (error) {
@@ -341,7 +346,7 @@ const AdminCinema = () => {
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu Rạp</h1>
+                    <h1 className={cx('title')}>Danh sách Phòng rạp</h1>
                 </Col>
                 <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
@@ -421,7 +426,7 @@ const AdminCinema = () => {
                                 allowClear
                             />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             {...formItemLayout}
                             name="cinemaComplex"
                             label="Cụm rạp"
@@ -447,7 +452,7 @@ const AdminCinema = () => {
                                 ]}
                                 allowClear
                             />
-                        </Form.Item>
+                        </Form.Item> */}
                     </Form>
                 </BaseModal>
             </Row>
@@ -459,7 +464,7 @@ const AdminCinema = () => {
                 }}
                 // dataSource={posts}
                 pagination={false}
-                dataSource={posts.map((post) => ({ ...post, key: post.id }))}
+                dataSource={posts?.map((post) => ({ ...post, key: post.id }))}
             />
             <div className={cx('wrapp-pagination')}>
                 <Pagination
