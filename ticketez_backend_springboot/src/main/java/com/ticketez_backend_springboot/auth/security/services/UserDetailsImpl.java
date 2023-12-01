@@ -23,28 +23,30 @@ public class UserDetailsImpl implements UserDetails {
   private String id;
   private String phone;
   private String fullname;
-  private String address;
+  private String image;
   private String email;
+  private String address;
   @JsonIgnore
   private String password;
   private Date birthday;
   private String gender;
-  private String image;
   private Date createdDate;
 
   private Collection<? extends GrantedAuthority> authorities;
 
-  public UserDetailsImpl(String id, String phone, String fullname, String address, String email, String password,
-      Date birthday, String gender, String image, Date createdDate,
+  public UserDetailsImpl(String id, String phone, String fullname, String image, String email,String address, String password,
+      Date birthday, String gender, Date createdDate,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.phone = phone;
     this.fullname = fullname;
+    this.image = image;
     this.email = email;
+    this.address = address;
     this.password = password;
     this.birthday = birthday;
     this.gender = gender;
-    this.image = image;
+
     this.createdDate = createdDate;
     this.authorities = authorities;
   }
@@ -54,17 +56,16 @@ public class UserDetailsImpl implements UserDetails {
         .map(role -> new SimpleGrantedAuthority(role.getName().name()))
         .collect(Collectors.toList());
 
-
     return new UserDetailsImpl(
         account.getId(),
         account.getPhone(),
         account.getFullname(),
+        account.getImage(),
         account.getEmail(),
         account.getAddress(),
         account.getPassword(),
         account.getBirthday(),
         account.getGender(),
-        account.getImage(),
         account.getCreatedDate(),
         authorities);
   }
