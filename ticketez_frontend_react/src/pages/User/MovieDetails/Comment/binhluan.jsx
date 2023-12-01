@@ -94,7 +94,7 @@ const Binhluan = () => {
         // }
         setLoading(true);
         try {
-            const userAdd = await accountApi.getById(user.id);
+            // const userAdd = await accountApi.getById(user.id);
 
             const datareview = {
                 comment,
@@ -102,7 +102,7 @@ const Binhluan = () => {
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, 'minhkhoi', 1);
+            reviewApi.post(datareview, user.id, movieId);
 
             setWorkSomeThing(!workSomeThing);
             setComment("");
@@ -185,10 +185,10 @@ const Binhluan = () => {
     console.log(rating);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handleOk = () => {
-        // Thực hiện xóa ở đây
-        setIsModalVisible(false);
-    };
+    // const handleOk = () => {
+    //     // Thực hiện xóa ở đây
+    //     setIsModalVisible(false);
+    // };
     const handleCancel = () => {
         setIsEditing(false);
         setEditedComment('');
