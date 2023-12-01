@@ -298,6 +298,18 @@ function AdminMovieStudio() {
                         Thêm
                     </Button>
                 </Col>
+                <Col span={24}>
+                    <Search
+                        placeholder="Nhập tên hãng phim vào đây..."
+                        allowClear
+                        // enterButton={false}
+                        onChange={(e) => onSearchStudio(e.target.value)}
+                        style={{
+                            width: 250,
+                            marginBottom: 10,
+                        }}
+                    />
+                </Col>
             </Row>
             <BaseModal
                 maskClosable={false}
