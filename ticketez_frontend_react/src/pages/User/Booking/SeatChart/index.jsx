@@ -66,17 +66,13 @@ function SeatChart(props) {
 
     const [showSeat, setShowSeat] = useState(false);
     const [reload, setReload] = useState(false);
-    const [listSeatNormal, setListSeatNormal] = useState([]);
-    const [listSeatVip, setListSeatVip] = useState([]);
     const [allSeats, setAllSeats] = useState([]);
-    const [listWay, setListWay] = useState([]);
-    const [listSeatCouple, setListSeatcouple] = useState([]);
-    const [allSeatsLocal, setAllSeatsLocal] = useState([]);
     const [seatState, setSeatState] = useState();
-    const [selectedSeatType, setSelectedSeatType] = useState('normal-seat');
+    // SeatChoose
     const [seatBookingData, setSeatBookingData] = useState([]);
+    // seatBooking
+    const [seatBookingData2, setSeatBookingData2] = useState([]);
     const [prices, setPrices] = useState([]);
-    const [filteredPrices, setFilteredPrices] = useState([]);
     const [seatType, setSeatType] = useState();
     const [seatArray, setSeatArray] = useState({
         seatType: { seat: [] },
@@ -116,7 +112,7 @@ function SeatChart(props) {
         setSeatType(respAll.data);
     };
 
-    const fetchDataSeatBooking = async () => {
+    const fetchDataSeatChoose = async () => {
         try {
             const resp = await axiosClient.get(
                 `seat-choose/find-seat-choose-by-seat-char-id-and-showtime-id/${showtime.seatChart.id}/${showtime.id}`,
@@ -125,11 +121,8 @@ function SeatChart(props) {
             if (data.length <= 0) {
                 setSeatBookingData([]);
             }
-            // console.log(data);
             data.forEach((newItem) => {
-                // Kiểm tra xem newItem đã tồn tại trong mảng hay chưa
                 if (!seatBookingData.includes(newItem)) {
-                    // Nếu chưa tồn tại, thì thêm vào mảng
                     setSeatBookingData((prev) => [...prev, newItem]);
                 }
             });
@@ -138,16 +131,36 @@ function SeatChart(props) {
         }
     };
 
-    // useEffect(() => {
-    //     const fetchDataInterval = setInterval(() => {
-    //         fetchDataSeatBooking();
-    //     }, 1000);
+    const fetchDataSeatBooking = async () => {
+        try {
+            const resp = await axiosClient.get(
+                `seatBooking/find-seat-booking-by-seat-char-id-and-showtime-id/${showtime.seatChart.id}/${showtime.id}`,
+            );
+            const data = resp.data;
+            if (data.length <= 0) {
+                setSeatBookingData2([]);
+            }
+            data.forEach((newItem) => {
+                if (!seatBookingData2.includes(newItem)) {
+                    setSeatBookingData2((prev) => [...prev, newItem]);
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-    //     // Để ngăn fetchDataSeatBooking chạy ngay khi component bị unmounted
-    //     return () => {
-    //         clearInterval(fetchDataInterval);
-    //     };
-    // }, []);
+    useEffect(() => {
+        const fetchDataInterval = setInterval(() => {
+            fetchDataSeatChoose();
+            fetchDataSeatBooking();
+        }, 1000);
+
+        // Để ngăn fetchDataSeatChoose chạy ngay khi component bị unmounted
+        return () => {
+            clearInterval(fetchDataInterval);
+        };
+    }, []);
 
     useEffect(() => {
         if (allSeats.length > 0 && seatBookingData.length > 0 && !seatState.seatReserved.length > 0) {
@@ -160,49 +173,6 @@ function SeatChart(props) {
         try {
             const respAll = await axiosClient.get(`seat/by-seatchart/${showtime.seatChart.id}`);
             setAllSeats(respAll.data);
-            const respVip = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${2}`);
-            const newVipSeats = respVip.data.map((seat) => seat.name);
-            setListSeatVip((prevState) => {
-                for (const newSeat of newVipSeats) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
-
-            const respNormal = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${1}`);
-            const newNormalSeats = respNormal.data.map((seat) => seat.name);
-            setListSeatNormal((prevState) => {
-                for (const newSeat of newNormalSeats) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
-
-            const respCouple = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${3}`);
-            const newCoupleSeats = respCouple.data.map((seat) => seat.name);
-            setListSeatcouple((prevState) => {
-                for (const newSeat of newCoupleSeats) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
-
-            const respWay = await axiosClient.get(`seat/by-seatchart-and-seattype/${showtime.seatChart.id}/${7}`);
-            const newWay = respWay.data.map((seat) => seat.name);
-            setListWay((prevState) => {
-                for (const newSeat of newWay) {
-                    if (!prevState.includes(newSeat)) {
-                        prevState.push(newSeat);
-                    }
-                }
-                return prevState;
-            });
 
             const respPrice = await axiosClient.get(
                 `price/findByCinemaComplexIdAndMovieId/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
@@ -223,13 +193,9 @@ function SeatChart(props) {
                 setReload(true);
             }
             if (allSeats.length > 0) {
-                if (listSeatVip.length > 0 || listSeatNormal.length > 0) {
-                    setSeatState(createSeatArray());
-                    setShowSeat(true);
-                    setReload(false);
-                } else {
-                    setReload(true);
-                }
+                setSeatState(createSeatArray());
+                setShowSeat(true);
+                setReload(false);
             } else {
                 setReload(true);
             }
@@ -243,16 +209,6 @@ function SeatChart(props) {
         fetchDataSeat();
         getDataSeatArray();
     }, [reload]);
-
-    const [showInfo, setShowInfo] = useState('');
-    useEffect(() => {
-        if (showInfo === 'success') {
-            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
-        }
-        if (showInfo === 'error') {
-            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'error');
-        }
-    }, [showInfo]);
 
     // Lấy price từ ghế
 
@@ -335,16 +291,13 @@ function SeatChart(props) {
         if (seatReserved.indexOf(seat) > -1) {
             setPriceSeats(priceSeats - seatPrices);
             seatReserved.splice(seatReserved.indexOf(seat), 1);
-            // setSeatState({
-            //     ...seatState,
-            //     normalSeat: [...normalSeat, seat],
-            // });
+            setSeatState({
+                ...seatState,
+                seatReserved: [...seatReserved],
+            });
+            removeDataFromDuplicateSeatByName(seat);
         } else {
             Object.keys(seatState).forEach((key) => {
-                // Xóa dữ liệu cũ tránh bị trùng
-                // while (seatState[key].indexOf(seat) > -1) {
-                //     seatState[key].splice(seatState[key].indexOf(seat), 1);
-                // }
                 seatType.forEach((seatType) => {
                     if (seatType.nickName === key) {
                         setSeatState({
@@ -455,6 +408,14 @@ function SeatChart(props) {
         });
         setPriceSeats(0);
     };
+    const [hasData, setHasData] = useState(false);
+
+    useEffect(() => {
+        if (seatState && seatState.seatReserved) {
+            const hasData = seatState.seatReserved.length > 0 ? true : false;
+            setHasData(hasData);
+        }
+    }, [seatState ? seatState.seatReserved : null]);
 
     // Lấy thời gian bắt đầu phim--------------------------------------------------
     const startDate = new Date(showtime.startTime);
@@ -511,26 +472,38 @@ function SeatChart(props) {
                                             <td className="header-cell protected-element">{header}</td>
                                             {seatState.seat[rowIndex].map((seat_no) => {
                                                 const seatClassName =
-                                                    Object.keys(seatState)
-                                                        .map((key) => {
-                                                            let color = null;
-                                                            if (seatState[key].indexOf(seat_no) > -1) {
-                                                                seatType.forEach((seat) => {
-                                                                    if (seat.nickName === key) {
-                                                                        color = seat.color;
-                                                                    }
-                                                                });
-                                                            }
+                                                    seatBookingData2.indexOf(seat_no) > -1
+                                                        ? '#404040'
+                                                        : seatBookingData.indexOf(seat_no) > -1
+                                                        ? '#404040'
+                                                        : seatState.seatReserved.indexOf(seat_no) > -1
+                                                        ? '#16A34A'
+                                                        : Object.keys(seatState)
+                                                              .map((key) => {
+                                                                  let color = null;
+                                                                  if (seatState[key].indexOf(seat_no) > -1) {
+                                                                      seatType.forEach((seat) => {
+                                                                          if (seat.nickName === key) {
+                                                                              color = seat.color;
+                                                                          }
+                                                                      });
+                                                                  }
 
-                                                            return color;
-                                                        })
-                                                        .filter(Boolean)
-                                                        .join(' ') || 'reserved';
+                                                                  return color;
+                                                              })
+                                                              .filter(Boolean)
+                                                              .join(' ') || 'reserved';
 
+                                                const style = {
+                                                    backgroundColor: seatClassName,
+                                                    pointerEvents: seatClassName === '#404040' ? 'none' : 'auto',
+                                                    visibility: seatClassName === '#121B2B' ? 'hidden' : 'visible',
+                                                    textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
+                                                };
                                                 return (
                                                     <td
                                                         className={`protected-element`}
-                                                        style={{ backgroundColor: `${seatClassName}` }}
+                                                        style={style}
                                                         key={seat_no}
                                                         onClick={() => onClickData(seat_no)}
                                                     >
@@ -612,9 +585,6 @@ function SeatChart(props) {
                         <div className="tw-mt-12 tw-mb-6">
                             <Space size={[0, 200]} wrap>
                                 <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '600px' }}>
-                                    <Tag className={cx('tagg')} color="#404040">
-                                        Đã đặt
-                                    </Tag>{' '}
                                     {seatType &&
                                         seatType.map((value) => {
                                             if (value.id === 7) {
@@ -628,20 +598,6 @@ function SeatChart(props) {
                                         })}
                                 </div>
                             </Space>
-                            {/* <Button
-                                style={{
-                                    width: '140px',
-                                    height: '70px',
-                                    backgroundColor: '#EB2F96',
-                                    fontWeight: 'bolder',
-                                }}
-                                className={cx('btn')}
-                                type="primary"
-                                onClick={handleButtonClick}
-                                icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
-                            >
-                                Mua vé
-                            </Button> */}
                         </div>
                     </Col>
 
@@ -655,13 +611,16 @@ function SeatChart(props) {
                                         style={{
                                             width: '150px',
                                             height: '70px',
-                                            backgroundColor: '#EB2F96',
+                                            backgroundColor: hasData ? '#EB2F96' : 'gray',
                                             fontWeight: 'bolder',
                                         }}
-                                        className={cx('btn')}
+                                        className={`btn ${
+                                            hasData === false ? 'bg-gray-500' : ''
+                                        } tw-text-white tw-hover:bg-gray-600 tw-focus:outline-none`}
                                         type="primary"
                                         onClick={handleButtonClick}
                                         icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
+                                        disabled={hasData === false}
                                     >
                                         Mua vé
                                     </Button>

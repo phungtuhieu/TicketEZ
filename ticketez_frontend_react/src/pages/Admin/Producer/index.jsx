@@ -27,7 +27,7 @@ import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
 import funcUtils from '~/utils/funcUtils';
-import { studioApi } from '~/api/admin';
+import { producerApi, studioApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 import moment from 'moment';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -50,7 +50,7 @@ const formItemLayout = {
     wrapperCol: { span: 16 },
 };
 
-function AdminMovieStudio() {
+function AdminProducer() {
     const formatDate = 'DD-MM-YYYY';
     const fontSize = 14;
     const [list, setList] = useState([]);
@@ -89,17 +89,16 @@ function AdminMovieStudio() {
         setLoadingButton(true);
         try {
             const values = await form.validateFields();
-            console.log('values', values);
             if (fileList.length > 0) {
                 if (!dataEdit) {
                     let imageName = await uploadApi.post(values.image.fileList[0].originFileObj);
                     const dataCreate = {
                         ...values,
-                        foundedDate: values.foundedDate.format('YYYY-MM-DD'),
+                        birthday: values.birthday.format('YYYY-MM-DD'),
                         image: imageName,
                     };
                     console.log('dataCreate', dataCreate);
-                    const resp = await studioApi.create(dataCreate);
+                    const resp = await producerApi.create(dataCreate);
                     setWorkSomething(!workSomething);
                     handleResetForm();
                     if (resp.status === HttpStatusCode.Ok) {
@@ -112,15 +111,11 @@ function AdminMovieStudio() {
                     if (fileList[0].hasOwnProperty('originFileObj')) {
                         imageName = await uploadApi.put(dataEdit.image, fileList[0].originFileObj);
                     }
-                    let dataUpdate = {
+                    const resp = await producerApi.update(dataEdit.id, {
                         ...values,
                         image: imageName != null ? imageName : values.image,
                         id: dataEdit.id,
-                    };
-                    console.log('dataUpdate: ', dataUpdate);
-                    const resp = await studioApi.update(dataEdit.id, dataUpdate);
-                    // console.log('resp update:', resp.data);
-                    // console.log('values update:', values);
+                    });
                     setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
                     setWorkSomething(!workSomething);
                     if (resp.status === HttpStatusCode.Ok) {
@@ -129,7 +124,7 @@ function AdminMovieStudio() {
                     }
                 }
             } else {
-                funcUtils.notify('Vui lòng chọn ảnh!', 'error');
+                funcUtils.notify('Vui lòng chọn ảnh', 'error');
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
@@ -162,13 +157,12 @@ function AdminMovieStudio() {
                     url: uploadApi.get(record.image),
                 },
             ]);
-            setPreviewTitle(`Logo của hãng ${record.name}`);
+            setPreviewTitle(`Ảnh đại diện của: ${record.name}`);
             form.setFieldsValue({
                 ...record,
-                foundedDate: dayjs(record.foundedDate, 'YYYY-MM-DD'),
+                birthday: dayjs(record.birthday, 'YYYY-MM-DD'),
             });
             setIsModalOpen(true);
-            console.log('record: edit:', record);
             setDataEdit(record);
         } catch (error) {
             console.log('error edit: ', error);
@@ -183,7 +177,7 @@ function AdminMovieStudio() {
     const handleDelete = async (record) => {
         setLoadingButton(true);
         try {
-            const resp = await studioApi.delete(record.id);
+            const resp = await producerApi.delete(record.id);
             if (resp.status === 200) {
                 setLoadingButton(false);
                 funcUtils.notify('Đã xoá thành công', 'success');
@@ -204,17 +198,18 @@ function AdminMovieStudio() {
         setSearchValue(value);
         setIsSearchingTable(true);
     };
-    
-    useSearchEffect(searchValue, studioApi, setList, isSearchingTable);
+    useSearchEffect(searchValue, producerApi, setList, isSearchingTable);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resp = await studioApi.getByPage(currentPage, pageSize);
+                const resp = await producerApi.getByPage(currentPage, pageSize);
                 const dataFormat = resp.data.map((item) => ({
                     ...item,
-                    // foundedDate: moment(item.foundedDate, 'YYYY-MM-DD').format(formatDate),
+                    // birthday: moment(item.birthday, 'YYYY-MM-DD').format(formatDate),
                 }));
+                console.log(dataFormat);
                 setList(dataFormat);
+                console.log(resp);
                 setTotalItems(resp.totalItems);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
@@ -327,7 +322,7 @@ function AdminMovieStudio() {
 
     const columns = [
         {
-            title: 'Tên hãng',
+            title: 'Tên NSX',
             dataIndex: 'name',
             key: 'name',
             sorter: {
@@ -337,7 +332,7 @@ function AdminMovieStudio() {
             ...getColumnSearchProps('name'),
         },
         {
-            title: 'Logo',
+            title: 'Ảnh đại diện',
             dataIndex: 'image',
             key: 'image',
             render: (_, record) => (
@@ -353,13 +348,13 @@ function AdminMovieStudio() {
             ),
         },
         {
-            title: 'Quốc gia',
-            dataIndex: 'country',
-            key: 'country',
-            ...getColumnSearchProps('country'),
+            title: 'Quốc tịch',
+            dataIndex: 'nationality',
+            key: 'nationality',
+            ...getColumnSearchProps('nationality'),
             render: (_, record) => {
-                let i = countriesJson.findIndex((item) => item.code === record.country);
-                return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
+                let i = countriesJson.findIndex((item) => item.code === record.nationality);
+                return <span>{i > -1 ? countriesJson[i].name : record.nationality}</span>;
             },
         },
         {
@@ -369,15 +364,20 @@ function AdminMovieStudio() {
             ...getColumnSearchProps('email'),
         },
         {
-            title: 'Ngày thành lập',
-            dataIndex: 'foundedDate',
-            key: 'foundedDate',
-            render: (foundedDate) => dayjs(foundedDate, 'YYYY-MM-DD').format(formatDate),
+            title: 'Ngày sinh',
+            dataIndex: 'birthday',
+            key: 'birthday',
+            render: (birthday) => dayjs(birthday, 'YYYY-MM-DD').format(formatDate),
         },
+        // {
+        //     title: 'Tiểu sử',
+        //     dataIndex: 'biography',
+        //     key: 'biography',
+        // },
 
         {
             title: 'Thao tác',
-            key: 'description',
+            key: 'action',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -403,25 +403,8 @@ function AdminMovieStudio() {
             <div>
                 <ul style={{ marginLeft: 52 }}>
                     <li>
-                        <b>Website: </b>
-                        <span>
-                            <a
-                                href={record.website}
-                                className={cx('table-link-video')}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {record.website}
-                            </a>
-                        </span>
-                    </li>
-                    <li>
-                        <b>Địa chỉ: </b>
-                        <Paragraph style={{ paddingLeft: 35 }}>{record.address}</Paragraph>
-                    </li>
-                    <li>
-                        <b>Mô tả: </b>
-                        <Paragraph style={{ paddingLeft: 35 }}>{record.description}</Paragraph>
+                        <b>Tiểu sử: </b>
+                        <Paragraph>{record.biography}</Paragraph>
                     </li>
                 </ul>
             </div>
@@ -446,7 +429,7 @@ function AdminMovieStudio() {
         <>
             <Row>
                 <Col span={22}>
-                    <h1>Hãng phim</h1>
+                    <h1>Nhà sản xuất</h1>
                 </Col>
                 <Col span={2} className={cx('wrap-act-top-right')}>
                     <Button
@@ -460,12 +443,12 @@ function AdminMovieStudio() {
                 </Col>
                 <Col span={24}>
                     <Search
-                        placeholder="Nhập tên hãng phim vào đây..."
+                        placeholder="Nhập tên nhà sản xuất vào đây..."
                         allowClear
                         // enterButton={false}
                         onChange={(e) => onSearchStudio(e.target.value)}
                         style={{
-                            width: 250,
+                            width: 280,
                             marginBottom: 10,
                         }}
                     />
@@ -514,22 +497,26 @@ function AdminMovieStudio() {
                     autoComplete="off"
                 >
                     <Form.Item
-                        label="Tên hãng"
+                        label="Tên NSX"
                         name="name"
                         rules={[
                             {
                                 required: true,
-                                message: 'Vui lòng nhập tên hãng phim!',
+                                message: 'Vui lòng nhập tên nhà sản xuất!',
                             },
                         ]}
                     >
                         <Input
                             style={{ fontFamily: 'inherit', fontSize: fontSize }}
-                            placeholder="Nhập tên hãng vào đây"
+                            placeholder="Nhập tên nhà sản xuất vào đây"
                         />
                     </Form.Item>
 
-                    <Form.Item label="Logo" name="image" rules={[{ required: true, message: 'Vui lòng chọn logo' }]}>
+                    <Form.Item
+                        label="Ảnh đại diện"
+                        name="image"
+                        rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                    >
                         <Upload
                             beforeUpload={(file) => {
                                 console.log({ file });
@@ -540,24 +527,29 @@ function AdminMovieStudio() {
                             onChange={onChangeUpload}
                             onPreview={handlePreview}
                             fileList={fileList}
-                            name="banner"
+                            name="image"
                             maxCount={1}
                         >
                             {fileList.length < 1 && '+ Tải lên'}
                         </Upload>
                     </Form.Item>
-                    <Form.Item name="foundedDate" label="Ngày thành lập" {...config}>
-                        <DatePicker style={{ width: 200 }} placeholder="Chọn ngày thành lập" format={formatDate} />
+                    <Form.Item name="birthday" label="Ngày sinh" {...config}>
+                        <DatePicker
+                            style={{ fontFamily: 'inherit', fontSize: fontSize, width: 200 }}
+                            placeholder="Chọn ngày sinh"
+                            format={formatDate}
+                        />
                     </Form.Item>
                     <Form.Item
                         {...formItemLayout}
-                        name="country"
-                        label="Quốc gia"
-                        rules={[{ required: true, message: 'Vui lòng chọn quốc gia' }]}
+                        name="nationality"
+                        label="Quốc tịch"
+                        rules={[{ required: true, message: 'Vui lòng chọn quốc tịch' }]}
                     >
                         <Select
+                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
                             showSearch
-                            placeholder="Tìm kiếm và chọn quốc gia"
+                            placeholder="Tìm kiếm và chọn quốc tịch"
                             // onChange={onGenderChange}
                             allowClear
                             filterOption={(input, option) =>
@@ -588,39 +580,18 @@ function AdminMovieStudio() {
                         rules={[
                             {
                                 required: true,
-                                message: 'Vui lòng nhập email của hãng phim!',
+                                message: 'Vui lòng nhập email của nhà sản xuất!',
                             },
                         ]}
                     >
                         <Input style={{ fontFamily: 'inherit', fontSize: fontSize }} placeholder="Nhập email vào đây" />
                     </Form.Item>
-                    <Form.Item
-                        label="Website"
-                        name="website"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập địa website của hãng phim!',
-                            },
-                        ]}
-                    >
-                        <Input
-                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
-                            placeholder="Nhập địa chỉ website vào đây"
-                        />
-                    </Form.Item>
-                    <Form.Item name={'address'} label="Địa chỉ">
-                        <Input.TextArea
-                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
-                            autoSize={{ minRows: 3, maxRows: 5 }}
-                            placeholder="Nhập address vào đây"
-                        />
-                    </Form.Item>
-                    <Form.Item name={'description'} label="Mô tả">
+
+                    <Form.Item name={'biography'} label="Tiểu sử">
                         <Input.TextArea
                             style={{ fontFamily: 'inherit', fontSize: fontSize }}
                             autoSize={{ minRows: 4, maxRows: 6 }}
-                            placeholder="Nhập mô tả vào đây"
+                            placeholder="Nhập tiểu sử vào đây"
                         />
                     </Form.Item>
                 </Form>
@@ -645,4 +616,4 @@ function AdminMovieStudio() {
     );
 }
 
-export default AdminMovieStudio;
+export default AdminProducer;

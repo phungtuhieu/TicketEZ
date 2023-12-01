@@ -219,6 +219,9 @@ function SeatChart(props) {
                                                     <td className="header-cell protected-element">{header}</td>
                                                     {seatState.seat[rowIndex].map((seat_no) => {
                                                         const seatClassName =
+                                                        nameSeat.indexOf(seat_no) > -1
+                                                        ? '#404040'
+                                                        :
                                                             Object.keys(seatState)
                                                                 .map((key) => {
                                                                     let color = null;
@@ -235,11 +238,16 @@ function SeatChart(props) {
                                                                 })
                                                                 .filter(Boolean)
                                                                 .join(' ') || 'none';
-
+                                                        const style = {
+                                                            backgroundColor: seatClassName,
+                                                            visibility:
+                                                                seatClassName === '#121B2B' ? 'hidden' : 'visible',
+                                                            textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
+                                                        };
                                                         return (
                                                             <td
                                                                 className={`protected-element`}
-                                                                style={{ backgroundColor: `${seatClassName}` }}
+                                                                style={style}
                                                                 key={seat_no}
                                                                 onClick={() => onClickData(seat_no)}
                                                             >
@@ -261,6 +269,9 @@ function SeatChart(props) {
                                                 {seatType &&
                                                     seatType.map((value) => {
                                                         if (value.id === 7) {
+                                                            return null;
+                                                        }
+                                                        if (value.id === 9) {
                                                             return null;
                                                         }
                                                         return (
@@ -295,6 +306,9 @@ function SeatChart(props) {
                                         {seatType &&
                                             seatType.map((value) => {
                                                 if (value.id === 7) {
+                                                    return null;
+                                                }
+                                                if (value.id === 9) {
                                                     return null;
                                                 }
                                                 return (

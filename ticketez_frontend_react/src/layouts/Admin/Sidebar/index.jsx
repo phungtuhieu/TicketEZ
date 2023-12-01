@@ -28,6 +28,7 @@ const items = [
     getItem('Phim', 'grMovie', <FontAwesomeIcon icon={solidIcons.faVideo} />, [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
         getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
+        getItem(<Link to="/admin/movie-producer">Nhà sản xuất</Link>, 'movieProducer'),
         getItem(<Link to="/admin/price">Giá vé</Link>, 'price'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
         getItem(<Link to="/admin/actor">Diễn viên</Link>, 'actor', null),

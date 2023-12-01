@@ -124,6 +124,7 @@ function TicketDetails({ paymentInfoDTO }) {
                                     <Col span={12} className={cx('ticket-qrcode-area')}>
                                         <QRCode
                                             value={infoTicket.paymentInfo.ticketId}
+                                            // value={'Title: 1, ID: 2'}
                                             bgColor="white"
                                             className={cx('qrcode')}
                                         />
