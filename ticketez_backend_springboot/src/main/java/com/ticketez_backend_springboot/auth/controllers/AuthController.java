@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.auth.controllers;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +38,7 @@ import com.ticketez_backend_springboot.auth.repository.AccountRepository;
 import com.ticketez_backend_springboot.auth.repository.RoleRepository;
 import com.ticketez_backend_springboot.auth.security.jwt.JwtUtils;
 import com.ticketez_backend_springboot.auth.security.services.UserDetailsImpl;
+import com.ticketez_backend_springboot.modules.account.Account;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -170,6 +174,39 @@ public class AuthController {
     accountRepository.save(account);
 
     return ResponseEntity.ok(new MessageResponse("Người dùng đã đăng ký thành công!"));
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody Map<String, Object> updates) {
+    if (!accountRepository.existsById(id)) {
+      return ResponseEntity.notFound().build();
+    }
+
+    SecurityAccount existingAccount = accountRepository.findById(id).orElse(null);
+    if (existingAccount == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    if (updates.containsKey("phone")) {
+      existingAccount.setPhone((String) updates.get("phone"));
+    }
+    if (updates.containsKey("fullname")) {
+      existingAccount.setFullname((String) updates.get("fullname"));
+    }
+    if (updates.containsKey("email")) {
+      existingAccount.setEmail((String) updates.get("email"));
+    }
+    if (updates.containsKey("address")) {
+      existingAccount.setAddress((String) updates.get("address"));
+    }
+    if (updates.containsKey("gender")) {
+      existingAccount.setGender((String) updates.get("gender"));
+    }
+
+    SecurityAccount updatedAccount = accountRepository.save(existingAccount);
+    return ResponseEntity.ok(updatedAccount);
+
+    
   }
 
   @GetMapping("/signout")

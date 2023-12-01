@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
-import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
+import { Avatar, Breadcrumb, Button, Divider, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
@@ -151,6 +151,7 @@ const Header = () => {
                             </div>
                         </div>
                     </a>
+                
                     <div className="tw-flex tw-items-center tw-font-medium tw-cursor-pointer">
                         <div className="tw-hidden lg:tw-block tw-mr-[20px] tw-text-gray-700 tw-font-2xl">
                             <a onClick={scrollToShowTimes} className="tw-text-gray-700">
@@ -198,8 +199,14 @@ const Header = () => {
                                 </a>
                             </Dropdown>
                         ) : (
+                            // <div
+                            //     className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl"
+                            //     onClick={handleLogin}
+                            // >
+                            //      <button className="tw-bg-[var(--primary--text-color)] tw-py-4  tw-px-8 tw-rounded tw-cursor-pointer hover:tw-opacity-[0.9]">Đăng nhập</button>
+                            // </div>
+                            
                             <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
-                          
                                 <span className="name-short">Đăng nhập</span>
                                 <Avatar
                                     style={{ backgroundColor: '#87d068' }}

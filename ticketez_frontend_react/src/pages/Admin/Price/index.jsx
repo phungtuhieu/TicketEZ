@@ -74,7 +74,7 @@ const AdminPrice = () => {
             sorter: (a, b) => a.id - b.id,
         },
         {
-            title: 'Ngày bắt đầu và kết thúc',
+            title: 'Ngày áp dụng',
             render: (_, record) =>
                 new Date(record.price.startDate).toLocaleDateString() +
                 ' - ' +
@@ -83,7 +83,7 @@ const AdminPrice = () => {
 
         {
             title: 'Tên phim',
-            render: (_, record) => record.price.movie.title,
+            render: (_, record) => record.price.formatMovie.movie.title,
         },
         {
             title: 'Cụm rạp và chuỗi rạp',
@@ -92,9 +92,9 @@ const AdminPrice = () => {
         },
 
         {
-            title: 'Giá ghế đầu tuần và cuối tuần',
+            title: 'Gồm các loại ghế',
             render: (_, record) =>
-                `${record.price.cinemaComplex.name} - ${record.price.cinemaComplex.cinemaChain.name}`,
+                `${record.newPriceSeatTypeDTOs.map((moment, index) => moment.seatType.name).join(',' + '\n')}`,
         },
 
         {
@@ -172,7 +172,7 @@ const AdminPrice = () => {
                     open={isModalOpen}
                     onOk={handleOk}
                     onCancel={handleCancel}
-                    width={500}
+                    width={700}
                     destroyOnClose={true}
                     footer={null}
                 >

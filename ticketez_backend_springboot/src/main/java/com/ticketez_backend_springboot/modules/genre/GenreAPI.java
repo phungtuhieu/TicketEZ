@@ -25,6 +25,7 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieDAO;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/genre")
@@ -37,33 +38,35 @@ public class GenreAPI {
     @GetMapping("/get/all")
     public ResponseEntity<?> findAll() {
         try {
-           List<Genre> list = dao.findAll();
-        return ResponseEntity.ok(list);
+            List<Genre> list = dao.findAll();
+            return ResponseEntity.ok(list);
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping
-        public ResponseEntity<?> findByPage(
-                @RequestParam("page") Optional<Integer> pageNo,
-                @RequestParam("limit") Optional<Integer> limit,
-                @RequestParam("search") Optional<String> search) {
-            try {
-                if (pageNo.isPresent() && pageNo.get() == 0) {
-                    return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
-                }
-                Sort sort = Sort.by(Sort.Order.desc("id"));
-                Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
-                Page<Genre> page = dao.findByKeyword(search.orElse(""),pageable);
-                ResponseDTO<Genre> responeDTO = new ResponseDTO<>();
-                responeDTO.setData(page.getContent());
-                responeDTO.setTotalItems(page.getTotalElements());
-                responeDTO.setTotalPages(page.getTotalPages());
-                return ResponseEntity.ok(responeDTO);
-            } catch (Exception e) {
-                return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> findByPage(
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("search") Optional<String> search) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Tài nguyên không tồn tại", HttpStatus.BAD_REQUEST);
             }
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+            Page<Genre> page = dao.findByKeyword(search.orElse(""), pageable);
+            ResponseDTO<Genre> responeDTO = new ResponseDTO<>();
+            responeDTO.setData(page.getContent());
+            responeDTO.setTotalItems(page.getTotalElements());
+            responeDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(responeDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Genre> findById(@PathVariable("id") Long id) {
         if (!dao.existsById(id)) {
@@ -79,7 +82,7 @@ public class GenreAPI {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Genre> put(@PathVariable("id") Long id, @RequestBody Genre genre) {
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Genre genre) {
         if (!dao.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -88,9 +91,18 @@ public class GenreAPI {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        dao.deleteById(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        Genre genre = dao.findById(id).orElse(null);
+        if (genre != null) {
+            if (!genre.getGenresMovies().isEmpty()) {
+                return new ResponseEntity<>("Không thể xóa, thể loại đã được thêm vào movie", HttpStatus.CONFLICT);
+            } else {
+                dao.deleteById(id);
+            }
+        } else {
+            return new ResponseEntity<>("Có lỗi, không thể tìm thấy thể loại để xóa", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(true);
     }
     // ----------------------------------------------------------------
 
