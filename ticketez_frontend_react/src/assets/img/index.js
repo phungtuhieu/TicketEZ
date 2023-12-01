@@ -22,7 +22,7 @@ import veMayBay from '../icon/f-ve-may-bay.svg';
 import veKhachSan from '../icon/f-khach-san.svg';
 import viNhanAi from '../icon/f-vi-nhan-ai.webp';
 import vayNhanh from '../icon/f-vay-nhanh.webp';
-
+import bgTopPhim from '../img/bgTopPhim.webp';
 import faceBook from '../icon/f-facebook.svg';
 import linkedIn from '../icon/f-linkedIn.svg';
 import youtube from '../icon/f-youtube.svg';
@@ -70,6 +70,7 @@ const img = {
     logoComment,
     logoHome,
     logoAdmin,
+    bgTopPhim
 };
 
 export default img;
