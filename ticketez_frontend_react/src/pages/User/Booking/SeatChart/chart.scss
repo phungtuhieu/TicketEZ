@@ -98,22 +98,20 @@ ul.mar li {
 
 /*ghế thường */
 .normal-seat {
-    border-radius: 10px;
+ 
     background-color: #5b2b9f; 
-    color: white;
+ 
 }
 
 /*ghế VIP */
 .vip-seat {
-    border-radius: 10px;
+  
     background-color: #b7232b; 
-    color: white; 
+
 }
 
 .couple-seat {
-    border-radius: 10px;
     background-color: #d82d8b;
-    color: white; 
     transform: scaleX(2);
 }
 
@@ -148,6 +146,8 @@ li {
 
 /* Trong tệp CSS hoặc SCSS của bạn */
 .protected-element {
+    border-radius: 10px;
+    color: white; 
     user-select: none; /* Ngăn chọn văn bản */
 }
 

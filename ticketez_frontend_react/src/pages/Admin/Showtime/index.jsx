@@ -491,8 +491,6 @@ const AdminShowtime = () => {
             //lấy ra giờ cuối cùng cộng thêm 15 phút
             const lastEndTimeWithExtra15Minutes = moment(lastArrayEndtime, 'HH:mm').add(15, 'minutes').format('HH:mm');
 
-
-
             let previousData = null;
             const formatValue = moment(valueStartTimeEdit).format('HH:mm');
             for (let i = 0; i < endtimeFormatHHmm.length; i++) {
@@ -531,16 +529,14 @@ const AdminShowtime = () => {
                             endTime: endTime,
                             status: 2, // Công chiếu
                         };
-                    }
-                    if ( startTime >= currentTime && startTime <= newCurrentDateADd ) {
+                    } else if (startTime >= currentTime && startTime <= newCurrentDateADd) {
                         values = {
                             ...values,
                             startTime: startTime,
                             endTime: endTime,
                             status: 1, // sắp chiếu
                         };
-                    }
-                    if (startTime > newCurrentDateADd) {
+                    } else {
                         values = {
                             ...values,
                             startTime: startTime,
@@ -607,30 +603,28 @@ const AdminShowtime = () => {
                         setOpen(true);
                         setLoading(false);
                     } else {
-                        if (currentTime.toDateString() === startTime.toDateString()) {
-                            values = {
-                                ...values,
-                                startTime: startTime,
-                                endTime: endTime,
-                                status: 2, // Công chiếu
-                            };
-                        }
-                        if (startTime < newCurrentDateADd && startTime > currentTime) {
-                            values = {
-                                ...values,
-                                startTime: startTime,
-                                endTime: endTime,
-                                status: 1, // sắp chiếu
-                            };
-                        }
-                        if (startTime > newCurrentDateADd) {
-                            values = {
-                                ...values,
-                                startTime: startTime,
-                                endTime: endTime,
-                                status: 0, //chưa công chiếu
-                            };
-                        }
+                       if (currentTime.toDateString() === startTime.toDateString()) {
+                           values = {
+                               ...values,
+                               startTime: startTime,
+                               endTime: endTime,
+                               status: 2, // Công chiếu
+                           };
+                       } else if (startTime >= currentTime && startTime <= newCurrentDateADd) {
+                           values = {
+                               ...values,
+                               startTime: startTime,
+                               endTime: endTime,
+                               status: 1, // sắp chiếu
+                           };
+                       } else {
+                           values = {
+                               ...values,
+                               startTime: startTime,
+                               endTime: endTime,
+                               status: 0, //chưa công chiếu
+                           };
+                       }
 
                         if (editData) {
                             let putData = {

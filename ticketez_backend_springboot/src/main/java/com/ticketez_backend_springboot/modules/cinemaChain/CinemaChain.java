@@ -23,6 +23,7 @@ public class CinemaChain {
 
     private String name;
     private String image;
+    private String banner;
     private String description;
 
     @JsonIgnore

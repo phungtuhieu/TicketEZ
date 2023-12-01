@@ -20,7 +20,6 @@ const items = [
     // Quản lý rạp phim
     getItem('Rạp', 'grCinema', <FontAwesomeIcon icon={solidIcons.faTv} />, [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
-        getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
         getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
         getItem(<Link to="/admin/cinema-chains">Chuỗi Rap</Link>, 'cinemaChains'),
     ]),

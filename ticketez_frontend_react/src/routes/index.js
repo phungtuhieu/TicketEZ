@@ -30,6 +30,7 @@ const publicRoutes = [
     { path: '/admin/priceservice', component: PageAdmin.AdminPriceService, layout: AdminLayout },
     { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout },
     { path: '/admin/price', component: PageAdmin.AdminPrice, layout: AdminLayout },
+    { path: '/admin/test', component: PageAdmin.Test, layout: AdminLayout },
     // User
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
@@ -48,6 +49,8 @@ const publicRoutes = [
     { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
+    { path: '/movieTop/', component: PageUser.MovieTop, layout: DefaultLayout },
+    { path: '/movieTop/1', component: PageUser.MovieTopDetails, layout: DefaultLayout },
     { path: '/movie-cinema-complex/:ccxId', component: PageUser.MovieCinemaComplex, layout: DefaultLayout },
 ];
 

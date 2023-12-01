@@ -9,3 +9,13 @@
     justify-content: center;
     align-items: center;
 }
+
+.custom-form-studio {
+    font-family: var(--font-family) !important;
+}
+.table-link-video {
+    color: var(--primary-color);
+    &:hover {
+        text-decoration: underline;
+    }
+}

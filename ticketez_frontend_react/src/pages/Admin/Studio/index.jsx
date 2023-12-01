@@ -1,9 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Input, Pagination, Popconfirm, Row, Select, Space, message } from 'antd';
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Image,
+    Input,
+    Pagination,
+    Popconfirm,
+    Row,
+    Select,
+    Space,
+    Upload,
+    message,
+} from 'antd';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
-
-import style from './MovieStudio.module.scss';
+import countriesJson from '~/data/countries.json';
+import style from './Studio.module.scss';
 import classNames from 'classnames/bind';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,15 +26,32 @@ import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
 import funcUtils from '~/utils/funcUtils';
+import { studioApi } from '~/api/admin';
+import uploadApi from '~/api/service/uploadApi';
+import moment from 'moment';
+import Paragraph from 'antd/es/typography/Paragraph';
+import dayjs from 'dayjs';
+import httpStatus from '~/api/global/httpStatus';
+import { HttpStatusCode } from 'axios';
+import Search from 'antd/es/input/Search';
+import { useSearchEffect } from '~/hooks';
 
 const cx = classNames.bind(style);
-
+const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
 const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 20 },
+    labelCol: { span: 6 },
+    wrapperCol: { span: 16 },
 };
 
 function AdminMovieStudio() {
+    const formatDate = 'DD-MM-YYYY';
+    const fontSize = 14;
     const [list, setList] = useState([]);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState('');
@@ -28,43 +59,71 @@ function AdminMovieStudio() {
     const searchInput = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataEdit, setDataEdit] = useState(null);
-
+    const [fileList, setFileList] = useState([]);
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomething, setworkSomething] = useState(10); // Số mục trên mỗi trang
     const [loadingButton, setLoadingButton] = useState(false); // Số mục trên mỗi trang
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [isSearchingTable, setIsSearchingTable] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
     const showModal = () => {
         setIsModalOpen(true);
+    };
+    const onChangeUpload = async ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+        console.log('newFileList', newFileList);
+    };
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
     };
     const handleOk = async () => {
         setLoadingButton(true);
         try {
             const values = await form.validateFields();
+
             if (!dataEdit) {
-                const resp = await axiosClient.post('movie-studio', values);
-                setLoadingButton(false);
+                let imageName = await uploadApi.post(values.image.fileList[0].originFileObj);
+                const dataCreate = {
+                    ...values,
+                    foundedDate: values.foundedDate.format('YYYY-MM-DD'),
+                    image: imageName,
+                };
+                console.log('dataCreate', dataCreate);
+                const resp = await studioApi.create(dataCreate);
                 setworkSomething(!workSomething);
-                form.resetFields();
-                funcUtils.notify('Thêm thành công', 'success');
+                handleResetForm();
+                if (resp.status === HttpStatusCode.Ok) {
+                    funcUtils.notify('Thêm thành công', 'success');
+                }
+                setFileList([]);
             } else {
-                const resp = await axiosClient.put(`movie-studio/-1`, {
+                const resp = await studioApi.update(dataEdit.id, {
                     ...values,
                     id: dataEdit.id,
                 });
-                setLoadingButton(false);
                 setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
                 setworkSomething(!workSomething);
-                funcUtils.notify('Cập nhật thành công', 'success');
-                form.setFieldValue(resp.data);
+                if (resp.status === HttpStatusCode.Ok) {
+                    funcUtils.notify('Cập nhật thành công', 'success');
+                    form.setFieldValue(resp.data);
+                }
             }
         } catch (error) {
-            setLoadingButton(false);
             if (error.hasOwnProperty('response')) {
                 funcUtils.notify(error.response.data, 'error');
             } else {
                 console.log(error);
             }
+        } finally {
+            setLoadingButton(false);
         }
     };
     const handleResetForm = () => {
@@ -73,16 +132,31 @@ function AdminMovieStudio() {
     const handleCancelModal = () => {
         setIsModalOpen(false);
         handleResetForm();
+        setFileList([]);
         if (dataEdit != null) {
             setDataEdit(null);
         }
     };
-    const handleEditData = (record) => {
-        setIsModalOpen(true);
-        setDataEdit(record);
-        form.setFieldsValue({
-            ...record,
-        });
+    const handleEditData = async (record) => {
+        try {
+            // const resp = await studioApi.getById(record.id);
+            setFileList([
+                {
+                    uid: record.id.toString(),
+                    name: record.image,
+                    url: uploadApi.get(record.image),
+                },
+            ]);
+            setPreviewTitle(`Logo của hãng ${record.name}`);
+            form.setFieldsValue({
+                ...record,
+                foundedDate: dayjs(record.foundedDate, 'YYYY-MM-DD'),
+            });
+            setIsModalOpen(true);
+            setDataEdit(record);
+        } catch (error) {
+            console.log('error edit: ', error);
+        }
     };
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -93,7 +167,7 @@ function AdminMovieStudio() {
     const handleDelete = async (record) => {
         setLoadingButton(true);
         try {
-            const resp = await axiosClient.delete(`movie-studio/${record.id}`);
+            const resp = await studioApi.delete(record.id);
             if (resp.status === 200) {
                 setLoadingButton(false);
                 funcUtils.notify('Đã xoá thành công', 'success');
@@ -101,19 +175,29 @@ function AdminMovieStudio() {
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
-                message.error(error.response.data);
+                funcUtils.notify(error.response.data, 'error');
             } else {
-                funcUtils.notify('Xoá thất bại', 'success');
+                funcUtils.notify('Xoá thất bại', 'error');
                 console.log(error);
             }
+        } finally {
+            setLoadingButton(false);
         }
     };
-
+    const onSearchStudio = (value) => {
+        setSearchValue(value);
+        setIsSearchingTable(true);
+    };
+    useSearchEffect(searchValue, studioApi, setList, isSearchingTable);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resp = await axiosClient.get(`movie-studio?page=${currentPage}&limit=${pageSize}`);
-                setList(resp.data.data);
+                const resp = await studioApi.getByPage(1, 10);
+                const dataFormat = resp.data.map((item) => ({
+                    ...item,
+                    // foundedDate: moment(item.foundedDate, 'YYYY-MM-DD').format(formatDate),
+                }));
+                setList(dataFormat);
                 setTotalItems(resp.data.totalItem);
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
@@ -236,10 +320,30 @@ function AdminMovieStudio() {
             ...getColumnSearchProps('name'),
         },
         {
+            title: 'Logo',
+            dataIndex: 'image',
+            key: 'image',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={105}
+                        height={80}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={uploadApi.get(record.image)}
+                    />
+                </Space>
+            ),
+        },
+        {
             title: 'Quốc gia',
             dataIndex: 'country',
             key: 'country',
             ...getColumnSearchProps('country'),
+            render: (_, record) => {
+                let i = countriesJson.findIndex((item) => item.code === record.country);
+                return <span>{i > -1 ? countriesJson[i].name : record.country}</span>;
+            },
         },
         {
             title: 'Email',
@@ -248,10 +352,12 @@ function AdminMovieStudio() {
             ...getColumnSearchProps('email'),
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
+            title: 'Ngày thành lập',
+            dataIndex: 'foundedDate',
+            key: 'foundedDate',
+            render: (foundedDate) => dayjs(foundedDate, 'YYYY-MM-DD').format(formatDate),
         },
+
         {
             title: 'Thao tác',
             key: 'description',
@@ -275,7 +381,44 @@ function AdminMovieStudio() {
             ),
         },
     ];
-
+    const expandedRowRender = (record) => {
+        return (
+            <div>
+                <ul style={{ marginLeft: 52 }}>
+                    <li>
+                        <b>Website: </b>
+                        <span>
+                            <a
+                                href={record.website}
+                                className={cx('table-link-video')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {record.website}
+                            </a>
+                        </span>
+                    </li>
+                    <li>
+                        <b>Địa chỉ: </b>
+                        <Paragraph style={{ paddingLeft: 35 }}>{record.address}</Paragraph>
+                    </li>
+                    <li>
+                        <b>Mô tả: </b>
+                        <Paragraph style={{ paddingLeft: 35 }}>{record.description}</Paragraph>
+                    </li>
+                </ul>
+            </div>
+        );
+    };
+    const config = {
+        rules: [
+            {
+                type: 'object',
+                required: true,
+                message: 'Vui lòng chọn thời gian!',
+            },
+        ],
+    };
     // Xử lý sự kiện thay đổi trang
     const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);
@@ -300,7 +443,11 @@ function AdminMovieStudio() {
                 </Col>
                 <Col span={24}>
                     <Search
+<<<<<<< HEAD:ticketez_frontend_react/src/pages/Admin/MovieStudio/index.jsx
                         placeholder="Nhập tên hãng phim vào đây..."
+=======
+                        placeholder="Nhập tên phim vào đây..."
+>>>>>>> d29388bcdf81e492a7c62f34a70c1e7ea6163463:ticketez_frontend_react/src/pages/Admin/Studio/index.jsx
                         allowClear
                         // enterButton={false}
                         onChange={(e) => onSearchStudio(e.target.value)}
@@ -318,6 +465,7 @@ function AdminMovieStudio() {
                 open={isModalOpen}
                 title={dataEdit ? 'Cập nhật' : 'Thêm mới'}
                 width={'45%'}
+                style={{ top: 20 }}
                 onOk={handleOk}
                 onCancel={handleCancelModal}
                 footer={[
@@ -353,19 +501,64 @@ function AdminMovieStudio() {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input
+                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
+                            placeholder="Nhập tên hãng vào đây"
+                        />
                     </Form.Item>
 
-                    <Form.Item name="country" label="Quốc tịch" rules={[{ required: true }]}>
+                    <Form.Item label="Logo" name="image" rules={[{ required: true, message: 'Vui lòng chọn logo' }]}>
+                        <Upload
+                            beforeUpload={(file) => {
+                                console.log({ file });
+                                return false;
+                            }}
+                            accept=".png, .jpg"
+                            listType="picture-card"
+                            onChange={onChangeUpload}
+                            onPreview={handlePreview}
+                            fileList={fileList}
+                            name="banner"
+                            maxCount={1}
+                        >
+                            {fileList.length < 1 && '+ Tải lên'}
+                        </Upload>
+                    </Form.Item>
+                    <Form.Item name="foundedDate" label="Ngày thành lập" {...config}>
+                        <DatePicker style={{ width: 200 }} placeholder="Chọn ngày thành lập" format={formatDate} />
+                    </Form.Item>
+                    <Form.Item
+                        {...formItemLayout}
+                        name="country"
+                        label="Quốc gia"
+                        rules={[{ required: true, message: 'Vui lòng chọn quốc gia' }]}
+                    >
                         <Select
-                            placeholder="Chọn quốc tịch ở bên dưới"
+                            showSearch
+                            placeholder="Tìm kiếm và chọn quốc gia"
                             // onChange={onGenderChange}
                             allowClear
-                        >
-                            <Select.Option value="VN">Việt Nam</Select.Option>
-                            <Select.Option value="EN">Anh</Select.Option>
-                            <Select.Option value="IDA">Ấn Độ</Select.Option>
-                        </Select>
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            }
+                            options={[
+                                ...countriesJson.map((item) => ({
+                                    value: item.code,
+                                    label: item.name,
+                                })),
+                            ]}
+                        />
+                        {/* {countriesJson.map((item) => {
+                                return (
+                                    <Select.Option key={item.code} value={item.code}>
+                                        {item.name}
+                                    </Select.Option>
+                                );
+                            })} */}
+                        {/* </Select> */}
                     </Form.Item>
                     <Form.Item
                         label="Email"
@@ -377,10 +570,36 @@ function AdminMovieStudio() {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input style={{ fontFamily: 'inherit', fontSize: fontSize }} placeholder="Nhập email vào đây" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Website"
+                        name="website"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Vui lòng nhập địa website của hãng phim!',
+                            },
+                        ]}
+                    >
+                        <Input
+                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
+                            placeholder="Nhập địa chỉ website vào đây"
+                        />
+                    </Form.Item>
+                    <Form.Item name={'address'} label="Địa chỉ">
+                        <Input.TextArea
+                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
+                            autoSize={{ minRows: 3, maxRows: 5 }}
+                            placeholder="Nhập address vào đây"
+                        />
                     </Form.Item>
                     <Form.Item name={'description'} label="Mô tả">
-                        <Input.TextArea />
+                        <Input.TextArea
+                            style={{ fontFamily: 'inherit', fontSize: fontSize }}
+                            autoSize={{ minRows: 4, maxRows: 6 }}
+                            placeholder="Nhập mô tả vào đây"
+                        />
                     </Form.Item>
                 </Form>
             </BaseModal>
@@ -391,6 +610,7 @@ function AdminMovieStudio() {
                     ...item,
                     key: item.id,
                 }))}
+                expandable={{ expandedRowRender }}
             />
 
             <PaginationCustom

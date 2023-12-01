@@ -48,15 +48,15 @@ GO
 
 CREATE TABLE Activity_Logs (
     id BIGINT IDENTITY(1,1) NOT NULL,
-    time_stamp DATETIME NOT NULL,
+    time_stamp DATETIME NOT NULL, -- Thời gian thực hiện
+	[action] NVARCHAR(MAX) NOT NULL, -- Thêm, sửa, xóa, đăng nhập, đăng xuất
 	[description] NVARCHAR(MAX) NOT NULL,
-	[result] NVARCHAR(MAX) NOT NULL,
-	activity_type INT NOT NULL,
 	ip_address NVARCHAR(MAX) NOT NULL,
-	[browser] NVARCHAR(MAX) NOT NULL,
-	operating_system NVARCHAR(MAX) NOT NULL,
-	device NVARCHAR(MAX) NOT NULL,
+	[user_agent] NVARCHAR(MAX) NOT NULL, -- Thông tin của trình duyệt: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+	[result] NVARCHAR(50) NOT NULL, -- Thành công, thất bại
 	account_id NVARCHAR(20) NOT NULL,
+    old_data NVARCHAR(MAX), -- Lưu các thông tin trước khi "xóa", "cập nhật" (Không bắt buộc)
+    new_data NVARCHAR(MAX) -- Lưu các thông tin sau khi "Thêm", "cập nhật" (Không bắt buộc)
 )
 GO
     CREATE TABLE Verification (
@@ -217,6 +217,7 @@ CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
     [image] NVARCHAR(MAX) NOT NULL,
+	[banner] NVARCHAR(MAX) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -237,6 +238,8 @@ GO
     CREATE TABLE Seat_Types (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
+		nick_name nvarChar(50) not null,
+		color nvarchar(50) not null,
         [image] NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX)
     )
@@ -1175,13 +1178,13 @@ VALUES
 (N'Phim Tây Bắc',N'image','1980-09-08' , N'Việt Nam','contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
 GO
 
-INSERT INTO Cinema_Chains ([name],[image],[description])
+INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png',N'image.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'image.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'image.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg',N'image.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp',N'image.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
@@ -1277,15 +1280,17 @@ GO
 
 
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
-INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name], [image], [description])
+INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color], [image], [description])
 VALUES
-    (N'Ghế thông thường', 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),
-    (N'Ghế hội nghị', 'url_anh_ghehoinghi.jpg', N'Loại ghế hội nghị dành cho các sự kiện, buổi họp, hội nghị.'),
-    (N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
-    (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
-	(N'đường đi', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
+    (N'Ghế thông thường','normalSeat','#7C25CE', 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
+    (N'Ghế VIP','vipSeat','#B32225', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi','coupleSeat','#AD1859','url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
+    (N'Ghế tựa','reclinerSeat','#0891B2' ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
+    (N'Ghế trẻ em','kidSeat','#10B785', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
+    (N'Ghế Sofa','sofaSeat','#C58B0B', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+	(N'đường đi','way','#121B2B' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
+	(N'Màu ghế đã đặt','seatUnavailable','#404040' ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
+	(N'Màu ghế chọn','seatReserved','#16A34A' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
@@ -1554,7 +1559,7 @@ GO
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
 INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    ( 3, 1),
+    ( 2, 1),
     ( 1, 2),
     ( 2, 1),
     ( 2, 2);

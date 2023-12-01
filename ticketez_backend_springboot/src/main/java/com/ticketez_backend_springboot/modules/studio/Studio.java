@@ -24,7 +24,7 @@ public class Studio {
 
 	private String name;
 	private String image;
-	private Date founded_date;
+	private Date foundedDate;
 	private String country;
 	private String email;
 	private String address;

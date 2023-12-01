@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { listIcon } from '~/assets/img';
 
 import './mapbox.scss';
-import { style } from '~/pages/Admin/Seat/SeatChart/SearChart.module.scss';
+
 
 function Mapbox({ latitude, longitude, address, title }) {
     const [showPopup, togglePopup] = React.useState(true);
@@ -12,6 +12,10 @@ function Mapbox({ latitude, longitude, address, title }) {
     // console.log('123', longitude);
     // console.log('123', address);
     // console.log('123', title);
+    // const vietnamBounds = [
+    //     [8.18, 102.14], // Tây bắc
+    //     [23.39, 109.46], // Đông nam
+    // ];
     return (
         <Map
             longitude={longitude}
@@ -22,13 +26,14 @@ function Mapbox({ latitude, longitude, address, title }) {
                 zoom: 16,
             }}
             style={{
-                height: '70vh',
+                height: '50vh',
+                width: '120vh'
             }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
             mapboxAccessToken="pk.eyJ1Ijoibmd1eWVudmFuaHV1dGFpIiwiYSI6ImNsbnU0N29jazBiemwyaW9kbGZyZnAxZjkifQ.C0_aqS6mFyHpXwUBBSLzqA"
             className="mapbox"
         >
-            <div className="abc">â</div>
+          
             {showPopup && (
                 <Popup
                     latitude={latitude}

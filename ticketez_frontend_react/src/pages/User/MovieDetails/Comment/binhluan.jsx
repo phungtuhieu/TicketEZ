@@ -11,6 +11,7 @@ import uploadApi from '~/api/service/uploadApi';
 import { comment } from 'postcss';
 import moment from 'moment-timezone';
 import { data } from 'autoprefixer';
+import authApi from './../../../../api/user/Security/authApi';
 
 const cx = classNames.bind(style);
 const Binhluan = () => {
@@ -33,6 +34,8 @@ const Binhluan = () => {
     const [editData, setEditData] = useState();
     const [deleteItem, setDeleteItem] = useState(null);
 
+
+    const user = authApi.getUser();
 
     useEffect(() => {
         const getList = async () => {
@@ -66,25 +69,32 @@ const Binhluan = () => {
         getMovie();
     }, [movieId])
     //hàm xử lý thêm và update bình luận
-    useEffect(() => {
-        const getAccount = async () => {
-            try {
-                const user = await accountApi.getById('user17');
-                setAccount(user.data); // Cập nhật giá trị của account khi có dữ liệu mới
-            } catch (error) {
-                console.error('Failed to get account:', error);
-            }
-        };
-        getAccount();
-    }, []);
+
+    
+    // useEffect(() => {
+    //     const getAccount = async () => {
+    //         try {
+               
+    //             console.log('1234',users);
+
+    //             // const user = await accountApi.getById(users.id);
+                
+    //             // setAccount(user.data); // Cập nhật giá trị của account khi có dữ liệu mới
+
+    //         } catch (error) {
+    //             console.error('Failed to get account:', error);
+    //         }
+    //     };
+    //     getAccount();
+    // }, []);
     const handleAdd = async () => {
-        if (!comment.trim()) {
-            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
-            return;
-        }
+        // if (!comment.trim()) {
+        //     funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+        //     return;
+        // }
         setLoading(true);
         try {
-            const user = await accountApi.getById('user17');
+            const userAdd = await accountApi.getById(user.id);
 
             const datareview = {
                 comment,
@@ -92,8 +102,8 @@ const Binhluan = () => {
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, 'user17', 1);
-            
+            reviewApi.post(datareview, 'minhkhoi', 1);
+
             setWorkSomeThing(!workSomeThing);
             setComment("");
             console.log(datareview);
@@ -194,10 +204,10 @@ const Binhluan = () => {
                 </Col>
                 <Col span={16}>
 
-                    <Typography>xin chào bạn: {account.fullname} </Typography>
+                    <Typography>xin chào bạn: {user.fullname} </Typography>
                     <Avatar
                         size={50}
-                        src={uploadApi.get(account.image)}
+                        src={uploadApi.get(user.image)}
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
@@ -216,7 +226,7 @@ const Binhluan = () => {
                         <Button
                             onClick={handleAdd}
                             className='tw-btn tw-bg-[#ff1493] tw-text-white'
-                             danger style={{
+                            danger style={{
                                 display: 'block',
 
                             }}>
@@ -249,7 +259,7 @@ const Binhluan = () => {
                             // loadMore={loadMore}
                             dataSource={review}
                             renderItem={(item, index) => (
-                                
+
                                 <List.Item>
 
                                     <Row>
@@ -311,31 +321,31 @@ const Binhluan = () => {
                                                         readOnly
                                                     >{item.comment} </p>
 
-<Space>
-    <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
-    <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
+                                                    <Space>
+                                                        <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
+                                                        <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
 
-    {item.account.id === 'user17' && (
-        <Dropdown
-            overlay={(
-                <Menu>
-                    <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
-                    <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
-                </Menu>
-            )}
-            trigger={['click']}
-        >
-            <Button
-                type="text"
-                icon={<DashOutlined
-                    className={cx('col-icon', {
-                        'text-blue-500': isClicked,
-                    })}
-                />}
-            />
-        </Dropdown>
-    )}
-</Space>
+                                                        {item.account.id === 'user17' && (
+                                                            <Dropdown
+                                                                overlay={(
+                                                                    <Menu>
+                                                                        <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
+                                                                        <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
+                                                                    </Menu>
+                                                                )}
+                                                                trigger={['click']}
+                                                            >
+                                                                <Button
+                                                                    type="text"
+                                                                    icon={<DashOutlined
+                                                                        className={cx('col-icon', {
+                                                                            'text-blue-500': isClicked,
+                                                                        })}
+                                                                    />}
+                                                                />
+                                                            </Dropdown>
+                                                        )}
+                                                    </Space>
                                                 </div>
                                             )}
                                         </Col>
