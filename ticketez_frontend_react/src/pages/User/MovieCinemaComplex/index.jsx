@@ -30,9 +30,10 @@ function MovieCinemaComplex() {
     const handleCancelModal = () => {
         setIsModalOpen(false);
     };
+    console.log("",dataCcx);
 
     const style = {
-        backgroundImage: `url(${uploadApi.get(dataCcx?.cinemaChain?.image)})`,
+        backgroundImage: `url(${uploadApi.get(dataCcx?.cinemaChain?.banner)})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
