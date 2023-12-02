@@ -10,7 +10,8 @@ export { default as provinceApi } from './managementCinema/provinceApi';
 
 // movie
 export { default as movieApi } from './managementMovie/movieApi';
-export { default as movieStudioApi } from './managementMovie/movieStudioApi';
+export { default as studioApi } from './managementMovie/studioApi';
+export { default as producerApi } from './managementMovie/producerApi';
 export { default as showtimeApi } from './managementMovie/showtimeApi';
 export { default as actorApi } from './managementMovie/actorApi';
 export { default as directorApi } from './managementMovie/directorApi';

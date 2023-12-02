@@ -17,6 +17,7 @@ import style from './SeatType.module.scss';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { regex } from '~/utils/regex';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 const { TextArea } = Input;
@@ -215,10 +216,6 @@ const AdminSeatType = () => {
         setOpen(false);
     };
 
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
-
     //form
     const handleResetForm = () => {
         form.resetFields();
@@ -278,7 +275,13 @@ const AdminSeatType = () => {
                             {...formItemLayout}
                             name="name"
                             label="Tên ghế"
-                            rules={[{ required: true, message: 'Vui lòng tên ghế' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập tên ghế' },
+                                {
+                                    pattern: regex.Vi,
+                                    message: 'Tên không chứa ký tự đặc biệt',
+                                },
+                            ]}
                         >
                             <Input placeholder="Tên ghế" />
                         </Form.Item>

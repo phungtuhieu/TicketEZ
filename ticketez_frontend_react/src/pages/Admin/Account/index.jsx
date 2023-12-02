@@ -37,6 +37,8 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useDebounce } from '~/hooks';
 import { rule } from 'postcss';
+import { regex } from '~/utils/regex';
+import { SearchOutlined } from '@ant-design/icons';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -107,6 +109,7 @@ const AdminAccount = () => {
 
     const handleCancelReason = () => {
         setIsModalOpen(false);
+        setReason('');
     };
 
     //call api
@@ -212,9 +215,14 @@ const AdminAccount = () => {
                                 title="Lí do khoá tài khoản"
                                 open={isModalOpen}
                                 onOk={() => {
-                                    handleStatus(record);
-                                    handleCancelReason();
-                                }}
+                                    if (reason.trim() !== '') {
+                                      handleStatus(record);
+                                      handleCancelReason();
+                                    } else {
+                                      funcUtils.notify("Nhập hoặc chọn lí do khoá tài khoản","error")
+                                    }
+                                  }}
+                            
                                 okText="Đồng ý"
                                 cancelText="Huỷ"
                                 onCancel={handleCancelReason}
@@ -306,7 +314,7 @@ const AdminAccount = () => {
                         };
                     }
                     await accountApi.patchInfoUser(values.id, upl);
-                    funcUtils.notify('Cập nhật diễn viên thành công', 'success');
+                    funcUtils.notify('Cập nhật tài khoản thành công', 'success');
                 }
                 setOpen(false);
                 form.resetFields();
@@ -326,11 +334,6 @@ const AdminAccount = () => {
         setOpen(false);
     };
 
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
-
-    //form
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
@@ -374,18 +377,19 @@ const AdminAccount = () => {
         },
     ];
 
+
     return (
         <>
             <Row>
-                <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+            <Col span={22}>
+                    <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
 
-                <Col>
+                <Col span={24} className=' tw-flex tw-items-center tw-justify-between tw-mb-10'>
                     <Select
                         defaultValue={1}
                         style={{
-                            width: 150,
+                            width: 170,
                         }}
                         onChange={handleChange}
                         options={[
@@ -398,7 +402,7 @@ const AdminAccount = () => {
                             },
                         ]}
                     />
-                    <Input onChange={(e) => setSearch(e.target.value)} />
+                    <Input className='tw-w-[200px]' placeholder="Tìm tên người dùng..." onChange={(e) => setSearch(e.target.value)} prefix={<SearchOutlined />} />
                 </Col>
 
                 <BaseModal
@@ -442,7 +446,12 @@ const AdminAccount = () => {
                             <DatePicker placeholder="Ngày sinh..." format={'DD-MM-YYYY'} style={{ width: '100%' }} />
                         </Form.Item>
 
-                        <Form.Item {...formItemLayout} name="gender" label="Giới tính">
+                        <Form.Item
+                            {...formItemLayout}
+                            name="gender"
+                            label="Giới tính"
+                            rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+                        >
                             {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
                             <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
@@ -454,8 +463,8 @@ const AdminAccount = () => {
                             rules={[
                                 { required: true, message: 'Vui lòng nhập email' },
                                 {
-                                    pattern: /^[A-Za-z0-9._%+-]+@gmail\.com$/,
-                                    message: 'Email không hợp lệ. Phải có đuôi @email.com',
+                                    pattern: regex.Email,
+                                    message: 'Email không hợp lệ. ',
                                 },
                             ]}
                         >
@@ -469,8 +478,8 @@ const AdminAccount = () => {
                             rules={[
                                 { required: true, message: 'Vui lòng nhập số điện thoại' },
                                 {
-                                    pattern: /^0\d{9}$/,
-                                    message: 'Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và gồm 10 số.',
+                                    pattern: regex.Phone,
+                                    message: 'Số điện thoại không hợp lệ.',
                                 },
                             ]}
                         >
@@ -481,7 +490,13 @@ const AdminAccount = () => {
                             {...formItemLayout}
                             name="address"
                             label="Địa chỉ"
-                            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập địa chỉ' },
+                                {
+                                    pattern: regex.Address,
+                                    message: 'Số điện thoại không hợp lệ.',
+                                },
+                            ]}
                         >
                             <Input placeholder="Địa chỉ..." />
                         </Form.Item>
