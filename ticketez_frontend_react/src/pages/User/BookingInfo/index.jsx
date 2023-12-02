@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import style from './BookingInfo.module.scss';
 import { TicketDetails } from '..';
@@ -15,6 +15,7 @@ const cx = classNames.bind(style);
 function BookingInfo() {
     const location = useLocation();
     const componentPDF = useRef();
+    const navigate = useNavigate();
     const generatePDF = useReactToPrint({
         content: () => componentPDF.current,
         documentTitle: 'Ticket',
@@ -91,12 +92,17 @@ function BookingInfo() {
                             </div>
                             <span className={cx('title', paymentStatus)}>{currentStatusConfig.title}</span>
                             <p className={cx('message')}>{currentStatusConfig.message}</p>
-                            <Button className={cx('btn-redirect', paymentStatus)}>
+                            <Button
+                                onClick={() => {
+                                    navigate('/booking-history');
+                                }}
+                                className={cx('btn-redirect', paymentStatus)}
+                            >
                                 {currentStatusConfig.btnTitle}
                             </Button>
                         </div>
                         {/* <TicketDetails></TicketDetails> */}
-                        {paymentStatus == 'success' && (
+                        {paymentStatus === 'success' && (
                             <div className={cx('wrapper-ticket-details', 'light')}>
                                 <div ref={componentPDF}>
                                     <TicketDetails paymentInfoDTO={paymentInfoDTO}></TicketDetails>

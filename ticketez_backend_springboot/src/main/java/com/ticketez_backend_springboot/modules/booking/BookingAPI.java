@@ -2,13 +2,23 @@ package com.ticketez_backend_springboot.modules.booking;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.TransientDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,14 +27,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
+import com.ticketez_backend_springboot.modules.account.AccountDAO;
+import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.movie.MovieAPI;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfoDAO;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -33,21 +49,122 @@ import jakarta.servlet.http.HttpServletRequest;
 public class BookingAPI {
 
 	@Autowired
+	SeatBookingDao seatBookingDao;
+	@Autowired
+	VNPayService vnPayService;
+	@Autowired
+	PaymentInfoDAO pmIDao;
+	@Autowired
+	AccountDAO accDao;
+	@Autowired
 	private BookingDAO dao;
+	private static final Logger logger = LoggerFactory.getLogger(MovieAPI.class);
 
 	@GetMapping
-	public ResponseEntity<List<Booking>> getAll() {
-		List<Booking> bookings = dao.findAll();
-		return ResponseEntity.ok(bookings);
+	public ResponseEntity<?> findByPage(
+			@RequestParam("page") Optional<Integer> pageNo,
+			@RequestParam("limit") Optional<Integer> limit,
+			@RequestParam("search") Optional<String> search) {
+		try {
+
+			if (pageNo.isPresent() && pageNo.get() == 0) {
+				return new ResponseEntity<>("Số trang không tồn tại!", HttpStatus.BAD_REQUEST);
+			}
+			Sort sort = Sort.by(Sort.Order.desc("id"));
+			Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+			Page<Booking> page = dao.findAll(pageable);
+			ResponseDTO<Booking> responeDTO = new ResponseDTO<>();
+			responeDTO.setData(page.getContent());
+			responeDTO.setTotalItems(page.getTotalElements());
+			responeDTO.setTotalPages(page.getTotalPages());
+			return ResponseEntity.ok(responeDTO);
+
+		} catch (TransientDataAccessException ex) {
+			logger.error("==> Loi ket noi voi database: {}", ex.toString());
+			return new ResponseEntity<>("Kết nối database bị đóng tạm thời", HttpStatus.BAD_REQUEST);
+		} catch (JpaSystemException ex) {
+			logger.error("==> Loi JpaSystemException: {}", ex.toString());
+			return new ResponseEntity<>("Có lỗi trong Booking API, hãy kiểm tra kiểu dữ liệu!",
+					HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException ex) {
+			logger.error("==> Khong tim thay doi tuong Booking API: {}", ex.toString());
+			return new ResponseEntity<>("Không tìm thấy đối tượng Booking API!", HttpStatus.NOT_FOUND);
+		} catch (Exception ex) {
+			logger.error("==> Xay ra loi trong Booking API  chua xac dinh!: {}", ex.toString());
+			return new ResponseEntity<>("Có lỗi trong Booking API  vui lòng liên hệ quản trị viên",
+					HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Booking> getOne(@PathVariable("id") String id) {
+	public ResponseEntity<?> getOne(@PathVariable("id") String id) {
 		Optional<Booking> bookingOptional = dao.findById(id);
 		if (bookingOptional.isPresent()) {
 			return ResponseEntity.ok(bookingOptional.get());
 		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return new ResponseEntity<>("Có lỗi trong Booking API vui lòng liên hệ quản trị viên",
+					HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/get-by-acc/{accId}")
+	public ResponseEntity<?> getBookingByAcc(@PathVariable("accId") String accountId,
+			@RequestParam("page") Optional<Integer> pageNo,
+			@RequestParam("limit") Optional<Integer> limit,
+			@RequestParam("search") Optional<String> search,
+			@RequestParam("ticketStatus") Optional<Integer> ticketStatus) {
+		if (!accDao.existsById(accountId)) {
+			return new ResponseEntity<>("Không tìm thấy thông tin tài khoản", HttpStatus.NOT_FOUND);
+		}
+		try {
+
+			if (pageNo.isPresent() && pageNo.get() == 0) {
+				return new ResponseEntity<>("Số trang không tồn tại!", HttpStatus.BAD_REQUEST);
+			}
+			Sort sort = Sort.by(Sort.Order.desc("id"));
+			Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+
+			Page<Booking> page = dao.findByMovieName(
+					search.orElse(""),
+					ticketStatus.orElse(1),
+					accountId, pageable);
+			ResponseDTO<BookingHistoryDTO> responeDTO = new ResponseDTO<>();
+			List<BookingHistoryDTO> lHistoryDTOs = new ArrayList<>();
+			boolean check = false;
+			for (Booking booking : page.getContent()) {
+				BookingHistoryDTO bh = new BookingHistoryDTO();
+				bh.setBooking(booking);
+				PaymentInfo paymentInfo = pmIDao.findByBookingId(booking.getId());
+				if (paymentInfo != null) {
+					bh.setPaymentId(paymentInfo.getTransactionId());
+				} else {
+					check = true;
+				}
+				bh.setPaymentId(booking.getPaymentInfos().get(0).getTransactionId());
+				lHistoryDTOs.add(bh);
+			}
+			if (check) {
+				return new ResponseEntity<>("Payment không tồn tại!", HttpStatus.BAD_REQUEST);
+			}
+			responeDTO.setData(lHistoryDTOs);
+			responeDTO.setTotalItems(page.getTotalElements());
+			responeDTO.setTotalPages(page.getTotalPages());
+			return ResponseEntity.ok(responeDTO);
+
+		} catch (TransientDataAccessException ex) {
+			logger.error("==> Loi ket noi voi database: {}", ex.toString());
+			return new ResponseEntity<>("Kết nối database bị đóng tạm thời", HttpStatus.BAD_REQUEST);
+		} catch (JpaSystemException ex) {
+			logger.error("==> Loi JpaSystemException: {}", ex.toString());
+			return new ResponseEntity<>("Có lỗi trong Booking API, hãy kiểm tra kiểu dữ liệu!",
+					HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException ex) {
+			logger.error("==> Khong tim thay doi tuong Booking API: {}", ex.toString());
+			return new ResponseEntity<>("Không tìm thấy đối tượng Booking API!", HttpStatus.NOT_FOUND);
+		} catch (Exception ex) {
+			logger.error("==> [getBookingByAcc] error!: {}", ex.toString());
+			return new ResponseEntity<>("Có lỗi trong Booking API  vui lòng liên hệ quản trị viên",
+					HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -58,13 +175,6 @@ public class BookingAPI {
 		return ResponseEntity.ok(bookingOptional);
 
 	}
-
-	@Autowired
-	SeatBookingDao seatBookingDao;
-	@Autowired
-	VNPayService vnPayService;
-	@Autowired
-	PaymentInfoDAO pmIDao;
 
 	@PostMapping
 	public ResponseEntity<?> post(@RequestBody BookingDTO bookingDto) {
