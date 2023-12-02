@@ -86,3 +86,12 @@ $bg-ticket: #fff0f5;
     background-color: #fff;
     color: $text-color-black;
 }
+@media print {
+    .custom-print-body {
+        height: 100vh;
+        // width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

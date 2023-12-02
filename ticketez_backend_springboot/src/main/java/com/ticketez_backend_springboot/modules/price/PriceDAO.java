@@ -19,16 +19,9 @@ public interface PriceDAO extends JpaRepository<Price, Long> {
         // @Param("movieId") Long movieId);
 
         // // lấy price theo cinemacomplexId và movieID
-        // @Query("SELECT p FROM Price p " +
-        // "JOIN FETCH p.cinemaComplex cc " +
-        // "JOIN FETCH p.movie m " +
-        // "WHERE cc.id = :cinemaComplexId AND m.id = :movieId")
-        // List<Price> findPricesByCinemaComplexIdAndMovieId(@Param("cinemaComplexId")
-        // Long cinemaComplexId,
-        // @Param("movieId") Long movieId);
 
-        // List<Price> findByCinemaComplexIdAndMovieId(Long cinemaComplexId, Long
-        // movieId);
+        // Trong interface PriceDAO
+        List<Price> findByCinemaComplexIdAndFormatMovie_Movie_Id(Long cinemaComplexId, Long movieId);
 
         @Query("select p from Price p  " +
                         " join FormatMovie fm " +

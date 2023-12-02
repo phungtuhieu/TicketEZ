@@ -92,4 +92,12 @@ public class SeatBookingAPI {
         bookingDao.deleteById(id);
         return ResponseEntity.ok(true);
     }
+
+
+    @GetMapping("find-seat-booking-by-seat-char-id-and-showtime-id/{seatChartID}/{showTimeID}")
+    public ResponseEntity<List<String>> findByStatus(
+            @PathVariable("seatChartID") Long seatChartId,
+            @PathVariable("showTimeID") Long showTimeId) {
+        return ResponseEntity.ok(bookingDao.findSeatNamesByShowtimeAndSeatChart(showTimeId, seatChartId));
+    }
 }

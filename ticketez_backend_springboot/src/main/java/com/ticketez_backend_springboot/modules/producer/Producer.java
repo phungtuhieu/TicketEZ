@@ -11,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -23,6 +25,7 @@ public class Producer {
 
 	private String name;
 	private String image;
+	@Temporal(TemporalType.DATE)
 	private String birthday;
 	private String nationality;
 	private String email;

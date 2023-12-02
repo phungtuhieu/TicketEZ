@@ -19,6 +19,7 @@ import { TimePicker } from 'antd';
 import cinemaChainsApi from '~/api/admin/managementCinema/cinemaChainApi';
 import Mapbox from '~/components/Mapbox';
 import MapboxCcx from './MapboxCcx/mapbox';
+import AdminCinema from './../Cinema/index';
 
 dayjs.extend(customParseFormat);
 
@@ -50,6 +51,8 @@ const AdminCinemaComplex = () => {
     const [cinemaChains, setCinemaChains] = useState([]);
     const [openingTime, setOpeningTime] = useState(null);
     const [closingTime, setClosingTime] = useState(null);
+    const [isCinemaModalOpen, setCinemaModalOpen] = useState(null);
+    const [cinemaComplex, setCinemaComplex] = useState(null);
 
 
     const [popupInfoFromMapbox, setPopupInfoFromMapbox] = useState({ latitude: 0, longitude: 0, address: "" });
@@ -254,12 +257,26 @@ const AdminCinemaComplex = () => {
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </Popconfirm>
+                    <Button onClick={() => { openCinemaModal(); cinemabyCinemaComplex(record); }}>Rạp</Button>
+
                 </Space>
             ),
         },
     ];
+     
+    const cinemabyCinemaComplex = (record) => {
+        setCinemaComplex(record);
+        console.log('123',record);
+    }
 
-
+    const openCinemaModal = () => {
+        setCinemaModalOpen(true);
+        // console.log(record);
+      };
+    
+      const closeCinemaModal = () => {
+        setCinemaModalOpen(false);
+      };
     const showModal = () => {
         form.resetFields();
         setEditData(null);
@@ -309,8 +326,8 @@ const AdminCinemaComplex = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            console.log(values.province);
-            console.log(values.cinemaChain);
+            // console.log(values.province);
+            // console.log(values.cinemaChain);
 
             const startTime = values.openingTime.format('HH:mm:ss');
             const endTime = values.closingTime.format('HH:mm:ss');
@@ -333,7 +350,7 @@ const AdminCinemaComplex = () => {
                 console.log(resp);
                 funcUtils.notify('Cập nhật thành công', 'success');
             }
-            console.log(values);
+            // console.log(values);
             if (!editData) {
                 try {
                     values = {
@@ -349,7 +366,7 @@ const AdminCinemaComplex = () => {
                     // message.success('Thêm thành công');
                     funcUtils.notify('Thêm thành công', 'success');
                 } catch (error) {
-                    console.log(error);
+                    // console.log(error);
                     funcUtils.notify('Thêm thất bại', 'error');
                 }
             }
@@ -359,7 +376,7 @@ const AdminCinemaComplex = () => {
             setWorkSomeThing(!workSomeThing);
             // getList();
         } catch (errorInfo) {
-            console.log('Failed:', errorInfo);
+            // console.log('Failed:', errorInfo);
             setLoading(false);
         }
     };
@@ -386,16 +403,17 @@ const AdminCinemaComplex = () => {
     dayjs.extend(customParseFormat);
     const onChangeStartTime = (time, timeString) => {
         setOpeningTime(timeString);
-        console.log(setOpeningTime);
+        // console.log(setOpeningTime);
     };
     const onChangeEndTime = (time, timeString) => {
         setClosingTime(timeString);
-        console.log(setClosingTime)
+        // console.log(setClosingTime)
     };
 
     const expandedRowRender = (record) => {
         return (
-            <div>
+            <div className={cx('flex')}>
+            <div className={cx('flex-1 p-4 m-2')}>
                 <ul className={cx('wrapp-more-info')}>
                     <li>
                         <span>
@@ -407,13 +425,6 @@ const AdminCinemaComplex = () => {
                             <b>Giờ đóng cửa: </b> {record.closingTime}
                         </span>
                     </li>
-
-                    <Mapbox
-                        className="tw-h-[50px] tw-w-[70px]"
-                        latitude={record.latitude}
-                        longitude={record.longitude}
-                        address={record.address}
-                    />
                     <li>
                         <span>
                             <b>Kinh độ: </b> {record.longitude}
@@ -426,11 +437,19 @@ const AdminCinemaComplex = () => {
                     </li>
                     <li>
                         <span>
-                            <b>địa chỉ: </b> {record.address}
+                            <b>Địa chỉ: </b> {record.address}
                         </span>
                     </li>
                 </ul>
             </div>
+            <div className={cx('w-[300px] h-[400px] p-3')}>
+                <Mapbox
+                    latitude={record.latitude}
+                    longitude={record.longitude}
+                    address={record.address}
+                />
+            </div>
+        </div>
         );
     };
 
@@ -623,6 +642,15 @@ const AdminCinemaComplex = () => {
                     onChange={handlePageChange}
                 />
             </div>
+            <BaseModal
+        open={isCinemaModalOpen}
+        width={'80%'}
+        title={'QUẢN LÝ PHÒNG CỦA RẠP'}
+        onCancel={closeCinemaModal}
+        
+      >
+        <AdminCinema cinemaComplexId={cinemaComplex}/>
+      </BaseModal>
         </>
     );
 };

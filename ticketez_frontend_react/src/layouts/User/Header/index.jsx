@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
 import uploadApi from '~/api/service/uploadApi';
+import { UserOutlined } from '@ant-design/icons';
 
 const Header = () => {
     const [userData, setUserData] = useState();
@@ -198,13 +199,21 @@ const Header = () => {
                                 </a>
                             </Dropdown>
                         ) : (
-                            <div
-                                className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl"
-                                onClick={handleLogin}
-                            >
-                                 <button className="tw-bg-[var(--primary--text-color)] tw-py-4  tw-px-8 tw-rounded tw-cursor-pointer hover:tw-opacity-[0.9]">Đăng nhập</button>
-                            </div>
+                            // <div
+                            //     className="tw-hidden lg:tw-block tw-mr-[10px] tw-text-gray-700 tw-font-2xl"
+                            //     onClick={handleLogin}
+                            // >
+                            //      <button className="tw-bg-[var(--primary--text-color)] tw-py-4  tw-px-8 tw-rounded tw-cursor-pointer hover:tw-opacity-[0.9]">Đăng nhập</button>
+                            // </div>
                             
+                            <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
+                                <span className="name-short">Đăng nhập</span>
+                                <Avatar
+                                    style={{ backgroundColor: '#87d068' }}
+                                    className="tw-ml-2"
+                                    icon={<UserOutlined />}
+                                />
+                            </a>
                         )}
                     </div>
                 </div>

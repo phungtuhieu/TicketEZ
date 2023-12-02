@@ -15,12 +15,14 @@ public class JwtResponse {
   private String id;
   private String phone;
   private String fullname;
-  private String address;
+  private String image;
+
   private String email;
+  private String address;
   // private String password;
   private Date birthday;
   private String gender;
-  private String image;
+
   private List<String> roles;
   private String token;
   private String type = "Bearer";
@@ -31,10 +33,11 @@ public class JwtResponse {
     this.id = id;
     this.phone = phone;
     this.fullname = fullname;
+    this.image = image;
     this.email = email;
+    this.address = address;
     this.birthday = birthday;
     this.gender = gender;
-    this.image = image;
     this.roles = roles;
     this.token = accessToken;
     this.type = type;

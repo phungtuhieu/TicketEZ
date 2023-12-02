@@ -31,6 +31,7 @@ const publicRoutes = [
     { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout },
     { path: '/admin/price', component: PageAdmin.AdminPrice, layout: AdminLayout },
     { path: '/admin/article', component: PageAdmin.AdminArticle, layout: AdminLayout },
+    { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
     // User
     { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
@@ -54,9 +55,6 @@ const publicRoutes = [
     { path: '/movie-cinema-complex/:ccxId', component: PageUser.MovieCinemaComplex, layout: DefaultLayout },
 ];
 
-const privateRoutes = [
-
-
-];
+const privateRoutes = [];
 
 export { publicRoutes, privateRoutes };

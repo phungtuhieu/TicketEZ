@@ -53,6 +53,7 @@ const AdminCinemaChains = () =>  {
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [cinemaChain, setCinemaChain] = useState([]);
     const [fileList, setFileList] = useState([]);
+    const [fileListBanner, setFileListBanner] = useState([]);
 
     //api
     useEffect(() => {
@@ -195,8 +196,8 @@ const AdminCinemaChains = () =>  {
             ...getColumnSearchProps('name'),
         },
         {
-            title: 'Ảnh đại diện',
-            dataIndex: 'avatar',
+            title: 'Ảnh chuỗi rạp',
+            dataIndex: 'image',
             render: (_, record) => (
                 <Space size="middle">
                     <Image
@@ -210,9 +211,24 @@ const AdminCinemaChains = () =>  {
             ),
         },
         {
+            title: 'Banner',
+            dataIndex: 'banner',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Image
+                        width={155}
+                        height={100}
+                        style={{ objectFit: 'contain' }}
+                        alt="ảnh rỗng"
+                        src={`http://localhost:8081/api/upload/${record.banner}`}
+                    />
+                </Space>
+            ),
+        },
+        {
             title: 'Mô tả',
             dataIndex: 'description',
-            width: '30%',
+            width: '20%',
             ...getColumnSearchProps('description'),
         },
         {
@@ -268,7 +284,13 @@ const AdminCinemaChains = () =>  {
             name: record.image,
             url: `http://localhost:8081/api/upload/${record.image}`,
         };
+        const newUploadBanner = {
+            uid: record.id.toString(),
+            name: record.banner,
+            url: `http://localhost:8081/api/upload/${record.banner}`,
+        };
         setFileList([newUploadFile]);
+        setFileListBanner([newUploadBanner]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -282,7 +304,7 @@ const AdminCinemaChains = () =>  {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            if(fileList.length > 0){
+            if(fileList.length > 0 ){
                 if (editData) {
                     let putData = {
                         id: editData.id,
@@ -296,6 +318,16 @@ const AdminCinemaChains = () =>  {
                         putData = {
                             ...putData,
                             image: images,
+                        };
+                    }
+                    if(putData.banner.file){
+                        console.log(putData);
+
+                        const filebaner = putData.banner.fileList[0].originFileObj;
+                        const banners = await uploadApi.put(editData.banner, filebaner);
+                        putData = {
+                            ...putData,
+                            banner: banners,
                         };
                     }
                     try {
@@ -317,10 +349,13 @@ const AdminCinemaChains = () =>  {
                 if (!editData) {
                     try {
                         const file = values.image.fileList[0].originFileObj;
+                        const filebaner = values.banner.fileList[0].originFileObj;
                         const images = await uploadApi.post(file);
+                        const banners = await uploadApi.post(filebaner);
                         const postData = {
                             ...values,
                             image: images,
+                            banner: banners,
                         };
                         console.log(postData);
                         const resPost = await cinemaChainApi.post(postData);
@@ -370,6 +405,9 @@ const AdminCinemaChains = () =>  {
       const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
+      const onChangeUploadBanner = async ({ fileListBanner: newFileListBanner }) => {
+        setFileListBanner(newFileListBanner);
+    };
     const onPreview = async (file) => {
         let src = file.url;
         if (!src) {
@@ -389,7 +427,7 @@ const AdminCinemaChains = () =>  {
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu Loại cụm Rạp</h1>
+                    <h1 className={cx('title')}>Bảng dữ liệu Loại chuỗi Rạp</h1>
                 </Col>
                 <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
@@ -436,9 +474,9 @@ const AdminCinemaChains = () =>  {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            label="Ảnh cụm rạp"
+                            label="Ảnh chuỗi rạp"
                             name="image"
-                            rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh' }]}
                         >
                             <Upload
                                 action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
@@ -448,6 +486,25 @@ const AdminCinemaChains = () =>  {
                                 // onPreview={onPreview}
                                 fileList={fileList}
                                 name="image"
+                                maxCount={1}
+                            >
+                                {fileList.length < 2 && '+ Upload'}
+                            </Upload>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            label="Ảnh nền"
+                            name="banner"
+                            rules={[{ required: true, message: 'Vui lòng chọn ảnh nền' }]}
+                        >
+                            <Upload
+                                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                accept=".png, .jpg, .webp"
+                                listType="picture-card"
+                                onChange={onChangeUploadBanner}
+                                // onPreview={onPreview}
+                                fileList={fileListBanner}
+                                name="banner"
                                 maxCount={1}
                             >
                                 {fileList.length < 2 && '+ Upload'}

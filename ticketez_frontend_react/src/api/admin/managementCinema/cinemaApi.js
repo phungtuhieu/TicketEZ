@@ -39,5 +39,14 @@ const cinemaApi = {
     delete: async (cinemaId) => {
         return axiosClient.delete(url + '/' + cinemaId);
     },
+    
+    getCinemaByComplexId: async (cinemaComplexId, page, limit) => {
+        const params = {
+            cinemaComplexId,
+            page,
+            limit,
+        }
+        return axiosClient.get(url + '/get/cinema-by-cinemaComplexId', {params});
+    },
 };
 export default cinemaApi;

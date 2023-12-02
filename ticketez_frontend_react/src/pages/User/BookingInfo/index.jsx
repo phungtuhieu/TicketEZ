@@ -9,16 +9,24 @@ import logorap from '../../../assets/img/lotte.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import bookingApi from '~/api/user/booking/bookingApi';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 const cx = classNames.bind(style);
 function BookingInfo() {
     const location = useLocation();
-    const [paymentStatus, setPaymentStatus] = useState(true);
+    const componentPDF = useRef();
+    const generatePDF = useReactToPrint({
+        content: () => componentPDF.current,
+        documentTitle: 'Ticket',
+        bodyClass: cx('custom-print-body'),
+        onAfterPrint: () => alert('Done'),
+    });
+    const [paymentStatus, setPaymentStatus] = useState('e');
     const paymentInfoId = location.state?.paymentInfoId;
     const [spin, setSpin] = useState(true);
     const [paymentInfoDTO, setPaymentInfoDTO] = useState({
         paymentInfo: {},
         booking: {},
-        showtime: {},
         seatBookings: [],
     });
     const [currentStatusConfig, setCurrentStatusConfig] = useState({});
@@ -42,33 +50,35 @@ function BookingInfo() {
     // let paymentStatus = 'success';
     // const currentStatusConfig = statusConfig[paymentStatus];
     useEffect(() => {
-        if (paymentInfoId !== null) {
-            const loadData = async () => {
-                try {
-                    const resp = await bookingApi.getPaymentInfoById(paymentInfoId);
-                    setSpin(false);
-                    console.log('resp', resp);
-                    const booking = resp.data.booking;
-                    const paymentInfo = resp.data.paymentInfo;
-                    const seatBookings = resp.data.seatBookings;
-                    setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
-                    setPaymentStatus('success');
-                    setCurrentStatusConfig(statusConfig['success']);
-                } catch (error) {
-                    setPaymentStatus('error');
-                    setSpin(false);
-                    setCurrentStatusConfig(statusConfig['error']);
-                    console.log('error', error);
-                }
-            };
-            loadData();
-        } else {
-            setPaymentStatus('fail');
-        }
+        // if (paymentInfoId !== null) {
+        const loadData = async () => {
+            try {
+                const resp = await bookingApi.getPaymentInfoById('123456');
+                setSpin(false);
+                console.log('resp', resp);
+                const booking = resp.data.booking;
+                const paymentInfo = resp.data.paymentInfo;
+                const seatBookings = resp.data.seatBookings;
+                console.log('booking', booking);
+                setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
+                setPaymentStatus('success');
+                setCurrentStatusConfig(statusConfig['success']);
+            } catch (error) {
+                setPaymentStatus('error');
+                setSpin(false);
+                setCurrentStatusConfig(statusConfig['error']);
+                console.log('error', error);
+            }
+        };
+        loadData();
+        // } else {
+        //     setPaymentStatus('fail');
+        // }
     }, [paymentInfoId]);
     return (
         <>
             <div className={cx('wrapper')}>
+                <Button onClick={generatePDF}>PDF</Button>
                 <div className={cx('container')}>
                     <div style={{ display: 'flex' }}>
                         <div className={cx('wrapper-box-status', 'light')}>
@@ -88,7 +98,9 @@ function BookingInfo() {
                         {/* <TicketDetails></TicketDetails> */}
                         {paymentStatus == 'success' && (
                             <div className={cx('wrapper-ticket-details', 'light')}>
-                                <TicketDetails paymentInfoDTO={paymentInfoDTO}></TicketDetails>
+                                <div ref={componentPDF}>
+                                    <TicketDetails paymentInfoDTO={paymentInfoDTO}></TicketDetails>
+                                </div>
                             </div>
                         )}
                     </div>

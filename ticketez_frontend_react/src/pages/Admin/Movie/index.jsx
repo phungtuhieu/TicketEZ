@@ -16,6 +16,7 @@ import {
     Row,
     Select,
     Space,
+    Table,
     Tabs,
     Tag,
     TimePicker,
@@ -40,7 +41,8 @@ import httpStatus from '~/api/global/httpStatus';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import funcUtils from '~/utils/funcUtils';
 import genreApi from '~/api/admin/managementMovie/genreApi';
-import { useSearchSelectEffect } from '~/hooks';
+import { useSearchEffect, useSearchSelectEffect } from '~/hooks';
+import Search from 'antd/es/input/Search';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -50,9 +52,6 @@ const getBase64 = (file) =>
         reader.onload = () => resolve(reader.result);
         reader.onerror = (error) => reject(error);
     });
-const onChangeTabGenre = (key) => {
-    console.log(key);
-};
 
 function AdminMovie() {
     const formatDate = 'DD-MM-YYYY';
@@ -75,6 +74,7 @@ function AdminMovie() {
         searchFormat: '',
         searchActor: '',
         searchDirector: '',
+        searchMovie: '',
     });
     const [initialOptions, setInitialOptions] = useState({
         studios: [],
@@ -86,21 +86,38 @@ function AdminMovie() {
     });
     const [listMPAA, setListMPAA] = useState([]);
     const [form] = Form.useForm();
+    const [formGenre] = Form.useForm();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenGenre, setIsModalOpenGenre] = useState(false);
     const [dataEdit, setDataEdit] = useState(null);
-    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const [pageSize, setPageSize] = useState(10);
+    const [totalItems, setTotalItems] = useState({
+        movie: 0,
+        genre: 0,
+    }); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState({
+        movie: 1,
+        genre: 1,
+    }); // Trang hiện tại
+    const [pageSize, setPageSize] = useState({
+        movie: 10,
+        genre: 10,
+    });
+
     const [selectDataTemp, setSelectDataTemp] = useState({
         actors: [],
         directors: [],
     });
-    const [workSomething, setworkSomething] = useState(10);
-    const [loadingButton, setLoadingButton] = useState(false);
+    const [workSomething, setWorkSomething] = useState({
+        movie: false,
+        genre: false,
+    });
+    const [loadingButton, setLoadingButton] = useState({
+        movie: false,
+        genre: false,
+    });
     const [selectedValue, setSelectedValue] = useState({
         studios: [],
         producers: [],
@@ -119,12 +136,285 @@ function AdminMovie() {
         director: false,
     });
     const [isSearch, setIsSearch] = useState(false);
-
+    const [isSearchingTable, setIsSearchingTable] = useState({
+        movie: false,
+        genre: false,
+    });
+    const [listDataGenre, setListDataGenre] = useState([]);
+    const [genreDataEdit, setGenreDataEdit] = useState(null);
+    const [activeKeyGenre, setActiveKeyGenre] = useState(2);
     const formItemLayout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 20 },
     };
+    const onChangeTabGenre = (key) => {
+        setActiveKeyGenre(key);
+        handleResetFormGenre();
+    };
+    const handleResetFormGenre = () => {
+        formGenre.resetFields();
+        setGenreDataEdit(null);
+    };
+    const handleOkGenre = async () => {
+        setLoadingButton((prev) => ({ ...prev, genre: true }));
 
+        const values = await formGenre.getFieldsValue();
+        if (genreDataEdit == null) {
+            // Thêm Genre
+            console.log('[handleOkGenre] values genre: ', values);
+            try {
+                const resp = await genreApi.create(values);
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                handleResetFormGenre();
+
+                if (resp.status === httpStatus.OK) {
+                    funcUtils.notify('Đã thêm thể loại thành công', 'success');
+                }
+                handleResetFormGenre();
+                setActiveKeyGenre(2);
+            } catch (error) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('Lỗi không thêm được thể loại', 'error');
+                    console.log(error);
+                }
+            }
+        } else {
+            //Cập nhật Gerne
+
+            try {
+                console.log('genreDataEdit', genreDataEdit.id);
+                const dataUpdate = {
+                    ...values,
+                    id: genreDataEdit.id,
+                };
+                const resp = await genreApi.update(genreDataEdit.id, dataUpdate);
+                if (resp.status === httpStatus.OK) {
+                    funcUtils.notify('Đã cập nhật thể loại thành công', 'success');
+                }
+            } catch (error) {
+                setGenreDataEdit(null);
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('Lỗi không cập nhật được thể loại', 'error');
+                    console.log(error);
+                }
+            }
+        }
+        setWorkSomething((prev) => ({ ...prev, genre: !workSomething.genre }));
+        setLoadingButton((prev) => ({ ...prev, genre: false }));
+    };
+    // load data Genre
+    useEffect(() => {
+        const loadDataGenre = async () => {
+            try {
+                const resp = await genreApi.getByPage(currentPage.genre, pageSize.genre);
+                console.log('genre', resp);
+                setListDataGenre(resp.data);
+                setTotalItems((...prev) => ({ ...prev, genre: resp.data.totalItems }));
+            } catch (error) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('errorLoadDateGenre', 'error');
+                    console.log(error);
+                }
+            }
+        };
+
+        if (isModalOpenGenre) {
+            loadDataGenre();
+        }
+    }, [isModalOpenGenre, workSomething.genre, currentPage.genre, pageSize.genre]);
+    const handleEditDataGenre = async (record) => {
+        try {
+            const resp = await genreApi.getById(record.id);
+            // console.log('genre data: ', resp.data);
+            const data = resp.data;
+            setGenreDataEdit(data);
+            setActiveKeyGenre(1);
+            formGenre.setFieldsValue(data);
+        } catch (error) {}
+    };
+    const handleDeleteGenre = async (id) => {
+        try {
+            const resp = await genreApi.delete(id);
+            if (resp.status === 200) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                funcUtils.notify('Đã xoá thể loại thành công', 'success');
+                setWorkSomething((prev) => ({ ...prev, genre: !workSomething.genre }));
+            }
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                funcUtils.notify(error.response.data, 'error');
+            } else {
+                funcUtils.notify('Xảy ra lỗi, không thể xoá', 'error');
+                console.log(error);
+            }
+            setLoadingButton((prev) => ({ ...prev, genre: false }));
+        }
+    };
+    const columnsGenre = [
+        {
+            title: 'Tên thể loại',
+            dataIndex: 'name',
+            key: 'name',
+            width: '30%',
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            key: 'description',
+            width: '50%',
+        },
+        {
+            title: 'Thao tác',
+            dataIndex: 'id',
+            key: 'id',
+            align: 'right',
+            render: (_, record) => (
+                <Space size="middle" className="tw-flex  tw-justify-end">
+                    <FontAwesomeIcon
+                        icon={solidIcons.faPen}
+                        onClick={() => handleEditDataGenre(record)}
+                        className={cx('icon-pen')}
+                    />
+                    <Popconfirm
+                        title="Bạn có chắc"
+                        description="Muốn xoá hay không?"
+                        okText="Yes"
+                        onConfirm={() => handleDeleteGenre(record.id)}
+                        cancelText="No"
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faTrash} className={cx('icon-trash')} />
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+    const handlePageGenreChange = (page, pageSize) => {
+        setCurrentPage((prev) => ({ ...prev, genre: page }));
+        setPageSize((prev) => ({ ...prev, genre: pageSize }));
+    };
+    const handleCancelModalGenre = async () => {
+        setIsModalOpenGenre(false);
+        handleResetFormGenre();
+        setActiveKeyGenre(2);
+    };
+    const tailLayout = {
+        wrapperCol: {
+            offset: 6,
+            span: 16,
+        },
+    };
+    const itemTabPanes = [
+        {
+            key: 1,
+            label: 'Form',
+            children: (
+                <Form
+                    form={formGenre}
+                    name="basic"
+                    {...formItemLayout}
+                    style={{
+                        maxWidth: 600,
+                    }}
+                    // onFinish={onFinish}
+                    // onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                        label="Tên thể loại"
+                        name="name"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Vui lòng nhập tên thể loại!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Nhập tên thể loại vào đây" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mô tả"
+                        name="description"
+                        rules={[
+                            {
+                                required: false,
+                            },
+                        ]}
+                    >
+                        <Input.TextArea
+                            style={{ fontSize: 14 }}
+                            autoSize={{ minRows: 4, maxRows: 6 }}
+                            placeholder="Nhập mô tả thể loại ở đây"
+                        />
+                    </Form.Item>
+                    <Form.Item {...tailLayout}>
+                        {!genreDataEdit && (
+                            <Button key="reset" onClick={handleResetFormGenre}>
+                                Làm mới
+                            </Button>
+                        )}
+                        <Button
+                            style={{
+                                margin: '0 8px',
+                            }}
+                            key="submit"
+                            type="primary"
+                            loading={loadingButton.genre}
+                            onClick={handleOkGenre}
+                        >
+                            {genreDataEdit ? 'Cập nhật' : 'Thêm'}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            ),
+        },
+        {
+            key: 2,
+            label: 'Danh sách',
+            children: (
+                <>
+                    <Search
+                        placeholder="Nhập tên thể loại vào đây..."
+                        allowClear
+                        // enterButton={false}
+                        onChange={(e) => onSearchGenre(e.target.value)}
+                        style={{
+                            width: 250,
+                            marginBottom: 10,
+                        }}
+                    />
+                    <Table
+                        pagination={false}
+                        columns={columnsGenre}
+                        dataSource={listDataGenre.map((item) => ({
+                            ...item,
+                            key: item.id,
+                        }))}
+                        scroll={{ x: true, y: 350 }}
+                    ></Table>
+                    <PaginationCustom
+                        current={currentPage.genre}
+                        pageSize={pageSize.genre}
+                        total={totalItems.genre}
+                        onChange={handlePageGenreChange}
+                    />
+                </>
+            ),
+        },
+        // {
+        //     key: '3',
+        //     label: 'Tab 3',
+        //     children: 'Content of Tab Pane 3',
+        // },
+    ];
     // Xem hình ảnh
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -140,8 +430,9 @@ function AdminMovie() {
     const showModalGenre = () => {
         setIsModalOpenGenre(true);
     };
+
     const handleOk = async () => {
-        // setLoadingButton(true);
+        // setLoadingButton((prev) => ({...prev,movie: true}) );
         try {
             const values = await form.getFieldsValue();
             // console.log(values, 'values');
@@ -176,15 +467,15 @@ function AdminMovie() {
                         };
                         console.log('dataCreate', dataCreate);
                         const resp = await movieApi.create(dataCreate);
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         handleResetForm();
-                        setworkSomething(!workSomething);
+                        setWorkSomething((prev) => ({ ...prev, movie: !workSomething.movie }));
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Đã thêm phim thành công', 'success');
                         }
                         setIsModalOpen(false);
                     } catch (error) {
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         if (error.hasOwnProperty('response')) {
                             funcUtils.notify(error.response.data, 'error');
                         } else {
@@ -255,15 +546,15 @@ function AdminMovie() {
                         // if (typesNoneSelect.length <= 0) {
                         const resp = await movieApi.update(dataEdit.id, dataUpdate);
                         setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
-                        setworkSomething(!workSomething);
+                        setWorkSomething((prev) => ({ ...prev, movie: !workSomething.movie }));
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Cập nhật phim thành công', 'success');
                         }
                         form.setFieldValue(resp.data);
                         // }
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                     } catch (error) {
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         if (error.hasOwnProperty('response')) {
                             funcUtils.notify(error.response.data, 'error');
                         } else {
@@ -275,11 +566,11 @@ function AdminMovie() {
                 }
             } else {
                 funcUtils.notify('Vui lòng chọn ảnh', 'error');
-                setLoadingButton(false);
+                setLoadingButton((prev) => ({ ...prev, movie: false }));
             }
         } catch (error) {
             console.log(error);
-            setLoadingButton(false);
+            setLoadingButton((prev) => ({ ...prev, movie: false }));
         }
     };
     const handleResetForm = () => {
@@ -293,9 +584,6 @@ function AdminMovie() {
         if (dataEdit != null) {
             setDataEdit(null);
         }
-    };
-    const handleCancelModalGenre = async () => {
-        setIsModalOpenGenre(false);
     };
 
     const handleEditData = async (record) => {
@@ -324,6 +612,7 @@ function AdminMovie() {
                 }
                 return totals;
             }, []);
+
             if (actsOpNotExist) {
                 setActorOptions((prev) => [...prev, ...actsOpNotExist]);
             }
@@ -371,7 +660,7 @@ function AdminMovie() {
                 // movieProducer: movie.movieProducer.id,
                 // movieStudio: movie.movieStudio.id,
                 mpaaRating: movie.mpaaRating.id,
-                releaseDate: dayjs(record.releaseDate, 'DD-MM-YYYY'),
+                releaseDate: dayjs(record.releaseDate, 'YYYY-MM-DD'),
                 duration: dayjs(movie.duration, 'HH:mm:ss'),
             });
         } catch (error) {
@@ -385,13 +674,13 @@ function AdminMovie() {
         setSearchedColumn(dataIndex);
     };
     const handleDelete = async (id) => {
-        setLoadingButton(true);
+        setLoadingButton((prev) => ({ ...prev, movie: true }));
         try {
-            const resp = await axiosClient.delete(`movie/${id}`);
+            const resp = await movieApi.delete(id);
             if (resp.status === 200) {
-                setLoadingButton(false);
+                setLoadingButton((prev) => ({ ...prev, movie: false }));
                 funcUtils.notify('Đã xoá phim thành công', 'success');
-                setworkSomething(!workSomething);
+                setWorkSomething(!workSomething.movie);
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
@@ -400,7 +689,7 @@ function AdminMovie() {
                 funcUtils.notify('Xảy ra lỗi, không thể xoá', 'error');
                 console.log(error);
             }
-            setLoadingButton(false);
+            setLoadingButton((prev) => ({ ...prev, movie: false }));
         }
     };
 
@@ -412,7 +701,7 @@ function AdminMovie() {
             try {
                 const [movieResp, studioResp, producerResp, mpaaResp, genreResp, formatResp, actorResp, directorResp] =
                     await Promise.all([
-                        movieApi.getByPage(currentPage, pageSize),
+                        movieApi.getByPage(currentPage.movie, pageSize.movie),
                         studioApi.getAll(),
                         producerApi.getAll(),
                         mpaaRatingApi.getAll(),
@@ -421,7 +710,7 @@ function AdminMovie() {
                         actorApi.getByPage(pageNoDefault, pageSizeDefault),
                         directorApi.getByPage(pageNoDefault, pageSizeDefault),
                     ]);
-                console.log(genreResp.data);
+                // console.log(genreResp.data);
                 const studioData = studioResp.data;
                 const genreData = genreResp.data;
                 const producerData = producerResp.data;
@@ -446,10 +735,10 @@ function AdminMovie() {
 
                 const dataFormat = movieResp.data.map((item) => ({
                     ...item,
-                    releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
+                    // releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
                 setList(dataFormat);
-                setTotalItems(movieResp.totalItems);
+                setTotalItems((prev) => ({ ...prev, movie: movieResp.totalItems }));
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
@@ -459,8 +748,9 @@ function AdminMovie() {
             }
         };
         fetchData();
-    }, [currentPage, pageSize, workSomething]);
-
+    }, [currentPage.movie, pageSize.movie, workSomething.movie]);
+    useSearchEffect(searchValue.searchMovie, movieApi, setList, isSearchingTable.movie);
+    useSearchEffect(searchValue.searchGenre, genreApi, setListDataGenre, isSearchingTable.genre);
     useSearchSelectEffect(
         searchValue.searchActor,
         actorApi,
@@ -640,10 +930,7 @@ function AdminMovie() {
             title: 'Ngày phát hành',
             dataIndex: 'releaseDate',
             key: 'releaseDate',
-            // render: (_, record) => {
-            //     const formattedDate = moment(record.releaseDate).format('DD-MM-YYYY');
-            //     return <span>{formattedDate}</span>;
-            // },
+            render: (releaseDate) => moment(releaseDate, 'YYYY-MM-DD').format(formatDate),
         },
         {
             title: 'Quốc gia',
@@ -732,10 +1019,18 @@ function AdminMovie() {
             </div>
         );
     };
+    const onSearchMovie = (value) => {
+        setSearchValue((prev) => ({ ...prev, searchMovie: value }));
+        setIsSearchingTable((prev) => ({ ...prev, movie: true }));
+    };
+    const onSearchGenre = (value) => {
+        setSearchValue((prev) => ({ ...prev, searchGenre: value }));
+        setIsSearchingTable((prev) => ({ ...prev, genre: true }));
+    };
     // Xử lý sự kiện thay đổi trang
     const handlePageChange = (page, pageSize) => {
-        setCurrentPage(page);
-        setPageSize(pageSize);
+        setCurrentPage((prev) => ({ ...prev, movie: page }));
+        setPageSize((prev) => ({ ...prev, movie: pageSize }));
     };
 
     const handleSearchInput = (value, type) => {
@@ -845,6 +1140,7 @@ function AdminMovie() {
             </Space>
         );
     };
+
     return (
         <>
             <Row>
@@ -861,6 +1157,18 @@ function AdminMovie() {
                         Thêm
                     </Button>
                 </Col>
+                <Col span={24}>
+                    <Search
+                        placeholder="Nhập tên phim vào đây..."
+                        allowClear
+                        // enterButton={false}
+                        onChange={(e) => onSearchMovie(e.target.value)}
+                        style={{
+                            width: 250,
+                            marginBottom: 10,
+                        }}
+                    />
+                </Col>
             </Row>
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancelPreview}>
                 <img
@@ -871,67 +1179,17 @@ function AdminMovie() {
                     src={previewImage}
                 />
             </Modal>
+
+            {/* Modal thể loại */}
             <Modal
                 forceRender
                 open={isModalOpenGenre}
-                width={'45%'}
+                width={'50%'}
                 title={'Quản lý thể loại'}
                 onCancel={handleCancelModalGenre}
-                footer={[
-                    <div key="wrapp" className={cx('wrapp-btn-modal')}>
-                        <Button key="back" onClick={handleCancelModalGenre}>
-                            Thoát
-                        </Button>
-
-                        <Button key="reset" onClick={handleResetForm}>
-                            Làm mới
-                        </Button>
-
-                        <Button key="submit" type="primary">
-                            Lưu
-                        </Button>
-                    </div>,
-                ]}
+                footer={[]}
             >
-                <Tabs defaultActiveKey="1" onChange={onChangeTabGenre}>
-                    <Tabs.TabPane tab="Form" key="formGenre">
-                        <Form
-                            name="basic"
-                            {...formItemLayout}
-                            style={{
-                                maxWidth: 600,
-                            }}
-                            // onFinish={onFinish}
-                            // onFinishFailed={onFinishFailed}
-                            autoComplete="off"
-                        >
-                            <Form.Item
-                                label="Tên thể loại"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng nhập tên thể loại!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder="Nhập tên thể loại vào đây" />
-                            </Form.Item>
-                            <Form.Item
-                                label="Mô tả"
-                                name="description"
-                                rules={[
-                                    {
-                                        required: false,
-                                    },
-                                ]}
-                            >
-                                <Input placeholder="Nhập tên mô tả vào đây" />
-                            </Form.Item>
-                        </Form>
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab="Danh sách" key="listGerne"></Tabs.TabPane>
-                </Tabs>
+                <Tabs items={itemTabPanes} activeKey={activeKeyGenre} onChange={onChangeTabGenre}></Tabs>
             </Modal>
             <BaseModal
                 forceRender
@@ -953,7 +1211,7 @@ function AdminMovie() {
                             </Button>
                         )}
 
-                        <Button key="submit" type="primary" loading={loadingButton} onClick={handleOk}>
+                        <Button key="submit" type="primary" loading={loadingButton.movie} onClick={handleOk}>
                             {dataEdit ? 'Cập nhật' : 'Thêm'}
                         </Button>
                     </div>,
@@ -1061,14 +1319,6 @@ function AdminMovie() {
                                 })),
                             ]}
                         />
-                        {/* {countriesJson.map((item) => {
-                                return (
-                                    <Select.Option key={item.code} value={item.code}>
-                                        {item.name}
-                                    </Select.Option>
-                                );
-                            })} */}
-                        {/* </Select> */}
                     </Form.Item>
                     <Form.Item
                         label="Nhà sản xuất"
@@ -1269,15 +1519,16 @@ function AdminMovie() {
                             },
                         ]}
                     >
-                        <Input placeholder="Dán link trailer phim vào đây" />
+                        <Input style={{ fontSize: 15 }} placeholder="Dán link trailer phim vào đây" />
                     </Form.Item>
 
                     <Form.Item name={'description'} label="Mô tả">
-                        <Input.TextArea placeholder="Nhập mô tả phim ở đây" />
+                        <Input.TextArea style={{ fontSize: 15 }} placeholder="Nhập mô tả phim ở đây" />
                     </Form.Item>
                 </Form>
             </BaseModal>
             <BaseTable
+                // scroll={{ x: true, y: 900 }}
                 pagination={false}
                 columns={columns}
                 dataSource={list.map((item) => ({
@@ -1288,9 +1539,9 @@ function AdminMovie() {
             />
 
             <PaginationCustom
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalItems}
+                current={currentPage.movie}
+                pageSize={pageSize.movie}
+                total={totalItems.movie}
                 onChange={handlePageChange}
             />
         </>
