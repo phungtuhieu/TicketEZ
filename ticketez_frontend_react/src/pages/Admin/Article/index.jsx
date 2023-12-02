@@ -1,4 +1,4 @@
-import React, {  useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Button,
     Input,
@@ -13,21 +13,21 @@ import {
     Pagination,
     DatePicker,
     Select,
+    Descriptions,
 } from 'antd';
-import {  PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import BaseTable from '~/components/common/BaseTable/BaseTable';
 import BaseModal from '~/components/common/BaseModal/BaseModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import TextArea from 'antd/es/input/TextArea';
-import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
 import articleApi from '~/api/admin/managementMovie/article';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import { movieApi } from '~/api/admin';
-
+import articleMovieAPI from '~/api/admin/managementMovie/articleMovie';
 
 const formItemLayout = {
     labelCol: { span: 4 },
@@ -36,7 +36,6 @@ const formItemLayout = {
 const { Option } = Select;
 
 const Article = () => {
-
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
@@ -46,7 +45,11 @@ const Article = () => {
     const [dataMovie, setDataMovie] = useState([]);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
-    console.log("kkkk",dataMovie);
+    const [valueArticleId, setValueArticleId] = useState(null);
+    console.log(valueArticleId);
+     const [dataArticleMovie, setDataArticleMovie] = useState([]);
+    const [valueSelectMovie, setValueSelectMovie] = useState([]);
+
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -78,8 +81,22 @@ const Article = () => {
             }
         };
         getListMovie();
-    }, [currentPage, pageSize, workSomeThing]);
-
+        if(valueArticleId){
+             const getListMovie = async () => {
+            setLoading(true);
+            if(valueArticleId !== null){
+                 try {
+                     const res = await articleMovieAPI.getMovieByArticle(valueArticleId);
+                     setDataArticleMovie(res.data);
+                     setLoading(false);
+                 } catch (error) {
+                     console.log(error);
+                 }
+            }
+        };
+        getListMovie();
+        }
+    }, [currentPage, pageSize, valueArticleId, workSomeThing]);
 
     const columns = [
         {
@@ -161,7 +178,7 @@ const Article = () => {
 
     const handleDelete = async (record) => {
         try {
-            const res = await mpaaRatingApi.delete(record.id);
+            const res = await articleApi.delete(record.id);
             if (res.status === 200) {
                 if (fileList.length > 0) {
                     await uploadApi.delete(record.icon);
@@ -178,7 +195,7 @@ const Article = () => {
     };
 
     const handleEditData = (record) => {
-         const formattedEndTime = dayjs(record.create_date, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.create_date, 'YYYY-MM-DD HH:mm:ss');
         const newUploadFile = {
             uid: record.id.toString(),
             name: record.banner,
@@ -190,7 +207,7 @@ const Article = () => {
         setEditData(record);
         form.setFieldsValue({
             ...record,
-            create_date:  formattedEndTime,
+            create_date: formattedEndTime,
         });
     };
 
@@ -212,7 +229,7 @@ const Article = () => {
                             banner: images,
                         };
                     }
-                  
+
                     try {
                         const resPut = await articleApi.update(putData.id, putData);
                         if (resPut.status === 200) {
@@ -229,9 +246,16 @@ const Article = () => {
                         const file = values.banner.fileList[0].originFileObj;
                         const images = await uploadApi.post(file);
                         const postData = {
-                            ...values,
-                            banner: images,
+                            movies: valueSelectMovie,
+                            article: {
+                                // ...values,
+                                title: values.title,
+                                create_date: values.create_date,
+                                content: values.content,
+                                banner: images,
+                            },
                         };
+                        console.log('data nè', postData);
                         const resPost = await articleApi.create(postData);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm danh sách phim thành công', 'success');
@@ -244,6 +268,7 @@ const Article = () => {
                         if (error.response.data.error) {
                             funcUtils.notify(error.response.data.error, 'error');
                         }
+                        funcUtils.notify(error.response.data, 'error');
                         console.log(error);
                     }
                 }
@@ -309,6 +334,14 @@ const Article = () => {
             return false;
         },
         fileList,
+    };
+
+    const onChangSelectMovie = (values) => {
+        let movies = values.map((id) => {
+            return dataMovie.find((o) => o.id === id);
+        });
+        //  console.log('movies', movies);
+        setValueSelectMovie(movies);
     };
 
     return (
@@ -395,7 +428,7 @@ const Article = () => {
                             <Select
                                 mode="multiple"
                                 style={{ width: '100%' }}
-                                // onChange={(value) => onChangSelectFormatMovie(value)}
+                                onChange={(value) => onChangSelectMovie(value)}
                                 // disabled={!selectedOption3}
                                 showSearch
                                 placeholder="Tìm kiếm hoặc chọn phim"
@@ -439,6 +472,20 @@ const Article = () => {
                     ...post,
                     key: post.id,
                 }))}
+                expandable={{
+                    expandedRowRender: (record) => {
+                        // setValueArticleId(record.id);
+                        console.log(record);
+                        return (
+                            <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                                <Descriptions title="Danh sách phim"></Descriptions>
+                                {/* {dataArticleMovie?.map((value) => (
+                                    <>{value.article.id}</>
+                                ))} */}
+                            </div>
+                        );
+                    },
+                }}
             />
             <div>
                 <Pagination

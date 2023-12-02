@@ -31,6 +31,7 @@ import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 import dayjs from 'dayjs';
 import seatChartApi from '~/api/admin/managementSeat/seatChart';
 import uploadApi from '~/api/service/uploadApi';
+import priceSeatApi from '~/api/admin/managementSeat/priceApi';
 
 const cx = classNames.bind(style);
 const { Option } = Select;
@@ -69,13 +70,13 @@ const AdminShowtime = () => {
     const [valueTimeMovie, setValueTimeMovie] = useState(null);
     const [valueEndtimeByTimeMovieAndStartime, setValueEndtimeByTimeMovieAndStartime] = useState(null);
     const [valueStartTimeEdit, setValueStartTimeEdit] = useState(null);
+    const [valuePrice, setvaluePrice] = useState([]);
     const [dataTimeMovie, setDataTimeMovie] = useState(null);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomeThing, setWorkSomeThing] = useState(false);
-
     //set disable theo thứ tự khi thêm
     const [selectedOption1, setSelectedOption1] = useState(null);
     const [selectedOption2, setSelectedOption2] = useState(null);
@@ -263,6 +264,24 @@ const AdminShowtime = () => {
             getIdFormatMovieByFormatAndMovie();
         } else {
             setLoading(false);
+        }
+
+        if (valueSelectCinemaComplex !== null && valueTimeMovie !== null) {
+            const getPriceByMovieAndCinemaComplex = async () => {
+                setLoading(true);
+                    try {
+                        const res = await priceSeatApi.getPriceByMovieAndCinemaComplex(
+                            valueTimeMovie,
+                            valueSelectCinemaComplex,
+                        );
+                        setvaluePrice(res.data);
+                        setLoading(false);
+                    } catch (error) {
+                        funcUtils.notify('Không tìm thấy giá phù hợp! Vui lòng kiểm tra lại bảng giá', 'error');
+                        setLoading(false);
+                    }
+            };
+            getPriceByMovieAndCinemaComplex();
         }
     }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema, valueSelectDate]);
 
@@ -603,28 +622,28 @@ const AdminShowtime = () => {
                         setOpen(true);
                         setLoading(false);
                     } else {
-                       if (currentTime.toDateString() === startTime.toDateString()) {
-                           values = {
-                               ...values,
-                               startTime: startTime,
-                               endTime: endTime,
-                               status: 2, // Công chiếu
-                           };
-                       } else if (startTime >= currentTime && startTime <= newCurrentDateADd) {
-                           values = {
-                               ...values,
-                               startTime: startTime,
-                               endTime: endTime,
-                               status: 1, // sắp chiếu
-                           };
-                       } else {
-                           values = {
-                               ...values,
-                               startTime: startTime,
-                               endTime: endTime,
-                               status: 0, //chưa công chiếu
-                           };
-                       }
+                        if (currentTime.toDateString() === startTime.toDateString()) {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 2, // Công chiếu
+                            };
+                        } else if (startTime >= currentTime && startTime <= newCurrentDateADd) {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 1, // sắp chiếu
+                            };
+                        } else {
+                            values = {
+                                ...values,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: 0, //chưa công chiếu
+                            };
+                        }
 
                         if (editData) {
                             let putData = {

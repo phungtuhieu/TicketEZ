@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -185,5 +186,17 @@ public class PriceAPI {
     public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
         priceDAO.deleteById(id);
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/get/price-by-movie-cinemaComplex/{movieId}/{cinemaComplexId}")
+    public ResponseEntity<?> getPriceByMovieAndCinemaComplex(@PathVariable("movieId") Long movieId, 
+       @PathVariable("cinemaComplexId") Long cinemaComplexId) {
+        try {
+            List<Price> movie = priceDAO.getPriceByMovieAndCinemaComplex(movieId, cinemaComplexId);
+            return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

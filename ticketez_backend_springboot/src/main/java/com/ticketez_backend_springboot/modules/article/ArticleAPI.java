@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.article;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,18 +24,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ticketez_backend_springboot.dto.ArticleDTO;
-import com.ticketez_backend_springboot.dto.MovieDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
-import com.ticketez_backend_springboot.modules.actorMovie.ActorMovie;
-import com.ticketez_backend_springboot.modules.actorMovie.ActorMoviePK;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovie;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovieDAO;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMoviePK;
-import com.ticketez_backend_springboot.modules.directorMovie.DirectorMovie;
-import com.ticketez_backend_springboot.modules.directorMovie.DirectorMoviePK;
-import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
-import com.ticketez_backend_springboot.modules.genreMovie.GenreMovie;
-import com.ticketez_backend_springboot.modules.genreMovie.GenreMoviePK;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @CrossOrigin("*")
@@ -80,41 +73,79 @@ public class ArticleAPI {
         }
     }
 
-    // @PostMapping
-    // public ResponseEntity<Article> post(@RequestBody ArticleDTO articleDTO) {
-    //     List<ArticleMovie> aherticleMovies = new ArrayList<>();
-    //     try {
-    //         Article articleSaved = dao.save(articleDTO.getArticle());
-            
-    //         for (int i = 0; i < articleDTO.getMovies().size(); i++) {
-    //             ArticleMoviePK articleMoviePK = new ArticleMoviePK(articleDTO.getMovies().get(i).getId(), articleSaved.getId());
-    //             ArticleMovie articleMovie = new ArticleMovie(articleMoviePK, articleDTO.getMovies().get(i),
-    //                     articleSaved);
-    //             aherticleMovies.add(articleMovie);
-    //         }
+    @PostMapping
+    public ResponseEntity<?> post(@RequestBody ArticleDTO articleDTO) {
+        List<ArticleMovie> articleMovies = new ArrayList<>();
 
+        try {
+            Article articleSaved = dao.save(articleDTO.getArticle());
+            for (int i = 0; i < articleDTO.getMovies().size(); i++) {
+                ArticleMoviePK articleMoviePK = new ArticleMoviePK();
+                articleMoviePK.setArticleId(articleSaved.getId());
+                articleMoviePK.setMovieId(articleDTO.getMovies().get(i).getId());
+                ArticleMovie articleMovie = new ArticleMovie();
+                articleMovie.setArticle(articleSaved);
+                articleMovie.setDirectorMoviePK(articleMoviePK);
+                articleMovie.setMovie(articleDTO.getMovies().get(i));
+                articleMovies.add(articleMovie);
+            }
 
-    //         // System.out.println("---- formarMovie "+ formatMovies);
-    //         articleMovieDAO.saveAll(aherticleMovies);
-    //         return ResponseEntity.ok(articleSaved);
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         // return new ResponseEntity<>("Không thể thêm, có lỗi trong việc lưu dữ liệu vui lòng liên hệ quản trị viên",
-    //         //         HttpStatus.CONFLICT);
+            articleMovieDAO.saveAll(articleMovies);
+            return ResponseEntity.ok(articleSaved);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Không thể thêm, có lỗi trong việc lưu Danh sách phim",
+                    HttpStatus.CONFLICT);
 
-    //     }
-    //    }
-
-    
+        }
+    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Article> put(@PathVariable("id") Long id, @RequestBody Article article) {
+    public ResponseEntity<Article> put(@PathVariable("id") Long id, @RequestBody ArticleDTO articleDTO) {
         try {
             if (!dao.existsById(id)) {
                 return ResponseEntity.notFound().build();
             }
-            dao.save(article);
-            return ResponseEntity.ok(article);
+            Article articleDB = dao.findById(articleDTO.getArticle().getId()).orElse(null);
+
+            if (!articleDTO.getMovies().isEmpty()) {
+                // tìm kiếm movie trong Article ở db
+                List<Movie> listMovieInArcticle = articleDB.getArticleMovies().stream()
+                        .map(ArticleMovie::getMovie)
+                        .collect(Collectors.toList());
+
+                // trên form xoá đi các movie ban đầu
+                List<ArticleMovie> listMovie = articleDB.getArticleMovies().stream()
+                        .filter(f -> articleDTO.getMovies().stream()
+                                .noneMatch(form -> {
+                                    return form.getId() == f.getMovie().getId();
+                                }))
+                        .collect(Collectors.toList());
+                // trên form đã thêm các movie mới
+                List<ArticleMovie> listArticleMovieCreate = articleDTO.getMovies().stream()
+                        .filter(f -> listMovieInArcticle.stream().noneMatch(fInM -> {
+                            return fInM.getId() == f.getId();
+                        }))
+                        .map(movieForm -> {
+                            ArticleMovie articleMovie = new ArticleMovie();
+                            ArticleMoviePK articleMoviePK = new ArticleMoviePK();
+                            articleMoviePK.setArticleId(movieForm.getId());
+                            articleMoviePK.setMovieId(articleDB.getId());
+
+                            articleMovie.setArticle(articleDB);
+                            articleMovie.setDirectorMoviePK(articleMoviePK);
+                            articleMovie.setMovie(movieForm);
+                            return articleMovie;
+                        }).collect(Collectors.toList());
+
+                if (listMovie.size() > 0) {
+                    articleMovieDAO.deleteAll(listMovie);
+                }
+                if (listArticleMovieCreate.size() > 0) {
+                    articleMovieDAO.saveAll(listArticleMovieCreate);
+                }
+            }
+            dao.save(articleDTO.getArticle());
+            return ResponseEntity.ok(articleDTO.getArticle());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -124,7 +155,7 @@ public class ArticleAPI {
     public ResponseEntity<String> delete(@PathVariable("id") Long id) {
         try {
             dao.deleteById(id);
-            return ResponseEntity.ok().body("Xoá sự kiện thành công");
+            return ResponseEntity.ok().body("Xoá danh sách phim thành công");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Không thể xóa sự kiện do tài liệu tham khảo hiện có");
