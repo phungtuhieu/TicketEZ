@@ -372,15 +372,13 @@ const ModalPrice = (props) => {
                         <Row>
                             {/*row1 */}
                             {record.newPriceSeatTypeDTOs.map((moment, index) => (
-                                <Col span={7} key={index}>
-                                    <p className="tw-font-bold tw-text-xl tw-mb-2">{moment.seatType.name}</p>
-                                    <div className="tw-ms-8">
-                                        <Row>
-                                            {' '}
+                                <Col key={index} span={24}>
+                                    <Row className='tw-mb-12'>
+                                        <Col span={7}>
+                                            <p className="tw-font-bold tw-text-xl tw-mb-2">{moment.seatType.name}</p>
+                                        </Col>
+                                        <Col span={7}>
                                             <p className="tw-text-xl tw-mb-2">Giá trong tuần</p>
-                                        </Row>
-                                        <Row>
-                                            {' '}
                                             <InputNumber
                                                 min={1}
                                                 max={1000000}
@@ -388,14 +386,10 @@ const ModalPrice = (props) => {
                                                 onChange={onChangeDefaultPrice}
                                                 disabled
                                             />
-                                        </Row>
-                                        <Row>
-                                            <div className="tw-ms-14 tw-text-5xl">↓</div>
-                                        </Row>
-                                        <Row>
-                                            <p className="tw-text-xl tw-mb-2 tw-mt-2">Giá cuối tuần</p>
-                                        </Row>
-                                        <Row>
+                                        </Col>
+                                        <Col span={7}>
+                                            <p className="tw-text-xl tw-mb-2">Giá cuối tuần</p>
+
                                             <InputNumber
                                                 min={1}
                                                 max={1000000}
@@ -403,8 +397,8 @@ const ModalPrice = (props) => {
                                                 onChange={onChangeDefaultPrice}
                                                 disabled
                                             />
-                                        </Row>
-                                    </div>
+                                        </Col>
+                                    </Row>
                                 </Col>
                             ))}
                         </Row>

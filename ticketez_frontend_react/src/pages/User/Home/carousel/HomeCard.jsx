@@ -17,7 +17,7 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
             <Row>
                 <Col style={{ backgroundColor: 'red' }}>
                     <div className="coverImage">
-                        <img src={uploadApi.get(movie.poster)} alt="" />
+                        <img src={uploadApi.get(movie.banner)} alt="" />
                     </div>
                 </Col>
                 <Col>
@@ -42,7 +42,9 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                                     {actors.map((actor, index) => (
                                         <React.Fragment key={actor.id}>
                                             <li>{actor.fullname}</li>
-                                            {index < actors.length - 1 && <span className="tw-mx-2 tw-text-white">,</span>}
+                                            {index < actors.length - 1 && (
+                                                <span className="tw-mx-2 tw-text-white">,</span>
+                                            )}
                                         </React.Fragment>
                                     ))}
                                 </p>
@@ -58,9 +60,11 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                                     </div>
                                 </p>
                             </div>
-                            <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900">
-                                <FontAwesomeIcon icon={faPlay} /> Xem ngay
-                            </button>
+                            <Link to={`/movie-details/${movie.id}`}>
+                                <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900 tw-cursor-pointer hover:border hover:border-[var(--border-color)]">
+                                    <FontAwesomeIcon icon={faPlay} /> <span className="tw-hover:underline">Xem ngay</span>
+                                </button>
+                            </Link>
                         </Col>
                         <Col span={6}>
                             <div className="palyButton ">

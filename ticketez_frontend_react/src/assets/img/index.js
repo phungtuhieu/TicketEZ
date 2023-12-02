@@ -27,7 +27,7 @@ import faceBook from '../icon/f-facebook.svg';
 import linkedIn from '../icon/f-linkedIn.svg';
 import youtube from '../icon/f-youtube.svg';
 import daDangKy from '../icon/f-da-dang-ky.webp';
-
+import loading from '../img/loading2.gif';
 import icon1 from '../icon/icon1.png';
 import icon2 from '../icon/icon2.png';
 import icon3 from '../icon/icon3.png';
@@ -63,7 +63,7 @@ const img = {
     tagDatTruoc,
     anhReview,
     logoLogin1,
-    //
+   loading,
     notFoundLogo,
     gifLoading,
     event,
