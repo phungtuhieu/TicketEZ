@@ -25,7 +25,7 @@ public class SeatType {
 	private String name;
 	private String nickName;
 	private String color;
-	
+	private Integer width;
 	private String image;
 	private String description;
 

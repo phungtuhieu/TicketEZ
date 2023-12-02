@@ -218,31 +218,37 @@ function SeatChart(props) {
                                                 <tr key={header}>
                                                     <td className="header-cell protected-element">{header}</td>
                                                     {seatState.seat[rowIndex].map((seat_no) => {
+                                                        let width = 1;
                                                         const seatClassName =
-                                                        nameSeat.indexOf(seat_no) > -1
-                                                        ? '#404040'
-                                                        :
-                                                            Object.keys(seatState)
-                                                                .map((key) => {
-                                                                    let color = null;
+                                                            nameSeat.indexOf(seat_no) > -1
+                                                                ? '#404040'
+                                                                : Object.keys(seatState)
+                                                                      .map((key) => {
+                                                                          let color = null;
 
-                                                                    if (seatState[key].indexOf(seat_no) > -1) {
-                                                                        seatType.forEach((seat) => {
-                                                                            if (seat.nickName === key) {
-                                                                                color = seat.color;
-                                                                            }
-                                                                        });
-                                                                    }
+                                                                          if (seatState[key].indexOf(seat_no) > -1) {
+                                                                              seatType.forEach((seat) => {
+                                                                                  if (seat.nickName === key) {
+                                                                                      color = seat.color;
+                                                                                      if (seat.width >= 2) {
+                                                                                          width = seat.width;
+                                                                                      }
+                                                                                  }
+                                                                              });
+                                                                          }
 
-                                                                    return color;
-                                                                })
-                                                                .filter(Boolean)
-                                                                .join(' ') || 'none';
+                                                                          return color;
+                                                                      })
+                                                                      .filter(Boolean)
+                                                                      .join(' ') || 'none';
+
                                                         const style = {
                                                             backgroundColor: seatClassName,
                                                             visibility:
                                                                 seatClassName === '#121B2B' ? 'hidden' : 'visible',
                                                             textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
+                                                            transform: `scaleX(${width})`,
+                                                            transformOrigin: 'top left', 
                                                         };
                                                         return (
                                                             <td
@@ -272,6 +278,9 @@ function SeatChart(props) {
                                                             return null;
                                                         }
                                                         if (value.id === 9) {
+                                                            return null;
+                                                        }
+                                                        if (value.id === 8) {
                                                             return null;
                                                         }
                                                         return (

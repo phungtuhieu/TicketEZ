@@ -471,6 +471,7 @@ function SeatChart(props) {
                                         <tr key={header}>
                                             <td className="header-cell protected-element">{header}</td>
                                             {seatState.seat[rowIndex].map((seat_no) => {
+                                                let width = 1;
                                                 const seatClassName =
                                                     seatBookingData2.indexOf(seat_no) > -1
                                                         ? '#404040'
@@ -485,6 +486,9 @@ function SeatChart(props) {
                                                                       seatType.forEach((seat) => {
                                                                           if (seat.nickName === key) {
                                                                               color = seat.color;
+                                                                              if (seat.width >= 2) {
+                                                                                  width = seat.width;
+                                                                              }
                                                                           }
                                                                       });
                                                                   }
@@ -499,6 +503,8 @@ function SeatChart(props) {
                                                     pointerEvents: seatClassName === '#404040' ? 'none' : 'auto',
                                                     visibility: seatClassName === '#121B2B' ? 'hidden' : 'visible',
                                                     textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
+                                                    transform: `scaleX(${width})`,
+                                                    transformOrigin: 'top left',
                                                 };
                                                 return (
                                                     <td

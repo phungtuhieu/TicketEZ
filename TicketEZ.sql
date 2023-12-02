@@ -240,6 +240,7 @@ GO
         [name] NVARCHAR(200) NOT NULL,
 		nick_name nvarChar(50) not null,
 		color nvarchar(50) not null,
+				[width] int not null,
         [image] NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX)
     )
@@ -373,6 +374,7 @@ GO
         cinema_id BIGINT NOT NULL,
         format_movie_id BIGINT NOT NULL,
         seat_chart_id BIGINT NOT NULL,
+		price_id  BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Booking (
@@ -735,6 +737,11 @@ ALTER TABLE
     Showtimes
 ADD
     CONSTRAINT FK_Showtimes_FormatMovies FOREIGN KEY (format_movie_id) REFERENCES Formats_Movies(id)
+GO
+ALTER TABLE
+    Showtimes
+ADD
+    CONSTRAINT FK_Showtimes_Price FOREIGN KEY (price_id) REFERENCES price(id)
 GO
     -- /Showtimes
     -- Price
@@ -1280,25 +1287,23 @@ GO
 
 
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
-INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color], [image], [description])
+INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color],[width], [image], [description])
 VALUES
-    (N'Ghế thông thường','normalSeat','#7C25CE', 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP','vipSeat','#B32225', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
-	(N'Ghế đôi','coupleSeat','#AD1859','url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
-    (N'Ghế tựa','reclinerSeat','#0891B2' ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
-    (N'Ghế trẻ em','kidSeat','#10B785', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế Sofa','sofaSeat','#C58B0B', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
-	(N'đường đi','way','#121B2B' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
-	(N'Màu ghế đã đặt','seatUnavailable','#404040' ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
-	(N'Màu ghế chọn','seatReserved','#16A34A' ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
+    (N'Ghế thường','normalSeat','#7C25CE',1, 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
+    (N'Ghế VIP','vipSeat','#B32225',1, 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi','coupleSeat','#AD1859',2,'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
+    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
+    (N'Ghế trẻ em','kidSeat','#10B785',1, 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
+    (N'Ghế Sofa','sofaSeat','#C58B0B',1, 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+	(N'đường đi','way','#121B2B',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
+	(N'Ghế đã đặt','seatUnavailable','#404040',1 ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
+	(N'Ghế chọn','seatReserved','#16A34A',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
 INSERT INTO Seat_Chart ([name], [rows], [columns], [status], cinema_id)
 VALUES
-    (N'Sơ đồ 1', 10, 7, 1, 1),
-    (N'Sơ đồ 2', 8, 12, 1, 1),
-    (N'Sơ đồ 3', 12, 8, 0, 1);
+    (N'Sơ đồ 1', 10, 7, 1, 1)
 GO
 -- 8. Thêm dữ liệu về ghế
 INSERT INTO Seats ([name], [status], [description], seat_type_id, seat_chart_id)
@@ -1563,14 +1568,18 @@ VALUES
     ( 1, 2),
     ( 2, 1),
     ( 2, 2);
+	go
+-- Inserting sample data into the Price table
+INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
+VALUES
+    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 -- 23. thêm dữ liệu bảng Showtimes
- INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
+ INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 4,1),
-  ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
-  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
-  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 1,1,1),
+  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1,1),
+  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking
@@ -1635,10 +1644,6 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
--- Inserting sample data into the Price table
-INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
-VALUES
-    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 
 INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)
@@ -1662,14 +1667,24 @@ VALUES
     ('10', 'user6', '2022-02-10 20:15:00', 2, 1, 1),
     ('11', 'user6', '2022-02-11 11:30:00', 3, 0, 2),
     ('12', 'user6', '2022-02-12 14:00:00', 3, 1, 2),
-    ('13', 'user6', '2022-02-13 16:15:00', 4, 0, 2),
-    ('14', 'user6', '2022-01-14 19:45:00', 4, 1, 2),
+    ('13', 'user6', '2022-02-13 16:15:00', 3, 0, 2),
+    ('14', 'user6', '2022-01-14 19:45:00', 3, 1, 2),
     ('15', 'user6', '2022-02-15 22:00:00', 3, 0, 2),
-    ('16', 'user6', '2023-01-16 09:15:00', 4, 1, 2),
-    ('17', 'user6', '2023-01-17 12:30:00', 4, 0, 1),
+    ('16', 'user6', '2023-01-16 09:15:00', 3, 1, 2),
+    ('17', 'user6', '2023-01-17 12:30:00', 3, 0, 1),
     ('18', 'user6', '2023-01-18 14:45:00', 3, 1, 1),
     ('19', 'user6', '2023-01-19 17:00:00', 3, 0, 1),
-    ('20', 'user6', '2023-01-20 20:30:00', 4, 1, 1);
+    ('20', 'user6', '2023-01-20 20:30:00', 3, 1, 1);
+
+	/* 
+	   CREATE TABLE Booking (
+        id NVARCHAR(10) NOT NULL,
+        account_id NVARCHAR(20) NOT NULL,
+        create_date DATETIME NOT NULL,
+        showtime_id BIGINT NOT NULL,
+        [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
+    )*/
 
 --thêm dữ liệu cho bảng Seats_Booking
 INSERT INTO Seats_Booking ([seat_id], [booking_id], [price])
