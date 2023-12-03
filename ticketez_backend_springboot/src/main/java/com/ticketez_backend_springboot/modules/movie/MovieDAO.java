@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
-import com.ticketez_backend_springboot.modules.genre.Genre;
 
 @Repository
 public interface MovieDAO extends JpaRepository<Movie, Long> {
@@ -31,7 +30,7 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
         List<Movie> findAllByOrderByIdDesc();
 
         @Query("SELECT m FROM Movie m WHERE EXISTS "
-                        + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id AND st.status = 2 "
+                        + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
                         + "AND CAST(CURRENT_TIMESTAMP AS DATE) BETWEEN  CAST(st.startTime AS DATE) AND  CAST(st.endTime AS DATE)  )")
         List<Movie> getMoviesExistsMovieIdShowtimes();
 
@@ -56,27 +55,27 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         "    SELECT fm.movie_id, MAX(s.end_time) AS max_end_time " +
                         "    FROM Showtimes s " +
                         "    JOIN Formats_Movies fm ON s.format_movie_id = fm.id " +
-                        "    WHERE s.status = 1 " +
-                        "      AND s.end_time >= GETDATE() " +
-                        "      AND s.end_time <= DATEADD(day, 10, GETDATE()) " +
+                        "    WHERE  s.end_time > DATEADD(day, 1, CONVERT(DATE, GETDATE()))  " +
+                        "      AND s.end_time < DATEADD(day, 10, CONVERT(DATE, GETDATE()))  " +
                         "    GROUP BY fm.movie_id " +
                         ") max_showtimes ON fm.movie_id = max_showtimes.movie_id " +
                         "JOIN Showtimes s ON s.format_movie_id = fm.id AND s.end_time = max_showtimes.max_end_time", nativeQuery = true)
         List<Movie> getMovieByShowtimeUpcoming();
 
         // Lấy ra top 5 phim có booking cao nhất
-        // @Query("SELECT m, COUNT(b) as bookingCount " +
-        // "FROM Movie m " +
-        // "LEFT JOIN m.formatsMovies fm " +
-        // "LEFT JOIN fm.showtimes st " +
-        // "LEFT JOIN st.bookings b " +
-        // "WHERE st.startTime >= CURRENT_TIMESTAMP " +
-        // "GROUP BY m.id, m.country, m.description, m.duration, m.movieProducer,
-        // m.movieStudio, m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title,
-        // m.videoTrailer "
-        // +
-        // "ORDER BY bookingCount DESC")
-        // List<Movie> findTop5MoviesByBookingCount();
+        @Query("SELECT m, COUNT(b) as bookingCount " +
+                        "FROM Movie m " +
+                        "LEFT JOIN m.formatsMovies fm " +
+                        "LEFT JOIN fm.showtimes st " +
+                        "LEFT JOIN st.bookings b " +
+                        "WHERE st.startTime >= CURRENT_TIMESTAMP " +
+                        "GROUP BY m.id, m.country, m.description, m.duration," +
+                        //" m.movieProducer,m.movieStudio, " +
+                        " m.mpaaRating, m.poster, m.rating, m.releaseDate, m.title," +
+                        "m.videoTrailer "
+                        +
+                        "ORDER BY bookingCount DESC")
+        List<Movie> findTop5MoviesByBookingCount();
 
         @Query(value = "SELECT DISTINCT m.* " +
                         "FROM Movies m " +

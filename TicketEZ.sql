@@ -1575,11 +1575,11 @@ VALUES
     ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 -- 23. thêm dữ liệu bảng Showtimes
- INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id],[price_id])
+ INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [cinema_id],  [format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 1,1,1),
-  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1,1),
-  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1,1);
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00',  1, 1,1,1),
+  ('2023-10-15 10:00:00', '2023-10-15 12:00:00',  3, 3,1,1),
+  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1,1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking

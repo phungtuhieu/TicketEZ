@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.price;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,8 +31,8 @@ public interface PriceDAO extends JpaRepository<Price, Long> {
                         " on m.id = fm.movie.id " +
                         " where m.id = :movieId " +
                         " and p.cinemaComplex.id = :cinemaComplexId  " +
-                        " and CAST(CURRENT_TIMESTAMP AS DATE) >  CAST(p.endDate AS DATE)")
-        List<Price> getPriceByMovieAndCinemaComplex(@Param("movieId") Long movieId,
-                        @Param("cinemaComplexId") Long cinemaComplexId);
+                        " and (CAST(:date AS DATE) BETWEEN CAST(p.startDate AS DATE)  AND CAST(p.endDate AS DATE))")
+        List<Price> getPriceByMovieAndCinemaComplexAndDate(@Param("movieId") Long movieId,
+                        @Param("cinemaComplexId") Long cinemaComplexId, @Param("date") LocalDate date);
 
 }

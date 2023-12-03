@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.modules.price.Price;
-import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 
 @CrossOrigin("*")
 @RestController
@@ -27,7 +25,7 @@ public class PriceSeatTypeAPI {
         return ResponseEntity.ok(dao.findAll());
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<List<PriceSeatType>> findbyIdprice(@PathVariable("id") Long id) {
         List<PriceSeatType> priceSeatTypes = dao.findByPriceId(id);
         return ResponseEntity.ok(priceSeatTypes);
