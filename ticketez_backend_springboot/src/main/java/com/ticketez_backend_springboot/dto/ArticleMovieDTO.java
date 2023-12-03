@@ -16,6 +16,7 @@ public class ArticleMovieDTO {
     private long totalItems;
     private int totalPages;
     List<MovieObjResp> listMovieObjResp;
+    
     @Data
     public class MovieObjResp {
         Article article;

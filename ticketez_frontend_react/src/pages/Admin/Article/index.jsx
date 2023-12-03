@@ -55,7 +55,6 @@ const Article = () => {
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomeThing, setWorkSomeThing] = useState(false);
-    console.log('value', posts);
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
@@ -132,6 +131,7 @@ const Article = () => {
         {
             title: 'Mô tả',
             dataIndex: 'content',
+            width: '30%',
             render: (_, record) => (
                 <Space size="middle">
                     <span>{record.article.content}</span>

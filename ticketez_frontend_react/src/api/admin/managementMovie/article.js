@@ -6,12 +6,16 @@ class ArticleApi extends BaseApi {
         super('article');
     }
     async getPageArticle(page = 1, limit = 10, search = '') {
-         const params = {
-             page,
-             limit,
-             search,
-         };
+        const params = {
+            page,
+            limit,
+            search,
+        };
         return axiosClient.get('/article/get/article-movie', { params });
+    }
+    async getPageArticleTrue() {
+        
+        return axiosClient.get('/article/get/article-movie-true');
     }
 }
 const articleApi = new ArticleApi();

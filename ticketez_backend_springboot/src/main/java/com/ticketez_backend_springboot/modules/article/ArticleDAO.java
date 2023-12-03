@@ -12,4 +12,7 @@ public interface ArticleDAO extends JpaRepository<Article, Long> {
 
         @Query("SELECT a FROM Article a ")
         Page<Article> getArticleMovie(Pageable pageable);
+
+        @Query("SELECT a FROM Article a where a.status = true")
+        Page<Article> getArticleMovieTrue(Pageable pageable);
 }
