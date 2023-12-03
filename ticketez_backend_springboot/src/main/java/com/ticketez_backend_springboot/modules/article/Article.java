@@ -25,6 +25,7 @@ public class Article {
     private String title;
     private String banner;
     private String content;
+    private Boolean status;
 
     @Column(name = "create_date")
     private Date create_date;

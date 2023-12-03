@@ -154,6 +154,7 @@ CREATE TABLE Articles(
     title NVARCHAR(255) NOT NULL,
 	banner NVARCHAR(MAX) NOT NULL,
     content NVARCHAR(MAX) NOT NULL,
+	status BIT NOT NULL,--0 là nháp , 1 là đăng
     create_date DATE NOT NULL,
 )
 GO
@@ -1709,6 +1710,21 @@ VALUES
     (18, 1, 31.75),
     (19, 1, 36.0),
     (20, 1, 29.25);
+
+	-- Chèn dữ liệu cho bảng Articles
+INSERT INTO Articles (title, banner, content, status, create_date)
+VALUES 
+(N'Tiêu đề 1', 'Banner 1', N'Nội dung 1', 1, '2023-01-01'),
+(N'Tiêu đề 2', 'Banner 2', N'Nội dung 2', 0, '2023-01-02'),
+(N'Tiêu đề 3', 'Banner 3', N'Nội dung 3', 1, '2023-01-03'),
+(N'Tiêu đề 4', 'Banner 4', N'Nội dung 4', 0, '2023-01-04'),
+(N'Tiêu đề 5', 'Banner 5', N'Nội dung 5', 1, '2023-01-05'),
+(N'Tiêu đề 6', 'Banner 6', N'Nội dung 6', 0, '2023-01-06'),
+(N'Tiêu đề 7', 'Banner 7', N'Nội dung 7', 1, '2023-01-07'),
+(N'Tiêu đề 8', 'Banner 8', N'Nội dung 8', 0, '2023-01-08'),
+(N'Tiêu đề 9', 'Banner 9', N'Nội dung 9', 1, '2023-01-09'),
+(N'Tiêu đề 10', 'Banner 10', N'Nội dung 10', 0, '2023-01-10');
+
 
 
 SELECT * FROM Accounts

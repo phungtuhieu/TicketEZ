@@ -14,20 +14,22 @@ import {
     DatePicker,
     Select,
     Descriptions,
+    Switch,
+    Tag,
+    Divider,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import BaseTable from '~/components/common/BaseTable/BaseTable';
 import BaseModal from '~/components/common/BaseModal/BaseModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import TextArea from 'antd/es/input/TextArea';
 import uploadApi from '~/api/service/uploadApi';
 import funcUtils from '~/utils/funcUtils';
 import articleApi from '~/api/admin/managementMovie/article';
-import moment from 'moment';
 import dayjs from 'dayjs';
 import { movieApi } from '~/api/admin';
-import articleMovieAPI from '~/api/admin/managementMovie/articleMovie';
+import moment from 'moment';
 
 const formItemLayout = {
     labelCol: { span: 4 },
@@ -45,9 +47,7 @@ const Article = () => {
     const [dataMovie, setDataMovie] = useState([]);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
-    const [valueArticleId, setValueArticleId] = useState(null);
-    console.log(valueArticleId);
-     const [dataArticleMovie, setDataArticleMovie] = useState([]);
+    const [statusValue, setStatusValue] = useState(true);
     const [valueSelectMovie, setValueSelectMovie] = useState([]);
 
     //phân trang
@@ -55,14 +55,14 @@ const Article = () => {
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
     const [pageSize, setPageSize] = useState(10); // Số mục trên mỗi trang
     const [workSomeThing, setWorkSomeThing] = useState(false);
-
+    console.log('value', posts);
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await articleApi.getByPage(currentPage, pageSize);
-                setPosts(res.data);
-                setTotalItems(res.totalItems);
+                const res = await articleApi.getPageArticle(currentPage, pageSize);
+                setPosts(res.data.listMovieObjResp);
+                setTotalItems(res.data.totalItems);
                 setLoading(false);
             } catch (error) {
                 console.log(error);
@@ -81,22 +81,7 @@ const Article = () => {
             }
         };
         getListMovie();
-        if(valueArticleId){
-             const getListMovie = async () => {
-            setLoading(true);
-            if(valueArticleId !== null){
-                 try {
-                     const res = await articleMovieAPI.getMovieByArticle(valueArticleId);
-                     setDataArticleMovie(res.data);
-                     setLoading(false);
-                 } catch (error) {
-                     console.log(error);
-                 }
-            }
-        };
-        getListMovie();
-        }
-    }, [currentPage, pageSize, valueArticleId, workSomeThing]);
+    }, [currentPage, pageSize, workSomeThing]);
 
     const columns = [
         {
@@ -104,11 +89,20 @@ const Article = () => {
             dataIndex: 'id',
             width: '6%',
             defaultSortOrder: 'sorting',
-            sorter: (a, b) => a.id - b.id,
+            render: (_, record) => (
+                <Space size="middle">
+                    <span>{record.article.id}</span>
+                </Space>
+            ),
         },
         {
             title: 'Tên',
             dataIndex: 'title',
+            render: (_, record) => (
+                <Space size="middle">
+                    <span>{record.article.title}</span>
+                </Space>
+            ),
         },
         {
             title: 'Ảnh',
@@ -120,7 +114,7 @@ const Article = () => {
                         height={80}
                         style={{ objectFit: 'contain' }}
                         alt="ảnh rỗng"
-                        src={`http://localhost:8081/api/upload/${record.banner}`}
+                        src={`http://localhost:8081/api/upload/${record.article.banner}`}
                     />
                 </Space>
             ),
@@ -129,15 +123,39 @@ const Article = () => {
             title: 'Ngày tạo',
             dataIndex: 'create_date',
             width: '10%',
-            render: (endTime) => {
-                return endTime ? moment(endTime).format('DD-MM-YYYY') : '';
-            },
+            render: (_, record) => (
+                <Space size="middle">
+                    <span>{moment(record.article.create_date).format('DD-MM-YYYY')}</span>
+                </Space>
+            ),
         },
         {
             title: 'Mô tả',
             dataIndex: 'content',
+            render: (_, record) => (
+                <Space size="middle">
+                    <span>{record.article.content}</span>
+                </Space>
+            ),
         },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            align: 'center',
+            width: '15%',
+            render: (_, record) => {
+                const statusText = record.article.status === true ? 'Hoạt động' : 'Kết thúc';
+                const tagColor = record.article.status === true ? '#9ADE7B' : '#C70039';
 
+                return <Tag color={tagColor}>{statusText}</Tag>;
+            },
+            onFilter: (value, record) => record.article.status === (value === 'true'),
+            filters: [
+                { text: 'Hoạt động', value: 'true' },
+                { text: 'Kết thúc', value: 'false' },
+            ],
+            filterMultiple: false,
+        },
         {
             title: 'Thao tác',
             width: '10%',
@@ -174,6 +192,9 @@ const Article = () => {
         setOpen(true);
         setResetForm(true);
         setFileList([]);
+        form.setFieldsValue({
+            status: true,
+        });
     };
 
     const handleDelete = async (record) => {
@@ -195,18 +216,20 @@ const Article = () => {
     };
 
     const handleEditData = (record) => {
-        const formattedEndTime = dayjs(record.create_date, 'YYYY-MM-DD HH:mm:ss');
+        const formattedEndTime = dayjs(record.article.create_date, 'YYYY-MM-DD HH:mm:ss');
         const newUploadFile = {
-            uid: record.id.toString(),
-            name: record.banner,
-            url: `http://localhost:8081/api/upload/${record.banner}`,
+            uid: record.article.id.toString(),
+            name: record.article.banner,
+            url: `http://localhost:8081/api/upload/${record.article.banner}`,
         };
         setFileList([newUploadFile]);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
+        setStatusValue(record.article.status);
         form.setFieldsValue({
-            ...record,
+            ...record.article,
+            status: record.article.status === true,
             create_date: formattedEndTime,
         });
     };
@@ -252,10 +275,10 @@ const Article = () => {
                                 title: values.title,
                                 create_date: values.create_date,
                                 content: values.content,
+                                status: values.status,
                                 banner: images,
                             },
                         };
-                        console.log('data nè', postData);
                         const resPost = await articleApi.create(postData);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm danh sách phim thành công', 'success');
@@ -340,7 +363,6 @@ const Article = () => {
         let movies = values.map((id) => {
             return dataMovie.find((o) => o.id === id);
         });
-        //  console.log('movies', movies);
         setValueSelectMovie(movies);
     };
 
@@ -393,6 +415,15 @@ const Article = () => {
                             >
                                 {fileList.length < 2 && '+ Tải lên'}
                             </Upload>
+                        </Form.Item>
+                        <Form.Item label="Trạng thái" name="status" {...formItemLayout}>
+                            <Switch
+                                checked={statusValue === true}
+                                onChange={(checked) => setStatusValue(checked ? true : false)}
+                                checkedChildren={'Đang hoạt động'}
+                                unCheckedChildren={'Kết Thúc '}
+                                defaultChecked
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -470,18 +501,65 @@ const Article = () => {
                 }}
                 dataSource={posts.map((post) => ({
                     ...post,
-                    key: post.id,
+                    key: post.article.id,
                 }))}
                 expandable={{
                     expandedRowRender: (record) => {
-                        // setValueArticleId(record.id);
-                        console.log(record);
                         return (
                             <div style={{ maxHeight: '400px', overflow: 'auto' }}>
                                 <Descriptions title="Danh sách phim"></Descriptions>
-                                {/* {dataArticleMovie?.map((value) => (
-                                    <>{value.article.id}</>
-                                ))} */}
+
+                                <Row>
+                                    {record.movies.map((value, index) => (
+                                        <Col lg={8} key={index}>
+                                            <Row>
+                                                <Col lg={6}>
+                                                    <img
+                                                        alt=""
+                                                        src={uploadApi.get(value.poster)}
+                                                        width="100%"
+                                                        height={150}
+                                                    />
+                                                </Col>
+                                                <Col lg={17} className="tw-ml-3">
+                                                    <div>
+                                                        <Tag color={value.mpaaRating.colorCode}>
+                                                            {value.mpaaRating.ratingCode}
+                                                        </Tag>
+                                                    </div>
+                                                    <div>
+                                                        <span className="tw-text-gray-400">Bộ phim:</span>{' '}
+                                                        <span className="tw-text-left tw-text-gray-950">
+                                                            {value.title}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="tw-text-gray-400">Thời lượng:</span>{' '}
+                                                        <span className="tw-text-left tw-text-gray-950">
+                                                            {value.duration}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="tw-text-gray-400">Quốc Gia:</span>{' '}
+                                                        <span className="tw-text-left tw-text-gray-950">
+                                                            {value.country}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <FontAwesomeIcon
+                                                            icon={faStar}
+                                                            className="tw-text-yellow-400 "
+                                                        />{' '}
+                                                        <span className="tw-text-left tw-text-gray-950 ">
+                                                            {value.rating}
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                                <Divider />
+                                            </Row>
+                                        </Col>
+                                    ))}
+                                </Row>
                             </div>
                         );
                     },

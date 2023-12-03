@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ticketez_backend_springboot.dto.ArticleDTO;
+import com.ticketez_backend_springboot.dto.ArticleMovieDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovie;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovieDAO;
@@ -159,6 +160,71 @@ public class ArticleAPI {
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Không thể xóa sự kiện do tài liệu tham khảo hiện có");
+        }
+    }
+
+    // @GetMapping("/get/article-movie")
+    // public ResponseEntity<?> getArticleMovie() {
+    // try {
+    // // Xử lý kết quả truy vấn và trả get ResponseEntity
+    // List<Article> articles = dao.getArticleMovie();
+    // ArticleMovieDTO articleMovieDTO = new ArticleMovieDTO();
+    // List<ArticleMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+    // for (Article article : articles) {
+    // ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new
+    // MovieObjResp();
+    // List<Movie> movieList = new ArrayList<>();
+    // for (ArticleMovie articleMovie : article.getArticleMovies()) {
+    // movieList.add(articleMovie.getMovie());
+    // }
+    // movieObjResp.setArticle(article);
+    // movieObjResp.setMovies(movieList);
+    // listMovieObjResp.add(movieObjResp);
+    // articleMovieDTO.setListMovieObjResp(listMovieObjResp);
+    // }
+
+    // return ResponseEntity.ok(articleMovieDTO);
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    // }
+    // }
+
+    @GetMapping("/get/article-movie")
+    public ResponseEntity<?> getArticleMovie(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Sort sort = Sort.by(Sort.Order.desc("id"));
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+            Page<Article> page = dao.getArticleMovie(pageable);
+
+            ArticleMovieDTO articleMovieDTO = new ArticleMovieDTO();
+            List<ArticleMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+
+            for (Article article : page.getContent()) {
+                ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new MovieObjResp();
+                List<Movie> movieList = new ArrayList<>();
+
+                for (ArticleMovie articleMovie : article.getArticleMovies()) {
+                    movieList.add(articleMovie.getMovie());
+                }
+
+                movieObjResp.setArticle(article);
+                movieObjResp.setMovies(movieList);
+                listMovieObjResp.add(movieObjResp);
+            }
+
+            articleMovieDTO.setListMovieObjResp(listMovieObjResp);
+            articleMovieDTO.setTotalItems(page.getTotalElements());
+            articleMovieDTO.setTotalPages(page.getTotalPages());
+
+            return ResponseEntity.ok(articleMovieDTO);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
