@@ -8,6 +8,7 @@ import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
 import { sassFalse } from 'sass';
+import img, { listIcon } from '~/assets/img';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -441,6 +442,21 @@ function SeatChart(props) {
         startDate.getDate() === currentDate.getDate() &&
         startDate.getMonth() === currentDate.getMonth() &&
         startDate.getFullYear() === currentDate.getFullYear();
+
+    const [isTableLoaded, setIsTableLoaded] = useState(false);
+
+    useEffect(() => {
+        // Simulate a delay (replace this with your actual data fetching logic)
+        const fetchData = async () => {
+            // Simulate data fetching delay
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            // Set isTableLoaded to true when data is fetched
+            setIsTableLoaded(true);
+        };
+
+        fetchData();
+    }, []);
     return (
         <>
             <Card className="card" style={{ display: 'flex' }}>
@@ -464,64 +480,74 @@ function SeatChart(props) {
                         </Row>
                     </Col>
                     <Col span={24}>
-                        <table className="grid">
-                            {showSeat && (
-                                <tbody>
-                                    {seatState.seatHeader.map((header, rowIndex) => (
-                                        <tr key={header}>
-                                            <td className="header-cell protected-element">{header}</td>
-                                            {seatState.seat[rowIndex].map((seat_no) => {
-                                                let width = 1;
-                                                const seatClassName =
-                                                    seatBookingData2.indexOf(seat_no) > -1
-                                                        ? '#404040'
-                                                        : seatBookingData.indexOf(seat_no) > -1
-                                                        ? '#404040'
-                                                        : seatState.seatReserved.indexOf(seat_no) > -1
-                                                        ? '#16A34A'
-                                                        : Object.keys(seatState)
-                                                              .map((key) => {
-                                                                  let color = null;
-                                                                  if (seatState[key].indexOf(seat_no) > -1) {
-                                                                      seatType.forEach((seat) => {
-                                                                          if (seat.nickName === key) {
-                                                                              color = seat.color;
-                                                                              if (seat.width >= 2) {
-                                                                                  width = seat.width;
+                        {isTableLoaded && (
+                            <table className="grid">
+                                {showSeat && (
+                                    <tbody>
+                                        {seatState.seatHeader.map((header, rowIndex) => (
+                                            <tr key={header}>
+                                                <td className="header-cell protected-element">{header}</td>
+                                                {seatState.seat[rowIndex].map((seat_no) => {
+                                                    let width = 1;
+                                                    const seatClassName =
+                                                        seatBookingData2.indexOf(seat_no) > -1
+                                                            ? '#404040'
+                                                            : seatBookingData.indexOf(seat_no) > -1
+                                                            ? '#404040'
+                                                            : seatState.seatReserved.indexOf(seat_no) > -1
+                                                            ? '#16A34A'
+                                                            : Object.keys(seatState)
+                                                                  .map((key) => {
+                                                                      let color = null;
+                                                                      if (seatState[key].indexOf(seat_no) > -1) {
+                                                                          seatType.forEach((seat) => {
+                                                                              if (seat.nickName === key) {
+                                                                                  color = seat.color;
+                                                                                  if (seat.width >= 2) {
+                                                                                      width = seat.width;
+                                                                                  }
                                                                               }
-                                                                          }
-                                                                      });
-                                                                  }
+                                                                          });
+                                                                      }
 
-                                                                  return color;
-                                                              })
-                                                              .filter(Boolean)
-                                                              .join(' ') || 'reserved';
+                                                                      return color;
+                                                                  })
+                                                                  .filter(Boolean)
+                                                                  .join(' ') || 'reserved';
 
-                                                const style = {
-                                                    backgroundColor: seatClassName,
-                                                    pointerEvents: seatClassName === '#404040' ? 'none' : 'auto',
-                                                    visibility: seatClassName === '#121B2B' ? 'hidden' : 'visible',
-                                                    textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
-                                                    transform: `scaleX(${width})`,
-                                                    transformOrigin: 'top left',
-                                                };
-                                                return (
-                                                    <td
-                                                        className={`protected-element`}
-                                                        style={style}
-                                                        key={seat_no}
-                                                        onClick={() => onClickData(seat_no)}
-                                                    >
-                                                        {seat_no}
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            )}
-                        </table>
+                                                    const style = {
+                                                        backgroundColor: seatClassName,
+                                                        pointerEvents: seatClassName === '#404040' ? 'none' : 'auto',
+                                                        visibility: seatClassName === '#121B2B' ? 'hidden' : 'visible',
+                                                        textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
+                                                        transform: `scaleX(${width})`,
+                                                        transformOrigin: 'top left',
+                                                    };
+                                                    return (
+                                                        <td
+                                                            className={`protected-element`}
+                                                            style={style}
+                                                            key={seat_no}
+                                                            onClick={() => onClickData(seat_no)}
+                                                        >
+                                                            {seat_no}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                )}
+                            </table>
+                        )}
+                        {!isTableLoaded && (
+                            <div
+                                className="tw-text-white tw-text-2xl"
+                                style={{  marginLeft: '60px' ,position:'relative',bottom:'60px' }}
+                            >
+                                <img src={img.loading} alt="Loading" />
+                            </div>
+                        )}
                     </Col>
                 </Row>
 
