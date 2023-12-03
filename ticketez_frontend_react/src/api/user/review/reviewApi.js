@@ -2,6 +2,7 @@ import { accountApi, movieApi } from '~/api/admin';
 import axiosClient from '../../global/axiosClient';
 const url = 'review'
 const urlMovie = 'movie'
+const urlAcc = 'account'
 
 const reviewApi = {
     getId: async (reviewId) => {
@@ -37,6 +38,10 @@ const reviewApi = {
     //lấy movie theo thể loại và đang chiếu
     getMovieByShowtimeShowingByGenres: async (genresId) => {
         return axiosClient.get(urlMovie + '/get/movie-by-showtime-showing-genres/' + genresId);
+    },
+    //check tài khoản
+    getcheckAccountBooking: async (accountId, movieId) => {
+        return axiosClient.get(url + `/get/check-account-booking?accountId=${accountId}&movieId=${movieId}`);
     }
 
 }

@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.modules.account.Account;
+import com.ticketez_backend_springboot.modules.account.AccountDAO;
+import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieDAO;
 
@@ -34,6 +38,8 @@ public class ReviewAPI {
     // public ResponseEntity<List<Review>> findAll() {
     // return ResponseEntity.ok(reviewDAO.findAll());
     // }
+    @Autowired
+    AccountDAO accountDAO;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
@@ -69,7 +75,7 @@ public class ReviewAPI {
     public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Review review) {
         try {
             if (!reviewDAO.existsById(id)) {
-                return new ResponseEntity<>("Rạp không tồn tại", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("không tồn tại", HttpStatus.NOT_FOUND);
             }
             reviewDAO.save(review);
             return ResponseEntity.ok(review);
@@ -82,7 +88,7 @@ public class ReviewAPI {
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             reviewDAO.deleteById(id);
-            return ResponseEntity.ok().body("Xoá rạp thành công");
+            return ResponseEntity.ok().body("Xoá bình luận thành công");
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
         }
@@ -93,6 +99,8 @@ public class ReviewAPI {
     public ResponseEntity<?> getReviewsByMovieId(@PathVariable("movieId") Long movieId) {
         try {
             Optional<Movie> optionalMovie = movieDAO.findById(movieId);
+            // Account account = accountDAO.findById("user6").get();
+            // System.out.println("+++++++++++++" + !account.getBookings().isEmpty());
 
             if (optionalMovie.isPresent()) {
                 List<Review> reviews = reviewDAO.findAllByMovieId(movieId);
@@ -102,6 +110,28 @@ public class ReviewAPI {
             return new ResponseEntity<>("Không tìm thấy phim có id " + movieId, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi để theo dõi tình trạng lỗi
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get/check-account-booking")
+    public ResponseEntity<?> getcheckAccountBooking(@RequestParam("accountId") String accountId,
+            @RequestParam("movieId") Long movieId) {
+        try {
+            Account optionalAccount = accountDAO.findById(accountId).get();
+            Movie optionalMovie = movieDAO.findById(movieId).get();
+
+            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
+
+            Boolean check = false;
+            if (!reviews.isEmpty()) {
+                check = true;
+                return ResponseEntity.ok(check);
+            }
+
+            return ResponseEntity.ok(check);
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
