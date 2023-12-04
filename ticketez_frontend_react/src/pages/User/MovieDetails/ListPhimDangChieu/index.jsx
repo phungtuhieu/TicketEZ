@@ -8,7 +8,7 @@ import { Button, Col, Divider, Row, Tag } from 'antd';
 import Slider from 'react-slick';
 import { useEffect, useState } from 'react';
 import funcUtils from '~/utils/funcUtils';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { movieApi } from '~/api/admin';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
 import uploadApi from '~/api/service/uploadApi';
@@ -54,7 +54,7 @@ function MovieDetailsListMovieRight() {
     const [dataMovieShowingByGenres, setDataMovieShowingByGenres] = useState(null);
     const [selectedButton, setSelectedButton] = useState(null);
     const { movieId } = useParams();
-    
+
     useEffect(() => {
         if (movieId) {
             const getList = async () => {
@@ -62,7 +62,7 @@ function MovieDetailsListMovieRight() {
                 try {
                     const res = await movieApi.getById(movieId);
                     setDataGenres(res.data.genres);
-                        setLoading(false);
+                    setLoading(false);
                 } catch (error) {
                     if (error.hasOwnProperty('response')) {
                         funcUtils.notify(error.response.data, 'error');
@@ -79,7 +79,7 @@ function MovieDetailsListMovieRight() {
                 try {
                     const res = await MovieShowingUserAPI.getMovieShowing();
                     setDataMovieShowingByGenres(res.listMovieObjResp);
-                        setLoading(false);
+                    setLoading(false);
                 } catch (error) {
                     if (error.hasOwnProperty('response')) {
                         funcUtils.notify(error.response.data, 'error');
@@ -95,7 +95,7 @@ function MovieDetailsListMovieRight() {
                 try {
                     const res = await reviewApi.getMovieByShowtimeShowingByGenres(selectedButton);
                     setDataMovieShowingByGenres(res.data.listMovieObjResp);
-                        setLoading(false);
+                    setLoading(false);
                 } catch (error) {
                     if (error.hasOwnProperty('response')) {
                         funcUtils.notify(error.response.data, 'error');
@@ -116,46 +116,50 @@ function MovieDetailsListMovieRight() {
         scroll.scrollTo(0);
     };
 
+    const location = useLocation();
+     const isMovieDetailsPage = location.pathname.startsWith('/movie-details/');
     return (
         <div className=" tw-text-black tw-font-[var(--font-family)] ">
             {/* <div>thể loại có thể bạn thích</div> */}
             <div>
-                <Slider
-                    {...settings}
-                    style={{
-                        maxWidth: '400px',
-                        display: 'flex',
-                        margin: '0 auto',
-                    }}
-                    className="tw-ml-[15px] tw-mt-[-22px]"
-                >
-                    <Button
-                        className={`tw-w-[100px] hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
-                            selectedButton === null
-                                ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
-                                : 'tw-bg-gray-200 tw-border-gray-200'
-                        }`}
-                        onClick={() => handleButtonClick(null)}
+                {isMovieDetailsPage && (
+                    <Slider
+                        {...settings}
+                        style={{
+                            maxWidth: '400px',
+                            display: 'flex',
+                            margin: '0 auto',
+                        }}
+                        className="tw-ml-[15px] tw-mt-[-22px]"
                     >
-                        Tất cả
-                    </Button>
-                    {dataGenres && dataGenres.length > 0
-                        ? dataGenres?.map((value) => (
-                              <div key={value.id} className=" tw-pr-[10px]">
-                                  <Button
-                                      className={` hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
-                                          selectedButton === value.id
-                                              ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
-                                              : 'tw-bg-gray-200 tw-border-gray-200'
-                                      }`}
-                                      onClick={() => handleButtonClick(value.id)}
-                                  >
-                                      <span className="tw-max-w-[100px] tw-line-clamp-1">{value.name}</span>
-                                  </Button>
-                              </div>
-                          ))
-                        : null}
-                </Slider>
+                        <Button
+                            className={`tw-w-[100px] hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
+                                selectedButton === null
+                                    ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
+                                    : 'tw-bg-gray-200 tw-border-gray-200'
+                            }`}
+                            onClick={() => handleButtonClick(null)}
+                        >
+                            Tất cả
+                        </Button>
+                        {dataGenres && dataGenres.length > 0
+                            ? dataGenres?.map((value) => (
+                                  <div key={value.id} className=" tw-pr-[10px]">
+                                      <Button
+                                          className={` hover:tw-bg-[var(--primary-background-color)] hover:tw-text-[var(--primany-text-background-color)] hover:tw-border-[var(--primary-background-color)] ${
+                                              selectedButton === value.id
+                                                  ? 'tw-bg-[var(--primary-background-color)] tw-text-white tw-border-[var(--primary-background-color)]'
+                                                  : 'tw-bg-gray-200 tw-border-gray-200'
+                                          }`}
+                                          onClick={() => handleButtonClick(value.id)}
+                                      >
+                                          <span className="tw-max-w-[100px] tw-line-clamp-1">{value.name}</span>
+                                      </Button>
+                                  </div>
+                              ))
+                            : null}
+                    </Slider>
+                )}
             </div>
             {loading && (
                 <div style={{ height: '100px' }}>

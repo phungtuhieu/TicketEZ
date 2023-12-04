@@ -1,6 +1,5 @@
 package com.ticketez_backend_springboot.auth.security.jwt;
 
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
       throws IOException, ServletException {
-    logger.error("loi loi: {}", authException.getMessage());
+    logger.error("Xay ra loi: {}", authException.getMessage());
 
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

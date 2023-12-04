@@ -64,25 +64,25 @@ const data = [
         title: 'Sự kiện',
     },
     {
-      url: '/account',
-      title: 'Quản lý người dùng',
-      
-  },
-  {
-    url: '/format',
-    title: 'Dạng phim',
-    
-},
-{
-    url: '/service',
-    title: 'dịch vụ',
-    
-},
-{
-    url: '/priceService',
-    title: 'Giá dịch vụ',
-    
-},
+        url: '/account',
+        title: 'Quản lý người dùng',
+    },
+    {
+        url: '/format',
+        title: 'Dạng phim',
+    },
+    {
+        url: '/service',
+        title: 'dịch vụ',
+    },
+    {
+        url: '/priceService',
+        title: 'Giá dịch vụ',
+    },
+    {
+        url: '/article',
+        title: 'Danh sách phim',
+    },
 ];
 
 const Bread = ({ path }) => {

@@ -22,7 +22,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
       address: address
     })
 
-  }, [])
+  }, [ latitude, longitude, address])
 
   console.log(popupInfo);
 
@@ -74,9 +74,11 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
   return (
     <Map
       onClick={handleMapClick}
+      latitude={popupInfo.latitude}
+      longitude={popupInfo.longitude}
       initialViewState={{
-        latitude: popupInfo.latitude,
-        longitude: popupInfo.longitude,
+        // latitude: popupInfo.latitude,
+        // longitude: popupInfo.longitude,
         zoom: 12,
       }}
       style={{

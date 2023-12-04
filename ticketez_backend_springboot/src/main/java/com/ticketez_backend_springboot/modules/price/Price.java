@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +32,10 @@ public class Price {
 	@JsonIgnore
 	@OneToMany(mappedBy = "price")
 	private List<PriceSeatType> priceSeatTypes;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "price")
+	private List<Showtime> showtimes;
 
 	@ManyToOne
 	@JoinColumn(name = "format_movie_id")

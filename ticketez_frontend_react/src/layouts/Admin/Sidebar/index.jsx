@@ -20,7 +20,6 @@ const items = [
     // Quản lý rạp phim
     getItem('Rạp', 'grCinema', <FontAwesomeIcon icon={solidIcons.faTv} />, [
         getItem(<Link to="/admin/cinema-complex">Cụm rạp</Link>, 'cinemaComplex'),
-        getItem(<Link to="/admin/cinema">Rạp</Link>, 'cinema'),
         getItem(<Link to="/admin/cinema-type">Loại rạp</Link>, 'cinemaType'),
         getItem(<Link to="/admin/cinema-chains">Chuỗi Rap</Link>, 'cinemaChains'),
     ]),
@@ -29,12 +28,14 @@ const items = [
     getItem('Phim', 'grMovie', <FontAwesomeIcon icon={solidIcons.faVideo} />, [
         getItem(<Link to="/admin/movie">Phim</Link>, 'moive'),
         getItem(<Link to="/admin/movie-studio">Hãng phim</Link>, 'moiveStudio'),
+        getItem(<Link to="/admin/movie-producer">Nhà sản xuất</Link>, 'movieProducer'),
         getItem(<Link to="/admin/price">Giá vé</Link>, 'price'),
         getItem(<Link to="/admin/showtime">Suất chiếu</Link>, 'showtime'),
         getItem(<Link to="/admin/actor">Diễn viên</Link>, 'actor', null),
         getItem(<Link to="/admin/director">Đạo diễn</Link>, 'director', null),
         getItem(<Link to="/admin/mpaaRating">Phân loại</Link>, 'mpaaRating'),
         getItem(<Link to="/admin/format">Dạng phim</Link>, 'format', null),
+        getItem(<Link to="/admin/article">Danh sách phim</Link>, 'article', null),
     ]),
 
     // Quản lý ghế

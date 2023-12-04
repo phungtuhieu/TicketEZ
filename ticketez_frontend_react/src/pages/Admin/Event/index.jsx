@@ -437,7 +437,6 @@ const AdminShowtime = () => {
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
-        console.log(form);
     };
     const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);

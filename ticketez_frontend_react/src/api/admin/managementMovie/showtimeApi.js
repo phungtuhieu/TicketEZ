@@ -1,5 +1,6 @@
 import axiosClient from '../../global/axiosClient';
 import cinemaApi from '../managementCinema/cinemaApi';
+import priceSeatApi from '../managementSeat/priceApi';
 import seatChartApi from '../managementSeat/seatChart';
 import formatMovieApi from './formatMovieApi';
 
@@ -26,30 +27,49 @@ const showtimeApi = {
     },
     //lấy dữ liệu của showtime theo endtime, movie, cinema, format
     getShowtimesByCCXAndMovieAndFormatAndEndtime(cinemaID, movieId, formatId, endTime) {
-        return axiosClient.get(url + '/get/showtime-by-endTime-movie-format-date/' + cinemaID + '/' + movieId + '/' + formatId + '/' + endTime);
+        return axiosClient.get(
+            url +
+                '/get/showtime-by-endTime-movie-format-date/' +
+                cinemaID +
+                '/' +
+                movieId +
+                '/' +
+                formatId +
+                '/' +
+                endTime,
+        );
     },
-    post: async (data, cinemaId, formatId, seatChartId) => {
-        const [cinema, formatMovie, seatChart] = await Promise.all([
+    post: async (data, cinemaId, formatId, seatChartId, priceId) => {
+        const [cinema, formatMovie, seatChart, price] = await Promise.all([
             cinemaApi.getId(cinemaId),
             formatMovieApi.getId(formatId),
             seatChartApi.getId(seatChartId),
+            priceSeatApi.getById(priceId),
         ]);
-        const values = { ...data, cinema: cinema.data, formatMovie: formatMovie.data, seatChart: seatChart.data };
+        const values = {
+            ...data,
+            cinema: cinema.data,
+            formatMovie: formatMovie.data,
+            seatChart: seatChart.data,
+            price: price.data,
+        };
         return axiosClient.post(url, values);
     },
-    put: async (id, data, cinemaId, formatId, seatChartId) => {
-           const [cinema, formatMovie, seatChart] = await Promise.all([
-               cinemaApi.getId(cinemaId),
-               formatMovieApi.getId(formatId),
-               seatChartApi.getId(seatChartId),
-           ]);
-           const values = {
-               id: id,
-               ...data,
-               cinema: cinema.data,
-               formatMovie: formatMovie.data,
-               seatChart: seatChart.data,
-           };
+    put: async (id, data, cinemaId, formatId, seatChartId, priceId) => {
+        const [cinema, formatMovie, seatChart, price] = await Promise.all([
+            cinemaApi.getId(cinemaId),
+            formatMovieApi.getId(formatId),
+            seatChartApi.getId(seatChartId),
+            priceSeatApi.getById(priceId),
+        ]);
+        const values = {
+            id: id,
+            ...data,
+            cinema: cinema.data,
+            formatMovie: formatMovie.data,
+            seatChart: seatChart.data,
+            price: price.data,
+        };
         return axiosClient.put(url + '/' + id, values);
     },
     delete: async (actorId) => {

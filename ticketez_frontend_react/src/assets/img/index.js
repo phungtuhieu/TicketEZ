@@ -22,12 +22,12 @@ import veMayBay from '../icon/f-ve-may-bay.svg';
 import veKhachSan from '../icon/f-khach-san.svg';
 import viNhanAi from '../icon/f-vi-nhan-ai.webp';
 import vayNhanh from '../icon/f-vay-nhanh.webp';
-
+import bgTopPhim from '../img/bgTopPhim.webp';
 import faceBook from '../icon/f-facebook.svg';
 import linkedIn from '../icon/f-linkedIn.svg';
 import youtube from '../icon/f-youtube.svg';
 import daDangKy from '../icon/f-da-dang-ky.webp';
-
+import loading from '../img/loading2.gif';
 import icon1 from '../icon/icon1.png';
 import icon2 from '../icon/icon2.png';
 import icon3 from '../icon/icon3.png';
@@ -63,13 +63,14 @@ const img = {
     tagDatTruoc,
     anhReview,
     logoLogin1,
-    //
+   loading,
     notFoundLogo,
     gifLoading,
     event,
     logoComment,
     logoHome,
     logoAdmin,
+    bgTopPhim
 };
 
 export default img;

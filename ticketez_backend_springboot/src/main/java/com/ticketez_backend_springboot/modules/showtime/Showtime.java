@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
+import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
 
 import jakarta.persistence.Column;
@@ -38,7 +39,7 @@ public class Showtime {
 	@Column(name = "end_time")
 	private Date endTime;
 
-	private Integer status;
+	// private Integer status;
 
 	@ManyToOne
 	@JoinColumn(name = "format_movie_id")
@@ -55,5 +56,9 @@ public class Showtime {
 	@ManyToOne
 	@JoinColumn(name = "seat_chart_id")
 	private SeatChart seatChart;
+
+	@ManyToOne
+	@JoinColumn(name = "price_id")
+	private Price price;
 
 }

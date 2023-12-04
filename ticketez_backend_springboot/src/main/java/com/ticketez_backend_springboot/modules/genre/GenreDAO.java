@@ -12,11 +12,11 @@ import org.springframework.stereotype.Repository;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @Repository
-public interface GenreDAO extends JpaRepository<Genre, Long>{
+public interface GenreDAO extends JpaRepository<Genre, Long> {
     @Query("SELECT o FROM Genre o WHERE o.name LIKE CONCAT('%', :keyword, '%') ")
     Page<Genre> findByKeyword(@Param("keyword") String search, Pageable pageable);
 
     @Query("SELECT g FROM Genre g JOIN g.genresMovies gm JOIN gm.movie m WHERE m = :movie")
     List<Genre> getGenreByMovie(@Param("movie") Movie movie);
-    
+
 }

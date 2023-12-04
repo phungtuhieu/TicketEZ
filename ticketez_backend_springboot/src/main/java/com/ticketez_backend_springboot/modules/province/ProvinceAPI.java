@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.CinemaComplexToProvinceDTO;
-import com.ticketez_backend_springboot.dto.CinemaToCinemaComplexDTO;
 
 @CrossOrigin("*")
 @RestController
@@ -59,16 +58,16 @@ public class ProvinceAPI {
         provinceDao.deleteById(id);
         return ResponseEntity.ok(true);
     }
-    // 
+
+    //
     @GetMapping("/get/province-by-name")
-    public ResponseEntity<List<Province>> findAllByNameLike( @RequestParam("name") Optional<String> name) {
+    public ResponseEntity<List<Province>> findAllByNameLike(@RequestParam("name") Optional<String> name) {
 
         return ResponseEntity.ok(provinceDao.findAllByNameLike(name.orElse("")));
 
     }
 
-
-    //hiển thị tổng  cinemacomplex theo province
+    // hiển thị tổng cinemacomplex theo province
     @GetMapping("/getTotalCinemaComplexToPrivince")
     public ResponseEntity<?> getTotalCinemaComplexToPrivince() {
         List<CinemaComplexToProvinceDTO> distinctMovieIds = provinceDao.getTotalCinemaComplexToPrivince();

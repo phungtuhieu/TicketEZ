@@ -44,25 +44,25 @@ const AdminPrice = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //call api
-    useEffect(() => {
-        const getList = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosClient.get(`price/price-price-seat-type-dto`);
-                console.log(res);
+    const getList = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosClient.get(`price/price-price-seat-type-dto`);
+            console.log(res);
 
-                const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
+            const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
 
-                setPosts(filteredPosts);
-                setLoading(false);
-            } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
-                } else {
-                    console.log(error);
-                }
+            setPosts(filteredPosts);
+            setLoading(false);
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
             }
-        };
+        }
+    };
+    useEffect(() => {
         getList();
     }, [workSomeThing]);
 
@@ -74,7 +74,7 @@ const AdminPrice = () => {
             sorter: (a, b) => a.id - b.id,
         },
         {
-            title: 'Ngày bắt đầu và kết thúc',
+            title: 'Ngày áp dụng',
             render: (_, record) =>
                 new Date(record.price.startDate).toLocaleDateString() +
                 ' - ' +
@@ -83,7 +83,7 @@ const AdminPrice = () => {
 
         {
             title: 'Tên phim',
-            render: (_, record) => record.price.movie.title,
+            render: (_, record) => record.price.formatMovie.movie.title,
         },
         {
             title: 'Cụm rạp và chuỗi rạp',
@@ -92,9 +92,9 @@ const AdminPrice = () => {
         },
 
         {
-            title: 'Giá ghế đầu tuần và cuối tuần',
+            title: 'Gồm các loại ghế',
             render: (_, record) =>
-                `${record.price.cinemaComplex.name} - ${record.price.cinemaComplex.cinemaChain.name}`,
+                `${record.newPriceSeatTypeDTOs.map((moment, index) => moment.seatType.name).join(',' + '\n')}`,
         },
 
         {
@@ -125,6 +125,7 @@ const AdminPrice = () => {
 
     const showModal = () => {
         setEditData(null);
+        setYourSelectedValue(null);
         setIsModalOpen(true);
     };
 
@@ -153,6 +154,7 @@ const AdminPrice = () => {
         setLoading(true);
     };
     const handleCancel = () => {
+        getList();
         setIsModalOpen(false);
     };
 
@@ -172,7 +174,7 @@ const AdminPrice = () => {
                     open={isModalOpen}
                     onOk={handleOk}
                     onCancel={handleCancel}
-                    width={500}
+                    width={700}
                     destroyOnClose={true}
                     footer={null}
                 >

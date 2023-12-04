@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PaymentInfoDAO extends JpaRepository<PaymentInfo, String> {
-
+    PaymentInfo findByBookingId(String bookingId);
 }

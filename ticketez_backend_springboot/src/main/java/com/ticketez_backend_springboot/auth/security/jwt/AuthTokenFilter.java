@@ -19,14 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ticketez_backend_springboot.auth.security.services.UserDetailsServiceImpl;
 
-
-
-
-
-
-
-
-
 public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired
   private JwtUtils jwtUtils;
@@ -45,17 +37,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception e) {
-      logger.error("Không thể đặt xác thực người dùng: ", e);
+      logger.error("Khong the dat xac thuc nguoi dung: ", e);
     }
 
     filterChain.doFilter(request, response);

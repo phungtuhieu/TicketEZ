@@ -7,6 +7,7 @@ import {
     Carousel,
     Col,
     DatePicker,
+    Flex,
     Form,
     Image,
     Input,
@@ -15,6 +16,8 @@ import {
     Row,
     Select,
     Space,
+    Table,
+    Tabs,
     Tag,
     TimePicker,
     Upload,
@@ -30,16 +33,16 @@ import axiosClient from '~/api/global/axiosClient';
 import Highlighter from 'react-highlight-words';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import PaginationCustom from '~/components/Admin/PaginationCustom';
-import { actorApi, directorApi, formatApi, movieApi, movieStudioApi } from '~/api/admin';
+import { actorApi, directorApi, formatApi, movieApi, studioApi, producerApi } from '~/api/admin';
 import '~/scss/_global.scss';
 import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import httpStatus from '~/api/global/httpStatus';
-import movieProducerApi from '~/api/admin/managementMovie/movieProducerApi';
 import mpaaRatingApi from '~/api/admin/managementMovie/mpaaRating';
 import funcUtils from '~/utils/funcUtils';
 import genreApi from '~/api/admin/managementMovie/genreApi';
-import { useSearchSelectEffect } from '~/hooks';
+import { useSearchEffect, useSearchSelectEffect } from '~/hooks';
+import Search from 'antd/es/input/Search';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -49,6 +52,7 @@ const getBase64 = (file) =>
         reader.onload = () => resolve(reader.result);
         reader.onerror = (error) => reject(error);
     });
+
 function AdminMovie() {
     const formatDate = 'DD-MM-YYYY';
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -57,9 +61,9 @@ function AdminMovie() {
     const [fileList, setFileList] = useState([]);
     const [fileListBanner, setFileListBanner] = useState([]);
     const [list, setList] = useState([]);
-    const [movieStudios, setMovieStudios] = useState([]);
+    const [studioOptions, setStudioOptions] = useState([]);
     const [formatOptions, setFormatOptions] = useState([]);
-    const [movieProducers, setMovieProducers] = useState([]);
+    const [producerOptions, setProducerOtions] = useState([]);
     const [directorOptions, setDirectorOptions] = useState([]);
     const [genreOptions, setGenreOptions] = useState([]);
     const [actorOptions, setActorOptions] = useState([]);
@@ -70,34 +74,53 @@ function AdminMovie() {
         searchFormat: '',
         searchActor: '',
         searchDirector: '',
+        searchMovie: '',
     });
     const [initialOptions, setInitialOptions] = useState({
-        movieStudios: [],
+        studios: [],
         genres: [],
-        movieProducers: [],
+        producers: [],
         formats: [],
         actors: [],
         directors: [],
     });
     const [listMPAA, setListMPAA] = useState([]);
     const [form] = Form.useForm();
+    const [formGenre] = Form.useForm();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpenGenre, setIsModalOpenGenre] = useState(false);
     const [dataEdit, setDataEdit] = useState(null);
-    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const [pageSize, setPageSize] = useState(10);
+    const [totalItems, setTotalItems] = useState({
+        movie: 0,
+        genre: 0,
+    }); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState({
+        movie: 1,
+        genre: 1,
+    }); // Trang hiện tại
+    const [pageSize, setPageSize] = useState({
+        movie: 10,
+        genre: 10,
+    });
+
     const [selectDataTemp, setSelectDataTemp] = useState({
         actors: [],
         directors: [],
     });
-    const [workSomething, setworkSomething] = useState(10);
-    const [loadingButton, setLoadingButton] = useState(false);
+    const [workSomething, setWorkSomething] = useState({
+        movie: false,
+        genre: false,
+    });
+    const [loadingButton, setLoadingButton] = useState({
+        movie: false,
+        genre: false,
+    });
     const [selectedValue, setSelectedValue] = useState({
-        movieStudio: {},
-        movieProducer: {},
+        studios: [],
+        producers: [],
         mpaaRating: {},
         genres: [],
         actors: [],
@@ -105,20 +128,293 @@ function AdminMovie() {
         directors: [],
     });
     const [loadingStates, setLoadingStates] = useState({
-        movieStudio: false,
+        studio: false,
         genre: false,
-        movieProducer: false,
+        producer: false,
         format: false,
         actor: false,
         director: false,
     });
     const [isSearch, setIsSearch] = useState(false);
-
+    const [isSearchingTable, setIsSearchingTable] = useState({
+        movie: false,
+        genre: false,
+    });
+    const [listDataGenre, setListDataGenre] = useState([]);
+    const [genreDataEdit, setGenreDataEdit] = useState(null);
+    const [activeKeyGenre, setActiveKeyGenre] = useState(2);
     const formItemLayout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 20 },
     };
+    const onChangeTabGenre = (key) => {
+        setActiveKeyGenre(key);
+        handleResetFormGenre();
+    };
+    const handleResetFormGenre = () => {
+        formGenre.resetFields();
+        setGenreDataEdit(null);
+    };
+    const handleOkGenre = async () => {
+        setLoadingButton((prev) => ({ ...prev, genre: true }));
 
+        const values = await formGenre.getFieldsValue();
+        if (genreDataEdit == null) {
+            // Thêm Genre
+            console.log('[handleOkGenre] values genre: ', values);
+            try {
+                const resp = await genreApi.create(values);
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                handleResetFormGenre();
+
+                if (resp.status === httpStatus.OK) {
+                    funcUtils.notify('Đã thêm thể loại thành công', 'success');
+                }
+                handleResetFormGenre();
+                setActiveKeyGenre(2);
+            } catch (error) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('Lỗi không thêm được thể loại', 'error');
+                    console.log(error);
+                }
+            }
+        } else {
+            //Cập nhật Gerne
+
+            try {
+                console.log('genreDataEdit', genreDataEdit.id);
+                const dataUpdate = {
+                    ...values,
+                    id: genreDataEdit.id,
+                };
+                const resp = await genreApi.update(genreDataEdit.id, dataUpdate);
+                if (resp.status === httpStatus.OK) {
+                    funcUtils.notify('Đã cập nhật thể loại thành công', 'success');
+                }
+            } catch (error) {
+                setGenreDataEdit(null);
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('Lỗi không cập nhật được thể loại', 'error');
+                    console.log(error);
+                }
+            }
+        }
+        setWorkSomething((prev) => ({ ...prev, genre: !workSomething.genre }));
+        setLoadingButton((prev) => ({ ...prev, genre: false }));
+    };
+    // load data Genre
+    useEffect(() => {
+        const loadDataGenre = async () => {
+            try {
+                const resp = await genreApi.getByPage(currentPage.genre, pageSize.genre);
+                console.log('genre', resp);
+                setListDataGenre(resp.data);
+                setTotalItems((...prev) => ({ ...prev, genre: resp.data.totalItems }));
+            } catch (error) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    funcUtils.notify('errorLoadDateGenre', 'error');
+                    console.log(error);
+                }
+            }
+        };
+
+        if (isModalOpenGenre) {
+            loadDataGenre();
+        }
+    }, [isModalOpenGenre, workSomething.genre, currentPage.genre, pageSize.genre]);
+    const handleEditDataGenre = async (record) => {
+        try {
+            const resp = await genreApi.getById(record.id);
+            // console.log('genre data: ', resp.data);
+            const data = resp.data;
+            setGenreDataEdit(data);
+            setActiveKeyGenre(1);
+            formGenre.setFieldsValue(data);
+        } catch (error) {}
+    };
+    const handleDeleteGenre = async (id) => {
+        try {
+            const resp = await genreApi.delete(id);
+            if (resp.status === 200) {
+                setLoadingButton((prev) => ({ ...prev, genre: false }));
+                funcUtils.notify('Đã xoá thể loại thành công', 'success');
+                setWorkSomething((prev) => ({ ...prev, genre: !workSomething.genre }));
+            }
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                funcUtils.notify(error.response.data, 'error');
+            } else {
+                funcUtils.notify('Xảy ra lỗi, không thể xoá', 'error');
+                console.log(error);
+            }
+            setLoadingButton((prev) => ({ ...prev, genre: false }));
+        }
+    };
+    const columnsGenre = [
+        {
+            title: 'Tên thể loại',
+            dataIndex: 'name',
+            key: 'name',
+            width: '30%',
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            key: 'description',
+            width: '50%',
+        },
+        {
+            title: 'Thao tác',
+            dataIndex: 'id',
+            key: 'id',
+            align: 'right',
+            render: (_, record) => (
+                <Space size="middle" className="tw-flex  tw-justify-end">
+                    <FontAwesomeIcon
+                        icon={solidIcons.faPen}
+                        onClick={() => handleEditDataGenre(record)}
+                        className={cx('icon-pen')}
+                    />
+                    <Popconfirm
+                        title="Bạn có chắc"
+                        description="Muốn xoá hay không?"
+                        okText="Yes"
+                        onConfirm={() => handleDeleteGenre(record.id)}
+                        cancelText="No"
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faTrash} className={cx('icon-trash')} />
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+    const handlePageGenreChange = (page, pageSize) => {
+        setCurrentPage((prev) => ({ ...prev, genre: page }));
+        setPageSize((prev) => ({ ...prev, genre: pageSize }));
+    };
+    const handleCancelModalGenre = async () => {
+        setIsModalOpenGenre(false);
+        handleResetFormGenre();
+        setActiveKeyGenre(2);
+    };
+    const tailLayout = {
+        wrapperCol: {
+            offset: 6,
+            span: 16,
+        },
+    };
+    const itemTabPanes = [
+        {
+            key: 1,
+            label: 'Form',
+            children: (
+                <Form
+                    form={formGenre}
+                    name="basic"
+                    {...formItemLayout}
+                    style={{
+                        maxWidth: 600,
+                    }}
+                    // onFinish={onFinish}
+                    // onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                        label="Tên thể loại"
+                        name="name"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Vui lòng nhập tên thể loại!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Nhập tên thể loại vào đây" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mô tả"
+                        name="description"
+                        rules={[
+                            {
+                                required: false,
+                            },
+                        ]}
+                    >
+                        <Input.TextArea
+                            style={{ fontSize: 14 }}
+                            autoSize={{ minRows: 4, maxRows: 6 }}
+                            placeholder="Nhập mô tả thể loại ở đây"
+                        />
+                    </Form.Item>
+                    <Form.Item {...tailLayout}>
+                        {!genreDataEdit && (
+                            <Button key="reset" onClick={handleResetFormGenre}>
+                                Làm mới
+                            </Button>
+                        )}
+                        <Button
+                            style={{
+                                margin: '0 8px',
+                            }}
+                            key="submit"
+                            type="primary"
+                            loading={loadingButton.genre}
+                            onClick={handleOkGenre}
+                        >
+                            {genreDataEdit ? 'Cập nhật' : 'Thêm'}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            ),
+        },
+        {
+            key: 2,
+            label: 'Danh sách',
+            children: (
+                <>
+                    <Search
+                        placeholder="Nhập tên thể loại vào đây..."
+                        allowClear
+                        // enterButton={false}
+                        onChange={(e) => onSearchGenre(e.target.value)}
+                        style={{
+                            width: 250,
+                            marginBottom: 10,
+                        }}
+                    />
+                    <Table
+                        pagination={false}
+                        columns={columnsGenre}
+                        dataSource={listDataGenre.map((item) => ({
+                            ...item,
+                            key: item.id,
+                        }))}
+                        scroll={{ x: true, y: 350 }}
+                    ></Table>
+                    <PaginationCustom
+                        current={currentPage.genre}
+                        pageSize={pageSize.genre}
+                        total={totalItems.genre}
+                        onChange={handlePageGenreChange}
+                    />
+                </>
+            ),
+        },
+        // {
+        //     key: '3',
+        //     label: 'Tab 3',
+        //     children: 'Content of Tab Pane 3',
+        // },
+    ];
     // Xem hình ảnh
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -131,24 +427,30 @@ function AdminMovie() {
     const showModal = () => {
         setIsModalOpen(true);
     };
+    const showModalGenre = () => {
+        setIsModalOpenGenre(true);
+    };
+
     const handleOk = async () => {
-        // setLoadingButton(true);
+        // setLoadingButton((prev) => ({...prev,movie: true}) );
         try {
             const values = await form.getFieldsValue();
-            console.log(values, 'values');
-            const { genres, formats, directors, actors, poster, ...movieData } = values;
-            console.log('movieData', movieData);
+            // console.log(values, 'values');
+            const { genres, formats, directors, actors, poster, producers, studios, ...movieData } = values;
+            // console.log('movieData', movieData);
             // return;
             if (fileList.length > 0 && fileListBanner.length > 0) {
                 if (!dataEdit) {
                     try {
                         let imageName = await uploadApi.post(values.poster.fileList[0].originFileObj);
-                        console.log(imageName);
+                        // console.log(imageName);
                         let bannerName = await uploadApi.post(values.banner.fileList[0].originFileObj);
-                        console.log(bannerName);
+                        // console.log(bannerName);
                         let dataCreate = {
                             genres: selectedValue.genres,
                             formats: selectedValue.formats,
+                            producers: selectedValue.producers,
+                            studios: selectedValue.studios,
                             directors: selectedValue.directors,
                             actors: selectedValue.actors,
                             movie: {
@@ -156,8 +458,8 @@ function AdminMovie() {
                                 releaseDate: movieData.releaseDate.format('YYYY-MM-DD'),
                                 duration: movieData.duration.format('HH:mm:ss'),
                                 rating: 0.0,
-                                movieStudio: selectedValue.movieStudio,
-                                movieProducer: selectedValue.movieProducer,
+                                // movieStudio: selectedValue.movieStudio,
+                                // movieProducer: selectedValue.movieProducer,
                                 mpaaRating: selectedValue.mpaaRating,
                                 poster: imageName,
                                 banner: bannerName,
@@ -165,15 +467,15 @@ function AdminMovie() {
                         };
                         console.log('dataCreate', dataCreate);
                         const resp = await movieApi.create(dataCreate);
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         handleResetForm();
-                        setworkSomething(!workSomething);
+                        setWorkSomething((prev) => ({ ...prev, movie: !workSomething.movie }));
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Đã thêm phim thành công', 'success');
                         }
                         setIsModalOpen(false);
                     } catch (error) {
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         if (error.hasOwnProperty('response')) {
                             funcUtils.notify(error.response.data, 'error');
                         } else {
@@ -182,7 +484,7 @@ function AdminMovie() {
                         }
                     }
                 } else {
-                    console.log('Cập nhật', dataEdit);
+                    // console.log('Cập nhật', dataEdit);
                     try {
                         let imageName = null;
                         let bannerName = null;
@@ -193,11 +495,13 @@ function AdminMovie() {
                         if (fileListBanner[0].hasOwnProperty('originFileObj')) {
                             bannerName = await uploadApi.put(dataEdit.banner, fileListBanner[0].originFileObj);
                         }
-                        console.log('dataEdit.banner', dataEdit.banner);
-
+                        // console.log('dataEdit.banner', dataEdit.banner);
+                        // console.log('selectedValue.producers', selectedValue.producers);
                         let dataUpdate = {
                             genres: selectedValue.genres,
                             formats: selectedValue.formats,
+                            producers: selectedValue.producers,
+                            studios: selectedValue.studios,
                             directors: (function () {
                                 if (selectDataTemp.directors.length > 0) {
                                     const selects = selectedValue.directors.reduce((total, item) => {
@@ -231,28 +535,26 @@ function AdminMovie() {
                                 releaseDate: movieData.releaseDate.format('YYYY-MM-DD'),
                                 duration: movieData.duration.format('HH:mm:ss'),
                                 rating: 0.0,
-                                movieStudio: selectedValue.movieStudio,
-                                movieProducer: selectedValue.movieProducer,
                                 mpaaRating: selectedValue.mpaaRating,
                                 poster: imageName != null ? imageName : values.poster,
                                 banner: bannerName != null ? bannerName : values.banner,
                                 id: dataEdit.id,
                             },
                         };
-                        console.log('movieData', movieData);
-                        console.log('dataUpdate', dataUpdate);
+                        // console.log('movieData', movieData);
+                        // console.log('dataUpdate', dataUpdate);
                         // if (typesNoneSelect.length <= 0) {
                         const resp = await movieApi.update(dataEdit.id, dataUpdate);
                         setList(list.map((item) => (item.id === dataEdit.id ? resp.data : item)));
-                        setworkSomething(!workSomething);
+                        setWorkSomething((prev) => ({ ...prev, movie: !workSomething.movie }));
                         if (resp.status === httpStatus.OK) {
                             funcUtils.notify('Cập nhật phim thành công', 'success');
                         }
                         form.setFieldValue(resp.data);
                         // }
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                     } catch (error) {
-                        setLoadingButton(false);
+                        setLoadingButton((prev) => ({ ...prev, movie: false }));
                         if (error.hasOwnProperty('response')) {
                             funcUtils.notify(error.response.data, 'error');
                         } else {
@@ -264,15 +566,16 @@ function AdminMovie() {
                 }
             } else {
                 funcUtils.notify('Vui lòng chọn ảnh', 'error');
-                setLoadingButton(false);
+                setLoadingButton((prev) => ({ ...prev, movie: false }));
             }
         } catch (error) {
             console.log(error);
-            setLoadingButton(false);
+            setLoadingButton((prev) => ({ ...prev, movie: false }));
         }
     };
     const handleResetForm = () => {
         setFileList([]);
+        setFileListBanner([]);
         form.resetFields();
     };
     const handleCancelModal = async () => {
@@ -286,7 +589,7 @@ function AdminMovie() {
     const handleEditData = async (record) => {
         try {
             const movieResp = await movieApi.getById(record.id);
-            const { actors, directors, formats, genres, ...movieData } = movieResp.data;
+            const { actors, directors, formats, genres, producers, studios, ...movieData } = movieResp.data;
             const movie = movieData.movie;
 
             setFileList([
@@ -309,6 +612,7 @@ function AdminMovie() {
                 }
                 return totals;
             }, []);
+
             if (actsOpNotExist) {
                 setActorOptions((prev) => [...prev, ...actsOpNotExist]);
             }
@@ -325,14 +629,16 @@ function AdminMovie() {
             const genreIds = genres.map((o) => o.id);
             const directorIds = directors.map((o) => o.id);
             const actorIds = actors.map((o) => o.id);
+            const producerIds = producers.map((o) => o.id);
+            const studioIds = studios.map((o) => o.id);
             await Promise.all([
                 handleSelectOption(actorIds, 'actor'),
                 handleSelectOption(formatIds, 'format'),
                 handleSelectOption(genreIds, 'genre'),
                 handleSelectOption(directorIds, 'director'),
+                handleSelectOption(producerIds, 'producer'),
+                handleSelectOption(studioIds, 'studio'),
                 handleSelectOption(movie.mpaaRating.id, 'mpaa'),
-                handleSelectOption(movie.movieProducer.id, 'movie-producer'),
-                handleSelectOption(movie.movieStudio.id, 'movie-studio'),
             ]);
 
             setPreviewTitle(`Poster của phim ${record.title}`);
@@ -349,10 +655,12 @@ function AdminMovie() {
                 formats: formatIds,
                 directors: directorIds,
                 actors: actorIds,
-                movieProducer: movie.movieProducer.id,
-                movieStudio: movie.movieStudio.id,
+                producers: producerIds,
+                studios: studioIds,
+                // movieProducer: movie.movieProducer.id,
+                // movieStudio: movie.movieStudio.id,
                 mpaaRating: movie.mpaaRating.id,
-                releaseDate: dayjs(record.releaseDate, 'DD-MM-YYYY'),
+                releaseDate: dayjs(record.releaseDate, 'YYYY-MM-DD'),
                 duration: dayjs(movie.duration, 'HH:mm:ss'),
             });
         } catch (error) {
@@ -366,13 +674,13 @@ function AdminMovie() {
         setSearchedColumn(dataIndex);
     };
     const handleDelete = async (id) => {
-        setLoadingButton(true);
+        setLoadingButton((prev) => ({ ...prev, movie: true }));
         try {
-            const resp = await axiosClient.delete(`movie/${id}`);
+            const resp = await movieApi.delete(id);
             if (resp.status === 200) {
-                setLoadingButton(false);
+                setLoadingButton((prev) => ({ ...prev, movie: false }));
                 funcUtils.notify('Đã xoá phim thành công', 'success');
-                setworkSomething(!workSomething);
+                setWorkSomething(!workSomething.movie);
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
@@ -381,7 +689,7 @@ function AdminMovie() {
                 funcUtils.notify('Xảy ra lỗi, không thể xoá', 'error');
                 console.log(error);
             }
-            setLoadingButton(false);
+            setLoadingButton((prev) => ({ ...prev, movie: false }));
         }
     };
 
@@ -391,54 +699,46 @@ function AdminMovie() {
         const pageSizeDefault = 20;
         const fetchData = async () => {
             try {
-                const [
-                    movieResp,
-                    movieStudioResp,
-                    movieProducerResp,
-                    mpaaResp,
-                    genreResp,
-                    formatResp,
-                    actorResp,
-                    directorResp,
-                ] = await Promise.all([
-                    movieApi.getByPage(currentPage, pageSize),
-                    movieStudioApi.getAll(),
-                    movieProducerApi.getAll(),
-                    mpaaRatingApi.getAll(),
-                    genreApi.getAll(),
-                    formatApi.getAll(),
-                    actorApi.getByPage(pageNoDefault, pageSizeDefault),
-                    directorApi.getByPage(pageNoDefault, pageSizeDefault),
-                ]);
-                console.log(genreResp.data);
-                const movieStudioOptions = movieStudioResp.data;
+                const [movieResp, studioResp, producerResp, mpaaResp, genreResp, formatResp, actorResp, directorResp] =
+                    await Promise.all([
+                        movieApi.getByPage(currentPage.movie, pageSize.movie),
+                        studioApi.getAll(),
+                        producerApi.getAll(),
+                        mpaaRatingApi.getAll(),
+                        genreApi.getAll(),
+                        formatApi.getAll(),
+                        actorApi.getByPage(pageNoDefault, pageSizeDefault),
+                        directorApi.getByPage(pageNoDefault, pageSizeDefault),
+                    ]);
+                // console.log(genreResp.data);
+                const studioData = studioResp.data;
                 const genreData = genreResp.data;
-                const movieProducerData = movieProducerResp.data;
+                const producerData = producerResp.data;
                 const formatData = formatResp.data;
                 const actorData = actorResp.data;
                 const directorData = directorResp.data;
 
-                setInitialOptions((prev) => ({ ...prev, movieStudios: movieStudioOptions }));
+                setInitialOptions((prev) => ({ ...prev, studios: studioData }));
                 setInitialOptions((prev) => ({ ...prev, formats: formatData }));
                 setInitialOptions((prev) => ({ ...prev, genres: genreData }));
-                setInitialOptions((prev) => ({ ...prev, movieProducers: movieProducerData }));
+                setInitialOptions((prev) => ({ ...prev, producers: producerData }));
                 setInitialOptions((prev) => ({ ...prev, actors: actorData }));
                 setInitialOptions((prev) => ({ ...prev, directors: directorData }));
 
                 setGenreOptions(genreData);
-                setMovieStudios(movieStudioOptions);
+                setStudioOptions(studioData);
                 setDirectorOptions(directorData);
-                setMovieProducers(movieProducerData);
+                setProducerOtions(producerData);
                 setFormatOptions(formatData);
                 setActorOptions(actorData);
                 setListMPAA(mpaaResp.data);
 
                 const dataFormat = movieResp.data.map((item) => ({
                     ...item,
-                    releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
+                    // releaseDate: moment(item.releaseDate, 'YYYY-MM-DD').format(formatDate),
                 }));
                 setList(dataFormat);
-                setTotalItems(movieResp.totalItems);
+                setTotalItems((prev) => ({ ...prev, movie: movieResp.totalItems }));
             } catch (error) {
                 if (error.hasOwnProperty('response')) {
                     message.error(error.response.data);
@@ -448,8 +748,9 @@ function AdminMovie() {
             }
         };
         fetchData();
-    }, [currentPage, pageSize, workSomething]);
-
+    }, [currentPage.movie, pageSize.movie, workSomething.movie]);
+    useSearchEffect(searchValue.searchMovie, movieApi, setList, isSearchingTable.movie);
+    useSearchEffect(searchValue.searchGenre, genreApi, setListDataGenre, isSearchingTable.genre);
     useSearchSelectEffect(
         searchValue.searchActor,
         actorApi,
@@ -629,10 +930,7 @@ function AdminMovie() {
             title: 'Ngày phát hành',
             dataIndex: 'releaseDate',
             key: 'releaseDate',
-            // render: (_, record) => {
-            //     const formattedDate = moment(record.releaseDate).format('DD-MM-YYYY');
-            //     return <span>{formattedDate}</span>;
-            // },
+            render: (releaseDate) => moment(releaseDate, 'YYYY-MM-DD').format(formatDate),
         },
         {
             title: 'Quốc gia',
@@ -695,7 +993,7 @@ function AdminMovie() {
                     </li>
                     <li>
                         <span>
-                            <b>Hãng phim: </b> {`${record.movieStudio.name} (${record.movieStudio.country})`}
+                            <b>Hãng phim: </b>
                         </span>
                     </li>
                     <li>
@@ -721,22 +1019,30 @@ function AdminMovie() {
             </div>
         );
     };
+    const onSearchMovie = (value) => {
+        setSearchValue((prev) => ({ ...prev, searchMovie: value }));
+        setIsSearchingTable((prev) => ({ ...prev, movie: true }));
+    };
+    const onSearchGenre = (value) => {
+        setSearchValue((prev) => ({ ...prev, searchGenre: value }));
+        setIsSearchingTable((prev) => ({ ...prev, genre: true }));
+    };
     // Xử lý sự kiện thay đổi trang
     const handlePageChange = (page, pageSize) => {
-        setCurrentPage(page);
-        setPageSize(pageSize);
+        setCurrentPage((prev) => ({ ...prev, movie: page }));
+        setPageSize((prev) => ({ ...prev, movie: pageSize }));
     };
 
     const handleSearchInput = (value, type) => {
         setIsSearch(true);
         switch (type) {
-            case 'movie-studio':
+            case 'studio':
                 setSearchValue((prev) => ({ ...prev, searchMovieStudio: value }));
                 break;
             case 'genre':
                 setSearchValue((prev) => ({ ...prev, searchGenre: value }));
                 break;
-            case 'movie-producer':
+            case 'producer':
                 setSearchValue((prev) => ({ ...prev, searchMovieProducer: value }));
                 break;
             case 'format':
@@ -756,14 +1062,18 @@ function AdminMovie() {
     const handleSelectOption = (value, type) => {
         setIsSearch(true);
         switch (type) {
-            case 'movie-studio':
-                let movieStudio = movieStudios.find((o) => o.id === value);
-                console.log('movieStudio', movieStudio);
-                setSelectedValue((prev) => ({ ...prev, movieStudio: movieStudio }));
+            case 'studio':
+                let studios = value.map((id) => {
+                    return studioOptions.find((o) => o.id === id);
+                });
+                console.log('studios', studios);
+                setSelectedValue((prev) => ({ ...prev, studios: studios }));
                 break;
-            case 'movie-producer':
-                let movieProducer = movieProducers.find((mProducer) => mProducer.id === value);
-                setSelectedValue((prev) => ({ ...prev, movieProducer: movieProducer }));
+            case 'producer':
+                let producers = value.map((id) => {
+                    return producerOptions.find((o) => o.id === id);
+                });
+                setSelectedValue((prev) => ({ ...prev, producers: producers }));
                 break;
             case 'mpaa':
                 let mpaa = listMPAA.find((o) => o.id === value);
@@ -830,6 +1140,7 @@ function AdminMovie() {
             </Space>
         );
     };
+
     return (
         <>
             <Row>
@@ -846,6 +1157,18 @@ function AdminMovie() {
                         Thêm
                     </Button>
                 </Col>
+                <Col span={24}>
+                    <Search
+                        placeholder="Nhập tên phim vào đây..."
+                        allowClear
+                        // enterButton={false}
+                        onChange={(e) => onSearchMovie(e.target.value)}
+                        style={{
+                            width: 250,
+                            marginBottom: 10,
+                        }}
+                    />
+                </Col>
             </Row>
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancelPreview}>
                 <img
@@ -855,6 +1178,18 @@ function AdminMovie() {
                     }}
                     src={previewImage}
                 />
+            </Modal>
+
+            {/* Modal thể loại */}
+            <Modal
+                forceRender
+                open={isModalOpenGenre}
+                width={'50%'}
+                title={'Quản lý thể loại'}
+                onCancel={handleCancelModalGenre}
+                footer={[]}
+            >
+                <Tabs items={itemTabPanes} activeKey={activeKeyGenre} onChange={onChangeTabGenre}></Tabs>
             </Modal>
             <BaseModal
                 forceRender
@@ -876,7 +1211,7 @@ function AdminMovie() {
                             </Button>
                         )}
 
-                        <Button key="submit" type="primary" loading={loadingButton} onClick={handleOk}>
+                        <Button key="submit" type="primary" loading={loadingButton.movie} onClick={handleOk}>
                             {dataEdit ? 'Cập nhật' : 'Thêm'}
                         </Button>
                     </div>,
@@ -905,6 +1240,7 @@ function AdminMovie() {
                     >
                         <Input placeholder="Nhập tên phim vào đây" />
                     </Form.Item>
+
                     <Form.Item
                         {...formItemLayout}
                         label="Poster"
@@ -970,7 +1306,9 @@ function AdminMovie() {
                             placeholder="Tìm kiếm và chọn quốc gia"
                             // onChange={onGenderChange}
                             allowClear
-                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }
@@ -981,22 +1319,14 @@ function AdminMovie() {
                                 })),
                             ]}
                         />
-                        {/* {countriesJson.map((item) => {
-                                return (
-                                    <Select.Option key={item.code} value={item.code}>
-                                        {item.name}
-                                    </Select.Option>
-                                );
-                            })} */}
-                        {/* </Select> */}
                     </Form.Item>
                     <Form.Item
                         label="Nhà sản xuất"
                         rules={[{ required: true, message: 'Vui lòng chọn nhà sản xuất' }]}
-                        name="movieProducer"
+                        name="producers"
                     >
                         <Select
-                            // mode=""
+                            mode="multiple"
                             allowClear
                             showSearch
                             placeholder="Tìm kiếm và chọn hãng sản xuât"
@@ -1004,10 +1334,10 @@ function AdminMovie() {
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }
-                            loading={loadingStates.movieProducer}
-                            onChange={(value) => handleSelectOption(value, 'movie-producer')}
+                            loading={loadingStates.producer}
+                            onChange={(value) => handleSelectOption(value, 'producer')}
                             options={[
-                                ...movieProducers.map((item) => ({
+                                ...producerOptions.map((item) => ({
                                     value: item.id,
                                     label: item.name,
                                 })),
@@ -1015,12 +1345,13 @@ function AdminMovie() {
                         />
                     </Form.Item>
                     <Form.Item
-                        name="movieStudio"
+                        name="studios"
                         label="Hãng phim"
                         rules={[{ required: true, message: 'Vui lòng chọn hãng phim' }]}
                     >
                         <Select
                             // mode=""
+                            mode="multiple"
                             allowClear
                             showSearch
                             placeholder="Tìm kiếm và chọn hãng phim"
@@ -1028,40 +1359,50 @@ function AdminMovie() {
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }
-                            onChange={(value) => handleSelectOption(value, 'movie-studio')}
-                            loading={loadingStates.movieStudio}
+                            onChange={(value) => handleSelectOption(value, 'studio')}
+                            loading={loadingStates.studio}
                             options={[
-                                ...movieStudios.map((item) => ({
+                                ...studioOptions.map((item) => ({
                                     value: item.id,
                                     label: item.name,
                                 })),
                             ]}
                         />
                     </Form.Item>
-                    <Form.Item
-                        name="genres"
-                        label="Thể loại phim"
-                        rules={[{ required: true, message: 'Vui lòng chọn thể loại phim' }]}
-                    >
-                        <Select
-                            mode="multiple"
-                            showSearch
-                            placeholder="Tìm kiếm và chọn loại phim"
-                            allowClear
-                            filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                            filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                            }
-                            onChange={(value) => handleSelectOption(value, 'genre')}
-                            loading={loadingStates.genre}
-                            options={[
-                                ...genreOptions.map((item) => ({
-                                    value: item.id,
-                                    label: item.name,
-                                })),
-                            ]}
-                        />
-                    </Form.Item>
+                    <Row gutter={10} style={{ paddingLeft: 10 }}>
+                        <Col span={22}>
+                            <Form.Item
+                                name="genres"
+                                label="Thể loại phim"
+                                rules={[{ required: true, message: 'Vui lòng chọn thể loại phim' }]}
+                            >
+                                <Select
+                                    style={{ marginLeft: 5 }}
+                                    mode="multiple"
+                                    showSearch
+                                    placeholder="Tìm kiếm và chọn loại phim"
+                                    allowClear
+                                    filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                                    filterSort={(optionA, optionB) =>
+                                        (optionA?.label ?? '')
+                                            .toLowerCase()
+                                            .localeCompare((optionB?.label ?? '').toLowerCase())
+                                    }
+                                    onChange={(value) => handleSelectOption(value, 'genre')}
+                                    loading={loadingStates.genre}
+                                    options={[
+                                        ...genreOptions.map((item) => ({
+                                            value: item.id,
+                                            label: item.name,
+                                        })),
+                                    ]}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={2}>
+                            <Button onClick={showModalGenre}>+</Button>
+                        </Col>
+                    </Row>
                     <Form.Item
                         name="formats"
                         label="Định dạng phim"
@@ -1178,15 +1519,16 @@ function AdminMovie() {
                             },
                         ]}
                     >
-                        <Input placeholder="Dán link trailer phim vào đây" />
+                        <Input style={{ fontSize: 15 }} placeholder="Dán link trailer phim vào đây" />
                     </Form.Item>
 
                     <Form.Item name={'description'} label="Mô tả">
-                        <Input.TextArea placeholder="Nhập mô tả phim ở đây" />
+                        <Input.TextArea style={{ fontSize: 15 }} placeholder="Nhập mô tả phim ở đây" />
                     </Form.Item>
                 </Form>
             </BaseModal>
             <BaseTable
+                // scroll={{ x: true, y: 900 }}
                 pagination={false}
                 columns={columns}
                 dataSource={list.map((item) => ({
@@ -1197,9 +1539,9 @@ function AdminMovie() {
             />
 
             <PaginationCustom
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalItems}
+                current={currentPage.movie}
+                pageSize={pageSize.movie}
+                total={totalItems.movie}
                 onChange={handlePageChange}
             />
         </>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, ColorPicker } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +17,7 @@ import style from './SeatType.module.scss';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { regex } from '~/utils/regex';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 const { TextArea } = Input;
@@ -35,6 +36,7 @@ const AdminSeatType = () => {
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
+    const [openColor, setOpenColor] = useState(false);
 
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
@@ -46,7 +48,9 @@ const AdminSeatType = () => {
                 const res = await axiosClient.get(`seatType/getAll`);
                 console.log(res);
 
-                const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
+                const filteredPosts = res.data.filter(
+                    (seatType) => seatType.id !== 7 && seatType.id !== 8 && seatType.id !== 9,
+                );
 
                 setPosts(filteredPosts);
                 setLoading(false);
@@ -62,20 +66,27 @@ const AdminSeatType = () => {
     }, [workSomeThing]);
 
     const columns = [
-        {
-            title: 'Mã',
-            dataIndex: 'id',
-            width: '10%',
-            sorter: (a, b) => a.id - b.id,
-        },
+        // {
+        //     title: 'Mã',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     sorter: (a, b) => a.id - b.id,
+        // },
         {
             title: 'tên loại ghế',
             dataIndex: 'name',
-            width: '30%',
         },
         {
-            title: 'Ghi chú',
-            dataIndex: 'description',
+            title: 'Tên viết tắt',
+            dataIndex: 'nickName',
+        },
+        {
+            title: 'Màu ghế',
+            render: (_, record) => <ColorPicker disabled value={record.color} showText />,
+        },
+        {
+            title: 'Chiệu rộng',
+            dataIndex: 'width',
         },
         {
             title: 'Ảnh ghế',
@@ -174,8 +185,6 @@ const AdminSeatType = () => {
                     };
 
                     if (putData.image.file) {
-                        console.log(putData);
-
                         const file = putData.image.fileList[0].originFileObj;
                         const images = await uploadApi.put(editData.image, file);
                         putData = {
@@ -183,10 +192,70 @@ const AdminSeatType = () => {
                             image: images,
                         };
                     }
+                    if (
+                        values.color &&
+                        typeof values.color === 'object' &&
+                        typeof values.color.toHexString === 'function'
+                    ) {
+                        var newcolor = values.color.toHexString();
+                        putData = {
+                            ...putData,
+                            color: newcolor,
+                        };
+                    } else {
+                        // Nếu không phải đối tượng có toHexString, giữ nguyên giá trị color
+                        var newcolor1 = values.color;
+                        putData = {
+                            ...putData,
+                            color: newcolor1,
+                        };
+                    }
+                    console.log(putData);
                     try {
                         const resPut = await axiosClient.put(`seatType/${putData.id}`, putData);
                         console.log(resPut);
                         if (resPut.status === 200) {
+                            funcUtils.notify('Cập nhật loại ghế thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
+                    }
+                } else {
+                    const file = values.image.fileList[0].originFileObj;
+                    const images = await uploadApi.post(file);
+                    let postData = {
+                        // id: editData.id,
+                        ...values,
+                        image: images,
+                    };
+                    if (
+                        values.color &&
+                        typeof values.color === 'object' &&
+                        typeof values.color.toHexString === 'function'
+                    ) {
+                        var newcolor = values.color.toHexString();
+                        postData = {
+                            ...postData,
+                            color: newcolor,
+                        };
+                    } else {
+                        // Nếu không phải đối tượng có toHexString, giữ nguyên giá trị color
+                        var newcolor1 = values.color;
+                        postData = {
+                            ...postData,
+                            color: newcolor1,
+                        };
+                    }
+
+                    console.log(postData);
+                    try {
+                        const resPost = await axiosClient.post(`seatType`, postData);
+                        console.log(resPost);
+                        if (resPost.status === 200) {
                             funcUtils.notify('Cập nhật loại ghế thành công', 'success');
                         }
                     } catch (error) {
@@ -215,9 +284,9 @@ const AdminSeatType = () => {
         setOpen(false);
     };
 
-    // useEffect(() => {
-    //     form.validateFields(['nickname']);
-    // }, [checkNick, form]);
+    const handleColorChange = (color) => {
+        form.setFieldsValue({ color });
+    };
 
     //form
     const handleResetForm = () => {
@@ -278,12 +347,54 @@ const AdminSeatType = () => {
                             {...formItemLayout}
                             name="name"
                             label="Tên ghế"
-                            rules={[{ required: true, message: 'Vui lòng tên ghế' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập tên ghế' },
+                                {
+                                    pattern: regex.Vi,
+                                    message: 'Tên không chứa ký tự đặc biệt',
+                                },
+                            ]}
                         >
                             <Input placeholder="Tên ghế" />
                         </Form.Item>
 
-                        <Form.Item {...formItemLayout} name="description" label="Mô tả">
+                        <Form.Item
+                            {...formItemLayout}
+                            name="nickName"
+                            label="Tên viết tắt"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập tên viết tắt ghế' },
+                                {
+                                    pattern: regex.Vi,
+                                    message: 'Tên không chứa ký tự đặc biệt',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Tên ghế" />
+                        </Form.Item>
+
+                        <Form.Item {...formItemLayout} name="color" label="Màu ghế">
+                            <ColorPicker showText onChange={handleColorChange} />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="width"
+                            label="Chiếu rộng ghế "
+                            initialValue={1}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập chiều rộng ghế' },
+                                { pattern: /^[0-9]*$/, message: 'Vui lòng chỉ nhập số' },
+                               
+                            ]}
+                        >
+                            <Input width={200} placeholder="chiều rộng ghế" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="description"
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Vui lòng nhập miêu tả' }]}
+                        >
                             <TextArea rows={4} />
                         </Form.Item>
 
@@ -303,7 +414,7 @@ const AdminSeatType = () => {
                                 name="image"
                                 maxCount={1}
                             >
-                                {fileList.length < 2 && '+ Upload'}
+                                {fileList.length < 1 && '+ Upload'}
                             </Upload>
                         </Form.Item>
                     </Form>

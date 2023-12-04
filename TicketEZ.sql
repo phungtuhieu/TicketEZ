@@ -48,15 +48,15 @@ GO
 
 CREATE TABLE Activity_Logs (
     id BIGINT IDENTITY(1,1) NOT NULL,
-    time_stamp DATETIME NOT NULL,
+    time_stamp DATETIME NOT NULL, -- Thời gian thực hiện
+	[action] NVARCHAR(MAX) NOT NULL, -- Thêm, sửa, xóa, đăng nhập, đăng xuất
 	[description] NVARCHAR(MAX) NOT NULL,
-	[result] NVARCHAR(MAX) NOT NULL,
-	activity_type INT NOT NULL,
 	ip_address NVARCHAR(MAX) NOT NULL,
-	[browser] NVARCHAR(MAX) NOT NULL,
-	operating_system NVARCHAR(MAX) NOT NULL,
-	device NVARCHAR(MAX) NOT NULL,
+	[user_agent] NVARCHAR(MAX) NOT NULL, -- Thông tin của trình duyệt: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+	[result] NVARCHAR(50) NOT NULL, -- Thành công, thất bại
 	account_id NVARCHAR(20) NOT NULL,
+    old_data NVARCHAR(MAX), -- Lưu các thông tin trước khi "xóa", "cập nhật" (Không bắt buộc)
+    new_data NVARCHAR(MAX) -- Lưu các thông tin sau khi "Thêm", "cập nhật" (Không bắt buộc)
 )
 GO
     CREATE TABLE Verification (
@@ -154,6 +154,7 @@ CREATE TABLE Articles(
     title NVARCHAR(255) NOT NULL,
 	banner NVARCHAR(MAX) NOT NULL,
     content NVARCHAR(MAX) NOT NULL,
+	status BIT NOT NULL,--0 là nháp , 1 là đăng
     create_date DATE NOT NULL,
 )
 GO
@@ -217,6 +218,7 @@ CREATE TABLE Cinema_Chains (
 	id BIGINT IDENTITY(1, 1) NOT NULL,
 	[name] NVARCHAR(255) NOT NULL,
     [image] NVARCHAR(MAX) NOT NULL,
+	[banner] NVARCHAR(MAX) NOT NULL,
 	[description] NVARCHAR(MAX)
 ) 
 GO
@@ -237,6 +239,9 @@ GO
     CREATE TABLE Seat_Types (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
+		nick_name nvarChar(50) not null,
+		color nvarchar(50) not null,
+				[width] int not null,
         [image] NVARCHAR(MAX) NOT NULL,
         [description] NVARCHAR(MAX)
     )
@@ -366,10 +371,11 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
-        [status] INT NOT NULL,
+        --[status] INT NOT NULL,
         cinema_id BIGINT NOT NULL,
         format_movie_id BIGINT NOT NULL,
         seat_chart_id BIGINT NOT NULL,
+		price_id  BIGINT NOT NULL,
     )
 GO
     CREATE TABLE Booking (
@@ -733,6 +739,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Showtimes_FormatMovies FOREIGN KEY (format_movie_id) REFERENCES Formats_Movies(id)
 GO
+ALTER TABLE
+    Showtimes
+ADD
+    CONSTRAINT FK_Showtimes_Price FOREIGN KEY (price_id) REFERENCES price(id)
+GO
     -- /Showtimes
     -- Price
 ALTER TABLE
@@ -821,7 +832,7 @@ GO
 ALTER TABLE
     Movies_Producers
 ADD
-    CONSTRAINT FK_MovieProducer_Producer FOREIGN KEY (movie_id) REFERENCES Producers(id)
+    CONSTRAINT FK_MovieProducer_Producer FOREIGN KEY (producer_id) REFERENCES Producers(id)
 GO
     -- /Movies
     -- Seat 
@@ -925,6 +936,16 @@ ALTER TABLE
     [Services_Booking]
 ADD
     CONSTRAINT FK_ServicesBooking_Services FOREIGN KEY (service_id) REFERENCES Services(id)
+GO
+ALTER TABLE
+    [Articles_Movies]
+ADD
+    CONSTRAINT FK_Articles_Movies_Movie FOREIGN KEY (movie_id) REFERENCES Movies(id)
+GO
+ALTER TABLE
+    [Articles_Movies]
+ADD
+    CONSTRAINT FK_Articles_Movies_Articles FOREIGN KEY (article_id) REFERENCES Articles(id)
 GO
     -- /Services_Booking
     -- Payment_Info
@@ -1165,13 +1186,13 @@ VALUES
 (N'Phim Tây Bắc',N'image','1980-09-08' , N'Việt Nam','contact@phimtaybac.com', N'Nhà sản xuất phim Tây Bắc tại Việt Nam.');
 GO
 
-INSERT INTO Cinema_Chains ([name],[image],[description])
+INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png',N'image.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'image.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'image.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg',N'image.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp',N'image.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
@@ -1267,23 +1288,23 @@ GO
 
 
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
-INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name], [image], [description])
+INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color],[width], [image], [description])
 VALUES
-    (N'Ghế thông thường', 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP', 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),
-    (N'Ghế hội nghị', 'url_anh_ghehoinghi.jpg', N'Loại ghế hội nghị dành cho các sự kiện, buổi họp, hội nghị.'),
-    (N'Ghế đôi', 'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
-    (N'Ghế trẻ em', 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế ngồi thoải mái', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
-	(N'đường đi', 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.');
+    (N'Ghế thường','normalSeat','#7C25CE',1, 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
+    (N'Ghế VIP','vipSeat','#B32225',1, 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi','coupleSeat','#AD1859',2,'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
+    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
+    (N'Ghế trẻ em','kidSeat','#10B785',1, 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
+    (N'Ghế Sofa','sofaSeat','#C58B0B',1, 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+	(N'đường đi','way','#121B2B',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
+	(N'Ghế đã đặt','seatUnavailable','#404040',1 ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
+	(N'Ghế chọn','seatReserved','#16A34A',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
 GO
 -- 8 . thêm dữ liệu cho bảng biểu đồ (seatChart)
 -- Chèn dữ liệu vào bảng SeatChart
 INSERT INTO Seat_Chart ([name], [rows], [columns], [status], cinema_id)
 VALUES
-    (N'Sơ đồ 1', 10, 7, 1, 1),
-    (N'Sơ đồ 2', 8, 12, 1, 1),
-    (N'Sơ đồ 3', 12, 8, 0, 1);
+    (N'Sơ đồ 1', 10, 7, 1, 1)
 GO
 -- 8. Thêm dữ liệu về ghế
 INSERT INTO Seats ([name], [status], [description], seat_type_id, seat_chart_id)
@@ -1544,18 +1565,22 @@ GO
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
 INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    ( 3, 1),
+    ( 2, 1),
     ( 1, 2),
     ( 2, 1),
     ( 2, 2);
+	go
+-- Inserting sample data into the Price table
+INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
+VALUES
+    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 -- 23. thêm dữ liệu bảng Showtimes
- INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id])
+ INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [cinema_id],  [format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-11-25 12:00:00', '2023-11-25 14:00:00', 1, 1, 4,1),
-  ('2023-10-12 14:00:00', '2023-10-10 16:00:00', 1, 2, 2,2),
-  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1),
-  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1);
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00',  1, 1,1,1),
+  ('2023-10-15 10:00:00', '2023-10-15 12:00:00',  3, 3,1,1),
+  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1,1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking
@@ -1620,10 +1645,6 @@ Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tì
 (N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
 (N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
 
--- Inserting sample data into the Price table
-INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
-VALUES
-    ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 
 INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)
@@ -1647,14 +1668,24 @@ VALUES
     ('10', 'user6', '2022-02-10 20:15:00', 2, 1, 1),
     ('11', 'user6', '2022-02-11 11:30:00', 3, 0, 2),
     ('12', 'user6', '2022-02-12 14:00:00', 3, 1, 2),
-    ('13', 'user6', '2022-02-13 16:15:00', 4, 0, 2),
-    ('14', 'user6', '2022-01-14 19:45:00', 4, 1, 2),
+    ('13', 'user6', '2022-02-13 16:15:00', 3, 0, 2),
+    ('14', 'user6', '2022-01-14 19:45:00', 3, 1, 2),
     ('15', 'user6', '2022-02-15 22:00:00', 3, 0, 2),
-    ('16', 'user6', '2023-01-16 09:15:00', 4, 1, 2),
-    ('17', 'user6', '2023-01-17 12:30:00', 4, 0, 1),
+    ('16', 'user6', '2023-01-16 09:15:00', 3, 1, 2),
+    ('17', 'user6', '2023-01-17 12:30:00', 3, 0, 1),
     ('18', 'user6', '2023-01-18 14:45:00', 3, 1, 1),
     ('19', 'user6', '2023-01-19 17:00:00', 3, 0, 1),
-    ('20', 'user6', '2023-01-20 20:30:00', 4, 1, 1);
+    ('20', 'user6', '2023-01-20 20:30:00', 3, 1, 1);
+
+	/* 
+	   CREATE TABLE Booking (
+        id NVARCHAR(10) NOT NULL,
+        account_id NVARCHAR(20) NOT NULL,
+        create_date DATETIME NOT NULL,
+        showtime_id BIGINT NOT NULL,
+        [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
+    )*/
 
 --thêm dữ liệu cho bảng Seats_Booking
 INSERT INTO Seats_Booking ([seat_id], [booking_id], [price])
@@ -1680,6 +1711,21 @@ VALUES
     (19, 1, 36.0),
     (20, 1, 29.25);
 
+	-- Chèn dữ liệu cho bảng Articles
+INSERT INTO Articles (title, banner, content, status, create_date)
+VALUES 
+(N'Tiêu đề 1', 'Banner 1', N'Nội dung 1', 1, '2023-01-01'),
+(N'Tiêu đề 2', 'Banner 2', N'Nội dung 2', 0, '2023-01-02'),
+(N'Tiêu đề 3', 'Banner 3', N'Nội dung 3', 1, '2023-01-03'),
+(N'Tiêu đề 4', 'Banner 4', N'Nội dung 4', 0, '2023-01-04'),
+(N'Tiêu đề 5', 'Banner 5', N'Nội dung 5', 1, '2023-01-05'),
+(N'Tiêu đề 6', 'Banner 6', N'Nội dung 6', 0, '2023-01-06'),
+(N'Tiêu đề 7', 'Banner 7', N'Nội dung 7', 1, '2023-01-07'),
+(N'Tiêu đề 8', 'Banner 8', N'Nội dung 8', 0, '2023-01-08'),
+(N'Tiêu đề 9', 'Banner 9', N'Nội dung 9', 1, '2023-01-09'),
+(N'Tiêu đề 10', 'Banner 10', N'Nội dung 10', 0, '2023-01-10');
+
+
 
 SELECT * FROM Accounts
 SELECT * FROM Verification
@@ -1687,6 +1733,8 @@ SELECT * FROM Reviews
 SELECT * FROM Genres
 SELECT * FROM Genres_Movies
 SELECT * FROM Studios
+SELECT * FROM Movies_Producers
+SELECT * FROM Movies_Studios
 SELECT * FROM MPAA_Rating
 SELECT * FROM Movies
 SELECT * FROM Formats

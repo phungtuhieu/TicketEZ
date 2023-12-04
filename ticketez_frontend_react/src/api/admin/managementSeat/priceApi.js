@@ -10,8 +10,13 @@ class PriceSeatApi extends BaseApi {
         return axiosClient.get(`/price/findByCinemaComplexIdAndMovieId/${cinemaCplxId}/${movieId}`);
     }
 
-    async findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(idCinemaComPlex, idMovie) {
-        return axiosClient.get('/findByCinemaComplexIdAndMovieId/' + idCinemaComPlex + '/' + idMovie);
+    async getPriceByMovieAndCinemaComplexAndDate(movieId, cinemaComplexId, date) {
+        return axiosClient.get(
+            '/price/get/price-by-movie-cinemaComplex/' + movieId + '/' + cinemaComplexId + '/' + date,
+        );
+    }
+    async findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(cinemaComplexId, movieId) {
+        return axiosClient.get('/price/findByCinemaComplexIdAndMovieId/' + cinemaComplexId + '/' + movieId);
     }
 }
 const priceSeatApi = new PriceSeatApi();

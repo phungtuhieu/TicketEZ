@@ -11,6 +11,7 @@ import uploadApi from '~/api/service/uploadApi';
 import { comment } from 'postcss';
 import moment from 'moment-timezone';
 import { data } from 'autoprefixer';
+import authApi from './../../../../api/user/Security/authApi';
 
 const cx = classNames.bind(style);
 const Binhluan = () => {
@@ -32,7 +33,10 @@ const Binhluan = () => {
     const [indexId, setIndexId] = useState();
     const [editData, setEditData] = useState();
     const [deleteItem, setDeleteItem] = useState(null);
-
+    const [commentError, setCommentError] = useState(false);
+    const [ratingError, setRatingError] = useState(false);
+    const [isPaid, setIsPaid] = useState(false);
+    const user = authApi.getUser();
 
     useEffect(() => {
         const getList = async () => {
@@ -65,42 +69,65 @@ const Binhluan = () => {
         }
         getMovie();
     }, [movieId])
-    //hàm xử lý thêm và update bình luận
+
     useEffect(() => {
-        const getAccount = async () => {
+        const checkPaymentStatus = async () => {
+            // Gọi API hoặc thực hiện kiểm tra trạng thái thanh toán ở đây
             try {
-                const user = await accountApi.getById('user17');
-                setAccount(user.data); // Cập nhật giá trị của account khi có dữ liệu mới
+                const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
+                setIsPaid(isPaid);
+                console.log('isPaid', isPaid);
             } catch (error) {
-                console.error('Failed to get account:', error);
+                console.error('Lỗi khi kiểm tra thanh toán:', error);
+                // Xử lý lỗi theo ý bạn
             }
         };
-        getAccount();
-    }, []);
+
+        checkPaymentStatus();
+    }, [user.id, movieId]);
+
     const handleAdd = async () => {
+
+        const user = authApi.getUser();
+        const accountInfo = await reviewApi.getcheckAccountBooking(user.id, movieId);
+        if (!accountInfo.isPaid) {
+            return accountInfo.status(400).json({ message: 'Chưa thanh toán. Không thể thêm bình luận.' });
+        }
         if (!comment.trim()) {
-            funcUtils.notify('Vui lòng nhập nội dung bình luận', 'warning');
+            setCommentError(true);
             return;
+        } else {
+            setCommentError(false);
+        }
+        if (rating === 0) {
+            setRatingError(true);
+            return;
+        } else {
+            setRatingError(false);
         }
         setLoading(true);
         try {
-            const user = await accountApi.getById('user17');
-
             const datareview = {
                 comment,
                 rating,
                 createDate: new Date(),
                 editData: null
             }
-            reviewApi.post(datareview, 'user17', 1);
-            
+            reviewApi.post(datareview, user.id, movieId);
+
             setWorkSomeThing(!workSomeThing);
             setComment("");
             console.log(datareview);
+            funcUtils.notify('Bình luận thành công.', 'success');
         } catch (error) {
             console.error('Failed:', error);
+            if (error.response && error.response.data) {
+                funcUtils.notify(error.response.data.message, 'error');
+            } else {
+                funcUtils.notify('Đã xảy ra lỗi', 'error');
+            }
+
             setLoading(false);
-            funcUtils.notify('Đã xảy ra lỗi', 'error');
         }
     };
     useEffect(() => {
@@ -145,7 +172,7 @@ const Binhluan = () => {
             content: `Bạn có chắc chắn muốn xóa bình luận của ${item.account.fullname}?`,
             onOk: () => confirmDelete(item),
             onCancel: () => setDeleteItem(null),
-            okButtonProps: { style: { background: '#ff1493', color: 'white' } },
+            okButtonProps: { style: { background: '[var(--primary-background-color)]', color: 'white' } },
         });
     };
 
@@ -175,10 +202,6 @@ const Binhluan = () => {
     console.log(rating);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handleOk = () => {
-        // Thực hiện xóa ở đây
-        setIsModalVisible(false);
-    };
     const handleCancel = () => {
         setIsEditing(false);
         setEditedComment('');
@@ -192,52 +215,61 @@ const Binhluan = () => {
                 <Col span={24} style={{ color: 'black', height: '120px', textAlign: 'left' }}>
                     <h2> <StarFilled style={{ color: 'yellow' }} /> 8.5/10 <span>3.0k lượt đánh giá</span></h2>
                 </Col>
+
                 <Col span={16}>
 
-                    <Typography>xin chào bạn: {account.fullname} </Typography>
+                    <Typography>xin chào bạn: {user.fullname} </Typography>
                     <Avatar
                         size={50}
-                        src={uploadApi.get(account.image)}
+                        src={uploadApi.get(user.image)}
                         style={{ margin: '10px' }}
                     >
                     </Avatar>
-                    <Space.Compact
-                        style={{
-                            width: '80%',
-                        }}
-                    >
-                        <Input.TextArea
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                            placeholder="Bình luận tại đây"
-                            autoSize={{ minRows: 1, maxRows: 3 }}
-                            rules={[{ required: true, message: 'Vui lòng nhập' }]}
+                    {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
+                        <Space.Compact
+                            style={{
+                                width: '80%',
+                            }}
+                        >
+                            <Input.TextArea
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                placeholder="Bình luận tại đây"
+                                autoSize={{ minRows: 1, maxRows: 3 }}
+                            />
+                            <Button
+                                onClick={handleAdd}
+                                className='tw-btn tw-bg-[var(--primary-background-color)] tw-text-white'
+                                danger
+                                style={{
+                                    display: 'block',
+                                }}
+                            >
+                                Send
+                            </Button>
+                            {commentError && <span style={{ color: 'red' }}>Vui lòng nhập bình luận</span>}
+                        </Space.Compact>
+                    ) : (
+                        // Nếu chưa thanh toán, hiển thị thông báo và ẩn input và nút bình luận
+                        <div>
+                            <p>Vui lòng thanh toán để có thể bình luận.</p>
+                        </div>
+                    )}
+                </Col>
+                {isPaid && ( // chỉ hiển thị rating khi isPaid là true
+                    <Col span={16}>
+                        <Typography>Đánh giá của bạn tại đây!</Typography>
+                        <Rate
+                            name="rating"
+                            allowHalf
+                            defaultValue={rating}
+                            style={{ fontSize: '36px', width: '250px' }}
+                            onChange={handleRatingChange}
+                            tooltips={1}
                         />
-                        <Button
-                            onClick={handleAdd}
-                            className='tw-btn tw-bg-[#ff1493] tw-text-white'
-                             danger style={{
-                                display: 'block',
-
-                            }}>
-                            Send
-                        </Button>
-                    </Space.Compact>
-                </Col>
-                <Col span={16}>
-                    {/* <span style={{color: 'black'}}> Đánh giá</span> <br /> */}
-                    <Typography>Đánh giá của bạn tại đây!</Typography>
-
-                    <Rate
-                        // value={rating}
-                        name="rating"
-                        allowHalf
-                        defaultValue={rating}
-                        style={{ fontSize: '36px', width: '250px' }}
-                        onChange={handleRatingChange}
-                        tooltips={1}
-                    />
-                </Col>
+                        {ratingError && <span style={{ color: 'red' }}>Vui lòng chọn đánh giá</span>}
+                    </Col>
+                )}
                 <Col span={16}>
                     {/* <div className="tw-overflow-hidden tw-scrollbar-hidden tw-max-h-[1000px]"> */}
                     <div style={{ overflowY: 'auto', maxHeight: '600px' }}>
@@ -249,7 +281,7 @@ const Binhluan = () => {
                             // loadMore={loadMore}
                             dataSource={review}
                             renderItem={(item, index) => (
-                                
+
                                 <List.Item>
 
                                     <Row>
@@ -301,7 +333,7 @@ const Binhluan = () => {
                                                         onChange={(e) => setEditedComment(e.target.value)}
                                                         className='tw-h-[100px]'
                                                     />
-                                                    <Button onClick={() => handleSaveEdit(item)} className='tw-btn tw-bg-[#ff1493] tw-text-white'>Lưu</Button>
+                                                    <Button onClick={() => handleSaveEdit(item)} className='tw-btn tw-bg-[var(--primary-background-color)] tw-text-white'>Lưu</Button>
                                                     <Button onClick={() => handleCancel()} type="default">Hủy bỏ</Button>
                                                 </div>
                                             ) : (
@@ -311,31 +343,31 @@ const Binhluan = () => {
                                                         readOnly
                                                     >{item.comment} </p>
 
-<Space>
-    <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
-    <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
+                                                    <Space>
+                                                        <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
+                                                        <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
 
-    {item.account.id === 'user17' && (
-        <Dropdown
-            overlay={(
-                <Menu>
-                    <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
-                    <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
-                </Menu>
-            )}
-            trigger={['click']}
-        >
-            <Button
-                type="text"
-                icon={<DashOutlined
-                    className={cx('col-icon', {
-                        'text-blue-500': isClicked,
-                    })}
-                />}
-            />
-        </Dropdown>
-    )}
-</Space>
+                                                        {item.account.id === user.id && (
+                                                            <Dropdown
+                                                                overlay={(
+                                                                    <Menu>
+                                                                        <Menu.Item key="edit" onClick={() => handleEdit(item, index)}>Sửa</Menu.Item>
+                                                                        <Menu.Item key="delete" onClick={() => handleDelete(item)}>Xóa</Menu.Item>
+                                                                    </Menu>
+                                                                )}
+                                                                trigger={['click']}
+                                                            >
+                                                                <Button
+                                                                    type="text"
+                                                                    icon={<DashOutlined
+                                                                        className={cx('col-icon', {
+                                                                            'text-blue-500': isClicked,
+                                                                        })}
+                                                                    />}
+                                                                />
+                                                            </Dropdown>
+                                                        )}
+                                                    </Space>
                                                 </div>
                                             )}
                                         </Col>
