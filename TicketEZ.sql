@@ -154,6 +154,7 @@ CREATE TABLE Articles(
     title NVARCHAR(255) NOT NULL,
 	banner NVARCHAR(MAX) NOT NULL,
     content NVARCHAR(MAX) NOT NULL,
+	status BIT NOT NULL,--0 là nháp , 1 là đăng
     create_date DATE NOT NULL,
 )
 GO
@@ -370,7 +371,7 @@ GO
         id BIGINT IDENTITY(1, 1) NOT NULL,
         start_time DATETIME NOT NULL,
         end_time DATETIME NOT NULL,
-        [status] INT NOT NULL,
+        --[status] INT NOT NULL,
         cinema_id BIGINT NOT NULL,
         format_movie_id BIGINT NOT NULL,
         seat_chart_id BIGINT NOT NULL,
@@ -1575,11 +1576,11 @@ VALUES
     ('2023-11-20', '2023-12-27', 1, 1, 1)
 
 -- 23. thêm dữ liệu bảng Showtimes
- INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id],[price_id])
+ INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [cinema_id],  [format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-12-4 18:00:00', '2023-12-4 22:00:00', 1, 1, 1,1,1),
-  ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1,1),
-  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1,1);
+  ('2023-11-25 12:00:00', '2023-11-25 14:00:00',  1, 1,1,1),
+  ('2023-10-15 10:00:00', '2023-10-15 12:00:00',  3, 3,1,1),
+  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1,1,1);
 GO
 
 --24. thêm dữ liệu cho bảng booking
@@ -1709,6 +1710,21 @@ VALUES
     (18, 1, 31.75),
     (19, 1, 36.0),
     (20, 1, 29.25);
+
+	-- Chèn dữ liệu cho bảng Articles
+INSERT INTO Articles (title, banner, content, status, create_date)
+VALUES 
+(N'Tiêu đề 1', 'Banner 1', N'Nội dung 1', 1, '2023-01-01'),
+(N'Tiêu đề 2', 'Banner 2', N'Nội dung 2', 0, '2023-01-02'),
+(N'Tiêu đề 3', 'Banner 3', N'Nội dung 3', 1, '2023-01-03'),
+(N'Tiêu đề 4', 'Banner 4', N'Nội dung 4', 0, '2023-01-04'),
+(N'Tiêu đề 5', 'Banner 5', N'Nội dung 5', 1, '2023-01-05'),
+(N'Tiêu đề 6', 'Banner 6', N'Nội dung 6', 0, '2023-01-06'),
+(N'Tiêu đề 7', 'Banner 7', N'Nội dung 7', 1, '2023-01-07'),
+(N'Tiêu đề 8', 'Banner 8', N'Nội dung 8', 0, '2023-01-08'),
+(N'Tiêu đề 9', 'Banner 9', N'Nội dung 9', 1, '2023-01-09'),
+(N'Tiêu đề 10', 'Banner 10', N'Nội dung 10', 0, '2023-01-10');
+
 
 
 SELECT * FROM Accounts

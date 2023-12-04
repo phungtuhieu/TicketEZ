@@ -465,7 +465,7 @@ function AdminMovie() {
                                 banner: bannerName,
                             },
                         };
-                        // console.log('dataCreate', dataCreate);
+                        console.log('dataCreate', dataCreate);
                         const resp = await movieApi.create(dataCreate);
                         setLoadingButton((prev) => ({ ...prev, movie: false }));
                         handleResetForm();

@@ -1,4 +1,4 @@
-import { Col, Divider, Row } from 'antd';
+import { Button, Col, Divider, Row } from 'antd';
 import React from 'react';
 import img from '~/assets/img';
 
@@ -69,6 +69,27 @@ const ListMovie = () => {
                 </Col>
                 <Divider className=" tw-mb-[30px] tw-mt-[20px]" />
             </Row>
+
+            <Button
+                // onClick={() => setPage(page + 1)}
+                className="tw-rounded-full tw-border tw-w-[140px] tw-h-[33px] tw-border-[var(--primary-background-color)] tw-py-1 tw-pl-4 tw-pr-6 tw-mb-[30px] tw-font-semibold tw-text-[var(--primary-background-color)] tw-transition-all hover:tw-bg-[#053b5035] hover:tw-text-[var(--primary--text-color)]"
+            >
+                {/* {loadingCard ? (
+                    'Đang tải...'
+                ) : ( */}
+                    <>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="tw-mr-2 tw-inline-block tw-h-5 tw-w-[10px] tw-animate-bounce tw-fill-[var(--primary-background-color)] hover:tw-fill-[var(--primary-background-color)]"
+                            height="1em"
+                            viewBox="0 0 384 512"
+                        >
+                            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
+                        </svg>
+                        Tải thêm
+                    </>
+                {/* )} */}
+            </Button>
         </div>
     );
 }
