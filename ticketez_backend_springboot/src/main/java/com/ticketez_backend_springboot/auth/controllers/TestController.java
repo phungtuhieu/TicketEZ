@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.auth.payload.response.JwtResponse;
+import com.ticketez_backend_springboot.auth.payload.response.JwtResponseDTO;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -20,7 +20,7 @@ public class TestController {
   }
 
   @GetMapping("/info")
-  public ResponseEntity<String> protectedResource(@RequestBody JwtResponse auJwtResponse) {
+  public ResponseEntity<String> protectedResource(@RequestBody JwtResponseDTO auJwtResponse) {
     return ResponseEntity.ok("Đã truy cập tài nguyên bảo mật.");
   }
 

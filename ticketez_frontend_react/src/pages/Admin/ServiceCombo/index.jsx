@@ -190,7 +190,7 @@ const AdminService = () => {
         {
             title: 'Rạp',
             dataIndex: 'nameCinemaComplex',
-            width: '30%',
+            width: '20%',
             // ...getColumnSearchProps('cinemaComplex'),
         },
         {
@@ -210,6 +210,7 @@ const AdminService = () => {
         },
         {
             title: 'Thao tác',
+            width: '30%',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -233,6 +234,25 @@ const AdminService = () => {
             ),
         },
     ];
+
+    const handleEditData = (record) => {
+        const newUploadFile = {
+            uid: record.id.toString(),
+            name: record.image,
+            url: `http://localhost:8081/api/upload/${record.image}`,
+        };
+        setFileList([newUploadFile]);
+        setOpen(true);
+        setResetForm(false);
+        setEditData(record);
+        form.setFieldsValue({
+            ...record,
+            cinemaComplex: record.cinemaComplex?.id,
+        });
+        console.log(record);
+    };
+    
+
 
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -265,23 +285,7 @@ const AdminService = () => {
         setWorkSomeThing(!workSomeThing);
     };
 
-    const handleEditData = (record) => {
-        const newUploadFile = {
-            uid: record.id.toString(),
-            name: record.image,
-            url: `http://localhost:8081/api/upload/${record.image}`,
-        };
-        setFileList([newUploadFile]);
-        setOpen(true);
-        setResetForm(false);
-        setEditData(record);
-        form.setFieldsValue({
-            ...record,
-            cinemaComplex: record.cinemaComplex?.id,
-        });
-        console.log(record);
-    };
-
+  
     const handleOk = async () => {
         setLoading(true);
         try {

@@ -50,11 +50,6 @@ public class JwtUtils {
     return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
   }
 
-  public String decodeStr(String s){
-    byte[] decodeBytes = Decoders.BASE64.decode(s);
-    String decodeString = new String(decodeBytes);
-    return decodeString;
-  }
 
 
 // xác định danh tính

@@ -61,11 +61,11 @@ CREATE TABLE Activity_Logs (
 GO
     CREATE TABLE Verification (
         id BIGINT IDENTITY(1, 1) NOT NULL,
-        account_id NVARCHAR(20) NOT NULL,
-        code NVARCHAR(6) NOT NULL,
-        created_at DATETIME NOT NULL,
-        expires_at DATETIME NOT NULL,
-        active BIT NOT NULL
+        account_id NVARCHAR(20) NULL,
+        code NVARCHAR(6) NULL,
+        created_at DATETIME NULL,
+        expires_at DATETIME NULL,
+        active BIT NULL
     )
 GO
     CREATE TABLE Reviews (

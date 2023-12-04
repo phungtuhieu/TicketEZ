@@ -1,5 +1,7 @@
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './css/CustomToastify.css'; 
+
 
 const funcUtils = {
     notify: function (content, type) {

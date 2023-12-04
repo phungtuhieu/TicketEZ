@@ -7,35 +7,39 @@ import authApi from '~/api/user/Security/authApi';
 import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import backgroundImage from '~/assets/img/texure.jpg';
-import { validateId, validatePassword } from '../Custom';
+import { validateEmail, validateId, validatePassword } from '../Custom';
 
 const { Header, Content } = Layout;
 
 
 const RegisterForm = () => {
 
-       const [signupError, setSignupError] = useState('');
+    const [signupError, setSignupError] = useState('');
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
+        if (!validateId(values.id)) return;
+        if (!validateEmail(values.email)) return;
+        if (!validatePassword(values.password)) return;
         try {
-            authApi.signup({
+            await authApi.signup({
                 id: values.id,
                 fullname: values.fullname,
                 email: values.email,
                 password: values.password,
             });
 
-
             funcUtils.notify('Đăng ký thành công!', 'success');
             navigate('/login');
         } catch (error) {
-            funcUtils.notify('Đăng ký không thành công!', 'error');
+            // Phân tích cú pháp lỗi từ phản hồi của API
+            const errorMessage = error.response?.data?.message;
+            funcUtils.notify(errorMessage, 'error');
         }
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('lỗi', errorInfo);
+        console.log('Lỗi:', errorInfo);
         setSignupError('Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.');
     };
 
@@ -81,13 +85,16 @@ const RegisterForm = () => {
                                 <p className={styles.formLabeEmail}><h4>Email:</h4></p>
                             </div>
                             <Form.Item
-                                // label="Tên tài khoản"
                                 name="email"
-                                rules={[{ required: true, message: 'Không được bỏ trống Email !' }]}
+                                rules={[
+                                    { required: true, message: 'Không được bỏ trống Email !' },
+                                    // Thêm quy tắc kiểm tra định dạng email của bạn ở đây nếu cần
+                                ]}
                                 className={styles.formItem}
                             >
-                                <Input type='email' placeholder="Email" className={styles.input} />
+                                <Input placeholder="Email" className={styles.input} />
                             </Form.Item>
+
                             <div className='formLabel'>
                                 <p className={styles.formLabelPassword}><h4>Mật khẩu:</h4></p>
                             </div>
@@ -152,7 +159,7 @@ const RegisterForm = () => {
                             </Form.Item> */}
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton}>
-                                 Đăng ký
+                                    Đăng ký
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản <a href="http://localhost:3000/Login">Đăng Nhập</a>
