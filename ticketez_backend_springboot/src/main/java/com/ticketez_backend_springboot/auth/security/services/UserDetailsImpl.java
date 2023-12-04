@@ -70,11 +70,6 @@ public class UserDetailsImpl implements UserDetails {
         authorities);
   }
 
-  // @Override
-  // public Role seveRole(Role role){
-  // return
-  // }
-
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
