@@ -1577,7 +1577,7 @@ VALUES
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [status],  [cinema_id],[format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-12-3 12:00:00', '2023-12-3 14:00:00', 1, 1, 1,1,1),
+  ('2023-12-4 18:00:00', '2023-12-4 22:00:00', 1, 1, 1,1,1),
   ('2023-10-15 10:00:00', '2023-10-15 12:00:00', 0, 3, 3,1,1),
   ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1, 1,1,1);
 GO

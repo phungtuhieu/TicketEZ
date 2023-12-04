@@ -31,8 +31,7 @@ public interface ShowtimeDAO extends JpaRepository<Showtime, Long> {
                         @Param("format") Format format,
                         @Param("date") LocalDate date);
 
-
-        //lấy showtime dựa trên cinema, movie, format và endtime
+        // lấy showtime dựa trên cinema, movie, format và endtime
         @Query("SELECT st FROM Showtime st WHERE "
                         + "st.cinema = :cinema "
                         + "AND st.formatMovie.movie = :movie "
@@ -44,6 +43,8 @@ public interface ShowtimeDAO extends JpaRepository<Showtime, Long> {
                         @Param("format") Format format,
                         @Param("date") LocalDate date);
 
-
+                        // Lấy ra showime truyền váo id price
+        @Query("SELECT s FROM Showtime s WHERE s.price.id = :priceId")
+        List<Showtime> findShowtimesByPriceId(@Param("priceId") Long priceId);
 
 }

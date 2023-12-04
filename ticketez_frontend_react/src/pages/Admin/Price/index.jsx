@@ -44,25 +44,25 @@ const AdminPrice = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //call api
-    useEffect(() => {
-        const getList = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosClient.get(`price/price-price-seat-type-dto`);
-                console.log(res);
+    const getList = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosClient.get(`price/price-price-seat-type-dto`);
+            console.log(res);
 
-                const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
+            const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
 
-                setPosts(filteredPosts);
-                setLoading(false);
-            } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
-                } else {
-                    console.log(error);
-                }
+            setPosts(filteredPosts);
+            setLoading(false);
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
             }
-        };
+        }
+    };
+    useEffect(() => {
         getList();
     }, [workSomeThing]);
 
@@ -125,6 +125,7 @@ const AdminPrice = () => {
 
     const showModal = () => {
         setEditData(null);
+        setYourSelectedValue(null);
         setIsModalOpen(true);
     };
 
@@ -153,6 +154,7 @@ const AdminPrice = () => {
         setLoading(true);
     };
     const handleCancel = () => {
+        getList();
         setIsModalOpen(false);
     };
 

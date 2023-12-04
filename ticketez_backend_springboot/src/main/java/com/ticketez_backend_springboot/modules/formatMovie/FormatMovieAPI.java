@@ -29,7 +29,7 @@ public class FormatMovieAPI {
     MovieDAO daoMovie;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<FormatMovie>> getAll() {
         List<FormatMovie> genreMovie = dao.findAll();
         return ResponseEntity.ok(genreMovie);
     }
