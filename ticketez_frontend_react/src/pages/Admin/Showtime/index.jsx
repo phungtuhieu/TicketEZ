@@ -249,7 +249,7 @@ const AdminShowtime = () => {
             };
 
             // Lấy id của format movie theo movie và format
-            if (valueTimeMovie  && valueFormat ) {
+            if (valueTimeMovie && valueFormat) {
                 const getIdFormatMovieByFormatAndMovie = async () => {
                     try {
                         const res = await formatMovieApi.getIdFormatMovieByFormatAndMovie(valueTimeMovie, valueFormat);
@@ -258,8 +258,7 @@ const AdminShowtime = () => {
                         // console.log(error.response.data);
                     }
                 };
-            getIdFormatMovieByFormatAndMovie();
-
+                getIdFormatMovieByFormatAndMovie();
             }
             getMovie();
             getDistinctFormarIds();
@@ -268,43 +267,77 @@ const AdminShowtime = () => {
         }
 
         //lấy price theo cinemacomplex, movie và ngày của showtime nằm trong bảng ngày của price
+        // if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
+        //     const getPriceByMovieAndCinemaComplexAndDate = async () => {
+        //         try {
+        //             if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
+        //                 const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
+        //                 const [price, finbyPrice] = await Promise.all([
+        //                     priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
+        //                         valueTimeMovie,
+        //                         valueSelectCinemaComplex,
+        //                         formatDate,
+        //                     ),
+        //                     priceSeatApi.findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
+        //                         valueSelectCinemaComplex,
+        //                         valueTimeMovie,
+        //                     ),
+        //                 ]);
+        //                 setValuePriceBySeatType(finbyPrice.data[0].newPriceSeatTypeDTOs);
+        //                 setvaluePrice(price.data);
+        //             }
+        //         } catch (error) {
+        //             console.log(error);
+        //             funcUtils.notify('Không tìm thấy giá phù hợp! Vui lòng kiểm tra lại bảng giá', 'error');
+        //         }
+        //     };
+        //     getPriceByMovieAndCinemaComplexAndDate();
+        // }
+
         if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
             const getPriceByMovieAndCinemaComplexAndDate = async () => {
                 try {
+                    const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
                     if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
-                        const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-                        const [price, finbyPrice] = await Promise.all([
-                            priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
-                                valueTimeMovie,
-                                valueSelectCinemaComplex,
-                                formatDate,
-                            ),
-                            priceSeatApi.findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
-                                valueSelectCinemaComplex,
-                                valueTimeMovie,
-                            ),
-                        ]);
-                        setValuePriceBySeatType(finbyPrice.data[0].newPriceSeatTypeDTOs);
-                        setvaluePrice(price.data);
+                        const res = await priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
+                            valueTimeMovie,
+                            valueSelectCinemaComplex,
+                            formatDate,
+                        );
+                        setvaluePrice(res.data);
+                    }
+                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectPrice !== null) {
+                        const res = await priceSeatApi.findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
+                            valueSelectCinemaComplex,
+                            valueTimeMovie,
+                        );
+                        setValuePriceBySeatType(res.data[0].newPriceSeatTypeDTOs);
                     }
                 } catch (error) {
-                    console.log(error);
-                    funcUtils.notify('Không tìm thấy giá phù hợp! Vui lòng kiểm tra lại bảng giá', 'error');
+                    // console.log(error.response.data);
                 }
             };
             getPriceByMovieAndCinemaComplexAndDate();
         }
-    }, [valueSelectCinemaComplex, valueSelectProvince, valueTimeMovie, valueFormat, valueCinema, valueSelectDate]);
+    }, [
+        valueSelectCinemaComplex,
+        valueSelectProvince,
+        valueTimeMovie,
+        valueFormat,
+        valueCinema,
+        valueSelectDate,
+        valueSelectPrice,
+    ]);
 
     const columns = [
-        {
-            title: '#',
-            dataIndex: 'id',
-            width: '7%',
-            defaultSortOrder: 'sorting',
-            align: 'center',
-            sorter: (a, b) => a.id - b.id,
-        },
+        // {
+        //     title: '#',
+        //     dataIndex: 'id',
+        //     width: '7%',
+        //     defaultSortOrder: 'sorting',
+        //     align: 'center',
+        //     sorter: (a, b) => a.id - b.id,
+        // },
         {
             title: 'Xuất chiếu',
             align: 'center',
@@ -499,7 +532,6 @@ const AdminShowtime = () => {
         setSelectedOption7(record.price ? record.price.id : null);
         setValueSeatChartByCinema(record.seatChart.id);
         setEditData(record);
-        console.log(valueSelectPrice);
         setOpen(true);
         setResetForm(false);
     };
@@ -715,7 +747,7 @@ const AdminShowtime = () => {
             seatChart: null,
             time: null,
             date: null,
-            price: null
+            price: null,
         });
     };
 
