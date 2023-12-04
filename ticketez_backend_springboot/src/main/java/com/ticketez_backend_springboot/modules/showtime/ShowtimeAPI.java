@@ -114,20 +114,20 @@ public class ShowtimeAPI {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
-        // Kiểm tra xem có Booking nào liên quan đến Showtime không
-        Showtime showtime = showtimeDAO.findById(id).orElse(null);
-        if (showtime == null) {
-            return new ResponseEntity<>("Không tìm thấy xuất chiếu để xoá", HttpStatus.NOT_FOUND);
-        }
+            // Kiểm tra xem có Booking nào liên quan đến Showtime không
+            Showtime showtime = showtimeDAO.findById(id).orElse(null);
+            if (showtime == null) {
+                return new ResponseEntity<>("Không tìm thấy xuất chiếu để xoá", HttpStatus.NOT_FOUND);
+            }
 
-        List<Booking> bookings = showtime.getBookings();
-        if (!bookings.isEmpty()) {
-            return new ResponseEntity<>("Không thể xoá vì xuất chiếu đã được đặt", HttpStatus.CONFLICT);
-        }
+            List<Booking> bookings = showtime.getBookings();
+            if (!bookings.isEmpty()) {
+                return new ResponseEntity<>("Không thể xoá vì xuất chiếu đã được đặt", HttpStatus.CONFLICT);
+            }
 
-        // Nếu không có Booking liên quan, tiến hành xóa Showtime
-        showtimeDAO.deleteById(id);
-        return ResponseEntity.ok().body("Xoá xuất chiếu thành công");
+            // Nếu không có Booking liên quan, tiến hành xóa Showtime
+            showtimeDAO.deleteById(id);
+            return ResponseEntity.ok().body("Xoá xuất chiếu thành công");
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xoá vì dính khoá ngoại", HttpStatus.CONFLICT);
         }
@@ -179,13 +179,18 @@ public class ShowtimeAPI {
             Format format = formatDAO.findById(formatId).get();
             if (cinema != null && movie != null && format != null) {
                 List<Showtime> showtimes = showtimeDAO.getShowtimesByCCXAndMovieAndFormatAndEndtime(
-                     cinema,movie, format, date);
+                        cinema, movie, format, date);
                 return ResponseEntity.ok(showtimes);
             }
             return null;
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/by-id-price/{priceId}")
+    public List<Showtime> findShowtimesByPriceId(@PathVariable("priceId") Long priceId) {
+        return showtimeDAO.findShowtimesByPriceId(priceId);
     }
 
 }
