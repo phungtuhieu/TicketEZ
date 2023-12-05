@@ -79,8 +79,9 @@ public class SecurityAccount {
 
     }
 
-    public SecurityAccount(String id, String fullname, String email, String password) {
+    public SecurityAccount(String id, String phone, String fullname, String email, String password) {
         this.id = id;
+        this.phone = phone;
         this.fullname = fullname;
         this.email = email;
         this.password = password;

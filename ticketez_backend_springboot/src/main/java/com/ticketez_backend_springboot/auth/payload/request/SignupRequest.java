@@ -1,11 +1,10 @@
 package com.ticketez_backend_springboot.auth.payload.request;
 
-
-
 import java.util.Set;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
 @Data
 public class SignupRequest {
   @NotBlank
@@ -17,11 +16,12 @@ public class SignupRequest {
   @Email
   private String email;
   private String fullname;
+
   private Set<String> role;
 
   @NotBlank
-  @Size(min = 6, max = 40)
+  @Size(min = 8, max = 40)
   private String password;
+  private String phone;
 
-  
 }

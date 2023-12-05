@@ -146,35 +146,34 @@ public class AuthController {
   }
 
   @PutMapping("/regenerate-otp")
-public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
-  Optional<SecurityAccount> securityAccountOpt = accountRepository.findByEmail(email);
-  
-  if (!securityAccountOpt.isPresent()) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng với email này: " + email);
-  }
-  SecurityAccount securityAccount = securityAccountOpt.get();
-  
-  String otp = otpUtil.generateOtp();
-  
-  try {
-    emailUtil.sendOtpEmail(email, otp);
-  } catch (MessagingException e) {
-    return ResponseEntity.badRequest().body("Không thể gửi OTP qua email, vui lòng thử lại sau.");
-  }
-  List<Verification> verifications = verificationDAO.findByAccountId(securityAccount.getId());
-  if (!verifications.isEmpty()) {
-    for (Verification verification : verifications) {
-      verification.setCode(otp);
-      verification.setCreatedAt(LocalDateTime.now());
-      verification.setActive(true); 
-      verificationDAO.save(verification);
+  public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
+    Optional<SecurityAccount> securityAccountOpt = accountRepository.findByEmail(email);
+
+    if (!securityAccountOpt.isPresent()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng với email này: " + email);
     }
-  } else {
+    SecurityAccount securityAccount = securityAccountOpt.get();
 
+    String otp = otpUtil.generateOtp();
+
+    try {
+      emailUtil.sendOtpEmail(email, otp);
+    } catch (MessagingException e) {
+      return ResponseEntity.badRequest().body("Không thể gửi OTP qua email, vui lòng thử lại sau.");
+    }
+    List<Verification> verifications = verificationDAO.findByAccountId(securityAccount.getId());
+    if (!verifications.isEmpty()) {
+      for (Verification verification : verifications) {
+        verification.setCode(otp);
+        verification.setCreatedAt(LocalDateTime.now());
+        verification.setActive(true);
+        verificationDAO.save(verification);
+      }
+    } else {
+
+    }
+    return ResponseEntity.ok("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút.");
   }
-  return ResponseEntity.ok("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút.");
-}
-
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -194,6 +193,7 @@ public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
     }
     SecurityAccount account = new SecurityAccount(
         signUpRequest.getId(),
+        signUpRequest.getPhone(),
         signUpRequest.getFullname(),
         signUpRequest.getEmail(),
 
