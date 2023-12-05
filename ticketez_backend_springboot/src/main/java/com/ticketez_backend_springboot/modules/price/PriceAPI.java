@@ -189,30 +189,30 @@ public class PriceAPI {
         return ResponseEntity.ok(true);
     }
 
-    
     @PatchMapping("/{id}")
-    public ResponseEntity<Price> patchStatus(@PathVariable("id") Long id, @RequestBody Map<String, Boolean> statusUpdates) {
+    public ResponseEntity<Price> patchStatus(@PathVariable("id") Long id,
+            @RequestBody Map<String, Boolean> statusUpdates) {
         Optional<Price> optionalPrice = priceDAO.findById(id);
-        
+
         if (optionalPrice.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-    
+
         Price price = optionalPrice.get();
-        
+
         // Check if the request body contains the 'status' field
         if (statusUpdates.containsKey("status")) {
             price.setStatus(statusUpdates.get("status"));
         }
-    
+
         priceDAO.save(price);
-        
+
         return ResponseEntity.ok(price);
     }
-    
+
     @GetMapping("/get/price-by-movie-cinemaComplex/{movieId}/{cinemaComplexId}/{date}")
-    public ResponseEntity<?> getPriceByMovieAndCinemaComplexAndDate(@PathVariable("movieId") Long movieId, 
-       @PathVariable("cinemaComplexId") Long cinemaComplexId, @PathVariable("date") LocalDate date) {
+    public ResponseEntity<?> getPriceByMovieAndCinemaComplexAndDate(@PathVariable("movieId") Long movieId,
+            @PathVariable("cinemaComplexId") Long cinemaComplexId, @PathVariable("date") LocalDate date) {
         try {
             List<Price> prices = priceDAO.getPriceByMovieAndCinemaComplexAndDate(movieId, cinemaComplexId,
                     date);
