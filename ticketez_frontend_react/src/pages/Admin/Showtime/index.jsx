@@ -266,41 +266,15 @@ const AdminShowtime = () => {
             setLoading(false);
         }
 
-        //lấy price theo cinemacomplex, movie và ngày của showtime nằm trong bảng ngày của price
-        // if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
-        //     const getPriceByMovieAndCinemaComplexAndDate = async () => {
-        //         try {
-        //             if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
-        //                 const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-        //                 const [price, finbyPrice] = await Promise.all([
-        //                     priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
-        //                         valueTimeMovie,
-        //                         valueSelectCinemaComplex,
-        //                         formatDate,
-        //                     ),
-        //                     priceSeatApi.findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
-        //                         valueSelectCinemaComplex,
-        //                         valueTimeMovie,
-        //                     ),
-        //                 ]);
-        //                 setValuePriceBySeatType(finbyPrice.data[0].newPriceSeatTypeDTOs);
-        //                 setvaluePrice(price.data);
-        //             }
-        //         } catch (error) {
-        //             console.log(error);
-        //             funcUtils.notify('Không tìm thấy giá phù hợp! Vui lòng kiểm tra lại bảng giá', 'error');
-        //         }
-        //     };
-        //     getPriceByMovieAndCinemaComplexAndDate();
-        // }
 
-        if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
+        if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate && valueFormat) {
             const getPriceByMovieAndCinemaComplexAndDate = async () => {
                 try {
                     const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
+                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null && valueFormat !== null) {
                         const res = await priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
                             valueTimeMovie,
+                            valueFormat,
                             valueSelectCinemaComplex,
                             formatDate,
                         );
@@ -329,15 +303,10 @@ const AdminShowtime = () => {
         valueSelectPrice,
     ]);
 
+    console.log("kết quả nè",valuePrice);
+
     const columns = [
-        // {
-        //     title: '#',
-        //     dataIndex: 'id',
-        //     width: '7%',
-        //     defaultSortOrder: 'sorting',
-        //     align: 'center',
-        //     sorter: (a, b) => a.id - b.id,
-        // },
+        
         {
             title: 'Xuất chiếu',
             align: 'center',
