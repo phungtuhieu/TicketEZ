@@ -476,6 +476,7 @@ const AdminShowtime = () => {
         setValueEndtimeByTimeMovieAndStartime();
         setValueSeatChartByCinema(null);
         setvaluePrice(null);
+        setvalueSelectPrice(null);
         setValuePriceBySeatType(null);
     };
     const showModal = () => {
@@ -582,9 +583,9 @@ const AdminShowtime = () => {
                 funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
                 setOpen(true);
                 setLoading(false);
-            } else if (time < secondToLastArrayEndtime && editData != null) {
+            } else if (secondToLastArrayEndtime != null && time < secondToLastArrayEndtime && editData != null) {
                 funcUtils.notify(
-                    `Thời gian phải hơn thời gian cuối cùng trong ngày là : ${secondToLastArrayEndtime}`,
+                    `Thời gian phải hơn thời gian cuối cùng trong ngày là kk : ${secondToLastArrayEndtime}`,
                     'error',
                 );
                 setOpen(true);
@@ -624,6 +625,7 @@ const AdminShowtime = () => {
                                 funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
                                 setLoading(false);
                             }
+                            funcUtils.notify(error.response.data, 'error');
                             console.log(error);
                         }
                     } else {
@@ -652,7 +654,11 @@ const AdminShowtime = () => {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
-                    } else if (time < lastTwoEndTimeWithExtra15Minutes && editData != null) {
+                    } else if (
+                        time < lastTwoEndTimeWithExtra15Minutes &&
+                        editData != null &&
+                        secondToLastArrayEndtime != null
+                    ) {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${secondToLastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
@@ -690,7 +696,9 @@ const AdminShowtime = () => {
                                     funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
                                     setLoading(false);
                                 }
+                                funcUtils.notify(error.response.data, 'error');
                                 console.log(error);
+                                setLoading(false);
                             }
                         } else {
                             try {
