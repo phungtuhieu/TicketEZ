@@ -11,5 +11,7 @@ public interface AccountLockHistoryDAO extends JpaRepository<AccountLockHistory,
     // List<AccountLockHistory> fing(@Param("accountId") String accountId);
 
    List<AccountLockHistory> findByAccountOrderByEventDateDesc(Account account);
-        
+
+
+        List<AccountLockHistory> findByAccountOrderByIdDesc(Account account);
 } 
