@@ -171,8 +171,9 @@ function SeatChart(props) {
 
     const handelUpdate = async (dataSeat) => {
         let data = dataSeat;
-
-        const respVip = await axiosClient.put(`seat/update`, data);
+        try {
+            const respVip = await axiosClient.put(`seat/update`, data);
+        } catch (error) {}
     };
     useEffect(() => {}, [seatState]);
 
@@ -206,7 +207,7 @@ function SeatChart(props) {
 
     useEffect(() => {
         const fetchData = async () => {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 4000));
 
             setIsTableLoaded(true);
         };

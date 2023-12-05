@@ -9,10 +9,12 @@ import axiosClient from '~/api/global/axiosClient';
 import style from '../Seat.module.scss';
 import funcUtils from '~/utils/funcUtils';
 import FirstSeat from '../FirstSeat';
+import img, { listIcon } from '~/assets/img';
 
 const cx = classNames.bind(style);
 
 export default function SeatGenerator() {
+    const [isTableLoaded, setIsTableLoaded] = useState(true);
     // Dữ liệu chuỗi rạp chiếu
     const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
     // Dữ liệu cụm rạp
@@ -145,6 +147,7 @@ export default function SeatGenerator() {
     // Thêm sơ đồ mới
 
     const postDataSeatChart = async () => {
+        setIsTableLoaded(false)
         try {
             const data = {
                 name: inputValue,
@@ -162,6 +165,7 @@ export default function SeatGenerator() {
             setIdSeatChart(resp.data.id);
             // createSeatDB(resp.data.id);
             setShowInfo('success');
+            setIsTableLoaded(true)
         } catch (error) {
             console.error(error);
         }
@@ -356,7 +360,7 @@ export default function SeatGenerator() {
                             <>
                                 <div className={cx('select')} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button type="primary" onClick={handelCreate}>
-                                        Tạo sơ đồ 
+                                        Tạo sơ đồ
                                     </Button>
                                 </div>
                             </>
@@ -364,9 +368,17 @@ export default function SeatGenerator() {
                     </Card>
                 </Col>
                 <Col span={16}>
-                    <Card>
-                        <FirstSeat rows={row} columns={col} key={firstChartDataChanged} idSeatChart={idSeatChart} />
-                    </Card>
+                    {isTableLoaded && (
+                        <Card>
+                            <FirstSeat rows={row} columns={col} key={firstChartDataChanged} idSeatChart={idSeatChart} />
+                        </Card>
+                    )}
+
+                    {!isTableLoaded && (
+                        <div className="tw-text-white tw-text-2xl">
+                            <img src={img.loading} />
+                        </div>
+                    )}
                 </Col>
             </Row>
         </>

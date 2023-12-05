@@ -23,7 +23,7 @@ public interface PriceDAO extends JpaRepository<Price, Long> {
 
         // Trong interface PriceDAO
         List<Price> findByCinemaComplexIdAndFormatMovie_Movie_Id(Long cinemaComplexId, Long movieId);
-
+        List<Price> findByShowtimesId(Long showtimeId);
         @Query("select p from Price p  " +
                         " join FormatMovie fm " +
                         " on p.formatMovie.id = fm.id  " +

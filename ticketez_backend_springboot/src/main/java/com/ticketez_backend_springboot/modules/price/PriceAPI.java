@@ -54,6 +54,36 @@ public class PriceAPI {
         }
         return ResponseEntity.ok(priceDAO.findById(id).get());
     }
+// tìm kiếm theoShowtime id
+      @GetMapping("/findByShowtimeId/{showtimeId}")
+    public ResponseEntity<List<PriceAndPriceSeatTypeDTO>> findAllPriceAndPriceSeatTypeDTOByShowtimeId(
+            @PathVariable("showtimeId") Long idShowtime) {
+        List<Price> prices = priceDAO.findByShowtimesId(idShowtime);
+
+        List<PriceAndPriceSeatTypeDTO> rspList = new ArrayList<>();
+
+        for (Price price : prices) {
+            PriceAndPriceSeatTypeDTO dto = new PriceAndPriceSeatTypeDTO();
+            dto.setPrice(price);
+
+            List<PriceSeatType> priceSeatTypes = priceSeatTypeDAO.findByPriceId(price.getId());
+            List<NewPriceSeatTypeDTO> newSeatTypes = new ArrayList<>();
+
+            for (PriceSeatType priceSeatType : priceSeatTypes) {
+                NewPriceSeatTypeDTO newSeatType = new NewPriceSeatTypeDTO();
+                newSeatType.setId(priceSeatType.getId());
+                newSeatType.setWeekdayPrice(priceSeatType.getWeekdayPrice());
+                newSeatType.setWeekendPrice(priceSeatType.getWeekendPrice());
+                newSeatType.setSeatType(priceSeatType.getSeatType());
+                newSeatTypes.add(newSeatType);
+            }
+
+            dto.setNewPriceSeatTypeDTOs(newSeatTypes);
+            rspList.add(dto);
+        }
+
+        return ResponseEntity.ok(rspList);
+    }
 
     // Tìm kiếm PriceAndPriceSeatTypeDTO theo id cinemacomplex và movie id
     @GetMapping("/findByCinemaComplexIdAndMovieId/{cinemacomplexId}/{movieId}")

@@ -175,20 +175,18 @@ function SeatChart(props) {
             const respAll = await axiosClient.get(`seat/by-seatchart/${showtime.seatChart.id}`);
             setAllSeats(respAll.data);
 
-            const respPrice = await axiosClient.get(
-                `price/findByCinemaComplexIdAndMovieId/${showtime.cinema.cinemaComplex.id}/${showtime.formatMovie.movie.id}`,
-            );
+            const respPrice = await axiosClient.get(`price/findByShowtimeId/${showtime.id}`);
             const currentDate = new Date();
 
             // Lọc ra các phần tử có startDate và endDate trong khoảng ngày hiện tại
-            const filteredPrices = respPrice.data.filter((price) => {
-                const startDate = new Date(price.price.startDate);
-                const endDate = new Date(price.price.endDate);
+            // const filteredPrices = respPrice.data.filter((price) => {
+            //     const startDate = new Date(price.price.startDate);
+            //     const endDate = new Date(price.price.endDate);
 
-                return startDate <= currentDate && endDate >= currentDate;
-            });
+            //     return startDate <= currentDate && endDate >= currentDate;
+            // });
 
-            setPrices(filteredPrices);
+            setPrices(respPrice.data);
 
             if (seatBookingData.length > 0) {
                 setReload(true);
@@ -234,6 +232,7 @@ function SeatChart(props) {
 
     const [priceSeats, setPriceSeats] = useState(0);
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
+        console.log(prices);
         let result = null;
         let finalRS = null;
         seatStateArray.forEach((seatItem) => {
@@ -241,6 +240,7 @@ function SeatChart(props) {
                 const price = prices.find((price) => {
                     return price.newPriceSeatTypeDTOs.some((seatType) => seatType.seatType.id === seatTypeId);
                 });
+                console.log(prices);
                 if (price) {
                     result = price.newPriceSeatTypeDTOs;
 
@@ -287,6 +287,9 @@ function SeatChart(props) {
                 }
             });
         });
+        console.log('====================================');
+        console.log(rs);
+        console.log('====================================');
         const seatPrices = getSeatPrice(rs);
 
         if (seatReserved.indexOf(seat) > -1) {
@@ -543,7 +546,7 @@ function SeatChart(props) {
                         {!isTableLoaded && (
                             <div
                                 className="tw-text-white tw-text-2xl"
-                                style={{  marginLeft: '60px' ,position:'relative',bottom:'60px' }}
+                                style={{ marginLeft: '60px', position: 'relative', bottom: '60px' }}
                             >
                                 <img src={img.loading} alt="Loading" />
                             </div>
