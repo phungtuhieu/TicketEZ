@@ -31,7 +31,7 @@ const RegisterForm = () => {
             });
 
             funcUtils.notify('Đăng ký thành công!', 'success');
-            navigate('/login');
+            navigate('/otp');
         } catch (error) {
             // Phân tích cú pháp lỗi từ phản hồi của API
             const errorMessage = error.response?.data?.message;
