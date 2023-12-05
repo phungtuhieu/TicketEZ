@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
-import { Avatar, Breadcrumb,  Divider, Dropdown } from 'antd';
+import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -193,7 +193,12 @@ const Header = () => {
                                 arrow
                             >
                                 <a className="tw-text-gray-700 flex items-center">
-                                    <span className="name-short">Xin chào, {userData.fullname.split(' ').pop()}</span>
+                                    <span className="name-short">
+                                        Xin chào,{' '}
+                                        {userData?.fullname == null || userData?.fullname == undefined
+                                            ? ''
+                                            : userData.fullname.split(' ').pop()}
+                                    </span>
                                     <Avatar src={uploadApi.get(userData.image)} alt={`${userData.id}'s avatar`} />
                                 </a>
                             </Dropdown>

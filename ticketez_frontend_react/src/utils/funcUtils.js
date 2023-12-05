@@ -12,6 +12,10 @@ const funcUtils = {
             draggable: true,
             progress: undefined,
             theme: 'light',
+            style: {
+                lineHeight: '1.6',
+                textAlign: 'left',
+            },
         };
 
         if (!content) return toast.error('Có lỗi vui lòng liên hệ quản trị viên!', option);
