@@ -282,9 +282,6 @@ const ModalPrice = (props) => {
             return;
         }
         setIsTableLoaded(false);
-        console.log('====================================');
-        console.log(startDateChoose);
-        console.log('====================================');
         const dataPrice = {
             id: record && record.price ? record.price.id : 0,
 
@@ -339,9 +336,6 @@ const ModalPrice = (props) => {
 
             // Xóa giá cũ
         } else {
-            console.log('====================================');
-            console.log(dataPrice);
-            console.log('====================================');
             let respPrice;
             try {
                 respPrice = await axiosClient.post(`price`, dataPrice);
@@ -351,14 +345,6 @@ const ModalPrice = (props) => {
                 return;
             }
             console.log(respPrice);
-
-            // try {
-            //     const resp = await axiosClient.patch(`price/${record.price.id}`, { status: false });
-            //     console.log(resp);
-            // } catch (error) {
-            //     console.log(error);
-            //     return;
-            // }
             const PriceSeatType = newPriceSeatTypeDTOs.map((priceSeatType) => ({
                 weekdayPrice: priceSeatType.weekdayPrice,
                 weekendPrice: priceSeatType.weekendPrice,
@@ -382,7 +368,7 @@ const ModalPrice = (props) => {
     };
 
     // Sửa giá
-    const [isFirstRowVisible, setIsFirstRowVisible] = useState(true);
+    const [isFirstRowVisible, setIsFirstRowVisible] = useState(record ? true : false);
 
     const editPrice = () => {
         if (showtimeData.length > 0) {
@@ -481,13 +467,15 @@ const ModalPrice = (props) => {
                         <hr />
                         <Row>
                             <Col span={16} className="tw-mt-8"></Col>
-                            <a
-                                onClick={editPrice}
-                                className="tw-mt-8 tw-mb-8 tw-ms-16 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white tw-rounded-md tw-transition tw-duration-300 tw-ease-in-out hover:tw-bg-blue-600"
-                                type="primary"
-                            >
-                                Sửa giá
-                            </a>
+                            {record && (
+                                <a
+                                    onClick={editPrice}
+                                    className="tw-mt-8 tw-mb-8 tw-ms-16 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white tw-rounded-md tw-transition tw-duration-300 tw-ease-in-out hover:tw-bg-blue-600"
+                                    type="primary"
+                                >
+                                    Sửa giá
+                                </a>
+                            )}
                         </Row>
                         <Row></Row>
                         {isFirstRowVisible && (

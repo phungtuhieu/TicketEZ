@@ -183,29 +183,50 @@ public class PriceAPI {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
-        priceDAO.deleteById(id);
-        return ResponseEntity.ok(true);
+        Optional<Price> priceOptional = priceDAO.findById(id);
+        if (priceOptional.isPresent()) {
+            Price price = priceOptional.get();
+
+            // Kiểm tra và xóa các liên kết với PriceSeatType
+            if (price.getPriceSeatTypes() != null) {
+                price.getPriceSeatTypes().forEach(priceSeatType -> {
+                    priceSeatTypeDAO.deleteById(priceSeatType.getId());
+                });
+            }
+
+            // Kiểm tra và xóa các liên kết với Showtime (nếu cần)
+            if (price.getShowtimes() != null) {
+                // Xử lý các liên kết với Showtime (nếu cần)
+            }
+
+            // Xóa Price sau khi đã xóa các liên kết
+            priceDAO.deleteById(id);
+
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Price> patchStatus(@PathVariable("id") Long id, @RequestBody Map<String, Boolean> statusUpdates) {
+    public ResponseEntity<Price> patchStatus(@PathVariable("id") Long id,
+            @RequestBody Map<String, Boolean> statusUpdates) {
         Optional<Price> optionalPrice = priceDAO.findById(id);
-        
+
         if (optionalPrice.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-    
+
         Price price = optionalPrice.get();
-        
+
         // Check if the request body contains the 'status' field
         if (statusUpdates.containsKey("status")) {
             price.setStatus(statusUpdates.get("status"));
         }
-    
+
         priceDAO.save(price);
-        
+
         return ResponseEntity.ok(price);
     }
-    
 
 }
