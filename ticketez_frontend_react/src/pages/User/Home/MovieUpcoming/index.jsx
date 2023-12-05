@@ -53,7 +53,6 @@ const MovieShowing = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
-    console.log(selectedMovie);
     const [setLoading] = useState(false);
     const [ellipsis] = useState(true);
 
