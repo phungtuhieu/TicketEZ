@@ -19,6 +19,7 @@ export { default as AdminDirector } from './Director';
 export { default as AdminFormat } from './Format';
 export { default as AdminAccount } from './Account';
 export { default as AdminCinemaChains } from './CinemaChains';
+export { default as AdminAccountStaff } from './AccountStaff';
 
 export { default as AdminEvent } from './Event';
 export { default as AdminMpaaRating } from './mpaaRating';
