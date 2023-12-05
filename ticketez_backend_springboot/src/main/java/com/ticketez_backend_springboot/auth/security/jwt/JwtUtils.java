@@ -1,7 +1,6 @@
 package com.ticketez_backend_springboot.auth.security.jwt;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -50,11 +49,6 @@ public class JwtUtils {
     return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
   }
 
-  public String decodeStr(String s){
-    byte[] decodeBytes = Decoders.BASE64.decode(s);
-    String decodeString = new String(decodeBytes);
-    return decodeString;
-  }
 
 
 // xác định danh tính

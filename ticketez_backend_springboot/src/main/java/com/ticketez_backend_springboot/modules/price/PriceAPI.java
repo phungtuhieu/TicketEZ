@@ -1,11 +1,13 @@
 package com.ticketez_backend_springboot.modules.price;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -229,4 +231,16 @@ public class PriceAPI {
         return ResponseEntity.ok(price);
     }
 
+    @GetMapping("/get/price-by-movie-cinemaComplex/{movieId}/{cinemaComplexId}/{date}")
+    public ResponseEntity<?> getPriceByMovieAndCinemaComplexAndDate(@PathVariable("movieId") Long movieId,
+            @PathVariable("cinemaComplexId") Long cinemaComplexId, @PathVariable("date") LocalDate date) {
+        try {
+            List<Price> prices = priceDAO.getPriceByMovieAndCinemaComplexAndDate(movieId, cinemaComplexId,
+                    date);
+            return ResponseEntity.ok(prices);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

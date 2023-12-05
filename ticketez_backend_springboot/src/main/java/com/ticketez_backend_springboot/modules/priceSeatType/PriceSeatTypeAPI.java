@@ -31,7 +31,7 @@ public class PriceSeatTypeAPI {
         return ResponseEntity.ok(dao.findAll());
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<List<PriceSeatType>> findbyIdprice(@PathVariable("id") Long id) {
         List<PriceSeatType> priceSeatTypes = dao.findByPriceId(id);
         return ResponseEntity.ok(priceSeatTypes);

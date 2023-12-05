@@ -434,7 +434,7 @@ function AdminMovie() {
     const handleOk = async () => {
         // setLoadingButton((prev) => ({...prev,movie: true}) );
         try {
-            const values = await form.getFieldsValue();
+            const values = await form.validateFields();
             // console.log(values, 'values');
             const { genres, formats, directors, actors, poster, producers, studios, ...movieData } = values;
             // console.log('movieData', movieData);
@@ -465,7 +465,7 @@ function AdminMovie() {
                                 banner: bannerName,
                             },
                         };
-                        // console.log('dataCreate', dataCreate);
+                        console.log('dataCreate', dataCreate);
                         const resp = await movieApi.create(dataCreate);
                         setLoadingButton((prev) => ({ ...prev, movie: false }));
                         handleResetForm();

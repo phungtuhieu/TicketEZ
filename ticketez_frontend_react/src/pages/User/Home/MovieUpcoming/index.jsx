@@ -121,7 +121,7 @@ const MovieShowing = () => {
         }, 1000);
     }, []);
     return (
-        <div className={cx('body')}>
+        <div className={cx('body','tw-mb-[130px]')}>
             <h1 className="tw-text-[var(--primary--text-color)]">Phim sắp chiếu</h1>
 
             {isLoadingPage && (

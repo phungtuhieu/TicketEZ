@@ -1,10 +1,24 @@
 import { Col, Row, Tag } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MovieDetailsListMovieRight from '../MovieDetails/ListPhimDangChieu';
 import ListMovie from './ListMovie';
 import Top3Movie from './Top3Movie';
+import articleApi from '~/api/admin/managementMovie/article';
 
 const MovieTop = () => {
+    const [data, setData] = useState([]);
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await articleApi.getPageArticleTrue();
+                setData(res.data.listMovieObjResp);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getData();
+    }, []);
     return (
         <div>
             <div className=" tw-container tw-mx-auto tw-px-[150px] tw-leading-none ">
@@ -18,7 +32,7 @@ const MovieTop = () => {
                         nhật liên tục với đa dạng các thể loại, quốc gia.
                     </h3>
 
-                    <Top3Movie />
+                    <Top3Movie data={data} />
                 </div>
             </div>
             <Tag color="#E0E0E0" className="tw-w-[100px] tw-h-[7px]"></Tag>

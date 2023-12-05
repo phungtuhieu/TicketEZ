@@ -29,7 +29,7 @@ public class VerificationAPI {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Verification> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<Verification> findById(@PathVariable("id") Integer id) {
         if (!verificationDAO.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -43,7 +43,7 @@ public class VerificationAPI {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Verification> put(@PathVariable("id") Long id, @RequestBody Verification verification) {
+    public ResponseEntity<Verification> put(@PathVariable("id") Integer id, @RequestBody Verification verification) {
         if (!verificationDAO.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -52,7 +52,7 @@ public class VerificationAPI {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable("id") Integer id) {
         verificationDAO.deleteById(id);
         return ResponseEntity.ok(true);
     }

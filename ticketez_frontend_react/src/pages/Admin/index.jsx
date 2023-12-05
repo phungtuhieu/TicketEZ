@@ -18,8 +18,10 @@ export { default as AdminActor } from './Actor';
 export { default as AdminDirector } from './Director';
 export { default as AdminFormat } from './Format';
 export { default as AdminAccount } from './Account';
+export { default as AdminArticle } from './Article';
 export { default as AdminCinemaChains } from './CinemaChains';
 export { default as AdminProducer } from './Producer';
+export { default as AdminAccountStaff } from './AccountStaff';
 
 export { default as AdminEvent } from './Event';
 export { default as AdminMpaaRating } from './mpaaRating';

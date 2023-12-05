@@ -1,10 +1,12 @@
-import { data } from 'autoprefixer';
-import axios from 'axios';
 import axiosClient from '~/api/global/axiosClient';
 
-const auth = 'auth/signin'
-const signupSecurity = 'auth/signup'
-const logoutSecurity = 'auth/signup'
+
+const endpoints = {
+    auth: 'auth/signin',
+    signup: 'auth/signup',
+    logout: 'auth/logout', 
+    regenerateOtp: 'auth/regenerate-otp'
+  };
 
 
 
@@ -12,7 +14,7 @@ const authApi = {
 
     getLogin: async (values) => {
         try {
-            const response = await axiosClient.post(auth, values);
+            const response = await axiosClient.post(endpoints.auth, values);
 
             if (response.data.token) {
                 localStorage.setItem('token', JSON.stringify(response.data.token));
@@ -42,11 +44,9 @@ const authApi = {
 
     signup: async (values) => {
         try {
-            const response = await axiosClient.post(signupSecurity, values);
+            const response = await axiosClient.post(endpoints.signup, values);
             const { data } = response;
-            if (data.token) {
-                localStorage.setItem('token', JSON.stringify(data.token));
-            }
+
             if (data.user) {
                 localStorage.setItem('user', JSON.stringify(data.user));
             }
@@ -57,6 +57,22 @@ const authApi = {
             throw error;
         }
     },
+
+
+
+
+    regenerateOtp: async (email) => {
+        try {
+
+          const response = await axiosClient.put(`${endpoints.regenerateOtp}?email=${(email)}`);
+          return response.data;
+        } catch (error) {
+          console.error('Lỗi trong quá trình tái tạo OTP:', error);
+          throw error;
+        }
+      },
+
+
 
 
     getToken() {
@@ -76,6 +92,7 @@ const authApi = {
         const user = localStorage.getItem('user');
         if (user) {
             try {
+
                 return JSON.parse(user);
             } catch (e) {
                 console.error('Lỗi khi phân tích user:', e);
@@ -88,14 +105,14 @@ const authApi = {
 
 
 
-   
+
 
 
     logout() {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         localStorage.removeItem('roles');
-        return axiosClient.get(logoutSecurity)
+        return axiosClient.get(endpoints.logout)
             .then(response => {
                 console.log(response.data);
             })
