@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, List, Skeleton, Row, Col, Rate, Space, Input, Typography, Dropdown, Menu, Modal } from 'antd';
+import { Avatar, Button, List, Row, Col, Rate, Space, Input, Typography, Dropdown, Menu, Modal } from 'antd';
 import { StarFilled, CommentOutlined, LikeOutlined, DashOutlined } from '@ant-design/icons'
 import classNames from 'classnames/bind';
 import style from './binhluan.module.scss';
@@ -8,9 +8,9 @@ import funcUtils from './../../../../utils/funcUtils';
 import { accountApi, movieApi } from '~/api/admin';
 import { useParams } from 'react-router-dom';
 import uploadApi from '~/api/service/uploadApi';
-import { comment } from 'postcss';
+
 import moment from 'moment-timezone';
-import { data } from 'autoprefixer';
+
 import authApi from './../../../../api/user/Security/authApi';
 
 const cx = classNames.bind(style);
@@ -88,11 +88,7 @@ const Binhluan = () => {
 
     const handleAdd = async () => {
 
-        const user = authApi.getUser();
-        const accountInfo = await reviewApi.getcheckAccountBooking(user.id, movieId);
-        if (!accountInfo.isPaid) {
-            return accountInfo.status(400).json({ message: 'Chưa thanh toán. Không thể thêm bình luận.' });
-        }
+       
         if (!comment.trim()) {
             setCommentError(true);
             return;
@@ -107,6 +103,9 @@ const Binhluan = () => {
         }
         setLoading(true);
         try {
+            const user = authApi.getUser();
+            const accountInfo = await reviewApi.getcheckAccountBooking(user.id, movieId);
+            
             const datareview = {
                 comment,
                 rating,
@@ -114,11 +113,10 @@ const Binhluan = () => {
                 editData: null
             }
             reviewApi.post(datareview, user.id, movieId);
-
-            setWorkSomeThing(!workSomeThing);
             setComment("");
             console.log(datareview);
             funcUtils.notify('Bình luận thành công.', 'success');
+            setWorkSomeThing(!workSomeThing);
         } catch (error) {
             console.error('Failed:', error);
             if (error.response && error.response.data) {
@@ -172,7 +170,7 @@ const Binhluan = () => {
             content: `Bạn có chắc chắn muốn xóa bình luận của ${item.account.fullname}?`,
             onOk: () => confirmDelete(item),
             onCancel: () => setDeleteItem(null),
-            okButtonProps: { style: { background: '[var(--primary-background-color)]', color: 'white' } },
+            okButtonProps: { style: { background: '#053b50', color: 'white' } },
         });
     };
 
@@ -200,7 +198,6 @@ const Binhluan = () => {
 
     };
     console.log(rating);
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleCancel = () => {
         setIsEditing(false);
@@ -215,40 +212,41 @@ const Binhluan = () => {
                 <Col span={24} style={{ color: 'black', height: '120px', textAlign: 'left' }}>
                     <h2> <StarFilled style={{ color: 'yellow' }} /> 8.5/10 <span>3.0k lượt đánh giá</span></h2>
                 </Col>
-
                 <Col span={16}>
-
-                    <Typography>xin chào bạn: {user.fullname} </Typography>
-                    <Avatar
+                    <Typography>Xin chào bạn: {user.fullname} bình luận của bạn tại đây! </Typography>
+                    {/* <Avatar
                         size={50}
                         src={uploadApi.get(user.image)}
                         style={{ margin: '10px' }}
                     >
-                    </Avatar>
+                    </Avatar> */}
                     {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
-                        <Space.Compact
-                            style={{
-                                width: '80%',
-                            }}
-                        >
-                            <Input.TextArea
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                placeholder="Bình luận tại đây"
-                                autoSize={{ minRows: 1, maxRows: 3 }}
-                            />
-                            <Button
-                                onClick={handleAdd}
-                                className='tw-btn tw-bg-[var(--primary-background-color)] tw-text-white'
-                                danger
-                                style={{
-                                    display: 'block',
-                                }}
-                            >
-                                Send
-                            </Button>
-                            {commentError && <span style={{ color: 'red' }}>Vui lòng nhập bình luận</span>}
-                        </Space.Compact>
+                      <Space.Compact
+                      className="tw-flex tw-flex-col tw-items-start tw-justify-start"
+                      style={{
+                          width: '90%',
+                      }}
+                  >
+                      <Input.TextArea
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          placeholder="Bình luận tại đây"
+                          autoSize={{ minRows: 3, maxRows: 3 }}
+                          className='tw-w-full'
+                      />
+                     
+                      <Button
+                          onClick={handleAdd}
+                          className='tw-bg-[var(--primary-background-color)] tw-text-white tw-mt-2' // Thêm margin-top để tạo khoảng cách giữa Input.TextArea và Button
+                
+                      >
+                          Send
+                      </Button>
+                     
+                      {commentError && <span style={{ color: 'red' }}>Vui lòng nhập bình luận</span>}
+                  </Space.Compact>
+                  
+                   
                     ) : (
                         // Nếu chưa thanh toán, hiển thị thông báo và ẩn input và nút bình luận
                         <div>
@@ -266,13 +264,14 @@ const Binhluan = () => {
                             style={{ fontSize: '36px', width: '250px' }}
                             onChange={handleRatingChange}
                             tooltips={1}
+                            className='tw-bg-gray-300'
                         />
                         {ratingError && <span style={{ color: 'red' }}>Vui lòng chọn đánh giá</span>}
                     </Col>
                 )}
                 <Col span={16}>
                     {/* <div className="tw-overflow-hidden tw-scrollbar-hidden tw-max-h-[1000px]"> */}
-                    <div style={{ overflowY: 'auto', maxHeight: '600px' }}>
+                    <div style={{ overflowY: 'scroll', maxHeight: '500px', WebkitOverflowScrolling: 'touch' }}>
                         <List
 
                             className="demo-loadmore-list"
