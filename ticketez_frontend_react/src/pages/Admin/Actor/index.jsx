@@ -68,7 +68,7 @@ const AdminActor = () => {
             setLoading(true);
             try {
                 const res = await actorApi.getByPage(currentPage, pageSize);
-                console.log(res);
+                // console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -300,7 +300,7 @@ const AdminActor = () => {
     const handleDelete = async (record) => {
         try {
             const res = await actorApi.delete(record.id);
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
                 await uploadApi.delete(record.avatar);
                 funcUtils.notify('Xoá thành công', 'success');
@@ -333,7 +333,7 @@ const AdminActor = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            console.log("ádasd",values);
+            // console.log("ádasd",values);
             if (fileList.length > 0) {
                 if (editData) {
                     let putData = {
@@ -341,7 +341,7 @@ const AdminActor = () => {
                         ...values,
                     };
                     if (putData.avatar.file) {
-                        console.log(putData);
+                        // console.log(putData);
 
                         const file = putData.avatar.fileList[0].originFileObj;
                         const images = await uploadApi.put(editData.avatar, file);
@@ -352,7 +352,7 @@ const AdminActor = () => {
                     }
                     try {
                         const resPut = await actorApi.update(putData.id, putData);
-                        console.log(resPut);
+                        // console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật diễn viên thành công', 'success');
                         }
@@ -372,9 +372,9 @@ const AdminActor = () => {
                             ...values,
                             avatar: images,
                         };
-                        console.log(postData);
+                        // console.log(postData);
                         const resPost = await actorApi.create(postData);
-                        console.log('resPost', resPost);
+                        // console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm diễn viên thành công', 'success');
                         }

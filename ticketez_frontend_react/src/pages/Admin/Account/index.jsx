@@ -143,14 +143,14 @@ const AdminAccount = () => {
     }, [currentPage, pageSize, workSomeThing, status, valueSearchDelay]);
 
     const [reason, setReason] = useState('');
-    console.log(reason);
+    // console.log(reason);
 
     const [accountLockHistory, setAccountLockHistory] = useState('');
 
-    const abc = async (accountId) => {
-        console.log(accountId);
+    const findByAccountLockHistoryByAccountId = async (accountId) => {
+        // console.log(accountId);
         const res = await accountApi.AccountLockHistoryFindByAccount(accountId);
-        console.log(res.data);
+        // console.log(res.data);
         setAccountLockHistory(res.data);
     };
 
@@ -274,7 +274,7 @@ const AdminAccount = () => {
                             <ExportOutlined
                                 onClick={() => {
                                     showModalLock();
-                                    abc(record.id);
+                                    findByAccountLockHistoryByAccountId(record.id);
                                 }}
                             />
 
@@ -320,7 +320,7 @@ const AdminAccount = () => {
     };
 
     const handleEditData = (record) => {
-        console.log(record);
+        // console.log(record);
         const newUploadFile = {
             uid: record.phone.toString(),
             name: record.image,
@@ -340,16 +340,16 @@ const AdminAccount = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            console.log('values:::::', values);
+            // console.log('values:::::', values);
             if (fileList.length > 0) {
                 if (editData) {
                     let upl = {
                         ...values,
                     };
-                    console.log(upl);
+                    // console.log(upl);
                     if (upl.image.fileList) {
                         const file = upl.image.fileList[0].originFileObj;
-                        console.log(file);
+                        // console.log(file);
                         const image = await uploadApi.put(editData.image, file);
                         upl = {
                             ...upl,
@@ -380,7 +380,7 @@ const AdminAccount = () => {
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
-        console.log(form);
+        // console.log(form);
     };
 
     const onPreview = async (file) => {
