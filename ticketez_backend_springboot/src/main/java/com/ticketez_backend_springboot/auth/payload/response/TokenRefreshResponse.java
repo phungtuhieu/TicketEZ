@@ -1,6 +1,5 @@
 package com.ticketez_backend_springboot.auth.payload.response;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

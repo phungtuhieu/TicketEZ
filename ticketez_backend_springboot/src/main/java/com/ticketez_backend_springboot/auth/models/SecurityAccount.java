@@ -6,19 +6,24 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistory;
 import com.ticketez_backend_springboot.modules.accountRole.AccountRole;
 import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.review.Review;
+import com.ticketez_backend_springboot.modules.verification.Verification;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
+@Table(name = "Accounts")
+// @Entity
+// @Table(name = "Accounts", uniqueConstraints = {
+// @UniqueConstraint(columnNames = "id"),
+// @UniqueConstraint(columnNames = "email")
+// })
 @Entity
-@Table(name = "Accounts", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "id"),
-        @UniqueConstraint(columnNames = "email")
-})
 @Data
 public class SecurityAccount {
     @Id
@@ -32,7 +37,6 @@ public class SecurityAccount {
     private String gender;
     private String image;
     private Integer status;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date")
     private Date createdDate;
@@ -42,6 +46,10 @@ public class SecurityAccount {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "Accounts_Roles", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<SecurityRole> roles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Verification verification;
 
     @JsonIgnore
     @OneToMany(mappedBy = "account")
@@ -59,7 +67,16 @@ public class SecurityAccount {
     @OneToMany(mappedBy = "account")
     private List<ActivityLog> activityLogs;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<Event> events;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private List<AccountLockHistory> accountLockHistory;
+
     public SecurityAccount() {
+
     }
 
     public SecurityAccount(String id, String fullname, String email, String password) {

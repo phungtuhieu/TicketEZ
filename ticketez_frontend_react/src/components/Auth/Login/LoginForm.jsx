@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Form, Input, Button, Checkbox } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
@@ -8,24 +8,46 @@ import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import { validateId, validatePassword } from '../Custom';
 
+
 const { Header, Content } = Layout;
 
 
 const LoginForm = () => {
-
-    // const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
-
-    const [loginError, setLoginError] = useState('');
+    const [countdown, setCountdown] = useState(0);
+    const [emailForOtp, setEmailForOtp] = useState('');
+    const [isOtpButtonDisabled, setOtpButtonDisabled] = useState(false);
+    const [otpExpired, setOtpExpired] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        let intervalId;
+
+        if (isOtpButtonDisabled && countdown > 0) {
+            intervalId = setInterval(() => {
+                setCountdown((prevCountdown) => prevCountdown - 1);
+            }, 1000);
+        } else if (countdown === 0) {
+            setOtpButtonDisabled(false);
+            setOtpExpired(true);
+        }
+
+        return () => clearInterval(intervalId);
+    }, [isOtpButtonDisabled, countdown]);
 
 
     const onFinish = async (values) => {
         if (!validateId(values.id)) return;
         if (!validatePassword(values.password)) return;
+        if (otpExpired) {
+            funcUtils.notify('Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.', 'error');
+            return;
+        }
         try {
             const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
+                otp: values.otp,
+
             });
 
             const user = await authApi.getUser();
@@ -40,9 +62,35 @@ const LoginForm = () => {
                 window.location.reload();
             }
         } catch (error) {
-            funcUtils.notify('Sai mật khẩu hoặc tài khoản', 'error');
+            funcUtils.notify('Sai mật khẩu hoặc tài khoản, Kiểm tra Mã OTP', 'error');
         }
     };
+
+
+    const handleResendOtp = async () => {
+        if (!emailForOtp) {
+            funcUtils.notify('Vui lòng nhập email để nhận mã OTP.', 'error');
+            return;
+        }
+
+        setOtpExpired(false);
+        setOtpButtonDisabled(true);
+        setCountdown(60);
+        try {
+            const response = await authApi.regenerateOtp(emailForOtp);
+            funcUtils.notify('Mã OTP đã được gửi. Vui lòng xác minh tài khoản trong vòng 1 phút!', 'success');
+            console.log(response);
+        } catch (error) {
+            funcUtils.notify('Có lỗi xảy ra khi gửi mã OTP. Vui lòng thử lại.', 'error');
+        }
+
+        setTimeout(() => {
+            setOtpButtonDisabled(true);
+        }, 60000); 
+    };
+
+
+
 
 
     return (
@@ -84,6 +132,42 @@ const LoginForm = () => {
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />
 
                             </Form.Item>
+                            <Form.Item
+                                name="otp"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập mã OTP!' },
+                                    { len: 6, message: 'Mã OTP phải gồm 6 chữ số!' }
+                                ]}
+                                className={styles.formItem}
+                            >
+                                <Input
+                                    placeholder="Nhập mã OTP"
+                                    maxLength={6}
+                                    className={styles.input}
+                                />
+                            </Form.Item>
+
+                            <Form.Item className={styles.formItem}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Input
+                                        style={{ flex: 1, marginRight: '8px' }}
+                                        placeholder="Email để nhận mã OTP"
+                                        name='email'
+                                        value={emailForOtp}
+                                        onChange={(e) => setEmailForOtp(e.target.value)}
+                                        className={styles.input}
+                                    />
+                                    <Button
+                                        onClick={handleResendOtp}
+                                        disabled={isOtpButtonDisabled}
+                                        className={styles.input}
+                                    >
+                                        {isOtpButtonDisabled ? `Gửi lại sau (${countdown}s)` : 'Gửi mã'}
+                                    </Button>
+
+                                </div>
+                            </Form.Item>
+
                             <Form.Item className={styles.formItem}>
                                 <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
                                 <a className={styles.forgot} href="">
@@ -93,7 +177,7 @@ const LoginForm = () => {
                             </Form.Item>
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton}>
-                                  Đăng nhập
+                                    Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>
@@ -113,29 +197,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

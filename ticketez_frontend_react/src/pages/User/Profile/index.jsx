@@ -162,9 +162,14 @@ const EditableProfile = () => {
                 <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
                   <Input />
                 </Form.Item>
-                <Form.Item name="birthday" label="Ngày sinh" rules={[{ required: true }]}>
-                  <DatePicker format="DD-MM-YYYY" />
-                </Form.Item>
+                <Form.Item
+                            // {...formItemLayout}
+                            name="birthday"
+                            label="Ngày sinh"
+                            rules={[{ required: true, message: 'Vui lòng nhập ngày sinh' }]}
+                        >
+                            <DatePicker placeholder="Ngày sinh..." format={'DD-MM-YYYY'} style={{ width: '100%' }} />
+                        </Form.Item>
 
                 <Form.Item name="" label="Đổi mật khẩu" >
                   <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">
