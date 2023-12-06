@@ -60,7 +60,6 @@ const BannerDetail = () => {
         position: 'absolute',
         zIndex: 0,
     };
-
     const imgCustom = {
         zIndex: 20,
     };
