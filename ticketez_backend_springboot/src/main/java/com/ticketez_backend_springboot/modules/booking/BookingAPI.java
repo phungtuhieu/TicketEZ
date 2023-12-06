@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.booking;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +31,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
+import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
+import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.account.AccountDAO;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieAPI;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfoDAO;
+import com.ticketez_backend_springboot.modules.price.Price;
+import com.ticketez_backend_springboot.modules.price.PriceDAO;
+import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
+import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatTypeDAO;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
+import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
+import com.ticketez_backend_springboot.modules.seatChoose.SeatChooseDao;
+import com.ticketez_backend_springboot.modules.showtime.Showtime;
+import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -163,7 +175,7 @@ public class BookingAPI {
 			return new ResponseEntity<>("Không tìm thấy đối tượng Booking API!", HttpStatus.NOT_FOUND);
 		} catch (Exception ex) {
 			logger.error("==> [getBookingByAcc] error!: {}", ex.toString());
-			return new ResponseEntity<>("Có lỗi trong Booking API  vui lòng liên hệ quản trị viên",
+			return new ResponseEntity<>("Có lỗi trong getBookingByAcc  vui lòng liên hệ quản trị viên",
 					HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -178,86 +190,129 @@ public class BookingAPI {
 
 	@PostMapping
 	public ResponseEntity<?> post(@RequestBody BookingDTO bookingDto) {
-		if (bookingDto == null) {
+		Double total = bookingDto.getTotal();
+		if (total == null || total <= 0) {
 			return new ResponseEntity<>("Không có dữ liệu để thêm", HttpStatus.BAD_REQUEST);
 		}
 
-		bookingDto.getBooking().setTicketStatus(TicketStatus.UNUSED);
-		Booking createdBooking = dao.save(bookingDto.getBooking());
-
-		List<SeatBooking> seatBookings = bookingDto.getSeats().stream().map(seat -> {
-			SeatBooking seatBooking = new SeatBooking();
-			seatBooking.setBooking(createdBooking);
-			seatBooking.setSeat(seat);
-			for (SeatTypePriceDTO stDto : bookingDto.getListPrice()) {
-				if (stDto.getSeatTypeId() == seat.getSeatType().getId()) {
-					seatBooking.setPrice(stDto.getPrice());
-					break;
-				}
-			}
-			// seatBooking.setStatus(1);
-			return seatBooking;
-		}).collect(Collectors.toList());
-		int total = 0;
-		for (SeatBooking s : seatBookings) {
-			total += s.getPrice().intValue();
-		}
-		System.out.println("-=-------------------toal: " + total);
-		seatBookingDao.saveAll(seatBookings);
-		String payUrl = vnPayService.createOrder(total, "Thanh toan ve xem phim ", createdBooking.getId());
-		// VNPayDTO vnPayDTO = new VNPayDTO();
-		// vnPayDTO.setBookingId(createdBooking.getId());
-		// vnPayDTO.setPayUrl(payUrl);
+		String payUrl = vnPayService.createOrder(total.intValue(), "Thanh toan ve xem phim ",
+				bookingDto.getBookingId(), bookingDto.getShowtimeId(), bookingDto.getAccountId());
 		return ResponseEntity.status(HttpStatus.OK).body(payUrl);
 	}
+
+	@Autowired
+	ShowtimeDAO showtimeDao;
+
+	@Autowired
+	SeatChooseDao seatChooseDao;
+
+	@Autowired
+	PriceDAO priceDAO;
+
+	@Autowired
+	PriceSeatTypeDAO priceSeatTypeDAO;
 
 	@GetMapping("/vnpay-payment")
 	public ResponseEntity<?> payment(HttpServletRequest request) {
 		Integer paymentStatus = vnPayService.orderReturn(request);
-
-		String bookingId = request.getParameter("bookingId");
-		Booking booking = dao.findById(bookingId).orElse(null);
-		if (booking == null) {
-			return new ResponseEntity<>("Không thể tìm thấy booking",
-					HttpStatus.NOT_FOUND);
-		}
-		// List<SeatBooking> seatBookings = seatBookingDao.findByBooking(booking);
-
-		String orderInfo = request.getParameter("vnp_OrderInfo");
-		String tmnCode = request.getParameter("vnp_TmnCode");
-		String paymentTime = request.getParameter("vnp_PayDate");
-		String transactionId = request.getParameter("vnp_TransactionNo");
-		String totalPrice = request.getParameter("vnp_Amount");
-		System.out.println("------------- totalPrice: " + totalPrice);
-		System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
-		String bankCode = request.getParameter("vnp_BankCode");
-		String transactionStatus = request.getParameter("vnp_TransactionStatus");
-
-		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		PaymentInfo paymentInfo = new PaymentInfo();
-
-		try {
-			Date date = inputFormat.parse(paymentTime);
-			String outputDateString = dateFormat.format(date);
-			Date payDate = dateFormat.parse(outputDateString);
-
-			paymentInfo.setTransactionId(transactionId);
-			paymentInfo.setBooking(booking);
-			// chia 100 vì vnpay đã mặc định 100
-			paymentInfo.setAmount(Double.valueOf(totalPrice) / 100);
-			paymentInfo.setBankCode(bankCode);
-			paymentInfo.setTmnCode(tmnCode);
-			paymentInfo.setOrderInfo(orderInfo);
-			paymentInfo.setPayDate(payDate);
-			paymentInfo.setTransactionStatus(transactionStatus);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
-					HttpStatus.CONFLICT);
-		}
-		PaymentInfo pInfo = pmIDao.save(paymentInfo);
 		if (paymentStatus >= 0) { // String urlRedirect = "/booking-info";
+			String bookingId = request.getParameter("bookingId");
+			String showtimeId = request.getParameter("showtimeId");
+			String accountId = request.getParameter("accountId");
+			Showtime showtime = showtimeDao.findById(Long.valueOf(showtimeId)).orElse(null);
+			Account account = accDao.findById(accountId).orElse(null);
+			if (showtime == null) {
+				return new ResponseEntity<>("Không thể tìm thấy suất chiếu",
+						HttpStatus.NOT_FOUND);
+			}
+			if (account == null) {
+				return new ResponseEntity<>("Không thể tìm thấy người dùng",
+						HttpStatus.NOT_FOUND);
+			}
+			Booking booking = new Booking();
+			booking.setAccount(account);
+			booking.setCreateDate(new Date());
+			booking.setStatus(BookingStatus.PAID);
+			booking.setId(bookingId);
+			booking.setTicketStatus(TicketStatus.UNUSED);
+			booking.setShowtime(showtime);
+
+			Booking bCreated = dao.save(booking);
+			List<Price> prices = priceDAO.findByShowtimesId(showtime.getId());
+			List<String> weekends = new ArrayList<>(Arrays.asList("Friday", "Saturday", "Sunday"));
+			List<SeatChoose> seatChooses = seatChooseDao.findByShowtimeId(showtime.getId());
+
+			// Kiểm tra cuối tuần
+			Date currentDate = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+			String dayOfWeek = sdf.format(currentDate);
+			boolean isWeekend = weekends.contains(dayOfWeek);
+			List<SeatBooking> lBookings = new ArrayList<>();
+
+			// Lặp qua các ghế mà người dùng đã chọn
+			for (SeatChoose seatChoose : seatChooses) {
+				SeatBooking seatBooking = new SeatBooking();
+				for (Price price : prices) {
+
+					List<PriceSeatType> priceSeatTypes = priceSeatTypeDAO.findByPriceId(price.getId());
+
+					for (PriceSeatType pst : priceSeatTypes) {
+						// Lấy giá theo loại ghế
+						if (pst.getSeatType() == seatChoose.getSeat().getSeatType()) {
+							seatBooking.setId(null);
+							seatBooking.setBooking(bCreated);
+							if (isWeekend) {
+								seatBooking.setPrice(pst.getWeekendPrice());
+							} else {
+								seatBooking.setPrice(pst.getWeekdayPrice());
+							}
+							seatBooking.setSeat(seatChoose.getSeat());
+							lBookings.add(seatBooking);
+						}
+					}
+				}
+			}
+			seatBookingDao.saveAll(lBookings);
+
+			String orderInfo = request.getParameter("vnp_OrderInfo");
+			String tmnCode = request.getParameter("vnp_TmnCode");
+			String paymentTime = request.getParameter("vnp_PayDate");
+			String transactionId = request.getParameter("vnp_TransactionNo");
+			String totalPrice = request.getParameter("vnp_Amount");
+			System.out.println("------------- totalPrice: " + totalPrice);
+			System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
+			String bankCode = request.getParameter("vnp_BankCode");
+			String transactionStatus = request.getParameter("vnp_TransactionStatus");
+
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			PaymentInfo paymentInfo = new PaymentInfo();
+
+			try {
+				Date date = inputFormat.parse(paymentTime);
+				String outputDateString = dateFormat.format(date);
+				Date payDate = dateFormat.parse(outputDateString);
+
+				paymentInfo.setTransactionId(transactionId);
+				paymentInfo.setBooking(bCreated);
+				// chia 100 vì vnpay đã mặc định 100
+				paymentInfo.setAmount(Double.valueOf(totalPrice) / 100);
+				paymentInfo.setBankCode(bankCode);
+				paymentInfo.setTmnCode(tmnCode);
+				paymentInfo.setOrderInfo(orderInfo);
+				paymentInfo.setPayDate(payDate);
+				paymentInfo.setTransactionStatus(transactionStatus);
+				System.out.println();
+				List<Long> seatChooseIdsDel = seatChooses.stream().map(seat -> seat.getId())
+						.collect(Collectors.toList());
+				seatChooseDao
+						.deleteAllById(seatChooseIdsDel);
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
+						HttpStatus.CONFLICT);
+			}
+			PaymentInfo pInfo = pmIDao.save(paymentInfo);
 			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
 		} else if (paymentStatus == 0) {
 			return new ResponseEntity<>("Giao dịch thất bại",
@@ -266,6 +321,7 @@ public class BookingAPI {
 			return new ResponseEntity<>("Thông tin giao dịch không chính xác",
 					HttpStatus.CONFLICT);
 		}
+
 	}
 
 	@GetMapping("/payment-info/{id}")

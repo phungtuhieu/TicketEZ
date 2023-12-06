@@ -5,9 +5,11 @@ class PriceSeatApi extends BaseApi {
     constructor() {
         super('price');
     }
-    async getListPriceDbBySeatType(objFind) {
-        const { cinemaCplxId, movieId } = objFind;
+    async getListPriceDbBySeatType(cinemaCplxId, movieId) {
         return axiosClient.get(`/price/findByCinemaComplexIdAndMovieId/${cinemaCplxId}/${movieId}`);
+    }
+    async findAllPriceAndPriceSeatTypeDTOByShowtimeId(showtimeId) {
+        return axiosClient.get(`/price/findByShowtimeId/${showtimeId}`);
     }
 
     async getPriceByMovieAndCinemaComplexAndDate(movieId, formatId, cinemaComplexId, date) {

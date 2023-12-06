@@ -8,6 +8,8 @@ import { TicketDetails } from '../..';
 import { bookingApi } from '~/api/user';
 import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
+import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(styles);
 function MovieTickets() {
     const ticketStatus = {
@@ -47,7 +49,14 @@ function MovieTickets() {
         console.log('ssss');
         const loadTickets = async () => {
             try {
-                const resp = await bookingApi.getBookingByAcc(1, 10, 'user2');
+                const account = authApi.getUser();
+                console.log(account);
+
+                if (account == null) {
+                    funcUtils.notify('Vui lòng đăng nhập');
+                    return;
+                }
+                const resp = await bookingApi.getBookingByAcc(1, 10, account.id);
                 console.log('resp', resp);
                 const dataFormat = resp.data.map((item) => ({
                     id: item.booking.id,
