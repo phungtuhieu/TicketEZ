@@ -1,4 +1,4 @@
-import { Anchor, Col, Divider, Row, Tag } from 'antd';
+import { Anchor, Button, Col, Divider, Modal, Row, Tag, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import articleApi from '~/api/admin/managementMovie/article';
 import { useParams } from 'react-router-dom';
@@ -6,7 +6,8 @@ import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import classNames from 'classnames/bind';
 import style from './movieDetail.module.scss';
-
+import { CloseCircleOutlined } from '@ant-design/icons';
+const { Paragraph, Title } = Typography;
 const cx = classNames.bind(style);
 const MovieTopDetails = () => {
     const [data, setData] = useState(null);
@@ -24,6 +25,33 @@ const MovieTopDetails = () => {
 
         getList();
     }, [articleId]);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState(null);
+    const [setLoading] = useState(false);
+    const [ellipsis] = useState(true);
+
+    const showModal = (movie) => {
+        setSelectedMovie(movie);
+        setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        setLoading(true);
+        setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setSelectedMovie(null);
+    };
+     const CustomCloseIcon = ({ onClick }) => (
+         <CloseCircleOutlined
+             onClick={onClick}
+             style={{ fontSize: '30px', color: 'gray', marginTop: '-55px', marginRight: '-55px' }}
+         />
+     );
+
 
     return (
         <div className="tw-min-h-[1000px]">
@@ -62,6 +90,10 @@ const MovieTopDetails = () => {
                                                         'icon',
                                                         'tw-absolute tw-w-[50px] tw-h-[50px] tw-fill-white tw-top-[90px] tw-left-[55px] tw-cursor-pointer',
                                                     )}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        showModal(movie);
+                                                    }}
                                                     viewBox="-51.2 -51.2 614.40 614.40"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -141,7 +173,11 @@ const MovieTopDetails = () => {
                                     items={value.listMovieandGens.map((movie, indexValue) => ({
                                         key: `movie-${index}-${indexValue - 1}`,
                                         href: `#movie-${index}-${indexValue - 1}`,
-                                        title: <div className="tw-p-[10px] tw-text-gray-500 tw-text-2xl ">{movie.movie.title}</div>,
+                                        title: (
+                                            <div className="tw-p-[10px] tw-text-gray-500 tw-text-2xl ">
+                                                {movie.movie.title}
+                                            </div>
+                                        ),
                                     }))}
                                 />
                             </Col>
@@ -149,6 +185,84 @@ const MovieTopDetails = () => {
                     </div>
                 </div>
             ))}
+            <Modal
+                width={700}
+                closeIcon={<CustomCloseIcon />}
+                onOk={handleOk}
+                open={isModalOpen}
+                onCancel={handleCancel}
+                footer={[
+                    <>
+                        <Row gutter={24}>
+                            <Col lg={3}>
+                                {selectedMovie ? (
+                                    <img
+                                        width={80}
+                                        height={130}
+                                        className={cx('img-modal')}
+                                        src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
+                                    />
+                                ) : (
+                                    ''
+                                )}
+                            </Col>
+                            <Col lg={21} className={cx('name-video-modal', 'tw-pl-[20px]')}>
+                                <Title level={5}>
+                                    {selectedMovie ? selectedMovie.movie.title : ''} - {''}
+                                    <span className={cx('theloai-modal')}>
+                                        {selectedMovie?.genres.map((valueGenre, index) => (
+                                            <span className={cx('span')} key={index}>
+                                                {valueGenre.name}
+                                            </span>
+                                        ))}
+                                    </span>
+                                </Title>
+                                <Paragraph
+                                    ellipsis={
+                                        ellipsis
+                                            ? {
+                                                  rows: 3,
+                                              }
+                                            : false
+                                    }
+                                    style={{ color: 'gray' }}
+                                >
+                                    {selectedMovie ? selectedMovie.movie.description : ''}
+                                </Paragraph>
+                            </Col>
+                        </Row>
+                        <div className="tw-mt-[-20px]">
+                            <Button
+                                href={`/movie-details/${selectedMovie?.movie.id}`}
+                                className="tw-bg-[var(--pink)] tw-border-[var(--pink)] tw-text-white tw-font-medium"
+                            >
+                                Đặt vé
+                            </Button>
+                            <Button
+                                onClick={handleCancel}
+                                className="tw-bg-gray-500 tw-border-gray-500 tw-text-white tw-font-medium"
+                            >
+                                Đóng
+                            </Button>
+                        </div>
+                    </>,
+                ]}
+            >
+                <iframe
+                    style={{
+                        width: '107.5%',
+                        height: '400px',
+                        border: 'none',
+                        borderTopLeftRadius: '3px',
+                        marginLeft: '-24px',
+                        marginTop: '-24px',
+                    }}
+                    src={selectedMovie ? selectedMovie.movie.videoTrailer : ''}
+                    title={selectedMovie ? selectedMovie.movie.title : ''}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                ></iframe>
+            </Modal>
         </div>
     );
 };
