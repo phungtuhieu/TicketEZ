@@ -1,5 +1,5 @@
 import { Row, Col } from 'antd';
-import { listIcon } from '~/assets/img';
+import img, { listIcon } from '~/assets/img';
 function Footer() {
     return (
         <Row>
@@ -146,7 +146,7 @@ function Footer() {
                             <span className="tw-text-[#8B8B8B]">Email :</span>
                             <span className="tw-text-[#9F9F9F] tw-transition tw-duration-300 tw-ease-in-out hover:tw-text-[#D9D9D9]">
                                 {' '}
-                                hotro@momo.vn
+                               khanhttpc03027@fpt.du.vn
                             </span>
                         </div>
                         <div className="tw-mb-3 ">
@@ -165,9 +165,6 @@ function Footer() {
                                     028.9999.5555
                                 </a>
                             </span>
-                        </div>
-                        <div className="tw-mb-3">
-                            <img src={listIcon.icon2} alt="" width={180} height={55} />
                         </div>
 
                         <h1 className="tw-text-[14px] tw-text-[#ffffffcc] ">HỢP TÁC DOANH NGHIỆP</h1>
@@ -189,7 +186,7 @@ function Footer() {
                                     href="#4"
                                     className="tw-text-[#9F9F9F] tw-transition tw-duration-300 tw-ease-in-out hover:tw-text-[#D9D9D9]"
                                 >
-                                    merchant.care@momo.vn
+                                    trankhanh@gmail.com
                                 </a>
                             </span>
                         </div>
@@ -200,13 +197,11 @@ function Footer() {
                                     href="#2"
                                     className="tw-text-[#9F9F9F] tw-transition tw-duration-300 tw-ease-in-out hover:tw-text-[#D9D9D9]"
                                 >
-                                    business.momo.vn
+                                    ticketez.vn
                                 </a>
                             </span>
                         </div>
-                        <div className="tw-mb-3 ">
-                            <img src={listIcon.icon1} alt="" width={180} height={55} />
-                        </div>
+                      
                     </Col>
                     <Col span={6} className="tw-pl-[20px]">
                         <h1 className="tw-text-[14px] tw-text-[#ffffffcc]">KẾT NỐI VỚI CHÚNG TÔI</h1>
@@ -217,29 +212,25 @@ function Footer() {
                         </div>
                         <h1 className="tw-text-[14px] tw-text-[#ffffffcc] tw-mt-[50px]">TẢI ỨNG DỤNG TRÊN ĐIỆN THOẠI</h1>
                         <div className="">
-                            <img src={listIcon.icon3} alt="" width={230} height={110} />
+                            <img src={img.mapr} alt="" width={200} height={230} />
                         </div>
                         <h1 className="tw-text-[14px] tw-text-[#ffffffcc] tw-mt-[50px]">ĐƯỢC CHỨNG NHẬN BỞI</h1>
-                        <div>
-                            <img src={listIcon.daDangKy} alt="" width={119} />
-                        </div>
+                       
                     </Col>
                 </Row>
             </Col>
             <Col span={24} className="tw-bg-[#262626] tw-h-[80px] tw-w-[100%] tw-flex  tw-justify-center tw-px-[30px] tw-py-[10px]">
                 <Row className='tw-w-[85%] tw-py-[10px]'> 
                     <Col span={1} className=''>
-                        <img src={listIcon.momo} alt="" width={50} />
+                        <img src={img.logoAdmin} alt="" width={50} />
                     </Col>
                     <Col span={15} className='tw-flex tw-items-end '>
                         <div className='tw-mb-4'>
-                            <div className='tw-text-[16px] tw-text-[#CBCBCB]'>CÔNG TY CỔ PHẦN DỊCH VỤ DI ĐỘNG TRỰC TUYẾN</div>
-                            <div className='tw-text-[14px] tw-text-[#ffffff80]'>Lầu 6, Toà nhà Phú Mỹ Hưng, số 8 Hoàng Văn Thái, khu phố 1, P. Tân Phú, Q. 7, Thành phố Hồ Chí Minh</div>
+                            <div className='tw-text-[16px] tw-text-[#CBCBCB]'>TICKETEZ ỨNG DỤNG SIÊU HÀNG ĐẦU ĐẶT VÉ XEM PHIM</div>
+                            <div className='tw-text-[14px] tw-text-[#ffffff80]'>Cái Răng, Cần Thơ</div>
                         </div>
                     </Col>
-                    <Col span={8} className='tw-flex tw-items-end tw-justify-end tw-mb-4 '>
-                        <div className='tw-text-[14px] tw-text-[#ffffff80] tw-pr-[75px]'>©Copyright M_Service 2023</div>
-                    </Col>
+                 
                 </Row>
             </Col>
         </Row>

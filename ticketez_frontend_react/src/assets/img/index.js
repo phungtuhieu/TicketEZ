@@ -13,6 +13,7 @@ import logoComment from './logo-cmt.webp';
 import notFoundLogo from './not-found.svg';
 import gifLoading from './loading.gif';
 import nenReviews from './nenReview.png';
+import mapr from './mapr.png';
 
 //
 import markerPink from '../icon/mapbox-marker-icon-20px-pink.png';
@@ -72,7 +73,8 @@ const img = {
     logoHome,
     logoAdmin,
     bgTopPhim,
-    nenReviews
+    nenReviews,
+    mapr
 };
 
 export default img;
