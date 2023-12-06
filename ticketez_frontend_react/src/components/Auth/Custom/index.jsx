@@ -5,6 +5,7 @@ const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const numericRegex = /\d/;
 const uppercaseRegex = /[A-Z]/;
 const lowercaseRegex = /[a-z]/;
+const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
 
 export const validateId = (id) => {
     if (id.length < 6) {
@@ -59,6 +60,14 @@ export const validateEmail = (email) => {
     }
     if (!emailRegex.test(email)) {
         funcUtils.notify('Email không hợp lệ!', 'error');
+        return false;
+    }
+    return true;
+};
+
+export const validatePhone = (phone) => {
+    if (!numericRegex.test(phone) || phone.length !== 10) {
+        funcUtils.notify('Số điện thoại không hợp lệ! Vui lòng nhập số điện thoại gồm 10 chữ số.', 'error');
         return false;
     }
     return true;
