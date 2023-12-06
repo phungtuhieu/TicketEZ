@@ -282,7 +282,6 @@ const AdminShowtime = () => {
     const handleDelete = async (record) => {
         try {
             const res = await eventApi.delete(record.id);
-            console.log(res);
             if (res.status === 200) {
                 if (fileList.length > 0) {
                     await uploadApi.deleteUpload(record.banner);

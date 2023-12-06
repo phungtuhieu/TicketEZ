@@ -288,7 +288,7 @@ const AdminShowtime = () => {
                         setValuePriceBySeatType(res.data[0].newPriceSeatTypeDTOs);
                     }
                 } catch (error) {
-                    // console.log(error.response.data);
+                     console.log(error.response.data);
                 }
             };
             getPriceByMovieAndCinemaComplexAndDate();
@@ -303,7 +303,6 @@ const AdminShowtime = () => {
         valueSelectPrice,
     ]);
 
-    console.log("kết quả nè",valuePrice);
 
     const columns = [
         

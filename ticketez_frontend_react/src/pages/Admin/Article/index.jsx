@@ -53,7 +53,6 @@ const Article = () => {
     const [posts, setPosts] = useState([]);
     const [statusValue, setStatusValue] = useState(true);
     const [valueSelectMovie, setValueSelectMovie] = useState([]);
-    console.log('value', posts);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -509,7 +508,6 @@ const Article = () => {
                 }))}
                 expandable={{
                     expandedRowRender: (record) => {
-                        console.log(record);
                         return (
                             <div style={{ maxHeight: '400px', overflow: 'auto' }}>
                                 <Descriptions title="Danh sách phim"></Descriptions>
