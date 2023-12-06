@@ -34,7 +34,7 @@ const publicRoutes = [
     { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
     { path: '/admin/accountStaff', component: PageAdmin.AdminAccountStaff, layout: AdminLayout },
     // User
-    { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
+    // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginForm, layout: DefaultLayout },
     { path: '/register', component: RegisterForm, layout: DefaultLayout },
