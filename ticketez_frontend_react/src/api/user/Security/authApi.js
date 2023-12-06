@@ -4,9 +4,10 @@ import axiosClient from '~/api/global/axiosClient';
 const endpoints = {
     auth: 'auth/signin',
     signup: 'auth/signup',
-    logout: 'auth/logout', 
-    regenerateOtp: 'auth/regenerate-otp'
-  };
+    logout: 'auth/logout',
+    regenerateOtp: 'auth/regenerate-otp',
+    verifyAccount: 'auth/verify-account'
+};
 
 
 
@@ -41,6 +42,17 @@ const authApi = {
         }
     },
 
+    getVerifyAccount: async (values) => {
+        try {
+            const response = await axiosClient.post(endpoints.verifyAccount, values);
+
+            return response;
+        } catch (error) {
+            console.error('Lỗi đăng nhập:', error);
+            throw error;
+        }
+    },
+
 
     signup: async (values) => {
         try {
@@ -64,13 +76,13 @@ const authApi = {
     regenerateOtp: async (email) => {
         try {
 
-          const response = await axiosClient.put(`${endpoints.regenerateOtp}?email=${(email)}`);
-          return response.data;
+            const response = await axiosClient.put(`${endpoints.regenerateOtp}?email=${(email)}`);
+            return response.data;
         } catch (error) {
-          console.error('Lỗi trong quá trình tái tạo OTP:', error);
-          throw error;
+            console.error('Lỗi trong quá trình tái tạo OTP:', error);
+            throw error;
         }
-      },
+    },
 
 
 

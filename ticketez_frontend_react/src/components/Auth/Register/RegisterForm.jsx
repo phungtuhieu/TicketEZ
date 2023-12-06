@@ -27,10 +27,11 @@ const RegisterForm = () => {
                 fullname: values.fullname,
                 email: values.email,
                 password: values.password,
+                phone: values.phone,
             });
 
             funcUtils.notify('Đăng ký thành công!', 'success');
-            navigate('/login');
+            navigate('/otp');
         } catch (error) {
             // Phân tích cú pháp lỗi từ phản hồi của API
             const errorMessage = error.response?.data?.message;
@@ -82,13 +83,25 @@ const RegisterForm = () => {
                                 <Input placeholder="Họ và tên" className={styles.input} />
                             </Form.Item>
                             <div className='formLabel'>
+                                <p className={styles.formLabelPhone}><h4>Số điện thoại:</h4></p>
+                            </div>
+                            <Form.Item
+                                name="phone"
+                                rules={[
+                                    { required: true, message: 'Không được bỏ trống số điện thoại !' },
+                                
+                                ]}
+                                className={styles.formItem}
+                            >
+                                <Input placeholder="Số điện thoại" className={styles.input} />
+                            </Form.Item>
+                            <div className='formLabel'>
                                 <p className={styles.formLabeEmail}><h4>Email:</h4></p>
                             </div>
                             <Form.Item
                                 name="email"
                                 rules={[
                                     { required: true, message: 'Không được bỏ trống Email !' },
-                                    // Thêm quy tắc kiểm tra định dạng email của bạn ở đây nếu cần
                                 ]}
                                 className={styles.formItem}
                             >
