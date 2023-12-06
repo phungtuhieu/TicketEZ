@@ -8,11 +8,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Services_Booking")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServiceBooking {
 	@EmbeddedId
 	ServiceBookingPK serviceBookingPK;
@@ -24,5 +28,7 @@ public class ServiceBooking {
 	@ManyToOne
 	@JoinColumn(name = "service_id", insertable = false, updatable = false)
 	private Service service;
+
+	private Double price;
 
 }
