@@ -149,7 +149,7 @@ function SeatChart(props) {
         } catch (error) {
             console.log(error);
         }
-
+        setIsTableLoaded(true);
         // handelUpdate(flattenedArray);
         setShowInfo('success');
     };

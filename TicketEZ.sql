@@ -1203,11 +1203,11 @@ GO
 
 INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'6d35ae07-a5cf-40f9-8a8d-82199ecb1266_6e8ce74e-29a6-4dc7-966f-afa42101f2fb_cgv.png',N'image.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'1f395c25-5693-4297-b32f-6146b0e37b5e_98a37a6d-7ab2-4e27-8d72-fc9977a0933e_lotte.jpg',N'image.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'ea2e716c-683a-41e8-bef4-88d2653bd551_069debaf-039a-4a94-90dc-4c573ec37b42_bhdcienma.jpg',N'image.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'3dd2d9d4-0e69-4964-919e-6a0dc0546942_megaGS.jpg',N'image.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'2a03b40a-7957-45fc-97dd-d60c74c838f8_c84d884f-25cb-4c4b-ba3c-5b299e8383c3_galaxy.webp',N'image.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'3c762e0c-be53-4688-b2eb-d8736f13943b_cgv.jpg',N'28a71603-d310-4097-8e47-085b87842135_cgvbanner.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'6c37626e-97f7-4977-a4ba-f93afe7560b9_lotte.jpg',N'09670227-8a38-4d94-b9ff-cdae1d189a61_lottebanner.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'f542d66c-b864-41b5-91f3-e1b8915a5a8b_bhp.jpg',N'86cb21b9-c1ec-4108-ada8-262a1f4ef37e_bhpbanner.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'7716ed22-db94-43f0-8df9-60196ac0cda7_mega.jpg',N'af84ac18-5ed7-4332-a7cf-9453a8e01f33_megaBannner.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'a2ff9ea8-3091-49e9-870d-f280e10439a9_galaci_cinema.jpg',N'970bc718-30f3-4cb8-be7a-153e5b4f6233_galaci_cinema_banner.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
@@ -1248,23 +1248,24 @@ GO
  -- 4. Thêm dữ liệu cho bảng Cinemas
 INSERT INTO [TicketEZ].[dbo].[Cinemas] ([name], [status], [cinema_type_id], [cinema_complex_id])
 VALUES
-    (N'Cinema 1', 1, 1, 1),
-    (N'Cinema 2', 1, 3, 1),
-    (N'Cinema 3', 1, 7, 2),
-    (N'Cinema 4', 0, 6, 2),
-    (N'Cinema 5', 0, 3, 3),
-    (N'Cinema 6', 1, 3, 3),
-    (N'Cinema 7', 1, 1, 4),
-    (N'Cinema 8', 1, 1, 4),
-    (N'Cinema 9', 0, 5, 7),
-    (N'Cinema 10', 1, 7, 5),
-	(N'Cinema 11', 1, 3, 3),
-	(N'Cinema 12', 1, 3, 4),
-	(N'Cinema 13', 1, 4, 6),
-	(N'Cinema 14', 0, 5, 5),
-	(N'Cinema 15', 1, 10, 5),
-	(N'Cinema 16', 1, 8, 5),
-	(N'Cinema 17', 0, 6, 5);
+    (N'Cinema 1 - Standard Cinema Complex ', 1, 1, 1),
+    (N'Cinema 2 - Standard Cinema Complex', 1, 3, 1),
+    (N'Cinema 1 - 3D Cinema Complex', 1, 7, 2),
+    (N'Cinema 2 - 3D Cinema Complex', 1, 6, 2),
+    (N'Cinema 1 - IMAX Cinema Complex', 1, 3, 3),
+    (N'Cinema 2 - IMAX Cinema Complex', 1, 3, 3),
+    (N'Cinema 1 - VIP Cinema Complex', 1, 1, 4),
+    (N'Cinema 2 - VIP Cinema Complex', 1, 1, 4),
+    (N'Cinema 1 - Multiplex Cinema Complex', 1, 5, 5),
+    (N'Cinema 2 - Multiplex Cinema Complex', 1, 7, 5),
+	(N'Cinema 1 - Independent Cinema Complex', 1, 3, 6),
+	(N'Cinema 2 - Independent Cinema Complex', 1, 3, 6),
+	(N'Cinema 1 - Boutique Cinema Complex', 1, 4, 7),
+	(N'Cinema 2 - Boutique Cinema Complex', 1, 5, 7),
+	(N'Cinema 1 - Family Cinema Complex', 1, 10, 8),
+	(N'Cinema 2 - Family Cinema Complex', 1, 8, 8),
+	(N'Cinema 1 - Sports Cinema Complex', 1, 6, 9),
+		(N'Cinema 2 -Sports Cinema Complex', 1, 6, 9);
 GO
 
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
@@ -1305,12 +1306,12 @@ GO
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
 INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color],[width], [image], [description])
 VALUES
-    (N'Ghế thường','normalSeat','#7C25CE',1, 'url_anh_ghethongthuong.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP','vipSeat','#B32225',1, 'url_anh_ghevip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
-	(N'Ghế đôi','coupleSeat','#AD1859',2,'url_anh_ghedoi.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
-    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'url_anh_ghehoinghi.jpg', N'Loại ghế tựa về sao.'),
-    (N'Ghế trẻ em','kidSeat','#10B785',1, 'url_anh_ghetreem.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế Sofa','sofaSeat','#C58B0B',1, 'url_anh_ghethoaithoaimai.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+    (N'Ghế thường','normalSeat','#7C25CE',1, '70ac78bd-5eb3-4122-8ef7-7da8920fd387_normal.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
+    (N'Ghế VIP','vipSeat','#B32225',1, 'fb3e3785-83ee-4e3d-87d8-5db008633444_vip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi','coupleSeat','#AD1859',2,'40f43f58-1b7c-4c0d-8bdf-110b2830f155_coupelseat.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
+    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'57b23dfc-0264-4d25-84dd-ad55affeb73b_ghetua.jpg', N'Loại ghế tựa về sao.'),
+    (N'Ghế trẻ em','kidSeat','#10B785',1, 'aee1468c-b7ae-4357-b38b-d53ecdfa7e5e_kid.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
+    (N'Ghế Sofa','sofaSeat','#C58B0B',1, '954ff02e-b68c-4bf6-858c-751c40f3009e_sofa.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
 	(N'đường đi','way','#121B2B',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
 	(N'Ghế đã đặt','seatUnavailable','#404040',1 ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
 	(N'Ghế chọn','seatReserved','#16A34A',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
@@ -1325,86 +1326,86 @@ GO
 INSERT INTO Seats ([name], [status], [description], seat_type_id, seat_chart_id)
 VALUES
     (N'A1', 1, N'Ghế thông thường', 1, 1),
-    (N'A2', 1, N'Ghế VIP', 2, 1),
+    (N'A2', 1, N'Ghế VIP', 1, 1),
     (N'A3', 1, N'Ghế thông thường', 1, 1),
-    (N'A4', 0, N'Ghế VIP', 2, 1),
+    (N'A4', 1, N'Ghế VIP', 1, 1),
     (N'A5', 1, N'Ghế thông thường', 1, 1),
-    (N'A6', 1, N'Ghế VIP', 2, 1),
+    (N'A6', 1, N'Ghế VIP', 1, 1),
     (N'A7', 1, N'Ghế thông thường', 1, 1),
     (N'B1', 1, N'Ghế thông thường', 1, 1),
-    (N'B2', 1, N'Ghế VIP', 2, 1),
+    (N'B2', 1, N'Ghế VIP', 1, 1),
     (N'B3', 1, N'Ghế thông thường', 1, 1),
-    (N'B4', 1, N'Ghế VIP', 2, 1),
-    (N'B5', 0, N'Ghế thông thường', 1, 1),
-    (N'B6', 1, N'Ghế VIP', 2, 1),
+    (N'B4', 1, N'Ghế VIP', 1, 1),
+    (N'B5', 1, N'Ghế thông thường', 1, 1),
+    (N'B6', 1, N'Ghế VIP', 1, 1),
     (N'B7', 1, N'Ghế thông thường', 1, 1),
 	(N'C1', 1, N'Ghế thông thường', 1, 1),
-    (N'C2', 1, N'Ghế VIP', 2, 1),
+    (N'C2', 1, N'Ghế VIP', 1, 1),
     (N'C3', 1, N'Ghế thông thường', 2, 1),
-    (N'C4', 0, N'Ghế VIP', 2, 1),
+    (N'C4', 1, N'Ghế VIP', 1, 1),
     (N'C5', 1, N'Ghế thông thường', 2, 1),
-    (N'C6', 1, N'Ghế VIP', 2, 1),
-	(N'C7', 0, N'Ghế VIP', 2, 1),
+    (N'C6', 1, N'Ghế VIP', 1, 1),
+	(N'C7', 1, N'Ghế VIP', 1, 1),
     (N'D1', 1, N'Ghế VIP', 1, 1),
     (N'D2', 1, N'Ghế thông thường', 1, 1),
-    (N'D3', 0, N'Ghế VIP', 1, 1),
+    (N'D3', 1, N'Ghế VIP', 1, 1),
     (N'D4', 1, N'Ghế thông thường', 1, 1),
-    (N'D5', 0, N'Ghế VIP', 1, 1),
-	(N'D6', 0, N'Ghế VIP', 1, 1),
-	(N'D7', 0, N'Ghế VIP', 1, 1),
+    (N'D5', 1, N'Ghế VIP', 1, 1),
+	(N'D6', 1, N'Ghế VIP', 1, 1),
+	(N'D7', 1, N'Ghế VIP', 1, 1),
 	(N'E1', 1, N'Ghế thông thường', 1, 1),
-    (N'E2', 1, N'Ghế VIP', 2, 1),
+    (N'E2', 1, N'Ghế VIP', 1, 1),
     (N'E3', 1, N'Ghế thông thường', 1, 1),
-    (N'E4', 0, N'Ghế VIP', 2, 1),
+    (N'E4', 1, N'Ghế VIP', 1, 1),
     (N'E5', 1, N'Ghế thông thường', 1, 1),
-    (N'E6', 1, N'Ghế VIP', 2, 1),
+    (N'E6', 1, N'Ghế VIP', 1, 1),
     (N'E7', 1, N'Ghế thông thường', 1, 1),
 	(N'F1', 1, N'Ghế thông thường', 1, 1),
-    (N'F2', 1, N'Ghế VIP', 2, 1),
+    (N'F2', 1, N'Ghế VIP', 1, 1),
     (N'F3', 1, N'Ghế thông thường', 1, 1),
-    (N'F4', 0, N'Ghế VIP', 2, 1),
+    (N'F4', 1, N'Ghế VIP', 1, 1),
     (N'F5', 1, N'Ghế thông thường', 1, 1),
-    (N'F6', 1, N'Ghế VIP', 2, 1),
+    (N'F6', 1, N'Ghế VIP', 1, 1),
     (N'F7', 1, N'Ghế thông thường', 1, 1),
-	(N'G1', 1, N'Ghế thông thường', 1, 1),
+	(N'G1', 1, N'Ghế thông thường', 2, 1),
     (N'G2', 1, N'Ghế VIP', 2, 1),
-    (N'G3', 1, N'Ghế thông thường', 1, 1),
-    (N'G4', 0, N'Ghế VIP', 2, 1),
-    (N'G5', 1, N'Ghế thông thường', 1, 1),
+    (N'G3', 1, N'Ghế thông thường', 2, 1),
+    (N'G4', 1, N'Ghế VIP', 2, 1),
+    (N'G5', 1, N'Ghế thông thường', 2, 1),
     (N'G6', 1, N'Ghế VIP', 2, 1),
-    (N'G7', 1, N'Ghế thông thường', 1, 1),
-	(N'H1', 1, N'Ghế thông thường', 1, 1),
+    (N'G7', 1, N'Ghế thông thường', 2, 1),
+	(N'H1', 1, N'Ghế thông thường', 2, 1),
     (N'H2', 1, N'Ghế VIP', 2, 1),
-    (N'H3', 1, N'Ghế thông thường', 1, 1),
-    (N'H4', 0, N'Ghế VIP', 2, 1),
-    (N'H5', 1, N'Ghế thông thường', 1, 1),
+    (N'H3', 1, N'Ghế thông thường', 2, 1),
+    (N'H4', 1, N'Ghế VIP', 2, 1),
+    (N'H5', 1, N'Ghế thông thường', 2, 1),
     (N'H6', 1, N'Ghế VIP', 2, 1),
-    (N'H7', 1, N'Ghế thông thường', 1, 1),
-	(N'I1', 1, N'Ghế thông thường', 1, 1),
+    (N'H7', 1, N'Ghế thông thường', 2, 1),
+	(N'I1', 1, N'Ghế thông thường', 2, 1),
     (N'I2', 1, N'Ghế VIP', 2, 1),
-    (N'I3', 1, N'Ghế thông thường', 1, 1),
-    (N'I4', 0, N'Ghế VIP', 2, 1),
-    (N'I5', 1, N'Ghế thông thường', 1, 1),
+    (N'I3', 1, N'Ghế thông thường', 2, 1),
+    (N'I4', 1, N'Ghế VIP', 2, 1),
+    (N'I5', 1, N'Ghế thông thường', 2, 1),
     (N'I6', 1, N'Ghế VIP', 2, 1),
-    (N'I7', 1, N'Ghế thông thường', 1, 1),
-	(N'J1', 1, N'Ghế thông thường', 1, 1),
+    (N'I7', 1, N'Ghế thông thường', 2, 1),
+	(N'J1', 1, N'Ghế thông thường', 2, 1),
     (N'J2', 1, N'Ghế VIP', 2, 1),
-    (N'J3', 1, N'Ghế thông thường', 1, 1),
-    (N'J4', 0, N'Ghế VIP', 2, 1),
-    (N'J5', 1, N'Ghế thông thường', 1, 1),
+    (N'J3', 1, N'Ghế thông thường', 2, 1),
+    (N'J4', 1, N'Ghế VIP', 2, 1),
+    (N'J5', 1, N'Ghế thông thường', 2, 1),
     (N'J6', 1, N'Ghế VIP', 2, 1),
-    (N'J7', 1, N'Ghế thông thường', 1, 1)
+    (N'J7', 1, N'Ghế thông thường', 2, 1)
 GO
   -- 9. Thêm dữ liệu cho bảng Studio
 INSERT INTO [TicketEZ].[dbo].[Studios] 
     ([name],[image], [founded_date], [country], [email],[address],[website], [description])
 VALUES
-    ('Walt Disney Pictures',N'Image.img', '2003-02-01', N'Hoa Kỳ', 'tuhieu@disney.com', N'Address1', N'website1', N'Studio sản xuất phim của Disney.'),
-    ('Warner Bros. Pictures', N'Image.img', '2003-02-01',N'Hoa Kỳ', 'phungtuhieut@warnerbros.com',  N'Address1', N'website1',N'Studio sản xuất phim của Warner Bros.'),
-    ('Paramount Pictures',N'Image.img', '2003-02-01', N'Canada', 'hieutuphung@paramount.com',  N'Address1', N'website1',N'Studio sản xuất phim của Paramount.'),
-    ('Universal Pictures', N'Image.img', '2003-02-01',N'Anh', 'nguyenhoangdinh@universal.com',  N'Address1', N'website1',N'Studio sản xuất phim của Universal.'),
-    ('20th Century Studios',N'Image.img', '2003-02-01', N'Anh', 'dinhnguyen@20thcentury.com', N'Address1', N'website1', N'Studio sản xuất phim của 20th Century.'),
-    ('Sony Pictures Entertainment',N'Image.img', '2003-02-01',	N'Mỹ', 'hieupt@sony.com', N'Address1', N'website1', N'Studio sản xuất phim của Sony.');
+    ('Walt Disney Pictures',N'2429086a-2c63-432d-ad32-e6eb3d9fc997_Walt-Disney.jpg', '2003-02-01', N'Hoa Kỳ', 'tuhieu@disney.com', N'Address1', N'website1', N'Studio sản xuất phim của Disney.'),
+    ('Warner Bros. Pictures', N'd5459db7-355b-4537-b6e7-a3d19766b87b_warner-bros.jpg', '2003-02-01',N'Hoa Kỳ', 'phungtuhieut@warnerbros.com',  N'Address1', N'website1',N'Studio sản xuất phim của Warner Bros.'),
+    ('Paramount Pictures',N'7dd31b5f-2fad-4183-a266-fbe668a7b44b_Paramount-Pictures-logo.jpg', '2003-02-01', N'Canada', 'hieutuphung@paramount.com',  N'Address1', N'website1',N'Studio sản xuất phim của Paramount.'),
+    ('Universal Pictures', N'2522e1df-3370-405f-a7c3-4826f08c9b45_Universal_Pictures.jpg', '2003-02-01',N'Anh', 'nguyenhoangdinh@universal.com',  N'Address1', N'website1',N'Studio sản xuất phim của Universal.'),
+    ('20th Century Studios',N'611960fc-8b7a-4fda-a9d7-c025a6f45050_20th_Century_Studios.jpg', '2003-02-01', N'Anh', 'dinhnguyen@20thcentury.com', N'Address1', N'website1', N'Studio sản xuất phim của 20th Century.'),
+    ('Sony Pictures Entertainment',N'b97ad77f-9101-4498-95aa-93a6b3ee74ff_Sony_Pictures_Entertainment.jpg', '2003-02-01',	N'Mỹ', 'hieupt@sony.com', N'Address1', N'website1', N'Studio sản xuất phim của Sony.');
 GO
  -- 10. Chèn dữ liệu vào bảng MPAA_Rating
 INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon],[color_code], [description])
@@ -1417,16 +1418,16 @@ VALUES
 GO
 INSERT INTO Movies (title, poster,banner,[description], duration, release_date, country, rating, video_trailer, MPAA_rating_id)
 VALUES
-(N'Người Tình', N'imaage.img',N'imaage.img',N'Một bộ phim tình cảm đầy cảm động', '02:15:00', '2023-09-15', N'Việt Nam', 7.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Nữ Đại Gia', N'imaage.img',N'imaage.img',N'Phim hài hước về cuộc sống thượng lưu', '02:00:00', '2023-07-20', N'Việt Nam', 8.2,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Biệt Đội Mật Mã', N'imaage.img',N'imaage.img',N'Phim hành động kịch tính', '02:30:00', '2023-06-10', N'Việt Nam', 6.8,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Rừng Xà Nu', N'imaage.img',N'imaage.img', N'Phim tài liệu về cuộc sống của dân tộc Xà Nu', '01:45:00', '2023-05-05', N'Việt Nam', 9.1,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Cuộc Chiến Ánh Sáng', N'imaage.img',N'imaage.img',N'Phim khoa học viễn tưởng', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5),
-(N'Bão Tố Trái Đất', N'imaage.img',N'imaage.img', N'Phim hành động thảm họa', '02:10:00', '2023-02-01', N'Việt Nam', 6.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 3),
-(N'Tình Yêu Hồi Sinh', N'imaage.img',N'imaage.img', N'Phim tình cảm và lãng mạn', '01:55:00', '2023-01-10', N'Việt Nam', 8.7,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 2),
-(N'Cậu Bé Thần Thánh', N'imaage.img',N'imaage.img' ,N'Phim hài hước dành cho gia đình', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 1),
-(N'Siêu Nhân Trái Đất', N'imaage.img',N'imaage.img', N'Phim siêu anh hùng đỉnh cao', '02:25:00', '2023-11-20', N'Việt Nam', 8.5,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 4),
-(N'Tinh Hoa Đất Việt', N'imaage.img',N'imaage.img',N'Phim tài liệu về văn hóa Việt Nam', '02:15:00', '2023-12-10', N'Việt Nam', 9.2,  'https://youtu.be/17ywQS6XO-M?si=znVx5MtxzG8eR2yb', 5);
+(N'Wonka', N'32595166-9640-4f04-aaed-7d3e769e39be_wonka.jpg',N'1a102436-e82c-4955-8321-c768a221eee1_wonkabanner.jpg',N'Dựa trên nhân vật từ quyến sách gối đầu giường của các em nhỏ trên toàn thế giới "Charlie và Nhà Máy Sôcôla" và phiên bản phim điện ảnh cùng tên vào năm 2005, WONKA kể câu chuyện kỳ diệu về hành trình của nhà phát minh, ảo thuật gia và nhà sản xuất sôcôla vĩ đại nhất thế giới trở thành WILLY WONKA đáng yêu mà chúng ta biết ngày nay. Từ đạo diễn loạt phim Paddington và nhà sản xuất loạt phim chuyển thể đình đám Harry Potter, WONKA hứa hẹn sẽ là một bộ phim đầy vui nhộn và màu sắc cho khán giả dịp Lễ Giáng Sinh năm nay.', '02:15:00', '2023-09-15', N'Việt Nam', 7.5,  'https://www.youtube.com/embed/1JHj4hc5MEI?si=5_ztvPzfFkUiDsaD', 1),
+(N'Người Mặt Trời', N'013066e1-ce40-4034-b7a9-f6a32c79bd65_nguoimattroi.jpg',N'4ce7bdeb-883a-448c-9983-15a3685a2b93_nguoimattroibanner.jpg',N'400 năm qua, loài Ma Cà Rồng đã bí mật sống giữa loài người trong hòa bình, nhưng hiểm họa bỗng ập đến khi một cô gái loài người phát hiện được thân phận của hai anh em Ma Cà Rồng. Người anh khát máu quyết săn lùng cô để bảo vệ bí mật giống loài, trong khi người còn lại chạy đua với thời gian để bảo vệ cô bằng mọi giá', '02:00:00', '2023-07-20', N'Việt Nam', 8.2,  'https://www.youtube.com/embed/L3t9jW4eRAs?si=PYjnv8njj25lUAi0', 2),
+(N'Bỗng Dưng Trúng Mánh', N'c4ec3220-7230-4c50-987c-d8bf65c4075a_bongdungtrungmanh.jpg',N'a38fb35e-0791-4810-98c6-0a0d2bde4b00_bongdungtrungmanhbanner.jpg',N'Bỗng Dưng Trúng Mánh là câu chuyện từ cá biệt toàn trường hoá tài phiệt học đường của Lee Kang-jin (Yoo Seon-ho) - một nam sinh thường xuyên bị bạn học bắt nạt. Tình cờ nhặt được chiếc phong bì chứa đầy tiền mặt của ông trùm cho vay nặng lãi Rang (Yoon Byung-hee), cuộc đời Kang-jin đã hoàn toàn thay đổi. Rang dạy Kang-jin những bài học đầu tiên về nghề cho vay siêu lợi nhuận, từ đó biến cậu học trò lầm lì trở thành “chiến thần tài chính”, đại gia mới nổi, “ông hoàng” cho vay nặng lãi của trường trung học Geumhwa', '02:30:00', '2023-06-10', N'Việt Nam', 6.8,  'https://www.youtube.com/embed/cH2lE3fxelc?si=th2RZVLkoslRHewS', 3),
+(N'Đường Hầm Tới Mùa Hạ, Lối Thoát Của Biệt Ly', N'f71a7431-2344-4804-9f17-312e61f7c121_duongham.jpg',N'4ebc9c31-b85d-48ec-864a-b806ca22ee84_duonghambanner.jpg', N'Dựa trên cuốn tiểu thuyết đạt giải thưởng. Bộ phim chuyển thể giành giải thưởng Paul Grimault tại Liên hoan phim hoạt hình quốc tế Annecy 2023. Một đường hầm bí ẩn tên Urashima có thể thực hiện bất kỳ điều ước nào…nhưng bạn sẽ phải đánh đổi bằng thời gian. Cậu học sinh trung học Kaoru, bị ám ảnh bởi quá khứ, cùng với Anzu, một cô gái luôn đấu tranh để đạt được ước mơ của mình bước vào đường hầm. Nhưng thứ họ phải đánh đổi là quá lớn. Đây là một câu chuyện mùa hè khó quên về nỗi nhớ, thời gian và tình yêu của tuổi trẻ', '01:45:00', '2023-05-05', N'Việt Nam', 9.1,  'https://www.youtube.com/embed/38B5-Ft_doo?si=riDFqsOfOdm7Pvee', 4),
+(N'Đế Chế Napoleon', N'eeae65a5-d921-4741-b40c-146cb30728e4_napoleon.jpg',N'98679b39-cbe3-45b3-ac6e-4391ba508775_napoleonbanner.jpg',N'Một góc nhìn riêng tư về nguồn gốc và quá trình leo lên ngôi hoàng đế nhanh chóng và tàn nhẫn của nhà cầm quân người Pháp. Câu chuyện được nhìn qua lăng kính mối quan hệ đầy đam mê và biến động giữa Napoleon với vợ và tình yêu đích thực của ông, Josephine.', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 'https://www.youtube.com/embed/2t6lSTexflk?si=vmRl58Y91yF55uwg', 5),
+(N'Cô Giáo Em Là Số 1', N'e656d640-074e-46c9-8cf9-3d7507396ff3_cogiaolaso1.jpg',N'cb96f159-fd2d-43da-b0bf-a251eca49bbf_cogiaolaso1banner.jpg', N'Si-min (do Shin Hae-sun thủ vai) là một võ sĩ quyền anh đầy triển vọng nhưng đã từ bỏ quyền thi đấu tại kỳ Thế vận hội Olympic để lấy tiền trả nợ cho cha. Từ đó, Si-min cũng nhận ra rằng, cuộc sống vốn không công bằng và “công lý không thể mài ra cơm”. Si-min gạt phăng giấc mơ trở thành võ sĩ quyền anh và quyết tâm trở thành giáo viên, với mong muốn về một cuộc sống ổn định hơn. Cô trở thành giáo viên hợp đồng của một trường trung học có tiếng cùng mục tiêu trở thành giáo viên chính thức ở đây. Để có thể nhanh chóng hoàn thành nguyện vọng, cô đã nỗ lực kìm nén cái tôi xuống đáy, luôn mỉm cười cho qua, bất chấp mọi tình huống trớ trêu xảy đến với mình. Tuy nhiên, Su-gang (do Lee Jun-young thủ vai) - kẻ cầm đầu của một băng đảng quậy phá, chuyên đi bắt nạt và hành hạ người yếu thế đã phá vỡ quy tắc của Si-min. Không thể chịu đựng được những hành vi bạo lực học đường của Su-gang, Si-min đeo lên một chiếc mặt nạ mèo và dạy cho tên côn đồ một bài học đáng nhớ. Nhận thấy quyền lực của mình bị đe dọa, Su-gang điên cuồng tìm kiếm người đeo mặt nạ mèo, Si-min đứng trước nguy cơ bị bại lộ danh tính và phải đối mặt với sự lựa chọn giữa “CÔNG LÝ hay CÔNG VIỆC.”', '02:10:00', '2023-02-01', N'Việt Nam', 6.5,  'https://www.youtube.com/embed/XieLp58PaJg?si=YM4zlkwkXCyw12Jk', 3),
+(N'Yêu Lại Vợ Ngầu', N'c554f0c4-c935-436f-9985-c4a921249f58_yeulaivongau.jpg',N'a173cc0f-fc9b-4222-8457-49e19fd741f9_yeulaivongaubanner.jpg', N'Cặp vợ chồng trẻ No Jung Yeol (Kang Ha-neul) và Hong Na Ra (Jung So-min) từ cuộc sống hôn nhân màu hồng dần “hiện nguyên hình” trở thành cái gai trong mắt đối phương với vô vàn thói hư, tật xấu. Không thể đi đến tiếng nói chung, Jung Yeol và Na Ra quyết định ra toà ly dị. Tuy nhiên, họ phải chờ 30 ngày cho đến khi mọi thủ tục chính thức được hoàn tất. Trong khoảng thời gian này, một vụ tai nạn xảy ra khiến cả hai mất đi ký ức và không nhớ người kia là ai. Từ thời gian 30 ngày chờ đợi để được “đường ai nấy đi”, tình huống trớ trêu khiến cả hai bắt đầu nảy sinh tình cảm trở lại. Liệu khi nhớ ra mọi thứ, họ vẫn sẽ ký tên vào tờ giấy ly hôn?', '01:55:00', '2023-01-10', N'Việt Nam', 8.7,  'https://www.youtube.com/embed/081I7DXNknc?si=jGn73WInT9nFXtjI', 2),
+(N'Bạn Không Thân', N'4f918076-73ed-46ba-a04d-74c802b8bc8b_bankhongthan.jpg',N'5eb46536-a8f5-4d36-bb66-9e5115e4cc37_bankhongthanbanner.jpg' ,N'Một nhóm học sinh trung học, với niềm đam mê làm phim chung, quyết định thực hiện một bộ phim ngắn dựa trên cuộc đời của bạn học yêu quý của họ. Nhưng họ không biết rằng, nỗ lực của họ sẽ khiến họ khám phá ra những bí mật ẩn giấu của người bạn đó, có thể thay đổi quan điểm của họ về đam mê mãi mãi.', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 'https://www.youtube.com/embed/jXuDMm55GYo?si=8B23gjAUGSPJN2iF', 1),
+(N'Ác Mộng Tuổi 21', N'9eb0c8b3-e256-4103-bec8-2af03f72d915_acmongtuoi21.jpg',N'2e002cd8-b71d-4048-87c1-23f58f9ffd4b_acmongtuoi21banner.jpg', N'Ác Mộng Tuổi 21 theo chân Sreynit - cô gái luôn bị ám ảnh bởi những giấc mơ khủng khiếp đến mức có thể giết chết cô khi ngủ. Một thầy bói từng nói với cô rằng cuộc sống của cô sẽ trở lại bình thường nếu cô sống sót qua sinh nhật thứ 21 của mình. Tuy nhiên, vào đêm trước khi cô bước sang tuổi 21, một giấc mơ đã đưa cô quay trở lại quá khứ, nơi cô và hai chàng trai khác có liên quan đến cái chết của một người bạn thời thơ ấu', '02:25:00', '2023-11-20', N'Việt Nam', 8.5,  'https://www.youtube.com/embed/RfFJFi1CErA?si=WNyu_bANIy9wLp4j', 4),
+(N'Điều Ước', N'15d85428-651b-4621-a482-f2a472aa3c79_dieuuoc.jpg',N'6685fefa-bcdd-42c0-9db8-3c52962f464c_dieuuocbanner.jpg',N'Một bộ phim hoạt hình hoàn toàn mới với chủ đề về những ngôi sao ước vọng. Phim có Ariana DeBose lồng tiếng vai Asha và được đạo diễn bởi Chris Buck & Fawn Veerasunthorn, sản xuất bởi Peter Del Vecho & Juan Pablo Reyes với các bài hát được Julia Michaels sáng tác mới hoàn toàn', '02:15:00', '2023-12-10', N'Việt Nam', 9.2,  'https://www.youtube.com/embed/ctlz0R1tSZE?si=W0LwG0DZXsaNBfhd', 5);
 GO
 INSERT INTO [TicketEZ].[dbo].[Movies_Producers](movie_id, producer_id)
 VALUES
@@ -1580,22 +1581,65 @@ GO
 -- Thêm dữ liệu mẫu cho bảng Formats_Movies
 INSERT INTO Formats_Movies (movie_id, format_id)
 VALUES
-    ( 2, 1),
+    ( 1, 1),
     ( 1, 2),
     ( 2, 1),
-    ( 2, 2);
+    ( 2, 2),
+	( 3, 1),
+    ( 3, 2),
+    ( 4, 1),  
+	( 4, 2),
+    ( 5, 1),
+    ( 5, 2),  
+	( 6, 1),
+    ( 6, 2),
+    ( 7, 1), 
+	( 7, 2),
+    ( 8, 1),
+    ( 8, 2), 
+	( 9, 1),
+    ( 9, 2),
+    ( 10, 1),
+	( 10, 2);
 	go
 -- Inserting sample data into the Price table
 INSERT INTO Price ([start_date], [end_date], [status], format_movie_id, cinema_complex_id)
 VALUES
-    ('2023-11-20', '2023-12-27', 1, 1, 1)
+    ('2023-11-20', '2023-12-27', 1, 1, 1),
+	('2023-11-20', '2023-12-27', 1, 2, 1),
+    ('2023-11-20', '2023-12-27', 1, 3, 2),
+	('2023-11-20', '2023-12-27', 1, 4, 2),
+	('2023-11-20', '2023-12-27', 1, 5, 3),
+	('2023-11-20', '2023-12-27', 1, 6, 3),
+	('2023-11-20', '2023-12-27', 1, 7, 4),
+	('2023-11-20', '2023-12-27', 1, 8, 4),
+	('2023-11-20', '2023-12-27', 1, 9, 5),
+	('2023-11-20', '2023-12-27', 1, 10, 5),
+	('2023-11-20', '2023-12-27', 1, 11, 6),
+	('2023-11-20', '2023-12-27', 1, 12, 6),
+	('2023-11-20', '2023-12-27', 1, 13, 8),
+	('2023-11-20', '2023-12-27', 1, 14, 9),
+	('2023-11-20', '2023-12-27', 1, 15, 10),
+	('2023-11-20', '2023-12-27', 1, 16, 11),
+	('2023-11-20', '2023-12-27', 1, 17, 12),
+    ('2023-11-20', '2023-12-27', 1, 18, 13),
+	('2023-11-20', '2023-12-27', 1, 19, 14),
+    ('2023-11-20', '2023-12-27', 1, 20, 15);
+
 
 -- 23. thêm dữ liệu bảng Showtimes
  INSERT INTO [TicketEZ].[dbo].[Showtimes] ([start_time], [end_time], [cinema_id],  [format_movie_id],[seat_chart_id],[price_id])
 VALUES
-  ('2023-11-25 12:00:00', '2023-11-25 14:00:00',  1, 1,1,1),
-  ('2023-10-15 10:00:00', '2023-10-15 12:00:00',  3, 3,1,1),
-  ('2023-11-15 20:00:00', '2023-11-15 23:00:00', 1, 1,1,1);
+  ('2023-12-8 12:00:00', '2023-12-8 14:00:00',  1, 1,1,1),
+  ('2023-12-8 15:00:00', '2023-12-8 17:00:00',  1, 3,1,3),
+  ('2023-12-8 18:00:00', '2023-12-8 20:00:00',  1, 5,1,5),
+  ('2023-12-8 21:00:00', '2023-12-8 23:00:00',  1, 7,1,7),
+  ('2023-12-9 12:00:00', '2023-12-9 14:00:00',  1, 9,1,9),
+  ('2023-12-9 15:00:00', '2023-12-9 17:00:00',  1, 2,1,2),
+  ('2023-12-9 18:00:00', '2023-12-9 20:00:00',  1, 4,1,4),
+  ('2023-12-9 21:00:00', '2023-12-9 23:00:00',  1, 6,1,6),
+  ('2023-12-10 12:00:00', '2023-12-10 14:00:00',1, 8,1,8),
+  ('2023-12-10 15:00:00', '2023-12-10 17:00:00',1, 10,1,10)
 GO
 
 --24. thêm dữ liệu cho bảng booking
@@ -1666,7 +1710,34 @@ INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_i
 VALUES
     (70000, 85000, 1, 1),
     ( 90000, 100000, 2, 1),
-    (100000, 120000, 3, 1)
+    (100000, 120000, 3, 1),
+	 (70000, 85000, 1, 2),
+    ( 90000, 100000, 2, 2),
+    (100000, 120000, 3, 2),
+	 (70000, 85000, 1, 3),
+    ( 90000, 100000, 2, 3),
+    (100000, 120000, 3, 4),
+	 (70000, 85000, 1, 4),
+    ( 90000, 100000, 2, 4),
+    (100000, 120000, 3, 4),
+	 (70000, 85000, 1, 5),
+    ( 90000, 100000, 2, 5),
+    (100000, 120000, 3, 5),
+	 (70000, 85000, 1, 6),
+    ( 90000, 100000, 2, 6),
+    (100000, 120000, 3, 6),
+	 (70000, 85000, 1, 7),
+    ( 90000, 100000, 2, 7),
+    (100000, 120000, 3, 7),
+	 (70000, 85000, 1, 8),
+    ( 90000, 100000, 2, 8),
+    (100000, 120000, 3, 8),
+	 (70000, 85000, 1, 9),
+    ( 90000, 100000, 2, 9),
+	 (70000, 85000, 1, 9),
+    ( 90000, 100000, 2, 10),
+    (100000, 120000, 3, 10),
+    (100000, 120000, 3, 10);
   
 --thêm dữ liệu cho bảng booking
 INSERT INTO Booking (id, account_id, create_date, showtime_id, [status],[ticket_status])
@@ -1759,7 +1830,7 @@ SELECT * FROM Directors_Movies
 SELECT * FROM Actors
 SELECT * FROM Actors_Movies
 SELECT * FROM Provinces
-SELECT * FROM Cinema_Complex
+
 SELECT * FROM Seat_Types
 SELECT * FROM Seats
 SELECT * FROM Seats_Choose
@@ -1773,6 +1844,7 @@ SELECT * FROM [Services]
 SELECT * FROM Price_Services
 SELECT * FROM Cinema_Types
 SELECT * FROM Cinemas
+SELECT * FROM Cinema_Complex
 SELECT * FROM Discounts
 SELECT * FROM Discounts_Booking
 SELECT * FROM Showtimes
