@@ -23,6 +23,8 @@ public interface AccountRepository extends JpaRepository<SecurityAccount, String
 
     Boolean existsByFullname(String fullname);
 
+    Boolean existsByPhone(String phone);
+
     SecurityAccount findByIdAndPassword(String id, String password);
 
 }

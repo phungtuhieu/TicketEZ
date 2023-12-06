@@ -14,9 +14,11 @@ const { Header, Content } = Layout;
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const onFinish = async (values) => {
         if (!validateId(values.id) || !validatePassword(values.password)) return;
+        setLoading(true);
         try {
             const response = await authApi.getLogin({
                 id: values.id,
@@ -40,6 +42,8 @@ const LoginForm = () => {
             } else {
                 funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.', 'error');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -91,7 +95,7 @@ const LoginForm = () => {
 
                             </Form.Item>
                             <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton}>
+                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
                                     Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>

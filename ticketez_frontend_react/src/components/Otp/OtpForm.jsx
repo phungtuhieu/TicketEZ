@@ -10,6 +10,7 @@ const { Header, Content } = Layout;
 
 
 const OtpForm = () => {
+    const [loading, setLoading] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [emailForOtp, setEmailForOtp] = useState('');
     const [isOtpButtonDisabled, setOtpButtonDisabled] = useState(false);
@@ -37,6 +38,7 @@ const OtpForm = () => {
             funcUtils.notify('Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.', 'error');
             return;
         }
+        setLoading(true);
         try {
             const response = await authApi.getVerifyAccount({
                 id: values.id,
@@ -47,6 +49,8 @@ const OtpForm = () => {
             navigate('/login');
         } catch (error) {
             funcUtils.notify('Kiểm tra Mã OTP', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -133,7 +137,7 @@ const OtpForm = () => {
                             </Form.Item>
 
                             <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton}>
+                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
                                     Xác nhận
                                 </Button>
                             </Form.Item>

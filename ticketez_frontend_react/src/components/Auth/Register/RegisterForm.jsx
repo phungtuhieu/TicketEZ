@@ -7,13 +7,13 @@ import authApi from '~/api/user/Security/authApi';
 import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import backgroundImage from '~/assets/img/texure.jpg';
-import { validateEmail, validateId, validatePassword } from '../Custom';
+import { validateEmail, validateId, validatePassword, validatePhone } from '../Custom';
 
 const { Header, Content } = Layout;
 
 
 const RegisterForm = () => {
-
+    const [loading, setLoading] = useState(false);
     const [signupError, setSignupError] = useState('');
     const navigate = useNavigate();
 
@@ -21,6 +21,8 @@ const RegisterForm = () => {
         if (!validateId(values.id)) return;
         if (!validateEmail(values.email)) return;
         if (!validatePassword(values.password)) return;
+        if (!validatePhone(values.phone)) return;
+        setLoading(true);
         try {
             await authApi.signup({
                 id: values.id,
@@ -36,6 +38,8 @@ const RegisterForm = () => {
             // Phân tích cú pháp lỗi từ phản hồi của API
             const errorMessage = error.response?.data?.message;
             funcUtils.notify(errorMessage, 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,7 +93,7 @@ const RegisterForm = () => {
                                 name="phone"
                                 rules={[
                                     { required: true, message: 'Không được bỏ trống số điện thoại !' },
-                                
+
                                 ]}
                                 className={styles.formItem}
                             >
@@ -171,7 +175,7 @@ const RegisterForm = () => {
 
                             </Form.Item> */}
                             <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton}>
+                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
                                     Đăng ký
                                 </Button>
                                 <p className={styles.signup}>

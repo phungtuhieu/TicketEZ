@@ -100,7 +100,7 @@ public class AuthController {
         .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với id: " + loginRequest.getId()));
     if (!securityAccount.isVerified()) {
       return ResponseEntity
-          .status(HttpStatus.FORBIDDEN) 
+          .status(HttpStatus.FORBIDDEN)
           .body("Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.");
     }
 
@@ -190,15 +190,20 @@ public class AuthController {
     if (accountRepository.existsById(signUpRequest.getId())) {
       return ResponseEntity
           .badRequest()
-          .body(new MessageResponse("Lỗi: Tên người dùng đã tồn tại!"));
+          .body(new MessageResponse("Tên người dùng đã tồn tại!"));
     }
 
     if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
       return ResponseEntity
           .badRequest()
-          .body(new MessageResponse("Lỗi: Email đã được sử dụng!"));
+          .body(new MessageResponse("Email đã được sử dụng!"));
     }
-    if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
+     if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
+    }
+    if (accountRepository.existsByPhone(signUpRequest.getPhone())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Số điện thoai đã được sử dụng!"));
 
     }
     SecurityAccount account = new SecurityAccount(
