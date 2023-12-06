@@ -93,7 +93,7 @@ const AdminPrice = () => {
 
         {
             title: 'Tên phim',
-            render: (_, record) => record.price.formatMovie.movie.title,
+            render: (_, record) => `${record.price.formatMovie.movie.title } ${record.price.formatMovie.format.name }`,
         },
         {
             title: 'Cụm rạp và chuỗi rạp',
@@ -157,7 +157,9 @@ const AdminPrice = () => {
         try {
             const res = await axiosClient.delete(`price/${record.price.id}`);
             console.log(res);
+            setShowInfo('success')
         } catch (error) {
+            // setShowInfo('errorEdit')
             console.log(error);
         }
 
@@ -180,7 +182,7 @@ const AdminPrice = () => {
     const [showInfo, setShowInfo] = useState('');
     useEffect(() => {
         if (showInfo === 'success') {
-            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
+            funcUtils.notify('Xóa thành công dữ liệu trong bảng', 'success');
             setShowInfo('es');
         }
         if (showInfo === 'errorFormat') {
