@@ -58,6 +58,12 @@ public class ServiceAPI {
 		return ResponseEntity.ok(services);
 	}
 
+	@GetMapping("/find-by-cinema-complex/{idCplx}")
+	public ResponseEntity<List<Service>> findByCplx(@PathVariable("idCplx") Long idCplx) {
+		List<Service> services = dao.findByCinemaComplexId(idCplx);
+		return ResponseEntity.ok(services);
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findById(@PathVariable("id") Long id) {
 		try {
