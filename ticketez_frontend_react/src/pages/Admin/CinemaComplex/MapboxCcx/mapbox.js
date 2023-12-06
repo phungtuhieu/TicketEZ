@@ -3,9 +3,13 @@ import Map, { Marker, Popup } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios';
 import { listIcon } from "~/assets/img";
+import Search from "antd/es/input/Search";
+import { SearchOutlined } from '@ant-design/icons';
 
 // export const maps = {popupInfo}
 function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
+  const [searchInput, setSearchInput] = useState('');
+
   const [popupInfo, setPopupInfo] = useState({
     latitude: 10.768928753876907,
     longitude: 106.65765392148774, address: ""
@@ -13,6 +17,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
 
   // console.log(latitude);
   // console.log(longitude);
+  
 
   useEffect(() => {
 
@@ -70,7 +75,35 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
     }
   };
 
-
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchInput}.json?access_token=${mapboxAccessToken}`
+      );
+  
+      if (response.data.features.length > 0) {
+        const firstResult = response.data.features[0];
+        const { center, place_name } = firstResult;
+  
+        setPopupInfo({
+          latitude: center[1],
+          longitude: center[0],
+          address: place_name,
+        });
+  
+        onPopupInfoChange({
+          latitude: center[1],
+          longitude: center[0],
+          address: place_name,
+        });
+      } else {
+        console.log('Không tìm thấy kết quả.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm địa điểm:', error);
+    }
+  };
+  
   return (
     <Map
       onClick={handleMapClick}
@@ -101,7 +134,16 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
           alt=""
         />
       </Marker>
-
+      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>
+  <input
+    type="text"
+    placeholder="Tìm kiếm địa điểm..."
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+    className="tw-border-b tw-border-black focus:tw-border-transparent tw-outline-none"
+  />
+  <SearchOutlined onClick={handleSearch} style={{fontSize: '25px'}}/>
+</div>
 
     </Map>
   );

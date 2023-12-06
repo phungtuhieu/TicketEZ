@@ -13,11 +13,11 @@ import com.ticketez_backend_springboot.modules.account.Account;
 
 public interface AccountRoleDAO extends JpaRepository<AccountRole, String> {
 
-    // @Query("SELECT ar FROM AccountRole ar JOIN ar.role r WHERE r.id NOT IN (1,
-    // 2)")
-    // List<AccountRole> findByAccountRole();
-    @Query("SELECT a, r.name as roleName FROM Account a JOIN a.accountRoles ar JOIN ar.role r "
-            + "WHERE ar.role.id NOT IN (1, 2) AND a.fullname LIKE CONCAT('%', :search, '%') AND a.status = :status ORDER BY a.createdDate DESC")
-    Page<Account> findByAccountRole(Pageable pageable, @Param("status") Integer status,
-            @Param("search") String search);
+        // @Query("SELECT ar FROM AccountRole ar JOIN ar.role r WHERE r.id NOT IN (1,
+        // 2)")
+        // List<AccountRole> findByAccountRole();
+        @Query("SELECT a, r.name as name FROM Account a JOIN a.accountRoles ar JOIN ar.role r "
+                        + "WHERE ar.role.id NOT IN (1, 2) AND a.fullname LIKE CONCAT('%', :search, '%') AND a.status = :status ORDER BY a.createdDate DESC")
+        Page<Account> findByAccountRole(Pageable pageable, @Param("status") Integer status,
+                        @Param("search") String search);
 }
