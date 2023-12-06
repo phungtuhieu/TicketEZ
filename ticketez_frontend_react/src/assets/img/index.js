@@ -12,6 +12,7 @@ import anhReview from './hinhanhReview.webp';
 import logoComment from './logo-cmt.webp';
 import notFoundLogo from './not-found.svg';
 import gifLoading from './loading.gif';
+import nenReviews from './nenReview.png';
 
 //
 import markerPink from '../icon/mapbox-marker-icon-20px-pink.png';
@@ -70,7 +71,8 @@ const img = {
     logoComment,
     logoHome,
     logoAdmin,
-    bgTopPhim
+    bgTopPhim,
+    nenReviews
 };
 
 export default img;

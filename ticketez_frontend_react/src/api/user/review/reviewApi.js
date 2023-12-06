@@ -2,7 +2,6 @@ import { accountApi, movieApi } from '~/api/admin';
 import axiosClient from '../../global/axiosClient';
 const url = 'review'
 const urlMovie = 'movie'
-const urlAcc = 'account'
 
 const reviewApi = {
     getId: async (reviewId) => {
@@ -42,6 +41,13 @@ const reviewApi = {
     //check tài khoản
     getcheckAccountBooking: async (accountId, movieId) => {
         return axiosClient.get(url + `/get/check-account-booking?accountId=${accountId}&movieId=${movieId}`);
+    },
+    getMovieOrReview: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        return axiosClient.get(url + `/get/by-movie-review`, {params});
     }
 
 }

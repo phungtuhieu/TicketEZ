@@ -30,16 +30,12 @@ public interface AccountDAO extends JpaRepository<Account, String> {
         // List<Account> findAllByOrderByPhoneDesc ();
         List<Account> findAllByOrderByCreatedDateDesc();
 
-  
         @Query("SELECT new com.ticketez_backend_springboot.dto.TotalDashboardAdmin ( " +
                         " COUNT(a.id) as total_user )" +
                         " FROM Account a " +
                         " JOIN " +
-                        " AccountRole ar on ar.account.id = a.id"  +
-                        " WHERE ar.role.id = 2"
-                        )
+                        " AccountRole ar on ar.account.id = a.id" +
+                        " WHERE ar.role.id = 2")
         List<TotalDashboardAdmin> getTotalUser();
-
-    
 
 }

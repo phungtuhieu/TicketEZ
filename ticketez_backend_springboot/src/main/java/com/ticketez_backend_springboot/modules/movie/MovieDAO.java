@@ -64,9 +64,9 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
 
         // Lấy ra top 5 phim có booking cao nhất
         @Query("SELECT b.showtime.formatMovie.movie " +
-        "FROM Booking b " +
-        "GROUP BY b.showtime.formatMovie.movie " +
-        "ORDER BY COUNT(b.id) DESC")
+                        "FROM Booking b " +
+                        "GROUP BY b.showtime.formatMovie.movie " +
+                        "ORDER BY COUNT(b.id) DESC")
 
         List<Movie> findTop5MoviesWithMostBookings();
 

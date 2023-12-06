@@ -500,15 +500,7 @@ const AdminCinemaComplex = () => {
                         >
                             <Input placeholder="Please input your name" />
                         </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                        // name="address"
-                        // label="Địa chỉ"
-                        // rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
-                        >
-                            {/* <Input placeholder="Please input your name" /> */}
-                            <MapboxCcx onPopupInfoChange={handlePopupInfoChange} latitude={mapCinema.latitude} longitude={mapCinema.longitude} address={mapCinema.address} />
-                        </Form.Item>
+                       
                         <Form.Item
                             {...formItemLayout}
                             name="phone"
@@ -617,6 +609,15 @@ const AdminCinemaComplex = () => {
                                 ]}
                                 allowClear
                             />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                        // name="address"
+                        // label="Địa chỉ"
+                        // rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                        >
+                            {/* <Input placeholder="Please input your name" /> */}
+                            <MapboxCcx onPopupInfoChange={handlePopupInfoChange} latitude={mapCinema.latitude} longitude={mapCinema.longitude} address={mapCinema.address} />
                         </Form.Item>
                     </Form>
                 </BaseModal>
