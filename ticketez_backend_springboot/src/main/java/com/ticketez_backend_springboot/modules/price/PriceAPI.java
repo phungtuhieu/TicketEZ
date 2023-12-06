@@ -261,11 +261,12 @@ public class PriceAPI {
         return ResponseEntity.ok(price);
     }
 
-    @GetMapping("/get/price-by-movie-cinemaComplex/{movieId}/{cinemaComplexId}/{date}")
+    @GetMapping("/get/price-by-movie-cinemaComplex/{movieId}/{formatId}/{cinemaComplexId}/{date}")
     public ResponseEntity<?> getPriceByMovieAndCinemaComplexAndDate(@PathVariable("movieId") Long movieId,
-            @PathVariable("cinemaComplexId") Long cinemaComplexId, @PathVariable("date") LocalDate date) {
+            @PathVariable("formatId") Long formatId, @PathVariable("cinemaComplexId") Long cinemaComplexId,
+            @PathVariable("date") LocalDate date) {
         try {
-            List<Price> prices = priceDAO.getPriceByMovieAndCinemaComplexAndDate(movieId, cinemaComplexId,
+            List<Price> prices = priceDAO.getPriceByMovieAndCinemaComplexAndDate(movieId, formatId, cinemaComplexId,
                     date);
             return ResponseEntity.ok(prices);
         } catch (Exception e) {

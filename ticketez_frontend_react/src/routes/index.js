@@ -4,6 +4,7 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 import RegisterForm from '~/components/Auth/Register/RegisterForm';
 import LoginForm from '~/components/Auth/Login/LoginForm';
+import OtpForm from '~/components/Otp/OtpForm';
 
 const publicRoutes = [
     //Admin
@@ -38,6 +39,7 @@ const publicRoutes = [
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginForm, layout: DefaultLayout },
     { path: '/register', component: RegisterForm, layout: DefaultLayout },
+    { path: '/otp', component: OtpForm, layout: DefaultLayout },
     //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
     { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },

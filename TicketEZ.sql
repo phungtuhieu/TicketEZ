@@ -310,6 +310,11 @@ GO
 
     )
 GO
+    CREATE TABLE [Events_Discounts] (
+        event_id BIGINT NOT NULL,
+        discount_id BIGINT NOT NULL,
+    )
+GO
     CREATE TABLE [Services] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         [name] NVARCHAR(200) NOT NULL,
@@ -862,6 +867,16 @@ ALTER TABLE
     Price_Services
 ADD
     CONSTRAINT FK_PriceService_Service FOREIGN KEY (service_id) REFERENCES [Services](id)
+GO
+ALTER TABLE
+    Events_Discounts
+ADD
+    CONSTRAINT FK_Events_Discounts_Events FOREIGN KEY (event_id) REFERENCES [Events](id)
+GO
+ALTER TABLE
+    Events_Discounts
+ADD
+    CONSTRAINT FK_Events_Discounts_Discount FOREIGN KEY (discount_id) REFERENCES [Discounts](id)
 GO
 ALTER TABLE
     Cinema_Complex
