@@ -12,13 +12,29 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
             'linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%)',
     };
 
+    const backgroundImage = {
+        backgroundImage: `linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%), url(${uploadApi.get(
+            movie.banner,
+        )})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        width: '100%',
+        height: '100%',
+        opacity: 0.8,
+        position: 'absolute',
+        zIndex: 0,
+    };
+
     return (
         <>
-            <Row>
+            <Row className='tw-bg-black'>
+                {' '}
+                <div style={backgroundImage}></div>
                 <Col style={{ backgroundColor: 'red' }}>
-                    <div className="coverImage">
+                    {/* <div className="coverImage">
                         <img src={uploadApi.get(movie.banner)} alt="" />
-                    </div>
+                    </div> */}
                 </Col>
                 <Col>
                     <Row>
@@ -62,7 +78,8 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                             </div>
                             <Link to={`/movie-details/${movie.id}`}>
                                 <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900 tw-cursor-pointer hover:border hover:border-[var(--border-color)]">
-                                    <FontAwesomeIcon icon={faPlay} /> <span className="tw-hover:underline">Xem ngay</span>
+                                    <FontAwesomeIcon icon={faPlay} />{' '}
+                                    <span className="tw-hover:underline">Xem ngay</span>
                                 </button>
                             </Link>
                         </Col>

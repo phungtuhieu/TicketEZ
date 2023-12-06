@@ -10,6 +10,7 @@ import { BookingDetail } from '../..';
 import { sassFalse } from 'sass';
 import img, { listIcon } from '~/assets/img';
 import authApi from '~/api/user/Security/authApi';
+import uploadApi from '~/api/service/uploadApi';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -26,6 +27,17 @@ function SeatChart(props) {
         console.log(seatChoose);
         deleteSeatChoose();
         setIsModalOpenBooking(false);
+    };
+
+    const [isModalOpenSeatType, setIsModalOpenSeatType] = useState(false);
+    const showModalSeatType = () => {
+        setIsModalOpenSeatType(true);
+    };
+    const handleOkSeatType = () => {
+        setIsModalOpenSeatType(false);
+    };
+    const handleCancelSeatType = () => {
+        setIsModalOpenSeatType(false);
     };
     const createSeatArray = () => {
         console.log(allSeats);
@@ -76,6 +88,7 @@ function SeatChart(props) {
     const [seatBookingData2, setSeatBookingData2] = useState([]);
     const [prices, setPrices] = useState([]);
     const [seatType, setSeatType] = useState();
+    const [seatTypeBySeatChart, setSeatTypeBySeatChart] = useState([]);
     const [seatArray, setSeatArray] = useState({
         seatType: { seat: [] },
     });
@@ -112,6 +125,11 @@ function SeatChart(props) {
     const fetchDaTaSeatType = async () => {
         const respAll = await axiosClient.get(`seatType/getAll`);
         setSeatType(respAll.data);
+    };
+
+    const fetchDaTaSeatTypeBySeatChart = async () => {
+        const respAll = await axiosClient.get(`seatType/bySeatChart/${showtime.seatChart.id}`);
+        setSeatTypeBySeatChart(respAll.data);
     };
 
     const fetchDataSeatChoose = async () => {
@@ -214,6 +232,7 @@ function SeatChart(props) {
         fetchDaTaSeatType();
         fetchDataSeat();
         getDataSeatArray();
+        fetchDaTaSeatTypeBySeatChart();
     }, [reload]);
 
     // Lấy price từ ghế
@@ -294,9 +313,6 @@ function SeatChart(props) {
                 }
             });
         });
-        console.log('====================================');
-        console.log(rs);
-        console.log('====================================');
         const seatPrices = getSeatPrice(rs);
 
         if (seatReserved.indexOf(seat) > -1) {
@@ -598,23 +614,24 @@ function SeatChart(props) {
                                                 {index < array.length - 1 && ','}
                                             </React.Fragment>
                                         ))}
-
-                                        <svg
-                                            onClick={deleteSeat}
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="rgb(239 68 68)"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="2"
-                                            stroke="currentColor"
-                                            aria-hidden="true"
-                                            className="tw-h-6 tw-shrink-0 tw-cursor-pointer tw-text-white tw-transition-all tw-hover:opacity-70"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            ></path>
-                                        </svg>
+                                        {seatState.seatReserved.length > 0 && (
+                                            <svg
+                                                onClick={deleteSeat}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="rgb(239 68 68)"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="2"
+                                                stroke="currentColor"
+                                                aria-hidden="true"
+                                                className="tw-h-6 tw-shrink-0 tw-cursor-pointer tw-text-white tw-transition-all tw-hover:opacity-70"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                ></path>
+                                            </svg>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -631,20 +648,87 @@ function SeatChart(props) {
                         <div className="tw-mt-12 tw-mb-6">
                             <Space size={[0, 200]} wrap>
                                 <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '600px' }}>
+                                    {seatTypeBySeatChart &&
+                                        seatTypeBySeatChart.map((value) => {
+                                            if (value.id === 7) {
+                                                return null;
+                                            }
+                                            return (
+                                                <Tag className={cx('')} key={value.id} color={value.color}>
+                                                    {value.name}
+                                                </Tag>
+                                            );
+                                        })}
                                     {seatType &&
                                         seatType.map((value) => {
                                             if (value.id === 7) {
                                                 return null;
                                             }
-                                            return (
-                                                <Tag className={cx('tagg')} key={value.id} color={value.color}>
-                                                    {value.name}
-                                                </Tag>
-                                            );
+                                            if (value.id === 9 || value.id === 8) {
+                                                return (
+                                                    <Tag className={cx('')} key={value.id} color={value.color}>
+                                                        {value.name}
+                                                    </Tag>
+                                                );
+                                            }
                                         })}
                                 </div>
                             </Space>
                         </div>
+                    </Col>
+                    <Col span={24}>
+                        <div
+                            onClick={showModalSeatType}
+                            class="tw-flex tw-items-center tw-border-b tw-border-gray-500 transition duration-300 ease-in-out transform hover:tw-font-semibold hover:tw-cursor-pointer"
+                        >
+                            <div class="tw-ml-4 tw-flex ">
+                                <p class="tw-border-b-2 tw-mr-4 tw-underline">xem chi tiết</p>
+                                <p>hình ảnh và thông tin ghế</p>
+                            </div>
+                        </div>
+                        <Modal
+                            title="Chi tiết loại ghế"
+                            open={isModalOpenSeatType}
+                            onOk={handleOkSeatType}
+                            onCancel={handleCancelSeatType}
+                            footer={false}
+                        >
+                            {seatTypeBySeatChart &&
+                                seatTypeBySeatChart.map((value) => {
+                                    if (value.id === 7) {
+                                        return null;
+                                    }
+                                    if (value.id === 8) {
+                                        return null;
+                                    }
+                                    if (value.id === 8) {
+                                        return null;
+                                    }
+                                    return (
+                                        <div className={cx('tagg')} key={value.id}>
+                                            <div class="tw-overflow-x-hidden tw-rounded-lg tw-shadow-xl">
+                                                <div className="tw-relative tw-aspect-2">
+                                                    <img
+                                                        src={uploadApi.get(value.image)}
+                                                        alt="image"
+                                                        style={{ height: '200px', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <ul className="tw-px-4 tw-py-3">
+                                                    <li>
+                                                        <b>{value.name}</b>
+                                                    </li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>{value.description}&nbsp;</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                        </Modal>
                     </Col>
 
                     <Col span={24}>
