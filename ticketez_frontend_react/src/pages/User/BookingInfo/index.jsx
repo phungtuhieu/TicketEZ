@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import bookingApi from '~/api/user/booking/bookingApi';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(style);
 function BookingInfo() {
     const location = useLocation();
@@ -51,10 +52,12 @@ function BookingInfo() {
     // let paymentStatus = 'success';
     // const currentStatusConfig = statusConfig[paymentStatus];
     useEffect(() => {
-        // if (paymentInfoId !== null) {
+        if (paymentInfoId !== null) {
+            funcUtils.notify('Lỗi không tìm thấy paymentInfo');
+        }
         const loadData = async () => {
             try {
-                const resp = await bookingApi.getPaymentInfoById('123456');
+                const resp = await bookingApi.getPaymentInfoById(paymentInfoId);
                 setSpin(false);
                 console.log('resp', resp);
                 const booking = resp.data.booking;
@@ -65,9 +68,9 @@ function BookingInfo() {
                 setPaymentStatus('success');
                 setCurrentStatusConfig(statusConfig['success']);
             } catch (error) {
-                setPaymentStatus('error');
+                setPaymentStatus('fail');
                 setSpin(false);
-                setCurrentStatusConfig(statusConfig['error']);
+                setCurrentStatusConfig(statusConfig['fail']);
                 console.log('error', error);
             }
         };
@@ -85,21 +88,34 @@ function BookingInfo() {
                         <div className={cx('wrapper-box-status', 'light')}>
                             <Spin spinning={spin} />
                             <div className={cx('wrapp-icon')}>
-                                <FontAwesomeIcon
-                                    icon={currentStatusConfig.icon}
-                                    className={cx('icon', paymentStatus)}
-                                />
+                                {currentStatusConfig?.icon != null && (
+                                    <FontAwesomeIcon
+                                        icon={currentStatusConfig?.icon}
+                                        className={cx('icon', paymentStatus)}
+                                    />
+                                )}
                             </div>
-                            <span className={cx('title', paymentStatus)}>{currentStatusConfig.title}</span>
-                            <p className={cx('message')}>{currentStatusConfig.message}</p>
-                            <Button
-                                onClick={() => {
-                                    navigate('/booking-history');
-                                }}
-                                className={cx('btn-redirect', paymentStatus)}
-                            >
-                                {currentStatusConfig.btnTitle}
-                            </Button>
+                            <span className={cx('title', paymentStatus)}>{currentStatusConfig?.title}</span>
+                            <p className={cx('message')}>{currentStatusConfig?.message}</p>
+                            {paymentStatus === 'success' ? (
+                                <Button
+                                    onClick={() => {
+                                        navigate('/booking-history');
+                                    }}
+                                    className={cx('btn-redirect', paymentStatus)}
+                                >
+                                    {currentStatusConfig?.btnTitle}
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => {
+                                        navigate('/');
+                                    }}
+                                    className={cx('btn-redirect', paymentStatus)}
+                                >
+                                    {currentStatusConfig?.btnTitle}
+                                </Button>
+                            )}
                         </div>
                         {/* <TicketDetails></TicketDetails> */}
                         {paymentStatus === 'success' && (

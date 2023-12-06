@@ -9,6 +9,7 @@ import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
 import { sassFalse } from 'sass';
 import img, { listIcon } from '~/assets/img';
+import authApi from '~/api/user/Security/authApi';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -150,7 +151,13 @@ function SeatChart(props) {
             console.error(error);
         }
     };
-
+    const [account, setAccount] = useState(null);
+    useEffect(() => {
+        const acc = authApi.getUser();
+        if (acc != null) {
+            setAccount(acc);
+        }
+    }, []);
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatChoose();
@@ -399,6 +406,10 @@ function SeatChart(props) {
     }, [reload]);
 
     const handleButtonClick = () => {
+        if (account == null) {
+            funcUtils.notify('Vui lòng đăng nhập trước khi tiến hành mua vé', 'warning');
+            return;
+        }
         onCreateDaTaSeatChoose();
         showModal();
     };
@@ -672,7 +683,7 @@ function SeatChart(props) {
                 onCancel={handleCancel}
                 destroyOnClose={true}
             />
-            {/* )} */}
+            ,{/* )} */}
         </>
     );
 }

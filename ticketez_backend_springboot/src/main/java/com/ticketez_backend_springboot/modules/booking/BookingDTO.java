@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingDTO {
-    Booking booking;
-    List<Seat> seats;
-    List<SeatTypePriceDTO> listPrice;
+    // Booking booking;
+    // List<Seat> seats;
+    // List<SeatTypePriceDTO> listPrice;
+    Double total;
+    String bookingId;
+    String showtimeId;
+    String accountId;
 }

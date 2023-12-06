@@ -50,7 +50,7 @@ const publicRoutes = [
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
-    { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: null },
+    { path: '/connector-page', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
     { path: '/booking-history', component: PageUser.BookingHistory, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },

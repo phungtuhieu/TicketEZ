@@ -37,13 +37,13 @@ public class Account {
 	private String email;
 	private String password;
 	private Date birthday;
-	private boolean gender;
+	private Boolean gender;
 	private String image;
 	private Integer status;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_date")
 	private Date createdDate;
-	private boolean verified;
+	private Boolean verified;
 	private int points;
 
 	@JsonIgnore
@@ -69,6 +69,5 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<AccountLockHistory> accountLockHistory;
-
 
 }
