@@ -12,41 +12,10 @@ function ReviewMovie() {
     }, []);
     return (
         <>
-        <div className='tw-bg-white tw-text-black tw-w-full tw-h-[40px] tw-flex tw-items-center tw-justify-center tw-mt-5 tw-pl-[50px]'>
-        <div className="tw-container tw-mx-auto tw-px-[150px] tw-mt-[-10px] tw-mb-[10px] tw-text-gray-700 tw-font-2xl tw-font-[var(--font-family)]">
-                            <Breadcrumb
-                                separator=<FontAwesomeIcon icon={faChevronRight} />
-                                items={[
-                                    {
-                                        href: '/',
-                                        title: <FontAwesomeIcon icon={faHome} />,
-                                        className: '',
-                                    },
-                                    {
-                                        href: '/',
-                                        title: (
-                                            <>
-                                                <span>Cinema</span>
-                                            </>
-                                        ),
-                                    },
-                                    {
-                                        href: '/review',
-                                       
-                                        title: (
-                                            <>
-
-                                                <span>review</span>
-                                            </>
-                                        ),
-                                    },
-                                ]}
-                            />
-                        </div>
-        </div>
             <Row>
-                <Col span={24} className='tw-bg-white tw-h-[400px] tw-mt-1 tw-mb-0 tw-justify-center'>
-                    <div className="tw-grid tw-grid-rows-3 tw-grid-flow-col tw-gap-3 tw-justify-center tw-h-[300px]">
+                <Col span={24} className='tw-bg-white tw-h-[600px] tw-mt-1 tw-mb-0 tw-justify-center'>
+                <img alt="" src={img.nenReviews} className="tw-rounded-lg tw-w-full tw-h-[600px]" />
+                    {/* <div className="tw-grid tw-grid-rows-3 tw-grid-flow-col tw-gap-3 tw-justify-center tw-h-[300px]">
                         <div className="tw-row-start-2 tw-row-span-2 tw-text-left tw-leading-normal tw-w-[600px]">
                         
                         <h2 className="tw-inline-block tw-rounded-full tw-bg-pink-100
@@ -79,20 +48,20 @@ function ReviewMovie() {
     
                         <div class="tw-row-start-2 tw-row-span-2">
                             <div className='flex tw-items-end tw-justify-end tw-pr-5'>
-                                <img alt="" src={img.anhReview} className="tw-mr-[20px] tw-rounded-lg tw-w-[450px]" />
+                                <img alt="" src={img.nenReviews} className="tw-mr-[20px] tw-rounded-lg tw-w-[450px]" />
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                 </Col>
                 <Col
                     span={24}
-                    style={{ display: 'flex', justifyContent: 'center', background: '#C0C0C0', minHeight: 1000 }}
+                    style={{ display: 'flex', justifyContent: 'center', background: 'white', minHeight: 1000 }}
                 >
                     <Row style={{ width: 1088, height: 'auto' }}>
                         <Col span={24}>
                             <Row gutter={[16, 16]}>
-                                <Col span={24} style={{ backgroundColor: '#C0C0C0', display: 'flex', marginTop: 30, minHeight: 600, }}>
+                                <Col span={24} style={{ backgroundColor: 'white', display: 'flex', marginTop: 30, minHeight: 600, }}>
                                 
                          <div className="tw-flex tw-justify-start tw-text-gray-900 tw-mt-2">                
                          <ReviewCard/>      
