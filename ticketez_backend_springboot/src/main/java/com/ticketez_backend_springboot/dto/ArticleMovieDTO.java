@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.dto;
 import java.util.List;
 
 import com.ticketez_backend_springboot.modules.article.Article;
+import com.ticketez_backend_springboot.modules.genre.Genre;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +21,11 @@ public class ArticleMovieDTO {
     @Data
     public class MovieObjResp {
         Article article;
-        List<Movie> movies;
+        List<MovieandGens> listMovieandGens;
+        @Data
+        public class MovieandGens {
+            Movie movie;
+            List<Genre> genres;
+        }
     }
 }

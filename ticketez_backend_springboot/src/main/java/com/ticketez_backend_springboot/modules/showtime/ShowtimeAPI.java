@@ -103,12 +103,33 @@ public class ShowtimeAPI {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Showtime> put(@PathVariable("id") Long id, @RequestBody Showtime showtime) {
-        if (!showtimeDAO.existsById(id)) {
+    public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Showtime showtime) {
+        Optional<Showtime> existingShowtimeOptional = showtimeDAO.findById(id);
+
+        if (existingShowtimeOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        showtimeDAO.save(showtime);
-        return ResponseEntity.ok(showtime);
+
+        Showtime existingShowtime = existingShowtimeOptional.get();
+
+        // Kiểm tra xem Showtime có tồn tại trong booking hay không
+        if (!existingShowtime.getBookings().isEmpty()) {
+            // Nếu tồn tại trong booking, không cho phép cập nhật
+            return ResponseEntity.badRequest().body("Không thể cập nhật xuất chiếu vì đã được đặt");
+        }
+
+        // Cập nhật các thông tin khác của Showtime
+        existingShowtime.setStartTime(showtime.getStartTime());
+        existingShowtime.setEndTime(showtime.getEndTime());
+        existingShowtime.setFormatMovie(showtime.getFormatMovie());
+        existingShowtime.setCinema(showtime.getCinema());
+        existingShowtime.setSeatChart(showtime.getSeatChart());
+        existingShowtime.setPrice(showtime.getPrice());
+
+        // Lưu lại Showtime đã cập nhật
+        showtimeDAO.save(existingShowtime);
+
+        return ResponseEntity.ok(existingShowtime);
     }
 
     @DeleteMapping("/{id}")
