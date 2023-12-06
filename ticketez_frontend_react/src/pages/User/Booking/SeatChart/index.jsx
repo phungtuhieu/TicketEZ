@@ -9,8 +9,8 @@ import funcUtils from '~/utils/funcUtils';
 import { BookingDetail } from '../..';
 import { sassFalse } from 'sass';
 import img, { listIcon } from '~/assets/img';
-import authApi from '~/api/user/Security/authApi';
 import uploadApi from '~/api/service/uploadApi';
+import authApi from '~/api/user/Security/authApi';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {

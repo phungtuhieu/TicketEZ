@@ -1,7 +1,8 @@
 import { Button, Col, Modal, Row } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './MovieTickets.module.scss';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import cgvLogo from '../../../../assets/img/cgv.png';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import { TicketDetails } from '../..';
@@ -10,8 +11,17 @@ import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useReactToPrint } from 'react-to-print';
 const cx = classNames.bind(styles);
 function MovieTickets() {
+    const componentPDF = useRef();
+    const generatePDF = useReactToPrint({
+        content: () => componentPDF.current,
+        documentTitle: 'Ticket',
+        bodyClass: cx('custom-print-body'),
+        // onAfterPrint: () => alert('Done'),
+    });
     const ticketStatus = {
         UNUSED: 0,
         USED: 1,
@@ -83,6 +93,10 @@ function MovieTickets() {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+    const handleSavePdf = () => {
+        // Create a div element to render content
+        generatePDF();
+    };
     return (
         <div id={cx('wrapper-movie-ticket-tabs')}>
             <BaseModal
@@ -96,8 +110,16 @@ function MovieTickets() {
                 ]}
             >
                 <div className={cx('wrapp-ticket-innerModal')}>
+                    <div className={cx('wrapp-btn-download')}>
+                        <Button onClick={handleSavePdf} className={cx('btn-download-ticket')}>
+                            <FontAwesomeIcon icon={solidIcons.faFileExport} />
+                        </Button>
+                    </div>
+
                     {isModalOpen && Object.keys(paymentInfoDTO.booking).length > 0 && (
-                        <TicketDetails paymentInfoDTO={paymentInfoDTO} />
+                        <div className={cx('ticket')} ref={componentPDF}>
+                            <TicketDetails paymentInfoDTO={paymentInfoDTO} />
+                        </div>
                     )}
                 </div>
             </BaseModal>

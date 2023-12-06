@@ -52,6 +52,7 @@ const publicRoutes = [
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
     { path: '/connector-page', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
+    { path: '/booking-combo', component: PageUser.BookingCombo, layout: DefaultLayout },
     { path: '/booking-history', component: PageUser.BookingHistory, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
     { path: '/movieTop/', component: PageUser.MovieTop, layout: DefaultLayout },

@@ -1,4 +1,3 @@
-
 import BaseApi from '~/api/global/baseApi';
 import cinemaComplexApi from '../managementCinema/cinemaComplexApi';
 import axiosClient from '~/api/global/axiosClient';
@@ -23,10 +22,20 @@ class ServiceApi extends BaseApi {
         }
     }
 
-     async put(id, data, cinemaComplexId) {
+    async put(id, data, cinemaComplexId) {
         const cinemaComplex = await cinemaComplexApi.getId(cinemaComplexId);
-        const values = {id: id, ...data, cinemaComplex: cinemaComplex.data };
+        const values = { id: id, ...data, cinemaComplex: cinemaComplex.data };
         return axiosClient.put(url + '/' + id, values);
+    }
+    async findByCplx(idCplx) {
+        try {
+            const response = await axiosClient.get(`${url}/find-by-cinema-complex/${idCplx}`);
+            console.log('Response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
     }
 }
 

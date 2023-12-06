@@ -1,7 +1,8 @@
+@import '../../../scss/global';
 $bg-color: #ffffff;
 $text-color-gray: rgb(132, 132, 132);
 $text-color-black: #161616;
-$bg-ticket: #fff0f5;
+$bg-ticket: $blue-100;
 .wrapper {
     all: initial;
     // line-height: 1.6rem;
@@ -162,7 +163,7 @@ $bg-ticket: #fff0f5;
             font-size: 20px;
         }
         .ticket-time {
-            color: #e93098;
+            color: $blue-600;
             font-weight: 700;
             font-size: 16px;
         }

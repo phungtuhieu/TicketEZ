@@ -323,6 +323,13 @@ GO
         cinema_complex_id BIGINT NOT NULL
     )
 GO
+
+    CREATE TABLE [Service_Choose] (
+        id BIGINT IDENTITY(1, 1) NOT NULL,
+        service_id BIGINT NOT NULL,
+        price FLOAT NOT NULL,
+    )
+
     CREATE TABLE Price_Services (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         price FLOAT NOT NULL,
@@ -405,7 +412,8 @@ GO
 GO
     CREATE TABLE Services_Booking (
         booking_id NVARCHAR(10)NOT NULL,
-        service_id BIGINT NOT NULL
+        service_id BIGINT NOT NULL,
+		price FLOAT NOT NULL
     )
 GO
 
@@ -447,6 +455,12 @@ ADD
     CONSTRAINT PK_Movies_Producers PRIMARY KEY (movie_id, producer_id);
 GO
 
+
+ALTER TABLE
+    Service_Choose
+ADD
+    CONSTRAINT PK_Service_Choose PRIMARY KEY (id);
+GO
 
 ALTER TABLE
     Studios
@@ -962,6 +976,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Articles_Movies_Articles FOREIGN KEY (article_id) REFERENCES Articles(id)
 GO
+ALTER TABLE
+    [Service_Choose]
+ADD
+    CONSTRAINT FK_Service_Choose_Service FOREIGN KEY (service_id) REFERENCES Services(id)
+GO
     -- /Services_Booking
     -- Payment_Info
 ALTER TABLE
@@ -1271,34 +1290,35 @@ GO
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
 INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
 VALUES
-    (N'Tiện ích ẩm thực và đồ uống', N'Tận hưởng đa dạng các loại đồ ăn nhẹ và đồ uống trong suốt buổi chiếu phim.', 'food.jpg', 1),
-    (N'Phòng VIP', N'Trải nghiệm dịch vụ VIP với ghế ngồi thoải mái và các dịch vụ độc quyền.', 'vip.jpg', 1),
-    (N'Cho thuê kính 3D', N'Thuê kính 3D để trải nghiệm phim sống động hơn.', '3d_glasses.jpg', 3),
-    (N'Bãi đỗ xe', N'Có các cơ sở đỗ xe tiện lợi.', 'parking.jpg', 1),
-    (N'Đặt vé trực tuyến', N'Đặt vé trực tuyến để trải nghiệm không gian không phải xếp hàng.', 'online_booking.jpg', 2),
-    (N'Tiệc sinh nhật', N'Chào đón sinh nhật của bạn tại rạp phim cùng với chúng tôi.', 'birthday.jpg', 2),
-    (N'Chiếu riêng', N'Đặt chiếu riêng cho nhóm hoặc sự kiện của bạn.', 'private_screening.jpg', 9),
-    (N'Tiệc trò chơi Arcade', N'Trải nghiệm các trò chơi Arcade trước hoặc sau khi xem phim.', 'arcade.jpg', 7),
-    (N'Ưu đãi cho nhóm', N'Ưu đãi đặc biệt dành cho các nhóm và sự kiện.', 'group_discount.jpg', 5),
-    (N'Dịch vụ chăm sóc trẻ em', N'Dịch vụ chăm sóc trẻ em dành cho các bậc cha mẹ có con nhỏ.', 'child_care.jpg', 8),
-    (N'Dịch vụ tiện ích', N'Chúng tôi cung cấp dịch vụ tiện ích để phục vụ tất cả khách hàng của chúng tôi.', 'accessibility.jpg', 10),
-    (N'Chương trình khách hàng thân thiết', N'Tham gia chương trình khách hàng thân thiết của chúng tôi để nhận ưu đãi và quà tặng độc quyền.', 'loyalty.jpg', 15);
+    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim', 'food.jpg', 1),
+    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim', 'vip.jpg', 1),
+    (N'SPECIAL DRINK FAMILY COMBO', N'04 nước pha chế vừa (nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) + 02 bắp ngọt. Nhận trong ngày xem phim. 
+	Chỉ thêm 5,000đ đổi sang nước lớn.
+	Số lượng quà tặng có giới hạn', '3d_glasses.jpg', 3),
+    (N'SPECIAL DRINK MD COMBO', N'01 ly nhân vật tùy chọn + 02 nước pha chế vừa ( nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) 
+	+ 01 bắp ngọt - Nhận trong ngày xem phim - Mẫu ly nhân vật phụ thuộc vào số lượng tại rạp 
+	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg', 1),
+    (N'TRIDENT MY COMBO', N'1 ly Aquaman Trident + 1 nước ngọt siêu lớn + 1 bắp lớn tùy chọn vị
+- Nhận trong ngày xem phim', 'online_booking.jpg', 2),
+    (N'GARFIELD TRIPPLE COMBO 2023', N'03 ly nhân vật Garfield (kèm nước) + 01 bắp hai vị
+* Nhận ngay trong ngày xem phim
+** Mẫu ly phụ thuộc vào số lượng của rạp', 'birthday.jpg', 2),
+    (N'GARFIELD DOUBLE COMBO 2023', N'02 ly nhân vật Garfield (kèm nước)
+* Nhận ngay trong ngày xem phim
+** Thêm 39,000đ nhận ngay 1 bắp ngọt
+*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg', 9)
+   
 GO
  -- 6. Thêm dữ liệu giá cho dịch vụ Price services
 INSERT INTO [TicketEZ].[dbo].[Price_Services] ([price], [start_date], [end_date], [service_id])
 VALUES
-    (50000, '2023-10-05', '2023-10-31', 1),
-    (100000, '2023-10-05', '2023-10-31', 2),
-    (20000, '2023-10-05', '2023-10-31', 3),
-    (5000, '2023-10-05', '2023-10-31', 4), 
-    (70000, '2023-10-05', '2023-10-31', 5),
-    (25000, '2023-10-05', '2023-10-31', 6),
-    (150000, '2023-10-05', '2023-10-31', 7),
-    (30000, '2023-10-05', '2023-10-31', 8),
-    (80000, '2023-10-05', '2023-10-31', 9),
-    (60000, '2023-10-05', '2023-10-31', 10),
-    (40000, '2023-10-05', '2023-10-31', 11),
-    (30000, '2023-10-05', '2023-10-31', 12);
+    (50000, '2023-12-05', '2023-12-29', 1),
+    (100000, '2023-10-05', '2023-12-29', 2),
+    (20000, '2023-10-05', '2023-12-29', 3),
+    (5000, '2023-10-05', '2023-12-29', 4), 
+    (70000, '2023-10-05', '2023-12-29', 5),
+    (25000, '2023-10-05', '2023-12-29', 6),
+    (150000, '2023-10-05', '2023-12-29', 7);
 GO
 
 

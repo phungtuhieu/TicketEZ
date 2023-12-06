@@ -41,11 +41,11 @@ function BookingInfo() {
             message: 'Thanh toán thành công, bạn có thể kiểm tra các vé của mình ở bên dưới!',
         },
         fail: {
-            title: 'Thất bại!',
+            title: 'Xảy ra lỗi!',
             btnTitle: 'Trở về trang chủ',
             color: '#FF5722',
             icon: solidIcons.faCircleXmark,
-            message: 'Có lỗi xảy ra trong quá trình thanh toán.',
+            message: 'Không thể xem được thông tin đặt vé.',
         },
     };
     // Lấy dữ liệu từ state

@@ -86,7 +86,7 @@ const Header = () => {
         {
             key: '2',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="">
+                <a rel="noopener noreferrer" href="/booking-history">
                     Lịch sử đặt vé
                 </a>
             ),

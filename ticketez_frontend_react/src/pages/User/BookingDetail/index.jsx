@@ -161,7 +161,6 @@ function BookingDetail(props) {
             if (accResp.status == httpStatus.OK) {
                 try {
                     const currentDate = new Date();
-                    const formattedDate = currentDate.toISOString();
                     const bookingId = generateRandomId();
                     try {
                         // const booking = {
@@ -399,7 +398,7 @@ function BookingDetail(props) {
                                                     ]}
                                                 >
                                                     <Input
-                                                        // readOnly={account.fullname != null}
+                                                        readOnly={account.fullname != null}
                                                         placeholder="Nhập tên của bạn"
                                                     />
                                                 </Form.Item>
@@ -416,7 +415,7 @@ function BookingDetail(props) {
                                                     ]}
                                                 >
                                                     <Input
-                                                        // readOnly={account.phone != null}
+                                                        readOnly={account.phone != null}
                                                         placeholder="Nhập số điện thoại"
                                                     />
                                                 </Form.Item>
@@ -443,7 +442,10 @@ function BookingDetail(props) {
                                                         },
                                                     ]}
                                                 >
-                                                    <Input placeholder="Nhập email vào đây" />
+                                                    <Input
+                                                        readOnly={account.email != null}
+                                                        placeholder="Nhập email vào đây"
+                                                    />
                                                 </Form.Item>
                                                 <Form.Item>
                                                     <Space>
