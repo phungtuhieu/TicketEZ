@@ -64,7 +64,7 @@ const AdminDirector = () => {
             setLoading(true);
             try {
                 const res = await directorApi.getByPage(currentPage, pageSize);
-                console.log(res);
+                // console.log(res);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -179,7 +179,7 @@ const AdminDirector = () => {
     const handleDelete = async (record) => {
         try {
             const res = await directorApi.delete(record.id);
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
                 await uploadApi.delete(record.avatar);
                 funcUtils.notify('Xoá thành công', 'success');
@@ -228,7 +228,7 @@ const AdminDirector = () => {
 
                     try {
                         const resPut = await directorApi.update(putData.id, putData);
-                        console.log(resPut);
+                        // console.log(resPut);
                         if (resPut.status === 200) {
                             funcUtils.notify('Cập nhật đạo diễn thành công', 'success');
                         }
@@ -245,9 +245,9 @@ const AdminDirector = () => {
                             ...values,
                             avatar: images,
                         };
-                        console.log(postData);
+                        // console.log(postData);
                         const resPost = await directorApi.create(postData);
-                        console.log('resPost', resPost);
+                        // console.log('resPost', resPost);
                         if (resPost.status === 200) {
                             funcUtils.notify('Thêm đạo diễn thành công', 'success');
                         }

@@ -1,5 +1,5 @@
 //
-export { default as MovieDef } from './Movie';
+// export { default as MovieDef } from './Movie';
 export { default as BookingDetail } from './BookingDetail';
 export { default as ConnectorPage } from './ConnectorPage';
 export { default as TicketDetails } from './TicketDetails';
