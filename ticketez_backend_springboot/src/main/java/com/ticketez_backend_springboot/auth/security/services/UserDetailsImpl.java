@@ -28,14 +28,14 @@ public class UserDetailsImpl implements UserDetails {
   @JsonIgnore
   private String password;
   private Date birthday;
-  private String gender;
+  private Boolean gender;
   private Date createdDate;
 
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserDetailsImpl(String id, String phone, String fullname, String image, String email, String address,
       String password,
-      Date birthday, String gender, Date createdDate,
+      Date birthday, Boolean gender, Date createdDate,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.phone = phone;

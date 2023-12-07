@@ -34,7 +34,7 @@ public class SecurityAccount {
     private String email;
     private String password;
     private Date birthday;
-    private String gender;
+    private Boolean gender;
     private String image;
     private Integer status;
     @Temporal(TemporalType.TIMESTAMP)

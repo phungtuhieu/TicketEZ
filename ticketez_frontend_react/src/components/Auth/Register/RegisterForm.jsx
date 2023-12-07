@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Form, Input, Button, Checkbox } from 'antd';
+import { Layout, Form, Input, Button, Checkbox, Radio } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styles from './RegisterForm.module.scss';
 import img from '~/assets/img';
@@ -30,6 +30,7 @@ const RegisterForm = () => {
                 email: values.email,
                 password: values.password,
                 phone: values.phone,
+                gender: values.gender === true,
             });
 
             funcUtils.notify('Đăng ký thành công!', 'success');
@@ -99,6 +100,7 @@ const RegisterForm = () => {
                             >
                                 <Input placeholder="Số điện thoại" className={styles.input} />
                             </Form.Item>
+
                             <div className='formLabel'>
                                 <p className={styles.formLabeEmail}><h4>Email:</h4></p>
                             </div>
@@ -111,7 +113,16 @@ const RegisterForm = () => {
                             >
                                 <Input placeholder="Email" className={styles.input} />
                             </Form.Item>
-
+                            <Form.Item
+                                name="gender"
+                                label="Giới tính"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                            >
+                                <Radio.Group>
+                                    <Radio value="male">Nam</Radio>
+                                    <Radio value="female">Nữ</Radio>
+                                </Radio.Group>
+                            </Form.Item>
                             <div className='formLabel'>
                                 <p className={styles.formLabelPassword}><h4>Mật khẩu:</h4></p>
                             </div>

@@ -20,14 +20,14 @@ public class JwtResponseDTO {
   private String email;
   private String address;
   private Date birthday;
-  private String gender;
+  private Boolean gender;
 
   private List<String> roles;
   private String token;
   private String type = "Bearer";
 
   public JwtResponseDTO( String id, String phone, String fullname, String email,
-      String address, Date birthday, String gender, String image, String accessToken, String type, List<String> roles) {
+      String address, Date birthday, Boolean gender, String image, String accessToken, String type, List<String> roles) {
 
     this.id = id;
     this.phone = phone;

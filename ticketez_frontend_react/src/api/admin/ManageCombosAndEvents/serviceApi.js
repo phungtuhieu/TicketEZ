@@ -27,16 +27,6 @@ class ServiceApi extends BaseApi {
         const values = { id: id, ...data, cinemaComplex: cinemaComplex.data };
         return axiosClient.put(url + '/' + id, values);
     }
-    async findByCplx(idCplx) {
-        try {
-            const response = await axiosClient.get(`${url}/find-by-cinema-complex/${idCplx}`);
-            console.log('Response:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('Error:', error);
-            throw error;
-        }
-    }
 }
 
 const serviceApi = new ServiceApi();
