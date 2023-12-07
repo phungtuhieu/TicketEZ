@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.priceService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.ResponseDTO;
+import com.ticketez_backend_springboot.modules.price.Price;
+import com.ticketez_backend_springboot.modules.service.Service;
+import com.ticketez_backend_springboot.modules.service.ServiceDAO;
 
 @CrossOrigin("*")
 @RestController
@@ -76,6 +80,40 @@ public class PriceServiceAPI {
 			return ResponseEntity.ok(priceService);
 		} catch (Exception e) {
 			return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@Autowired
+	ServiceDAO serviceDAO;
+
+	@GetMapping("/find-by-cinema-complex/{idCplx}")
+	public ResponseEntity<?> findByCplx(@PathVariable("idCplx") Long idCplx) {
+		System.out.println("-------------------------idCplx" + idCplx);
+		try {
+			List<Service> services = serviceDAO.findByCinemaComplexId(idCplx);
+			List<Long> serviceIds = new ArrayList<>();
+			for (Service service : services) {
+				System.out.println("--------------------" + service.getId());
+				serviceIds.add(service.getId());
+			}
+			List<PriceService> priceServices = dao.findByCplxAndService(serviceIds);
+			List<PriceServiceDTO> priceServiceDTOs = new ArrayList<>();
+			for (Service service : services) {
+				for (PriceService priceService : priceServices) {
+					if (priceService.getService().getId() == service.getId()) {
+						PriceServiceDTO priceServiceDTO = new PriceServiceDTO();
+						priceServiceDTO.setPrice(priceService);
+						priceServiceDTO.setService(service);
+						priceServiceDTOs.add(priceServiceDTO);
+					}
+				}
+
+			}
+			return ResponseEntity.ok(priceServiceDTOs);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(" Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

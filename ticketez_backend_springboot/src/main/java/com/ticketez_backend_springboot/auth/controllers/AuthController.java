@@ -40,6 +40,7 @@ import com.ticketez_backend_springboot.auth.OTP.util.OtpUtil;
 import com.ticketez_backend_springboot.auth.models.SecurityAccount;
 import com.ticketez_backend_springboot.auth.models.SecurityERole;
 import com.ticketez_backend_springboot.auth.models.SecurityRole;
+import com.ticketez_backend_springboot.auth.payload.request.ChangePasswordRequest;
 import com.ticketez_backend_springboot.auth.payload.request.LoginRequest;
 import com.ticketez_backend_springboot.auth.payload.request.SignupRequest;
 import com.ticketez_backend_springboot.auth.payload.response.JwtResponseDTO;
@@ -198,7 +199,7 @@ public class AuthController {
           .badRequest()
           .body(new MessageResponse("Email đã được sử dụng!"));
     }
-     if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
+    if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
     }
     if (accountRepository.existsByPhone(signUpRequest.getPhone())) {
       return ResponseEntity
@@ -213,6 +214,13 @@ public class AuthController {
         signUpRequest.getEmail(),
 
         encoder.encode(signUpRequest.getPassword()));
+
+    Boolean gender = signUpRequest.getGender();
+    if (gender != null) {
+      account.setGender(gender);
+    } else {
+
+    }
 
     Set<String> strRoles = signUpRequest.getRole();
     Set<SecurityRole> roles = new HashSet<>();
@@ -257,6 +265,7 @@ public class AuthController {
       });
     }
     // ngay tao
+    account.setStatus(1);
     account.setCreatedDate(new Date());
 
     account.setRoles(roles);
@@ -280,6 +289,30 @@ public class AuthController {
     accountRepository.save(account);
 
     return ResponseEntity.ok(new MessageResponse("Người dùng đã đăng ký thành công!"));
+  }
+
+  @PutMapping("/change-password")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+    SecurityAccount securityAccount = accountRepository.findById(changePasswordRequest.getId())
+        .orElseThrow(
+            () -> new UsernameNotFoundException("Không tìm thấy người dùng " + changePasswordRequest.getId()));
+
+    if (!encoder.matches(changePasswordRequest.getOldPassword(), securityAccount.getPassword())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Mật khẩu cũ không đúng!"));
+    }
+
+    if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())) {
+        return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Mật khẩu mới và mật khẩu xác nhận không khớp"));
+    }
+    securityAccount.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+    accountRepository.save(securityAccount);
+
+    return ResponseEntity.ok().body("Đổi mật khẩu thành công");
+    
   }
 
   @PutMapping("/{id}")
@@ -310,7 +343,7 @@ public class AuthController {
         existingAccount.setAddress((String) updates.get("address"));
       }
       if (updates.containsKey("gender")) {
-        existingAccount.setGender((String) updates.get("gender"));
+        existingAccount.setGender((Boolean) updates.get("gender"));
       }
       SecurityAccount updatedAccount = accountRepository.save(existingAccount);
 

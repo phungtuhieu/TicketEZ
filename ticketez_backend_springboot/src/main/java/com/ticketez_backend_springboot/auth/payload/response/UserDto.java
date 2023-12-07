@@ -20,11 +20,11 @@ public class UserDto {
   private String email;
   private String address;
   private Date birthday;
-  private String gender;
+  private Boolean gender;
   private String image;
 
   // Constructor
-  public UserDto(String id, String phone, String fullname, String email, String address, Date birthday, String gender,
+  public UserDto(String id, String phone, String fullname, String email, String address, Date birthday, Boolean gender,
       String image, String type, List<String> roles) {
     this.id = id;
     this.phone = phone;

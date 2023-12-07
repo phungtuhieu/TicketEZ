@@ -6,7 +6,8 @@ const endpoints = {
     signup: 'auth/signup',
     logout: 'auth/logout',
     regenerateOtp: 'auth/regenerate-otp',
-    verifyAccount: 'auth/verify-account'
+    verifyAccount: 'auth/verify-account',
+    changePassword: 'auth/change-password'
 };
 
 
@@ -80,6 +81,17 @@ const authApi = {
             return response.data;
         } catch (error) {
             console.error('Lỗi trong quá trình tái tạo OTP:', error);
+            throw error;
+        }
+    },
+
+    changePasswordNew: async (values) => {
+        try {
+
+            const response = await axiosClient.put(endpoints.changePassword, values);
+            return response.data;
+        } catch (error) {
+            console.error('Lỗi Đổi mật khẩu:', error);
             throw error;
         }
     },

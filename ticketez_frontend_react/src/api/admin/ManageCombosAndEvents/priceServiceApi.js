@@ -9,10 +9,22 @@ class PriceServiceApi extends BaseApi {
         super('priceService');
     }
 
-
+    async findByCplx(idCplx) {
+        try {
+            const response = await axiosClient.get(`${url}/find-by-cinema-complex/${idCplx}`);
+            console.log('Response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
     async post(data, serviceId, cinemaComplexId) {
         try {
-            const [service, cinemaComplex] = await Promise.all([serviceApi.getById(serviceId), cinemaComplexApi.getId(cinemaComplexId)]);
+            const [service, cinemaComplex] = await Promise.all([
+                serviceApi.getById(serviceId),
+                cinemaComplexApi.getId(cinemaComplexId),
+            ]);
             const values = { ...data, service: service.data, cinemaComplex: cinemaComplex.data };
             console.log('values', values);
             return axiosClient.post(url, values);
@@ -21,10 +33,10 @@ class PriceServiceApi extends BaseApi {
             throw error;
         }
     }
-    async put(id, data, serviceId,) {
+    async put(id, data, serviceId) {
         try {
             const [service] = await Promise.all([serviceApi.getById(serviceId)]);
-            const values = { id: id, ...data, service: service.data};
+            const values = { id: id, ...data, service: service.data };
             console.log('values', values);
             return axiosClient.put(url + '/' + id, values);
         } catch (error) {
@@ -32,9 +44,6 @@ class PriceServiceApi extends BaseApi {
             throw error;
         }
     }
-
-
-
 }
 const priceServiceApi = new PriceServiceApi();
 export default priceServiceApi;
