@@ -760,13 +760,14 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            <BookingDetail
+            {account != null &&  <BookingDetail
                 showtime={showtime}
                 seatBooking={seatBooking}
                 open={isModalOpenBooking}
                 onCancel={handleCancel}
                 destroyOnClose={true}
-            />
+            />}
+           
             ,{/* )} */}
         </>
     );

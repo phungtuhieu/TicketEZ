@@ -151,9 +151,9 @@ function BookingDetail(props) {
             let accUpdate = {
                 ...account,
                 gender: true,
-                phone: account.phone != null ? account.phone : values.phone,
-                email: account.email != null ? account.email : values.email,
-                fullname: account.fullname != null ? account.fullname : values.fullname,
+                phone: account?.phone  ? account.phone : values.phone,
+                email: account?.email  ? account.email : values.email,
+                fullname: account?.fullname  ? account.fullname : values.fullname,
             };
             console.log('accUpdate', accUpdate);
             const accResp = await accountApi.patchInfoUser(account.id, accUpdate);

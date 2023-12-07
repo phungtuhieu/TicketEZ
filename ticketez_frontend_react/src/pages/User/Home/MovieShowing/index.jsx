@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import img from '~/assets/img';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronCircleLeft, faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(style);
 const { Paragraph, Title } = Typography;
@@ -33,6 +33,8 @@ const SamplePrevArrow = (props) => {
     return (
         <div className={cx('control-btn')} onClick={onClick}>
             <button className={cx('prev')}>
+                <FontAwesomeIcon icon={faChevronCircleLeft} />
+
                 <i class="fa fa-chevron-left"></i>
             </button>
         </div>
