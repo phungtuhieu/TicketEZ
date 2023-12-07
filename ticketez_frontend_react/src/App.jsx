@@ -33,35 +33,43 @@ function App() {
                                 }
                             />
                         );
+
                     })}
 
+
+
                     {privateRoutes.map((route, index) => {
-                        if (route.requireRole === 'SUPER_ADMIN'
-                            && !roles.includes('MOVIE_MANAGEMENT_ADMIN')) {
+                        const hasRequiredRole = roles.includes('SUPER_ADMIN') ||
+                            roles.includes('MOVIE_MANAGEMENT_ADMIN') ||
+                            roles.includes('SCHEDULING_PRICING_ADMIN') ||
+                            roles.includes('USER_MANAGEMENT_ADMIN');
+
+                        if (!isAuthenticated || !hasRequiredRole) {
                             return null;
                         }
-                        if (route.requireRole === ' SCHEDULING_PRICING_ADMIN'
-                            && !roles.includes(' USER_MANAGEMENT_ADMIN')) {
-                            return null;
-                        }
-                        const Page = route.component;
-                        let Layout = route.layout ? route.layout : Fragment;
                         if (!isAuthenticated || !roles.includes(route.requireRole)) {
                             return null;
                         }
+                        if (!hasRequiredRole && route.requireRole === 'SUPER_ADMIN') {
+                            return null;
+                        }
+                        const Page = route.component;
+                        let Layout = route.layout || Fragment;
+
                         return (
                             <Route
                                 key={index}
                                 path={route.path}
                                 element={
                                     <Layout>
-                                        <Page />
+                                        <Page />    
                                         <ToastContainer />
                                     </Layout>
                                 }
                             />
                         );
                     })}
+                    
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
