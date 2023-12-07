@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Form, Input, Button, Checkbox } from 'antd';
+import { Layout, Form, Input, Button, Checkbox, Radio } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styles from './RegisterForm.module.scss';
 import img from '~/assets/img';
@@ -7,35 +7,45 @@ import authApi from '~/api/user/Security/authApi';
 import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import backgroundImage from '~/assets/img/texure.jpg';
-import { validateId, validatePassword } from '../Custom';
+import { validateEmail, validateId, validatePassword, validatePhone } from '../Custom';
 
 const { Header, Content } = Layout;
 
 
 const RegisterForm = () => {
-
-       const [signupError, setSignupError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [signupError, setSignupError] = useState('');
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
+        if (!validateId(values.id)) return;
+        if (!validateEmail(values.email)) return;
+        if (!validatePassword(values.password)) return;
+        if (!validatePhone(values.phone)) return;
+        setLoading(true);
         try {
-            authApi.signup({
+            await authApi.signup({
                 id: values.id,
                 fullname: values.fullname,
                 email: values.email,
                 password: values.password,
+                phone: values.phone,
+                gender: values.gender === true,
             });
 
-
             funcUtils.notify('Đăng ký thành công!', 'success');
-            navigate('/login');
+            navigate('/otp');
         } catch (error) {
-            funcUtils.notify('Đăng ký không thành công!', 'error');
+            // Phân tích cú pháp lỗi từ phản hồi của API
+            const errorMessage = error.response?.data?.message;
+            funcUtils.notify(errorMessage, 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('lỗi', errorInfo);
+        console.log('Lỗi:', errorInfo);
         setSignupError('Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.');
     };
 
@@ -78,15 +88,40 @@ const RegisterForm = () => {
                                 <Input placeholder="Họ và tên" className={styles.input} />
                             </Form.Item>
                             <div className='formLabel'>
+                                <p className={styles.formLabelPhone}><h4>Số điện thoại:</h4></p>
+                            </div>
+                            <Form.Item
+                                name="phone"
+                                rules={[
+                                    { required: true, message: 'Không được bỏ trống số điện thoại !' },
+
+                                ]}
+                                className={styles.formItem}
+                            >
+                                <Input placeholder="Số điện thoại" className={styles.input} />
+                            </Form.Item>
+
+                            <div className='formLabel'>
                                 <p className={styles.formLabeEmail}><h4>Email:</h4></p>
                             </div>
                             <Form.Item
-                                // label="Tên tài khoản"
                                 name="email"
-                                rules={[{ required: true, message: 'Không được bỏ trống Email !' }]}
+                                rules={[
+                                    { required: true, message: 'Không được bỏ trống Email !' },
+                                ]}
                                 className={styles.formItem}
                             >
-                                <Input type='email' placeholder="Email" className={styles.input} />
+                                <Input placeholder="Email" className={styles.input} />
+                            </Form.Item>
+                            <Form.Item
+                                name="gender"
+                                label="Giới tính"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                            >
+                                <Radio.Group>
+                                    <Radio value="male">Nam</Radio>
+                                    <Radio value="female">Nữ</Radio>
+                                </Radio.Group>
                             </Form.Item>
                             <div className='formLabel'>
                                 <p className={styles.formLabelPassword}><h4>Mật khẩu:</h4></p>
@@ -151,8 +186,8 @@ const RegisterForm = () => {
 
                             </Form.Item> */}
                             <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton}>
-                                 Đăng ký
+                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
+                                    Đăng ký
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản <a href="http://localhost:3000/Login">Đăng Nhập</a>

@@ -18,6 +18,7 @@ import style from './SeatType.module.scss';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { regex } from '~/utils/regex';
+
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 const { TextArea } = Input;
@@ -145,11 +146,9 @@ const AdminSeatType = () => {
         try {
             const res = await seatTypeApi.delete(record.id);
             console.log(res);
-            if (res.status === 200) {
-                await uploadApi.delete(record.avatar);
-                funcUtils.notify('Xoá thành công', 'success');
-            }
+            setShowInfo('success');
         } catch (error) {
+            setShowInfo('errorEdit');
             console.log(error);
         }
 
@@ -170,6 +169,25 @@ const AdminSeatType = () => {
             ...record,
         });
     };
+    const [showInfo, setShowInfo] = useState('');
+    useEffect(() => {
+        if (showInfo === 'success') {
+            funcUtils.notify('xóa thành công dữ liệu trong bảng', 'success');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorFormat') {
+            funcUtils.notify('Vui lòng chọn loại phim', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorCinemaComplex') {
+            funcUtils.notify('Vui lòng chọn cụm rạp', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorEdit') {
+            funcUtils.notify('Loại ghế này đang được sử dụng !', 'error');
+            setShowInfo('es');
+        }
+    }, [showInfo]);
 
     const handleOk = async () => {
         setLoading(true);
@@ -384,7 +402,6 @@ const AdminSeatType = () => {
                             rules={[
                                 { required: true, message: 'Vui lòng nhập chiều rộng ghế' },
                                 { pattern: /^[0-9]*$/, message: 'Vui lòng chỉ nhập số' },
-                               
                             ]}
                         >
                             <Input width={200} placeholder="chiều rộng ghế" />

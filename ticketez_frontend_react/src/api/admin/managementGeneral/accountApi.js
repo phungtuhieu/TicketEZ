@@ -52,11 +52,14 @@ class AccountApi extends BaseApi {
         const res = await axiosClient.get(url, { params });
         return res.data;
     }
-    async patchStatus(id, status, reason ) {
+    async patchStatus(id, status, reason) {
         return axiosClient.patch(url + '/status/' + id, { status, reason });
     }
     async patchInfoUser(id, data) {
         return axiosClient.patch(url + '/infoUser/' + id, data);
+    }
+    async AccountLockHistoryFindByAccount(accountId) {
+        return axiosClient.get('account-lock-history/' + accountId);
     }
 }
 const accountApi = new AccountApi();

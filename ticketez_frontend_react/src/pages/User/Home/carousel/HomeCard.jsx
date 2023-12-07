@@ -12,13 +12,29 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
             'linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%)',
     };
 
+    const backgroundImage = {
+        backgroundImage: `linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%), url(${uploadApi.get(
+            movie.banner,
+        )})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        width: '100%',
+        height: '100%',
+        opacity: 0.8,
+        position: 'absolute',
+        zIndex: 0,
+    };
+
     return (
         <>
-            <Row>
+            <Row className='tw-bg-black'>
+                {' '}
+                <div style={backgroundImage}></div>
                 <Col style={{ backgroundColor: 'red' }}>
-                    <div className="coverImage">
-                        <img src={uploadApi.get(movie.poster)} alt="" />
-                    </div>
+                    {/* <div className="coverImage">
+                        <img src={uploadApi.get(movie.banner)} alt="" />
+                    </div> */}
                 </Col>
                 <Col>
                     <Row>
@@ -42,7 +58,9 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                                     {actors.map((actor, index) => (
                                         <React.Fragment key={actor.id}>
                                             <li>{actor.fullname}</li>
-                                            {index < actors.length - 1 && <span className="tw-mx-2 tw-text-white">,</span>}
+                                            {index < actors.length - 1 && (
+                                                <span className="tw-mx-2 tw-text-white">,</span>
+                                            )}
                                         </React.Fragment>
                                     ))}
                                 </p>
@@ -58,9 +76,12 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
                                     </div>
                                 </p>
                             </div>
-                            <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900">
-                                <FontAwesomeIcon icon={faPlay} /> Xem ngay
-                            </button>
+                            <Link to={`/movie-details/${movie.id}`}>
+                                <button className="tw-mt-8 border tw-bg-[var(--pink-color)] tw-shadow-pink-900 tw-cursor-pointer hover:border hover:border-[var(--border-color)]">
+                                    <FontAwesomeIcon icon={faPlay} />{' '}
+                                    <span className="tw-hover:underline">Xem ngay</span>
+                                </button>
+                            </Link>
                         </Col>
                         <Col span={6}>
                             <div className="palyButton ">

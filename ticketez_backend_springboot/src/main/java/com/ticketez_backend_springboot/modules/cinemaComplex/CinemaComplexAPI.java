@@ -221,6 +221,7 @@ public class CinemaComplexAPI {
 
                     List<Showtime> showtime = showtimeDao.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
                             movie, formatMovie.getFormat(), date.orElse(LocalDate.now()));
+                            
                     formatAndShowtimes.setShowtimes(showtime);
                     lisFormatAndShowtimes.add(formatAndShowtimes);
                 }

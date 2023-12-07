@@ -127,7 +127,7 @@ function ListMovie() {
                 );
                 setTotalItems(resss.totalItems);
                 setData(resss.listMovieObjResp);
-                console.log('res nè:', resss);
+                // console.log('res nè:', resss);
                 setLoading(false);
             } catch (error) {
                 console.log(error);

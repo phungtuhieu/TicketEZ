@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import style from './BookingInfo.module.scss';
 import { TicketDetails } from '..';
@@ -11,10 +11,12 @@ import { useEffect, useState } from 'react';
 import bookingApi from '~/api/user/booking/bookingApi';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(style);
 function BookingInfo() {
     const location = useLocation();
     const componentPDF = useRef();
+    const navigate = useNavigate();
     const generatePDF = useReactToPrint({
         content: () => componentPDF.current,
         documentTitle: 'Ticket',
@@ -39,21 +41,23 @@ function BookingInfo() {
             message: 'Thanh toán thành công, bạn có thể kiểm tra các vé của mình ở bên dưới!',
         },
         fail: {
-            title: 'Thất bại!',
+            title: 'Xảy ra lỗi!',
             btnTitle: 'Trở về trang chủ',
             color: '#FF5722',
             icon: solidIcons.faCircleXmark,
-            message: 'Có lỗi xảy ra trong quá trình thanh toán.',
+            message: 'Không thể xem được thông tin đặt vé.',
         },
     };
     // Lấy dữ liệu từ state
     // let paymentStatus = 'success';
     // const currentStatusConfig = statusConfig[paymentStatus];
     useEffect(() => {
-        // if (paymentInfoId !== null) {
+        if (paymentInfoId !== null) {
+            funcUtils.notify('Lỗi không tìm thấy paymentInfo');
+        }
         const loadData = async () => {
             try {
-                const resp = await bookingApi.getPaymentInfoById('123456');
+                const resp = await bookingApi.getPaymentInfoById(paymentInfoId);
                 setSpin(false);
                 console.log('resp', resp);
                 const booking = resp.data.booking;
@@ -64,9 +68,9 @@ function BookingInfo() {
                 setPaymentStatus('success');
                 setCurrentStatusConfig(statusConfig['success']);
             } catch (error) {
-                setPaymentStatus('error');
+                setPaymentStatus('fail');
                 setSpin(false);
-                setCurrentStatusConfig(statusConfig['error']);
+                setCurrentStatusConfig(statusConfig['fail']);
                 console.log('error', error);
             }
         };
@@ -84,19 +88,37 @@ function BookingInfo() {
                         <div className={cx('wrapper-box-status', 'light')}>
                             <Spin spinning={spin} />
                             <div className={cx('wrapp-icon')}>
-                                <FontAwesomeIcon
-                                    icon={currentStatusConfig.icon}
-                                    className={cx('icon', paymentStatus)}
-                                />
+                                {currentStatusConfig?.icon != null && (
+                                    <FontAwesomeIcon
+                                        icon={currentStatusConfig?.icon}
+                                        className={cx('icon', paymentStatus)}
+                                    />
+                                )}
                             </div>
-                            <span className={cx('title', paymentStatus)}>{currentStatusConfig.title}</span>
-                            <p className={cx('message')}>{currentStatusConfig.message}</p>
-                            <Button className={cx('btn-redirect', paymentStatus)}>
-                                {currentStatusConfig.btnTitle}
-                            </Button>
+                            <span className={cx('title', paymentStatus)}>{currentStatusConfig?.title}</span>
+                            <p className={cx('message')}>{currentStatusConfig?.message}</p>
+                            {paymentStatus === 'success' ? (
+                                <Button
+                                    onClick={() => {
+                                        navigate('/booking-history');
+                                    }}
+                                    className={cx('btn-redirect', paymentStatus)}
+                                >
+                                    {currentStatusConfig?.btnTitle}
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => {
+                                        navigate('/');
+                                    }}
+                                    className={cx('btn-redirect', paymentStatus)}
+                                >
+                                    {currentStatusConfig?.btnTitle}
+                                </Button>
+                            )}
                         </div>
                         {/* <TicketDetails></TicketDetails> */}
-                        {paymentStatus == 'success' && (
+                        {paymentStatus === 'success' && (
                             <div className={cx('wrapper-ticket-details', 'light')}>
                                 <div ref={componentPDF}>
                                     <TicketDetails paymentInfoDTO={paymentInfoDTO}></TicketDetails>

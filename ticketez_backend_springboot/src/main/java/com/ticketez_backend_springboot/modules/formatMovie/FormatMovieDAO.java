@@ -24,4 +24,8 @@ public interface FormatMovieDAO extends JpaRepository<FormatMovie, Long> {
     //lấy id của formatmovie dựa theo id của movie và format
     @Query("SELECT f FROM FormatMovie f WHERE f.movie = :movieId AND f.format = :formatId")
     List<FormatMovie> getIdFoMatMvoie(@Param("movieId") Movie movieId, @Param("formatId") Format formatId);
+
+    @Query("SELECT fm FROM FormatMovie fm WHERE fm.format.id = :formatId")
+    List<FormatMovie> findByFormatId(@Param("formatId") Long formatId);
+
 }

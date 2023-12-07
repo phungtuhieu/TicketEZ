@@ -8,7 +8,7 @@ import { Flex, Spin } from 'antd';
 const cx = classNames.bind(style);
 
 function ConnectorPage() {
-    const { bookingId } = useParams();
+    // const {bookingId,showtimeId, accountId} = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     useEffect(() => {
@@ -26,6 +26,9 @@ function ConnectorPage() {
             const vnp_TransactionStatus = queryParams.get('vnp_TransactionStatus');
             const vnp_TxnRef = queryParams.get('vnp_TxnRef');
             const vnp_SecureHash = queryParams.get('vnp_SecureHash');
+            const bookingId = queryParams.get('bookingId');
+            const accountId = queryParams.get('accountId');
+            const showtimeId = queryParams.get('showtimeId');
 
             const params = {
                 vnp_Amount,
@@ -41,6 +44,8 @@ function ConnectorPage() {
                 vnp_TxnRef,
                 vnp_SecureHash,
                 bookingId,
+                accountId,
+                showtimeId,
             };
             const page = '/booking-info';
             try {

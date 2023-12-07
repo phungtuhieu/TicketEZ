@@ -2,11 +2,15 @@ package com.ticketez_backend_springboot.modules.booking;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
+import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @Repository
 public interface BookingDAO extends JpaRepository<Booking, String> {
@@ -36,5 +40,14 @@ public interface BookingDAO extends JpaRepository<Booking, String> {
         // " fm.movie m" +
         // " WHERE k.ticketStatus = 1")
         // List<TotalDashboardAdmin> getTotalTicketsAndTotalMovies();
+        @Query("SELECT o FROM Booking o WHERE " +
+                        "((o.showtime.formatMovie.movie.title LIKE CONCAT('%', :keyword, '%') OR " +
+                        "o.showtime.cinema.cinemaComplex.name LIKE CONCAT('%', :keyword, '%')) AND " +
+                        "o.ticketStatus = :ticketStatus) AND o.account.id = :accId")
+        Page<Booking> findByMovieName(
+                        @Param("keyword") String search,
+                        @Param("ticketStatus") Integer ticketStatus,
+                        @Param("accId") String accId,
+                        Pageable pageable);
 
 }

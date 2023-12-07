@@ -10,11 +10,14 @@ import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.review.Review;
+import com.ticketez_backend_springboot.modules.verification.Verification;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -34,13 +37,13 @@ public class Account {
 	private String email;
 	private String password;
 	private Date birthday;
-	private boolean gender;
+	private Boolean gender;
 	private String image;
 	private Integer status;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_date")
 	private Date createdDate;
-	private boolean verified;
+	private Boolean verified;
 	private int points;
 
 	@JsonIgnore

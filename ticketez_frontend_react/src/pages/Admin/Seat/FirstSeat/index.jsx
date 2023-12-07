@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import style from './SearChart.module.scss';
 // import '~/pages/User/Booking/SeatChart/chart.scss'
 import axiosClient from '~/api/global/axiosClient';
+import img, { listIcon } from '~/assets/img';
 
 import funcUtils from '~/utils/funcUtils';
 
@@ -55,6 +56,7 @@ function SeatChart(props) {
 
         return seatState;
     };
+    const [isTableLoaded, setIsTableLoaded] = useState(true);
 
     const [showSeat, setShowSeat] = useState(true);
     const [reload, setReload] = useState(false);
@@ -119,6 +121,7 @@ function SeatChart(props) {
     };
 
     const onClickUpdate = async () => {
+        setIsTableLoaded(false);
         let check = 0;
         const dataArray = seatState.seatHeader.map((header, rowIndex) =>
             seatState.seat[rowIndex].map((seat_no) => ({
@@ -141,7 +144,12 @@ function SeatChart(props) {
         await new Promise((resolve) => {
             resolve();
         });
-        const resp = await axiosClient.post(`seat`, flattenedArray);
+        try {
+            const resp = await axiosClient.post(`seat`, flattenedArray);
+        } catch (error) {
+            console.log(error);
+        }
+        setIsTableLoaded(true);
         // handelUpdate(flattenedArray);
         setShowInfo('success');
     };
@@ -178,14 +186,15 @@ function SeatChart(props) {
                     <Col span={24}>
                         <Row>
                             <Col span={18}>
-                                <table className="grid">
-                                    {showSeat && (
-                                        <tbody>
-                                            {seatState.seatHeader.map((header, rowIndex) => (
-                                                <tr key={header}>
-                                                    <td className="header-cell protected-element">{header}</td>
-                                                    {seatState.seat[rowIndex].map((seat_no) => {
-                                                        const seatClassName = `
+                                {isTableLoaded && (
+                                    <table className="grid">
+                                        {showSeat && (
+                                            <tbody>
+                                                {seatState.seatHeader.map((header, rowIndex) => (
+                                                    <tr key={header}>
+                                                        <td className="header-cell protected-element">{header}</td>
+                                                        {seatState.seat[rowIndex].map((seat_no) => {
+                                                            const seatClassName = `
                                                 ${
                                                     seatState.way.indexOf(seat_no) > -1
                                                         ? 'way'
@@ -193,21 +202,27 @@ function SeatChart(props) {
                                                         ? 'normal-seat'
                                                         : 'normal-seat'
                                                 } protected-element`;
-                                                        return (
-                                                            <td
-                                                                className={seatClassName}
-                                                                key={seat_no}
-                                                                onClick={() => onClickData(seat_no)}
-                                                            >
-                                                                {seat_no}
-                                                            </td>
-                                                        );
-                                                    })}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    )}
-                                </table>
+                                                            return (
+                                                                <td
+                                                                    className={seatClassName}
+                                                                    key={seat_no}
+                                                                    onClick={() => onClickData(seat_no)}
+                                                                >
+                                                                    {seat_no}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        )}
+                                    </table>
+                                )}
+                                {!isTableLoaded && (
+                                    <div className="tw-text-white tw-text-2xl">
+                                        <img src={img.loading} />
+                                    </div>
+                                )}
                             </Col>
                             <Col span={6} className={cx('col-right-radioBox-btn')}>
                                 {idSeatChart && (

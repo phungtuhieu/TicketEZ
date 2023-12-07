@@ -21,10 +21,11 @@ function BookingDetail(props) {
     const { showtime, seatBooking } = props;
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
-    const [account, setAccount] = useState({});
     const [loading, setLoading] = useState(true);
     const [listPrice, setListPrice] = useState([]);
     const [ellipsis, setEllipsis] = useState(true);
+    const [account, setAccount] = useState(null);
+    const [total, setTotal] = useState(0);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     // Load table
@@ -46,14 +47,13 @@ function BookingDetail(props) {
                     console.log('today', dateNow.toDate().getDay());
                     // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
                     console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
-                    const getPriceListBySeatTypeIdsAsync = async () => {
-                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatType({
-                            cinemaCplxId: showtime.cinema.cinemaComplex.id,
-                            movieId: showtime.formatMovie.movie.id,
-                        });
+
+                    const getPriceList = async () => {
+                        const listPriceDb = await priceSeatApi.findAllPriceAndPriceSeatTypeDTOByShowtimeId(showtime.id);
                         return listPriceDb;
                     };
-                    const listPriceResp = await getPriceListBySeatTypeIdsAsync();
+
+                    const listPriceResp = await getPriceList();
                     console.log('listPriceResp', listPriceResp);
                     let listPr = [];
                     const totalAmount = seatBooking.reduce((total, item) => {
@@ -82,6 +82,7 @@ function BookingDetail(props) {
                         style: 'currency',
                         currency: 'VND',
                     }).format(totalAmount);
+                    setTotal(totalAmount);
                     console.log('totalAmount', totalAmount);
                     console.log('formattedTotalAmount', formattedTotalAmount);
                     const seatInfo = {
@@ -105,8 +106,24 @@ function BookingDetail(props) {
                         },
                         cinemaName: showtime.cinema.name,
                     };
-                    const acc = authApi.getUser();
-                    console.log('acc', acc);
+                    try {
+                        const acc = authApi.getUser();
+
+                        if (acc == null) {
+                            funcUtils.notify('Không tìm thấy thông tin khách hàng !', 'error');
+                        } else {
+                            let accInfo = {
+                                fullname: acc.fullname,
+                                email: acc.email,
+                                phone: acc.phone,
+                            };
+                            console.log('acc', acc);
+                            setAccount(acc);
+                            form.setFieldsValue(accInfo);
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
                     console.log('showtime', showtime);
                     console.log('seatBooking', seatBooking);
                     // const acc = authApi.getUser();
@@ -125,34 +142,66 @@ function BookingDetail(props) {
     }, [showtime, seatBooking]);
 
     const handlePurchase = async () => {
-        const values = await form.getFieldsValue();
-        console.log(values);
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString();
-        const id = generateRandomId();
         try {
-            const accResp = await accountApi.getById('user2');
-
-            const booking = {
-                id,
-                account: accResp.data,
-                showtime,
-                createDate: formattedDate,
-                status: 0, // 0: thành công, 1:thanh toán gặp lỗi
+            const values = await form.validateFields();
+            // if (!Object.values(values).every((value) => value !== null && value !== undefined)) {
+            //     funcUtils.notify('Vui lòng điền thông tin người dùng!', 'error');
+            // }
+            console.log('account', account);
+            let accUpdate = {
+                ...account,
+                gender: true,
+                phone: account.phone != null ? account.phone : values.phone,
+                email: account.email != null ? account.email : values.email,
+                fullname: account.fullname != null ? account.fullname : values.fullname,
             };
-
-            const bookingDto = {
-                booking,
-                seats: seatBooking,
-                listPrice,
-            };
-            const resp = await bookingApi.create(bookingDto);
-            const payUrl = resp.data;
-            window.location.href = payUrl;
+            console.log('accUpdate', accUpdate);
+            const accResp = await accountApi.patchInfoUser(account.id, accUpdate);
+            console.log('accUpdate: ', accResp);
+            if (accResp.status == httpStatus.OK) {
+                try {
+                    const currentDate = new Date();
+                    const bookingId = generateRandomId();
+                    try {
+                        // const booking = {
+                        // id,
+                        // account: account,
+                        // showtime,
+                        // createDate: formattedDate,
+                        // status: 0, // 0: thành công, 1:thanh toán gặp lỗi
+                        // };
+                        console.log('account.id', account.id);
+                        const bookingDto = {
+                            total,
+                            showtimeId: showtime.id,
+                            accountId: account.id,
+                            bookingId,
+                        };
+                        const resp = await bookingApi.create(bookingDto);
+                        const payUrl = resp.data;
+                        window.location.href = payUrl;
+                    } catch (error) {
+                        funcUtils.notify(error.data, 'error');
+                    }
+                } catch (error) {
+                    if (error.hasOwnProperty('response')) {
+                        funcUtils.notify(error.response.data, 'error');
+                    } else {
+                        console.log(error);
+                    }
+                    funcUtils.notify('Có lỗi trong khi thanh toán', 'error');
+                }
+            }
         } catch (error) {
-            funcUtils.notify(error.data, 'error');
+            if (error.hasOwnProperty('response')) {
+                funcUtils.notify(error.response.data, 'error');
+            } else {
+                console.log(error);
+            }
+            funcUtils.notify('Thông tin khách hàng không hợp lệ', 'error');
         }
-        console.log('id', id);
+        // return;
+        //
     };
     const generateRandomId = () => {
         // Lấy thời gian mili giây hiện tại
@@ -200,123 +249,128 @@ function BookingDetail(props) {
                     footer={null}
                 >
                     {loading === false && (
-                        <Row className={cx('content-info-details', 'ps-0')}>
-                            <Col span={13} className="pe-20">
-                                <div className={cx('wrapp-title-movie')}>
-                                    <Tag className={cx('mpaa-movie')} color="blue-inverse">
-                                        {showtimeInfo.ratingCode}
-                                    </Tag>
-                                    <h3 className={cx('title-movie')} level={4}>
-                                        {showtimeInfo.movieTitle}
-                                    </h3>
-                                </div>
-                                <Divider dashed className={cx('divider-custom')} plain></Divider>
-                                <Row className={cx('wrapp-info')}>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Thời gian</li>
-                                            <li className={cx('info-inner', 'duration')}>
-                                                <b>
-                                                    <span className="start-time">{showtimeInfo.time.startTime}</span> ~
-                                                    <span className="end-time">{showtimeInfo.time.endTime}</span>
-                                                </b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Ngày chiếu</li>
-                                            <li className={cx('info-inner', 'release-date')}>
-                                                <b>{showtimeInfo.time.showDate}</b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={24}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Thời gian</li>
-                                            <li className={cx('cinema-complex-name', 'info-inner')}>
-                                                <b>{showtimeInfo.cinemaClx.name}</b>
-                                                <Paragraph
-                                                    className={cx('address-cinema-complex', 'text-gray-500')}
-                                                    ellipsis={
-                                                        ellipsis
-                                                            ? {
-                                                                  rows: 2,
-                                                                  expandable: true,
-                                                                  symbol: 'Xem thêm',
-                                                              }
-                                                            : false
-                                                    }
-                                                >
-                                                    {showtimeInfo.cinemaClx.address}
-                                                </Paragraph>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Phòng chiếu</li>
-                                            <li className={cx('info-inner')}>
-                                                <b>{showtimeInfo.cinemaName}</b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Định dạng</li>
-                                            <li className={cx('info-inner')}>
-                                                <b>{showtimeInfo.format}</b>{' '}
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                </Row>
-                                <Divider dashed className={cx('divider-custom')} plain></Divider>
-                                <Row className={cx('wrapp-seat-info')}>
-                                    <Col span={12} className="">
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>Ghế</li>
-                                            <li className={cx('info-inner')}>
-                                                <b>
-                                                    {showtimeInfo.seatInfo.listSeat.map((item) => item.name).join(', ')}
-                                                </b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('label-inner', 'text-gray-500')}>&nbsp;</li>
-                                            <li className={cx('info-inner', 'text-end')}>
-                                                <b>{showtimeInfo.seatInfo.totalAmount}</b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                </Row>
-                                <Divider dashed className={cx('divider-custom')} plain></Divider>
-                                <Row className={cx('wrapp-price-ticket')}>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('info-inner')}>
-                                                <b>Tạm tính</b>
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={12}>
-                                        <ul className={cx('wrapp-info-details')}>
-                                            <li className={cx('info-inner', 'text-end')}>
-                                                <b>{showtimeInfo.seatInfo.totalAmount}</b>{' '}
-                                            </li>
-                                        </ul>
-                                    </Col>
-                                    <Col span={24}>
-                                        <span className={cx('discount-info', 'text-gray-500')}>
-                                            Ưu đãi (nếu có) sẽ được áp dụng ở bước thanh toán.
-                                        </span>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col span={11} className={cx('wrapp-pay-area')}>
-                                <Row>
-                                    {/* <Col span={24}>Quét mã QR bằng VNPay để thanh toán</Col>
+                        <div className={cx('wrapper')}>
+                            <Row className={cx('content-info-details', 'ps-0')}>
+                                <Col span={13} className="pe-20">
+                                    <div className={cx('wrapp-title-movie')}>
+                                        <Tag className={cx('mpaa-movie')} color="blue-inverse">
+                                            {showtimeInfo.ratingCode}
+                                        </Tag>
+                                        <h3 className={cx('title-movie')} level={4}>
+                                            {showtimeInfo.movieTitle}
+                                        </h3>
+                                    </div>
+                                    <Divider dashed className={cx('divider-custom')} plain></Divider>
+                                    <Row className={cx('wrapp-info')}>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Thời gian</li>
+                                                <li className={cx('info-inner', 'duration')}>
+                                                    <b>
+                                                        <span className="start-time">
+                                                            {showtimeInfo.time.startTime} ~{' '}
+                                                        </span>
+                                                        <span className="end-time">{showtimeInfo.time.endTime}</span>
+                                                    </b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Ngày chiếu</li>
+                                                <li className={cx('info-inner', 'release-date')}>
+                                                    <b>{showtimeInfo.time.showDate}</b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={24}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Thời gian</li>
+                                                <li className={cx('cinema-complex-name', 'info-inner')}>
+                                                    <b>{showtimeInfo.cinemaClx.name}</b>
+                                                    <Paragraph
+                                                        className={cx('address-cinema-complex', 'text-gray-500')}
+                                                        ellipsis={
+                                                            ellipsis
+                                                                ? {
+                                                                      rows: 2,
+                                                                      expandable: true,
+                                                                      symbol: 'Xem thêm',
+                                                                  }
+                                                                : false
+                                                        }
+                                                    >
+                                                        {showtimeInfo.cinemaClx.address}
+                                                    </Paragraph>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Phòng chiếu</li>
+                                                <li className={cx('info-inner')}>
+                                                    <b>{showtimeInfo.cinemaName}</b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Định dạng</li>
+                                                <li className={cx('info-inner')}>
+                                                    <b>{showtimeInfo.format}</b>{' '}
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                    </Row>
+                                    <Divider dashed className={cx('divider-custom')} plain></Divider>
+                                    <Row className={cx('wrapp-seat-info')}>
+                                        <Col span={12} className="">
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Ghế</li>
+                                                <li className={cx('info-inner')}>
+                                                    <b>
+                                                        {showtimeInfo.seatInfo.listSeat
+                                                            .map((item) => item.name)
+                                                            .join(', ')}
+                                                    </b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>&nbsp;</li>
+                                                <li className={cx('info-inner', 'text-end')}>
+                                                    <b>{showtimeInfo.seatInfo.totalAmount}</b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                    </Row>
+                                    <Divider dashed className={cx('divider-custom')} plain></Divider>
+                                    <Row className={cx('wrapp-price-ticket')}>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('info-inner')}>
+                                                    <b>Tạm tính</b>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={12}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('info-inner', 'text-end')}>
+                                                    <b>{showtimeInfo.seatInfo.totalAmount}</b>{' '}
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                        <Col span={24}>
+                                            <span className={cx('discount-info', 'text-gray-500')}>
+                                                Ưu đãi (nếu có) sẽ được áp dụng ở bước thanh toán.
+                                            </span>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col span={11} className={cx('wrapp-pay-area')}>
+                                    <Row>
+                                        {/* <Col span={24}>Quét mã QR bằng VNPay để thanh toán</Col>
                                     <Col span={24} className={cx('wrapp-qrcode-inner')}>
                                         <Space direction="vertical" align="center">
                                             <QRCode value={text || '-'} className={cx('qrcode-custom')} />
@@ -326,64 +380,86 @@ function BookingDetail(props) {
                                         <FontAwesomeIcon icon={solidIcon.faQrcode} /> &nbsp; Sử dụng App VNPay hoặc{' '}
                                         <br /> ứng dụng Camera hỗ trợ QR code để quét mã.
                                     </Col> */}
-                                    <div className={cx('wrapp-pay-area-inner')}>
-                                        <Title level={4} className={cx('title')}>
-                                            Kiểm tra thông tin
-                                        </Title>
-                                        <Divider style={{ backgroundColor: '#fff' }} />
-                                        <Form form={form} name="basic" layout="vertical" autoComplete="off">
-                                            <Form.Item
-                                                className={cx('form-item')}
-                                                label={<label className={cx('label')}>Tên người dùng</label>}
-                                                name="fullname"
-                                                rules={[
-                                                    {
-                                                        required: false,
-                                                        message: 'Vui lòng nhập tên phim!',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input placeholder="Nhập tên của bạn" />
-                                            </Form.Item>
+                                        <div className={cx('wrapp-pay-area-inner')}>
+                                            <Title level={4} className={cx('title')}>
+                                                Kiểm tra thông tin
+                                            </Title>
+                                            <Divider style={{ backgroundColor: '#fff' }} />
+                                            <Form form={form} name="basic" layout="vertical" autoComplete="off">
+                                                <Form.Item
+                                                    className={cx('form-item')}
+                                                    label={<label className={cx('label')}>Tên người dùng</label>}
+                                                    name="fullname"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: 'Vui lòng nhập tên phim!',
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input
+                                                        readOnly={account.fullname != null}
+                                                        placeholder="Nhập tên của bạn"
+                                                    />
+                                                </Form.Item>
 
-                                            <Form.Item
-                                                className={cx('form-item')}
-                                                label={<label className={cx('label')}>Số điện thoại</label>}
-                                                name="phone"
-                                                rules={[
-                                                    {
-                                                        required: false,
-                                                        message: 'Vui lòng nhập tên phim!',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input placeholder="Nhập số điện thoại" />
-                                            </Form.Item>
-                                            <Form.Item
-                                                className={cx('form-item')}
-                                                label={<label className={cx('label')}>Email</label>}
-                                                name="email"
-                                                rules={[
-                                                    {
-                                                        required: false,
-                                                        message: 'Vui lòng nhập tên phim!',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input placeholder="Nhập email" />
-                                            </Form.Item>
-                                            <Form.Item>
-                                                <Space>
-                                                    <Button type="primary" key="submit" onClick={handlePurchase}>
-                                                        Mua vé
-                                                    </Button>
-                                                </Space>
-                                            </Form.Item>
-                                        </Form>
-                                    </div>
-                                </Row>
-                            </Col>
-                        </Row>
+                                                <Form.Item
+                                                    className={cx('form-item')}
+                                                    label={<label className={cx('label')}>Số điện thoại</label>}
+                                                    name="phone"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: 'Vui lòng nhập số điên thoại!',
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input
+                                                        readOnly={account.phone != null}
+                                                        placeholder="Nhập số điện thoại"
+                                                    />
+                                                </Form.Item>
+                                                {/* <Form.Item
+                                                    className={cx('form-item')}
+                                                    label={<label className={cx('label')}>Email</label>}
+                                                    name="email"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: 'Vui lòng nhập tên phim!',
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input readOnly={account.email != null} placeholder="Nhập email" />
+                                                </Form.Item> */}
+                                                <Form.Item
+                                                    label="Email"
+                                                    name="email"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: 'Vui lòng nhập email của hãng phim!',
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input
+                                                        readOnly={account.email != null}
+                                                        placeholder="Nhập email vào đây"
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item>
+                                                    <Space>
+                                                        <Button type="primary" key="submit" onClick={handlePurchase}>
+                                                            Mua vé
+                                                        </Button>
+                                                    </Space>
+                                                </Form.Item>
+                                            </Form>
+                                        </div>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </div>
                     )}
                 </Modal>
             )}

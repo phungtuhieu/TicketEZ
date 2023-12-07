@@ -4,6 +4,8 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 import RegisterForm from '~/components/Auth/Register/RegisterForm';
 import LoginForm from '~/components/Auth/Login/LoginForm';
+import OtpForm from '~/components/Otp/OtpForm';
+import PasswordChangeForm from '~/components/Auth/ChangePassword/ChangePasswordForm';
 
 const publicRoutes = [
     //Admin
@@ -32,11 +34,14 @@ const publicRoutes = [
     { path: '/admin/price', component: PageAdmin.AdminPrice, layout: AdminLayout },
     { path: '/admin/article', component: PageAdmin.AdminArticle, layout: AdminLayout },
     { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
+    { path: '/admin/accountStaff', component: PageAdmin.AdminAccountStaff, layout: AdminLayout },
     // User
-    { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
+    // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginForm, layout: DefaultLayout },
     { path: '/register', component: RegisterForm, layout: DefaultLayout },
+    { path: '/otp', component: OtpForm, layout: DefaultLayout },
+    { path: '/changepassword', component: PasswordChangeForm, layout: DefaultLayout },
     //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
     { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },
@@ -47,8 +52,10 @@ const publicRoutes = [
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
-    { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: null },
+    { path: '/connector-page', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
+    { path: '/booking-combo', component: PageUser.BookingCombo, layout: DefaultLayout },
+    { path: '/booking-history', component: PageUser.BookingHistory, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
     { path: '/movieTop/', component: PageUser.MovieTop, layout: DefaultLayout },
     { path: '/movieTop/:articleId', component: PageUser.MovieTopDetails, layout: DefaultLayout },

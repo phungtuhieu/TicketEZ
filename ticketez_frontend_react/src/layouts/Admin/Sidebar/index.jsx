@@ -67,6 +67,11 @@ const items = [
         'grAccount',
         <FontAwesomeIcon icon={solidIcons.faUsers} />,
     ),
+    getItem(
+        <Link to="/admin/accountStaff">Quản lý nhân viên</Link>,
+        'grAccountStaff',
+        <FontAwesomeIcon icon={solidIcons.faUsers} />,
+    ),
 ];
 function Sidebar() {
     return <Menu mode="inline" items={items} />;

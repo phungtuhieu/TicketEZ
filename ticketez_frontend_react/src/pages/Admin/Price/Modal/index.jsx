@@ -1,92 +1,120 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Breadcrumb, Select, Col, Row, Button, Modal, DatePicker, Space } from 'antd';
+import { Card, Breadcrumb, Select, Col, Row, Button, Modal, DatePicker, Space, Tag } from 'antd';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form, Input } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
 import { InputNumber } from 'antd';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
+import img, { listIcon } from '~/assets/img';
+
+import { data } from 'autoprefixer';
 const ModalPrice = (props) => {
     const { isEdit, record } = props;
     const [cinemaComplexDaTa, setCinemaComplexDaTa] = useState([]);
     const [movieData, setMovieData] = useState([]);
+    // Dữ liệu chuỗi rạp chiếu
+    const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
+    const [formatDaTa, setFormatDaTa] = useState([]);
+    // Check xem showtime có trong price không mới được sửa
+    // ẩn hiện chọn cụm rạp là phải check lúc bấm vào chuỗi rạp
+    const [selectedCinemaChain, setSelectedCinemaChain] = useState(false);
+    const [selectedFormat, setSelectedFormat] = useState(false);
+    const [showtimeData, setShowtimeData] = useState([]);
     const [seatTypeData, setSeatTypeData] = useState([]);
+    const [formatMovieData, setFormatMovieData] = useState([]);
     const [cinemaComplexChoose, setCinemaComplexChoose] = useState(record ? record.price.cinemaComplex.id : null);
     const [movieChoose, setMovieChoose] = useState(record ? record.price.formatMovie.movie.id : null);
-    const [startDateChoose, setStartDateChoose] = useState(record ? record.price.startDate : null);
-    const [endDateChoose, setEndDateChoose] = useState(record ? record.price.endDate : null);
+    const [formatMovieChoose, setFormatMovieChoose] = useState(record ? record.price.formatMovie.id : null);
+    const [startDateChoose, setStartDateChoose] = useState(record ? dayjs(record.price.startDate) : dayjs());
+    const [endDateChoose, setEndDateChoose] = useState(record ? dayjs(record.price.endDate) : dayjs());
+    const [seatTypeOnModal, setSeatTypeOnModal] = useState([]);
     // lưu giá khi chọn
-    const [priceSeatDayNormal, setPriceSeatDayNormal] = useState();
-    const [priceSeatDayVip, setPriceSeatDayVip] = useState();
-    const [priceSeatDayCouple, setPriceSeatDayCouple] = useState();
-    const [priceSeatDayRecliner, setPriceSeatDayRecliner] = useState();
-    const [priceSeatDayKid, setPriceSeatDayKid] = useState();
-    const [priceSeatDaySofa, setPriceSeatDaySofa] = useState();
-    const [priceSeatWeekNormal, setPriceSeatWeekNormal] = useState();
-    const [priceSeatWeekVip, setPriceSeatWeekVip] = useState();
-    const [priceSeatWeekCouple, setPriceSeatWeekCouple] = useState();
-    const [priceSeatWeekRecliner, setPriceSeatWeekRecliner] = useState();
-    const [priceSeatWeekKid, setPriceSeatWeekKid] = useState();
-    const [priceSeatWeekSofa, setPriceSeatWeekSofa] = useState();
 
-    const onChangeDefaultPrice = (value) => {
-        console.log('changed', value);
-    };
-    // Day
-    const onChangeDayPriceNormal = (value) => {
-        setPriceSeatDayNormal(value);
-        console.log('changed', value);
-    };
-    const onChangeDayPriceVip = (value) => {
-        setPriceSeatDayVip(value);
-        console.log('changed', value);
+    const [newPriceSeatTypeDTOs, setNewPriceSeatTypeDTOs] = useState(
+        props.record && props.record.newPriceSeatTypeDTOs ? props.record.newPriceSeatTypeDTOs : null,
+    );
+
+    useEffect(() => {
+        console.log(newPriceSeatTypeDTOs);
+    }, [newPriceSeatTypeDTOs]);
+
+    // Trường hợp sửa giá ngày
+    const onchangeDay = (seatTypeId, value) => {
+        setNewPriceSeatTypeDTOs((prevState) => {
+            const updatedState = [...prevState];
+            const seatIndex = updatedState.findIndex((moment) => moment.seatType.id === seatTypeId);
+            if (seatIndex !== -1) {
+                updatedState[seatIndex].weekdayPrice = value;
+            }
+            return updatedState;
+        });
     };
 
-    const onChangeDayPriceCouple = (value) => {
-        setPriceSeatDayCouple(value);
-        console.log('changed', value);
+    // trường hợp sửa giá tháng
+
+    const onchangeWeek = (seatTypeId, value) => {
+        console.log(`onchangeWeek - Seat Type ID: ${seatTypeId}, New Value: ${value}`);
+        setNewPriceSeatTypeDTOs((prevState) => {
+            const updatedState = [...prevState];
+            const seatIndex = updatedState.findIndex((moment) => moment.seatType.id === seatTypeId);
+            if (seatIndex !== -1) {
+                updatedState[seatIndex].weekendPrice = value;
+            }
+            return updatedState;
+        });
+    };
+    // Trường hợp sửa giá mặc định
+
+    const handelCreateSeatType = () => {
+        // Bắt lỗi ghế đã có rồi mà chọn thêm nữa
+        const seatTypes = newPriceSeatTypeDTOs ? newPriceSeatTypeDTOs.map((item) => item.seatType) : null;
+        if (seatTypes && seatTypes.some((seatType) => seatTypeOnModal === seatType.id)) {
+            alert('Ghế này đã có trong giá');
+            showModal(true);
+            return;
+        }
+        const selectedSeatType = seatTypeData.find((seatType) => seatTypeOnModal === seatType.id);
+
+        const newSeatType = {
+            weekdayPrice: 90000,
+            weekendPrice: 100000,
+            seatType: selectedSeatType,
+        };
+        console.log(newSeatType);
+
+        setNewPriceSeatTypeDTOs((prevState) => {
+            // Kiểm tra xem prevState có tồn tại không
+            const newState = prevState ? [...prevState, newSeatType] : [newSeatType];
+            return newState;
+        });
+    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+        handelCreateSeatType();
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
     };
 
-    const onChangeDayPriceRecliner = (value) => {
-        setPriceSeatDayRecliner(value);
-        console.log('changed', value);
-    };
-    const onChangeDayPriceKid = (value) => {
-        setPriceSeatDayKid(value);
-        console.log('changed', value);
-    };
-    const onChangeDayPriceSofa = (value) => {
-        setPriceSeatDaySofa(value);
-        console.log('changed', value);
-    };
-
-    // Week
-    const onChangeWeekPriceNormal = (value) => {
-        setPriceSeatWeekNormal(value);
-        console.log('changed', value);
-    };
-    const onChangeWeekPriceVip = (value) => {
-        setPriceSeatWeekVip(value);
-        console.log('changed', value);
-    };
-    const onChangeWeekPriceCouple = (value) => {
-        setPriceSeatWeekCouple(value);
-        console.log('changed', value);
-    };
-    const onChangeWeekPriceRecliner = (value) => {
-        setPriceSeatWeekRecliner(value);
-        console.log('changed', value);
-    };
-    const onChangeWeekPriceKid = (value) => {
-        setPriceSeatWeekKid(value);
-        console.log('changed', value);
-    };
-    const onChangeWeekPriceSofa = (value) => {
-        setPriceSeatWeekSofa(value);
-        console.log('changed', value);
-    };
-
-    const fetchDataCinemaComplex = async () => {
+    const fetchDataCinemaChain = async () => {
         try {
-            const resp = await axiosClient.get(`cinemaComplex/get/all`);
+            const resp = await axiosClient.get(`cinemaChain/get/all`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const dataCinemaChain = resp.data;
+            setCinemaChainDaTa(dataCinemaChain);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchDataCinemaComplex = async (idCinemaChain) => {
+        try {
+            const resp = await axiosClient.get(`cinemaComplex/bycimemaChain/${idCinemaChain}`);
             const dataCinemaComplex = resp.data;
             setCinemaComplexDaTa(dataCinemaComplex);
         } catch (error) {
@@ -98,7 +126,11 @@ const ModalPrice = (props) => {
         try {
             const resp = await axiosClient.get(`seatType/getAll`);
             const dataSeatType = resp.data;
-            setSeatTypeData(dataSeatType);
+
+            // Lọc ra các mục có id không phải 7, 8, 9
+            const filteredSeatTypeData = dataSeatType.filter((seatType) => ![7, 8, 9].includes(seatType.id));
+
+            setSeatTypeData(filteredSeatTypeData);
         } catch (error) {
             console.error(error);
         }
@@ -113,7 +145,46 @@ const ModalPrice = (props) => {
             console.error(error);
         }
     };
+    const fetchDataFormat = async () => {
+        try {
+            const resp = await axiosClient.get(`format/get/all`);
+            // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
+            const dataFormat = resp.data;
+            setFormatDaTa(dataFormat);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
+    const fetchDataFormatMovie = async (formatId) => {
+        try {
+            const resp = await axiosClient.get(`formatMovie/by-formatId/${formatId}`);
+            const dataFormatMovie = resp.data;
+            setFormatMovieData(dataFormatMovie);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchDataShowtime = async () => {
+        try {
+            const resp = await axiosClient.get(`showtime/by-id-price/${record.price.id}`);
+            const dataShowtime = resp.data;
+            setShowtimeData(dataShowtime);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const optionsCinemaChain = cinemaChainDaTa.map((cinemaChain) => ({
+        value: cinemaChain.id,
+        label: cinemaChain.name,
+    }));
+
+    const optionsFormat = formatDaTa.map((format) => ({
+        value: format.id,
+        label: format.name,
+    }));
     const options = cinemaComplexDaTa.map((cinema) => ({
         value: cinema.id,
         label: cinema.name,
@@ -124,11 +195,66 @@ const ModalPrice = (props) => {
         label: movie.title,
     }));
 
+    const optionsSeatTypeSelect = seatTypeData.map((seatType) => ({
+        value: seatType.id,
+        label: seatType.name,
+        color: seatType.color,
+    }));
+
+    const optionFormatMovieSelect = formatMovieData.map((formatMovie) => ({
+        value: formatMovie.id,
+        label: formatMovie.format.name + ' ' + formatMovie.movie.title,
+    }));
+
     useEffect(() => {
-        fetchDataCinemaComplex();
+        fetchDataCinemaChain();
+        fetchDataFormat();
+        fetchDataCinemaComplex(1);
         fetchDataSeatType();
         fetchDataMovie();
-    });
+        fetchDataFormatMovie(1);
+        fetchDataShowtime();
+    }, [record]);
+
+    const [isTableLoaded, setIsTableLoaded] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            // Sử dụng Promise.all để đợi tất cả các promise hoàn thành
+            await Promise.all([
+                fetchDataCinemaChain(),
+                fetchDataFormat(),
+                fetchDataCinemaComplex(1),
+                fetchDataSeatType(),
+                fetchDataMovie(),
+                fetchDataFormatMovie(1),
+                fetchDataShowtime(),
+            ]);
+
+            // Tất cả các promise đã hoàn thành, set setIsTableLoaded(true)
+            setIsTableLoaded(true);
+        };
+
+        fetchData();
+    }, []);
+
+    const onChangeCinemaChain = (value) => {
+        fetchDataCinemaComplex(value);
+        setSelectedCinemaChain(true);
+        console.log(`selected ${value}`);
+    };
+    const onSearchCinemaChain = (value) => {
+        console.log('search:', value);
+    };
+    const onChangeFormat = (value) => {
+        fetchDataFormatMovie(value);
+        setSelectedFormat(true);
+        console.log(`selected ${value}`);
+    };
+    const onSearchFormat = (value) => {
+        console.log('search:', value);
+    };
+
     const onSearchCinemaComplex = (value) => {};
 
     const onChangeCinemaComplex = (value) => {
@@ -139,13 +265,24 @@ const ModalPrice = (props) => {
     const onChangeMovie = (value) => {
         setMovieChoose(value);
     };
+
+    const onSearchFormatMovie = (value) => {};
+
+    const onChangeFormatMovie = (value) => {
+        setFormatMovieChoose(value);
+    };
+    const onSearchSeatType = (value) => {};
+
+    const onChangeSeatType = (value) => {
+        setSeatTypeOnModal(value);
+    };
     const onChangeStartDate = (date, dateString) => {
         if (date === null) {
             return;
         }
         const formattedDate = date.format('YYYY-MM-DD');
 
-        setStartDateChoose(formattedDate);
+        setStartDateChoose(date);
     };
     const onChangeEndDate = (date, dateString) => {
         if (date === null) {
@@ -153,7 +290,7 @@ const ModalPrice = (props) => {
         }
         const formattedDate = date.format('YYYY-MM-DD');
 
-        setEndDateChoose(formattedDate);
+        setEndDateChoose(date);
     };
 
     const disabledStartDate = (current) => {
@@ -170,22 +307,12 @@ const ModalPrice = (props) => {
         return false;
     };
     const validate = () => {
-        if (priceSeatDayNormal === undefined) {
+        if (cinemaComplexChoose === null) {
+            setShowInfo('errorCinemaComplex');
             return false;
         }
-        if (priceSeatDayVip === undefined) {
-            return false;
-        }
-        if (priceSeatDayCouple === undefined) {
-            return false;
-        }
-        if (priceSeatWeekNormal === undefined) {
-            return false;
-        }
-        if (priceSeatWeekVip === undefined) {
-            return false;
-        }
-        if (priceSeatWeekCouple === undefined) {
+        if (formatMovieChoose === null) {
+            setShowInfo('errorFormat');
             return false;
         }
     };
@@ -195,132 +322,201 @@ const ModalPrice = (props) => {
             funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
             setShowInfo('es');
         }
-        if (showInfo === 'error') {
-            funcUtils.notify('Không được để trống dữ liệu', 'error');
+        if (showInfo === 'errorFormat') {
+            funcUtils.notify('Vui lòng chọn loại phim', 'error');
             setShowInfo('es');
         }
-        if (showInfo === 'successDate') {
-            funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
+        if (showInfo === 'errorCinemaComplex') {
+            funcUtils.notify('Vui lòng chọn cụm rạp', 'error');
+            setShowInfo('es');
         }
-        if (showInfo === 'errorDateStart') {
-            funcUtils.notify('Ngày bắt đầu không thể lớn hơn ngày kết thúc', 'error');
-        }
-        if (showInfo === 'errorDateEnd') {
-            funcUtils.notify('Ngày kết thúc không thể nhỏ hơn ngày bắt đầu', 'error');
+        if (showInfo === 'errorEdit') {
+            funcUtils.notify('Do tiền này nằm trong suất chiếu nên không thể sửa đổi !', 'error');
+            setShowInfo('es');
         }
     }, [showInfo]);
 
     const handelCreateAndUpdate = async () => {
         if (validate() === false) {
-            setShowInfo('error');
             return;
         }
-
+        setIsTableLoaded(false);
         const dataPrice = {
-            startDate: startDateChoose,
-            endDate: endDateChoose,
+            id: record && record.price ? record.price.id : 0,
+
+            startDate: startDateChoose.format('YYYY-MM-DD'),
+            endDate: endDateChoose.format('YYYY-MM-DD'),
             status: true,
             formatMovie: {
-                id: record.price.formatMovie.id,
+                id: formatMovieChoose,
             },
             cinemaComplex: {
                 id: cinemaComplexChoose,
             },
         };
+        if (isEdit) {
+            console.log(dataPrice);
+            try {
+                const resp = await axiosClient.put(`price/${dataPrice.id}`, dataPrice);
+                console.log(resp);
+            } catch (error) {
+                console.log(error);
+                return;
+            }
+            // // xóa cái cũ
+            const listDataIDPriceSeatType = newPriceSeatTypeDTOs.map((priceSeatType) =>
+                priceSeatType.id ? priceSeatType.id : 0,
+            );
+            console.log(newPriceSeatTypeDTOs);
+            // // Xóa ghế cũ
+            try {
+                const resp = await axiosClient.post(`price_seat_type/deleteMultiple`, listDataIDPriceSeatType);
+                console.log(resp);
+            } catch (error) {
+                console.log(error.response);
+                return;
+            }
+            // Thêm(cập nhật) ghế mới
+            const PriceSeatType = newPriceSeatTypeDTOs.map((priceSeatType) => ({
+                weekdayPrice: priceSeatType.weekdayPrice,
+                weekendPrice: priceSeatType.weekendPrice,
+                seatType: priceSeatType.seatType,
+                price: record.price,
+            }));
 
-        let respPrice;
+            // console.log(PriceSeatType);
+            try {
+                const resp = await axiosClient.post(`price_seat_type`, PriceSeatType);
+                console.log(resp);
+            } catch (error) {
+                console.log(error.response);
+                return;
+            }
 
-        try {
-            respPrice = await axiosClient.post(`price`, dataPrice);
+            // Xóa giá cũ
+        } else {
+            let respPrice;
+            try {
+                respPrice = await axiosClient.post(`price`, dataPrice);
+                console.log(respPrice);
+            } catch (error) {
+                console.log(error);
+                return;
+            }
             console.log(respPrice);
-        } catch (error) {
-            console.log(error);
-            return;
-        }
-        console.log(respPrice);
-
-        const dataPriceSeatType = record.newPriceSeatTypeDTOs.map((item) => {
-            return {
-                weekdayPrice:
-                    item.seatType.id === 1
-                        ? priceSeatDayNormal
-                        : item.seatType.id === 2
-                        ? priceSeatDayVip
-                        : item.seatType.id === 3
-                        ? priceSeatDayCouple
-                        : item.seatType.id === 4
-                        ? priceSeatDayRecliner
-                        : item.seatType.id === 5
-                        ? priceSeatDayKid
-                        : item.seatType.id === 6
-                        ? priceSeatDaySofa
-                        : null,
-                weekendPrice:
-                    item.seatType.id === 1
-                        ? priceSeatWeekNormal
-                        : item.seatType.id === 2
-                        ? priceSeatWeekVip
-                        : item.seatType.id === 3
-                        ? priceSeatWeekCouple
-                        : item.seatType.id === 4
-                        ? priceSeatWeekRecliner
-                        : item.seatType.id === 5
-                        ? priceSeatWeekKid
-                        : item.seatType.id === 6
-                        ? priceSeatWeekSofa
-                        : null,
-                seatType: {
-                    id: item.seatType.id,
-                },
+            const PriceSeatType = newPriceSeatTypeDTOs.map((priceSeatType) => ({
+                weekdayPrice: priceSeatType.weekdayPrice,
+                weekendPrice: priceSeatType.weekendPrice,
+                seatType: priceSeatType.seatType,
                 price: {
                     id: respPrice.data.id,
                 },
-            };
-        });
-        console.log(dataPriceSeatType);
+            }));
 
-        try {
-            const resp = await axiosClient.patch(`price/${record.price.id}`, { status: false });
-            console.log(resp);
-        } catch (error) {
-            console.log(error);
-            return;
+            console.log(PriceSeatType);
+            try {
+                const resp = await axiosClient.post(`price_seat_type`, PriceSeatType);
+                console.log(resp);
+            } catch (error) {
+                console.log(error.response);
+                return;
+            }
         }
-
-        try {
-            const resp = await axiosClient.post(`price_seat_type`, dataPriceSeatType);
-            console.log(resp);
-        } catch (error) {
-            console.log(error);
-            return;
-        }
-
+        setIsTableLoaded(true);
         setShowInfo('success');
     };
 
-    const [isFirstRowVisible, setIsFirstRowVisible] = useState(true);
+    // Sửa giá
+    const [isFirstRowVisible, setIsFirstRowVisible] = useState(record ? true : false);
 
     const editPrice = () => {
+        if (showtimeData.length > 0) {
+            setShowInfo('errorEdit');
+            return;
+        }
         setIsFirstRowVisible(!isFirstRowVisible);
+        //   const currentTime = dayjs();
+        // showtimeData.forEach((showtimeData) => {
+        //     const isAfterStartTime = currentTime.isAfter(dayjs(showtimeData.startTime));
+        //     const isBeforeEndTime = currentTime.isBefore(dayjs(showtimeData.endTime));
+
+        //     if (isAfterStartTime && isBeforeEndTime) {
+        //       setShowInfo('errorEdit');
+        //       return;
+        //     }
+        //   });
     };
     return (
         <>
-            <Row>
-                <Col span={24}>
-                    <p className="tw-font-medium tw-mb-2">Chọn cụm rạp :</p>
-                    <Select
-                        className="tw-width-100"
-                        showSearch
-                        placeholder="Chọn cụm rạp"
-                        optionFilterProp="children"
-                        onChange={onChangeCinemaComplex}
-                        onSearch={onSearchCinemaComplex}
-                        filterOption={(input, option) => option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                        options={options}
-                        defaultValue={record ? record.price.cinemaComplex.id : null}
-                    />
-                </Col>
-                <Col span={24}>
+            {isTableLoaded && (
+                <Row>
+                    <Col span={24}>
+                        <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
+                        <Select
+                            className="tw-width-100"
+                            showSearch
+                            placeholder="Chọn chuỗi rạp"
+                            optionFilterProp="children"
+                            onChange={onChangeCinemaChain}
+                            onSearch={onSearchCinemaChain}
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            disabled={isFirstRowVisible === true}
+                            options={optionsCinemaChain}
+                        />
+                    </Col>
+                    <Col span={24}>
+                        <p className="tw-font-medium tw-mb-2">Chọn cụm rạp :</p>
+                        <Select
+                            className="tw-width-100"
+                            showSearch
+                            placeholder="Chọn cụm rạp"
+                            optionFilterProp="children"
+                            onChange={onChangeCinemaComplex}
+                            onSearch={onSearchCinemaComplex}
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={options}
+                            defaultValue={cinemaComplexChoose ? cinemaComplexChoose : null}
+                            disabled={isFirstRowVisible === true || selectedCinemaChain === false}
+                        />
+                    </Col>
+                    <Col span={24}>
+                        <p className="tw-font-medium tw-mb-3">Phân loại phim :</p>
+                        <Select
+                            className="tw-width-100"
+                            showSearch
+                            placeholder="Chọn phân loại phim"
+                            optionFilterProp="children"
+                            onChange={onChangeFormat}
+                            onSearch={onSearchFormat}
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            disabled={isFirstRowVisible === true}
+                            options={optionsFormat}
+                        />
+                    </Col>
+                    <Col span={24}>
+                        <p className="tw-font-medium tw-mb-2">Chọn loại phim :</p>
+                        <Select
+                            className="tw-width-100"
+                            showSearch
+                            placeholder="Chọn loại phim"
+                            optionFilterProp="children"
+                            onChange={onChangeFormatMovie}
+                            onSearch={onSearchFormatMovie}
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={optionFormatMovieSelect}
+                            defaultValue={formatMovieChoose ? formatMovieChoose : null}
+                            disabled={isFirstRowVisible === true || selectedFormat === false}
+                        />
+                    </Col>
+                    {/* <Col span={24}>
                     <p className="tw-font-medium tw-mb-2">Chọn phim :</p>
                     <Select
                         className="tw-width-100"
@@ -333,191 +529,208 @@ const ModalPrice = (props) => {
                         options={optionsMovieSelect}
                         defaultValue={record ? record.price.formatMovie.movie.id : null}
                     />
-                </Col>
-                <Col span={24} className="tw-mb-5">
-                    <Row>
-                        <Col span={12}>
-                            <p className="tw-font-medium tw-mb-2">Ngày bắt đầu :</p>
-                            <DatePicker
-                                defaultValue={record ? dayjs(record.price.startDate) : dayjs()}
-                                onChange={onChangeStartDate}
-                                locale="vi"
-                                disabledDate={disabledStartDate}
-                            />
-                        </Col>
-                        <Col span={12}>
-                            <p className="tw-font-medium tw-mb-2">Ngày kết thúc :</p>
-                            <DatePicker
-                                defaultValue={record ? dayjs(record.price.endDate) : dayjs()}
-                                onChange={onChangeEndDate}
-                                locale="vi"
-                                disabledDate={disabledEndDate}
-                            />
-                        </Col>
-                    </Row>
-                </Col>
-                <Col span={24}>
-                    <hr />
-                    <Row>
-                        <Col span={18}>
-                            <p className="tw-font-medium tw-mt-4">Loại ghế :</p>
-                        </Col>
-                        <Col span={6} className="tw-mt-8">
-                            <a onClick={editPrice} className="tw-ms-16 " type="primary">
-                                Sửa giá
-                            </a>
-                        </Col>
-                    </Row>
-                    {isFirstRowVisible && (
+                </Col> */}
+                    <Col span={24} className="tw-mb-5">
                         <Row>
-                            {/*row1 */}
-                            {record.newPriceSeatTypeDTOs.map((moment, index) => (
-                                <Col span={7} key={index}>
-                                    <p className="tw-font-bold tw-text-xl tw-mb-2">{moment.seatType.name}</p>
-                                    <div className="tw-ms-8">
-                                        <Row>
-                                            {' '}
-                                            <p className="tw-text-xl tw-mb-2">Giá trong tuần</p>
-                                        </Row>
-                                        <Row>
-                                            {' '}
-                                            <InputNumber
-                                                min={1}
-                                                max={1000000}
-                                                defaultValue={moment.weekdayPrice}
-                                                onChange={onChangeDefaultPrice}
-                                                disabled
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <div className="tw-ms-14 tw-text-5xl">↓</div>
-                                        </Row>
-                                        <Row>
-                                            <p className="tw-text-xl tw-mb-2 tw-mt-2">Giá cuối tuần</p>
-                                        </Row>
-                                        <Row>
-                                            <InputNumber
-                                                min={1}
-                                                max={1000000}
-                                                defaultValue={moment.weekendPrice}
-                                                onChange={onChangeDefaultPrice}
-                                                disabled
-                                            />
-                                        </Row>
-                                    </div>
-                                </Col>
-                            ))}
+                            <Col span={12}>
+                                <p className="tw-font-medium tw-mb-2">Ngày bắt đầu :</p>
+                                <DatePicker
+                                    defaultValue={record ? dayjs(record.price.startDate) : dayjs()}
+                                    onChange={onChangeStartDate}
+                                    locale="vi"
+                                    disabledDate={disabledStartDate}
+                                    disabled={isFirstRowVisible === true}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <p className="tw-font-medium tw-mb-2">Ngày kết thúc :</p>
+                                <DatePicker
+                                    defaultValue={record ? dayjs(record.price.endDate) : dayjs()}
+                                    onChange={onChangeEndDate}
+                                    locale="vi"
+                                    disabledDate={disabledEndDate}
+                                    disabled={isFirstRowVisible === true}
+                                />
+                            </Col>
                         </Row>
-                    )}
-
-                    {!isFirstRowVisible && (
+                    </Col>
+                    <Col span={24}>
+                        <hr />
                         <Row>
-                            {record.newPriceSeatTypeDTOs.map((moment, index) => (
-                                <Col span={7} key={index}>
-                                    <p className="tw-font-bold tw-text-xl tw-mb-2">{moment.seatType.name}</p>
-                                    <div className="tw-ms-8">
-                                        <Row>
-                                            {' '}
-                                            <p className="tw-text-xl tw-mb-2">Giá trong tuần</p>
-                                        </Row>
-                                        <Row>
-                                            {' '}
-                                            <InputNumber
-                                                min={1}
-                                                max={1000000}
-                                                value={
-                                                    moment.seatType.id === 1
-                                                        ? priceSeatDayNormal
-                                                        : moment.seatType.id === 2
-                                                        ? priceSeatDayVip
-                                                        : moment.seatType.id === 3
-                                                        ? priceSeatDayCouple
-                                                        : moment.seatType.id === 4
-                                                        ? priceSeatDayRecliner
-                                                        : moment.seatType.id === 5
-                                                        ? priceSeatDayKid
-                                                        : moment.seatType.id === 6
-                                                        ? priceSeatDaySofa
-                                                        : null
-                                                }
-                                                onChange={
-                                                    moment.seatType.id === 1
-                                                        ? onChangeDayPriceNormal
-                                                        : moment.seatType.id === 2
-                                                        ? onChangeDayPriceVip
-                                                        : moment.seatType.id === 3
-                                                        ? onChangeDayPriceCouple
-                                                        : moment.seatType.id === 4
-                                                        ? onChangeDayPriceRecliner
-                                                        : moment.seatType.id === 5
-                                                        ? onChangeDayPriceKid
-                                                        : moment.seatType.id === 6
-                                                        ? onChangeDayPriceSofa
-                                                        : null
-                                                }
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <div className="tw-ms-14 tw-text-5xl">↓</div>
-                                        </Row>
-                                        <Row>
-                                            <p className="tw-text-xl tw-mb-2 tw-mt-2">Giá cuối tuần</p>
-                                        </Row>
-                                        <Row>
-                                            <InputNumber
-                                                min={1}
-                                                max={1000000}
-                                                value={
-                                                    moment.seatType.id === 1
-                                                        ? priceSeatWeekNormal
-                                                        : moment.seatType.id === 2
-                                                        ? priceSeatWeekVip
-                                                        : moment.seatType.id === 3
-                                                        ? priceSeatWeekCouple
-                                                        : moment.seatType.id === 4
-                                                        ? priceSeatWeekRecliner
-                                                        : moment.seatType.id === 5
-                                                        ? priceSeatWeekKid
-                                                        : moment.seatType.id === 6
-                                                        ? priceSeatWeekSofa
-                                                        : null
-                                                }
-                                                onChange={
-                                                    moment.seatType.id === 1
-                                                        ? onChangeWeekPriceNormal
-                                                        : moment.seatType.id === 2
-                                                        ? onChangeWeekPriceVip
-                                                        : moment.seatType.id === 3
-                                                        ? onChangeWeekPriceCouple
-                                                        : moment.seatType.id === 4
-                                                        ? onChangeWeekPriceRecliner
-                                                        : moment.seatType.id === 5
-                                                        ? onChangeWeekPriceKid
-                                                        : moment.seatType.id === 6
-                                                        ? onChangeWeekPriceSofa
-                                                        : null
-                                                }
-                                            />
-                                        </Row>
-                                    </div>
-                                </Col>
-                            ))}
+                            <Col span={16} className="tw-mt-8"></Col>
+                            {record && (
+                                <a
+                                    onClick={editPrice}
+                                    className="tw-mt-8 tw-mb-8 tw-ms-16 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white tw-rounded-md tw-transition tw-duration-300 tw-ease-in-out hover:tw-bg-blue-600"
+                                    type="primary"
+                                >
+                                    Sửa giá
+                                </a>
+                            )}
                         </Row>
-                    )}
-                </Col>
+                        <Row></Row>
+                        {isFirstRowVisible && (
+                            <Row>
+                                <div className="tw-overflow-x-auto">
+                                    <table className="tw-min-w-full ">
+                                        <thead>
+                                            <tr style={{ borderBottom: '1px solid #ccc' }}>
+                                                <th className="tw-py-2 tw-px-4 ">Loại ghế</th>
+                                                <th className="tw-py-2 tw-px-4 ">Giá trong tuần ( t2 → t5)</th>
+                                                <th className="tw-py-2 tw-px-4 ">Giá cuối tuần (t6 → Chủ nhật)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {record &&
+                                                record.newPriceSeatTypeDTOs &&
+                                                record.newPriceSeatTypeDTOs.map((moment, index) => (
+                                                    <tr key={index} style={{ borderBottom: '1px solid #ccc' }}>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{
+                                                                borderRight: '1px solid #ccc',
+                                                                paddingRight: '8px',
+                                                            }}
+                                                        >
+                                                            <Tag color={moment.seatType.color}>
+                                                                {moment.seatType.name}
+                                                            </Tag>
+                                                        </td>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{
+                                                                borderRight: '1px solid #ccc',
+                                                                paddingRight: '8px',
+                                                            }}
+                                                        >
+                                                            {moment.weekdayPrice}
+                                                        </td>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{ paddingRight: '8px' }}
+                                                        >
+                                                            {moment.weekendPrice}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </Row>
+                        )}
+                        {!isFirstRowVisible && (
+                            <Row>
+                                <div className="tw-overflow-x-auto">
+                                    <table className="tw-min-w-full ">
+                                        <thead>
+                                            <tr style={{ borderBottom: '1px solid #ccc' }}>
+                                                <th className="tw-py-2 tw-px-4 ">Loại ghế</th>
+                                                <th className="tw-py-2 tw-px-4 ">Giá trong tuần ( t2 → t5)</th>
+                                                <th className="tw-py-2 tw-px-4 ">Giá cuối tuần (t6 → Chủ nhật)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {newPriceSeatTypeDTOs &&
+                                                newPriceSeatTypeDTOs.map((moment, index) => (
+                                                    <tr key={index} style={{ borderBottom: '1px solid #ccc' }}>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{
+                                                                borderRight: '1px solid #ccc',
+                                                                paddingRight: '8px',
+                                                            }}
+                                                        >
+                                                            <Tag color={moment.seatType.color}>
+                                                                {moment.seatType.name}
+                                                            </Tag>
+                                                        </td>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{
+                                                                borderRight: '1px solid #ccc',
+                                                                paddingRight: '8px',
+                                                            }}
+                                                        >
+                                                            <InputNumber
+                                                                min={1}
+                                                                max={1000000}
+                                                                onChange={(value) =>
+                                                                    onchangeDay(moment.seatType.id, value)
+                                                                }
+                                                                value={moment.weekdayPrice}
+                                                            />
+                                                        </td>
+                                                        <td
+                                                            className="tw-pl-20 tw-py-2 tw-px-4"
+                                                            style={{ paddingRight: '8px' }}
+                                                        >
+                                                            <InputNumber
+                                                                min={1}
+                                                                max={1000000}
+                                                                onChange={(value) =>
+                                                                    onchangeWeek(moment.seatType.id, value)
+                                                                }
+                                                                value={moment.weekendPrice}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <Button
+                                    style={{ marginTop: '20px', marginLeft: '200px' }}
+                                    icon={<PlusOutlined />}
+                                    type="dashed"
+                                    onClick={showModal}
+                                >
+                                    Thêm ghế
+                                </Button>
 
-                <Col span={24}>
-                    <Button
-                        onClick={handelCreateAndUpdate}
-                        className={`tw-mt-5 ${
-                            isFirstRowVisible === true ? 'tw-cursor-not-allowed tw-opacity-50' : 'tw-type-primary'
-                        }`}
-                        type="primary"
-                    >
-                        {isEdit ? 'Cập nhât' : 'Thêm'}
-                    </Button>
-                </Col>
-            </Row>
+                                <Modal title="Chọn loại ghế" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                                    <Select
+                                        className="tw-width-100"
+                                        showSearch
+                                        placeholder="Chọn loại ghế"
+                                        optionFilterProp="children"
+                                        onChange={onChangeSeatType}
+                                        onSearch={onSearchSeatType}
+                                        // defaultValue={1}
+                                    >
+                                        {optionsSeatTypeSelect.map((option) => (
+                                            <Select.Option
+                                                key={option.value}
+                                                value={option.value}
+                                                style={{ color: option.color }}
+                                            >
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Modal>
+                            </Row>
+                        )}
+                    </Col>
+
+                    <Col span={24}>
+                        <Button
+                            onClick={handelCreateAndUpdate}
+                            className={`tw-mt-5 ${
+                                isFirstRowVisible === true ? 'tw-cursor-not-allowed tw-opacity-50' : 'tw-type-primary'
+                            }`}
+                            type="primary"
+                            disabled={isFirstRowVisible === true}
+                        >
+                            {isEdit ? 'Cập nhât' : 'Thêm'}
+                        </Button>
+                    </Col>
+                </Row>
+            )}{' '}
+            {!isTableLoaded && (
+                <div className="tw-text-white tw-text-2xl">
+                    <img src={img.loading} />
+                </div>
+            )}
         </>
     );
 };

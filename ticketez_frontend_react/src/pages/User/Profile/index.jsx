@@ -7,6 +7,7 @@ import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
+import dayjs from 'dayjs';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
@@ -14,7 +15,7 @@ const EditableProfile = () => {
   const [editing, setEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef();
-  const [fileList, setFileList] = useState([]);
+  const [birthday, setBirthday] = useState(null);
 
 
   useEffect(() => {
@@ -25,11 +26,15 @@ const EditableProfile = () => {
         console.log(user);
         form.setFieldsValue({
           ...user,
-          birthday: user.birthday ? moment(user.birthday) : null,
+          birthday: user.birthday ? dayjs(user.birthday) : null,
+          gender: user.gender
 
         });
+        setBirthday(dayjs(user.birthday));
+        console.log(user.birthday);
+        // funcUtils.notify("Cập nhật thành công", 'success');
       } catch (error) {
-        console.error(error);
+        // funcUtils.notify("Cập nhật Thất bại", 'error');
       }
     };
 
@@ -38,21 +43,27 @@ const EditableProfile = () => {
 
   const onSave = async (values) => {
     try {
+      const updatedValues = {
+        ...values,
+        birthday: birthday ? birthday.toISOString() : null,
+      };
 
-      const response = await profileApi.putUser(userData.id, values);
+      console.log(values.birthday);
+
+      const response = await profileApi.putUser(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
-      console.log(response);
       localStorage.removeItem('user');
       localStorage.setItem('user', JSON.stringify(response.data));
-      window.location.reload();
       funcUtils.notify("Cập nhật thành công", 'success');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
     } catch (error) {
       funcUtils.notify("Cập nhật Thất bại", 'error');
-
     }
   };
-
 
 
 
@@ -142,14 +153,14 @@ const EditableProfile = () => {
                   rules={[{ required: true, message: 'Vui lòng nhập họ và' }]} >
                   <Input />
                 </Form.Item>
-                <Form.Item initialValue={userData.gender} name="gender" label="Giới tính">
-
+                <Form.Item name="gender" label="Giới tính">
                   <Radio.Group>
-
-                    <Radio value="1">Nam</Radio>
-                    <Radio value="0">Nữ</Radio>
+                    <Radio value={true}>Nam</Radio>
+                    <Radio value={false}>Nữ</Radio>
                   </Radio.Group>
                 </Form.Item>
+
+
                 <Form.Item name="address" label="Địa chỉii" rules={[{ required: true }]} initialValue={userData.address}>
                   <Input />
                 </Form.Item>
@@ -162,9 +173,21 @@ const EditableProfile = () => {
                 <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
                   <Input />
                 </Form.Item>
-                <Form.Item name="birthday" label="Ngày sinh" rules={[{ required: true }]}>
-                  <DatePicker format="DD-MM-YYYY" />
+                <Form.Item
+                  name="birthday"
+                  label="Ngày sinh"
+                  rules={[{ required: true, message: 'Vui lòng nhập ngày sinh' }]}
+                >
+                  <DatePicker
+                    value={birthday}
+                    onChange={(date) => setBirthday(date)}
+                    format="DD-MM-YYYY"
+                    style={{ width: '100%' }}
+                  />
+
                 </Form.Item>
+
+
 
                 <Form.Item name="" label="Đổi mật khẩu" >
                   <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">

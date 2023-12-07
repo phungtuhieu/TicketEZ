@@ -434,7 +434,7 @@ function AdminMovie() {
     const handleOk = async () => {
         // setLoadingButton((prev) => ({...prev,movie: true}) );
         try {
-            const values = await form.getFieldsValue();
+            const values = await form.validateFields();
             // console.log(values, 'values');
             const { genres, formats, directors, actors, poster, producers, studios, ...movieData } = values;
             // console.log('movieData', movieData);

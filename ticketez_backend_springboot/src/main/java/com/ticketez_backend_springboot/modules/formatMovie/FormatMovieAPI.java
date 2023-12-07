@@ -29,7 +29,7 @@ public class FormatMovieAPI {
     MovieDAO daoMovie;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<FormatMovie>> getAll() {
         List<FormatMovie> genreMovie = dao.findAll();
         return ResponseEntity.ok(genreMovie);
     }
@@ -40,6 +40,11 @@ public class FormatMovieAPI {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(dao.findById(id).get());
+    }
+
+    @GetMapping("by-formatId/{formatId}")
+    public List<FormatMovie> getFormatMoviesByFormatId(@PathVariable("formatId") Long formatId) {
+        return dao.findByFormatId(formatId);
     }
 
     @GetMapping("/getDistinctMovie")

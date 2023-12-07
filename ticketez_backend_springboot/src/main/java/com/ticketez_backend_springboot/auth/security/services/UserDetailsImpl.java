@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.auth.models.SecurityAccount;
-import com.ticketez_backend_springboot.modules.role.Role;
 
 import lombok.Data;
 
@@ -29,13 +28,14 @@ public class UserDetailsImpl implements UserDetails {
   @JsonIgnore
   private String password;
   private Date birthday;
-  private String gender;
+  private Boolean gender;
   private Date createdDate;
 
   private Collection<? extends GrantedAuthority> authorities;
 
-  public UserDetailsImpl(String id, String phone, String fullname, String image, String email,String address, String password,
-      Date birthday, String gender, Date createdDate,
+  public UserDetailsImpl(String id, String phone, String fullname, String image, String email, String address,
+      String password,
+      Date birthday, Boolean gender, Date createdDate,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.phone = phone;
@@ -70,27 +70,9 @@ public class UserDetailsImpl implements UserDetails {
         authorities);
   }
 
-  // @Override
-  // public Role seveRole(Role role){
-  // return
-  // }
-
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  @Override
-  public String getPassword() {
-    return password;
   }
 
   @Override
@@ -126,6 +108,13 @@ public class UserDetailsImpl implements UserDetails {
   @Override
   public String getUsername() {
     return id;
+
+  }
+
+  @Override
+  public String getPassword() {
+    return password;
+
   }
 
 }

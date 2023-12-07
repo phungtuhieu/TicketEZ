@@ -4,7 +4,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axiosClient from '~/api/global/axiosClient';
-
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
@@ -33,6 +32,7 @@ const AdminPrice = () => {
     const [form] = Form.useForm();
     // const [checkNick, setCheckNick] = useState(false);
     const [resetForm, setResetForm] = useState(false);
+    const [showtimeData, setShowtimeData] = useState([]);
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
@@ -44,25 +44,35 @@ const AdminPrice = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //call api
-    useEffect(() => {
-        const getList = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosClient.get(`price/price-price-seat-type-dto`);
-                console.log(res);
+    const getList = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosClient.get(`price/price-price-seat-type-dto`);
+            console.log(res);
 
-                const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
+            const filteredPosts = res.data.filter((seatType) => seatType.id !== 7);
 
-                setPosts(filteredPosts);
-                setLoading(false);
-            } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
-                } else {
-                    console.log(error);
-                }
+            setPosts(filteredPosts);
+            setLoading(false);
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
             }
-        };
+        }
+    };
+    const fetchDataShowtime = async () => {
+        try {
+            const resp = await axiosClient.get(`showtime/get/all`);
+            const dataShowtime = resp.data;
+            setShowtimeData(dataShowtime);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    useEffect(() => {
+        fetchDataShowtime();
         getList();
     }, [workSomeThing]);
 
@@ -83,7 +93,7 @@ const AdminPrice = () => {
 
         {
             title: 'Tên phim',
-            render: (_, record) => record.price.formatMovie.movie.title,
+            render: (_, record) => `${record.price.formatMovie.movie.title } ${record.price.formatMovie.format.name }`,
         },
         {
             title: 'Cụm rạp và chuỗi rạp',
@@ -103,7 +113,7 @@ const AdminPrice = () => {
                 <Space size="middle">
                     <FontAwesomeIcon
                         icon={faPen}
-                        className={cx('icon-pen')}
+                        className={cx('icon-pen', 'tw-cursor-pointer')}
                         onClick={() => {
                             handleEditData(record);
                         }}
@@ -116,7 +126,7 @@ const AdminPrice = () => {
                         cancelText="Huỷ"
                         onConfirm={() => handleDelete(record)}
                     >
-                        <FontAwesomeIcon icon={faTrash} className={cx('icon-trash')} />
+                        <FontAwesomeIcon icon={faTrash} className={cx('icon-trash', 'tw-cursor-pointer')} />
                     </Popconfirm>
                 </Space>
             ),
@@ -125,18 +135,31 @@ const AdminPrice = () => {
 
     const showModal = () => {
         setEditData(null);
+        setYourSelectedValue(null);
         setIsModalOpen(true);
     };
 
     const handleDelete = async (record) => {
-        try {
-            const res = await seatTypeApi.delete(record.id);
-            console.log(res);
-            if (res.status === 200) {
-                await uploadApi.delete(record.avatar);
-                funcUtils.notify('Xoá thành công', 'success');
+        let shouldContinue = true;
+
+        showtimeData.forEach((time) => {
+            if (time.price.id === record.price.id) {
+                setShowInfo('errorEdit');
+                shouldContinue = false;
+                return;
             }
+        });
+
+        if (!shouldContinue) {
+            return;
+        }
+
+        try {
+            const res = await axiosClient.delete(`price/${record.price.id}`);
+            console.log(res);
+            setShowInfo('success')
         } catch (error) {
+            // setShowInfo('errorEdit')
             console.log(error);
         }
 
@@ -153,8 +176,28 @@ const AdminPrice = () => {
         setLoading(true);
     };
     const handleCancel = () => {
+        getList();
         setIsModalOpen(false);
     };
+    const [showInfo, setShowInfo] = useState('');
+    useEffect(() => {
+        if (showInfo === 'success') {
+            funcUtils.notify('Xóa thành công dữ liệu trong bảng', 'success');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorFormat') {
+            funcUtils.notify('Vui lòng chọn loại phim', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorCinemaComplex') {
+            funcUtils.notify('Vui lòng chọn cụm rạp', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorEdit') {
+            funcUtils.notify('Do tiền này nằm trong suất chiếu nên không thể sửa đổi !', 'error');
+            setShowInfo('es');
+        }
+    }, [showInfo]);
 
     return (
         <>

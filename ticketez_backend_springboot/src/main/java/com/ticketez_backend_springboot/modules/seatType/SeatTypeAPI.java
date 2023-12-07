@@ -1,6 +1,7 @@
 package com.ticketez_backend_springboot.modules.seatType;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.modules.seatChart.SeatChart;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/seatType")
@@ -26,6 +29,19 @@ public class SeatTypeAPI {
     @GetMapping("getAll")
     public ResponseEntity<List<SeatType>> findAll() {
         return ResponseEntity.ok(seatTypeDAO.findAllByOrderByIdDesc());
+    }
+
+        @GetMapping("bySeatChart/{seatChartId}")
+    public ResponseEntity<List<SeatType>> getSeatTypesBySeatChartId(@PathVariable Long seatChartId) {
+        Optional<SeatType> seatChartOptional = seatTypeDAO.findById(seatChartId);
+
+        if (seatChartOptional.isPresent()) {
+            SeatType seatChart = seatChartOptional.get();
+            List<SeatType> seatTypes =seatTypeDAO.findSeatTypesBySeatChartId(seatChart.getId());
+            return new ResponseEntity<>(seatTypes, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
