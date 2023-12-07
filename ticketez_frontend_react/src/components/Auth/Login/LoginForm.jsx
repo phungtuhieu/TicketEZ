@@ -30,6 +30,7 @@ const LoginForm = () => {
             if (roles.includes('SUPER_ADMIN')) {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/admin/index');
+                window.location.reload();
             } else {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/');
@@ -46,6 +47,34 @@ const LoginForm = () => {
             setLoading(false);
         }
     };
+    // const onFinish = async (values) => {
+    //     if (!validateId(values.id) || !validatePassword(values.password)) return;
+
+    //     setLoading(true); // Consider showing only a non-blocking UI indicator
+    //     try {
+    //         const response = await authApi.getLogin({
+    //             id: values.id,
+    //             password: values.password,
+    //         });
+
+    //         // Optimistically update the UI
+    //         funcUtils.notify('Đăng nhập thành công!', 'success');
+    //         const roles = getRolesFromLocalStorage();
+    //         const targetRoute = roles.includes('SUPER_ADMIN') ? '/admin/index' : '/';
+    //         navigate(targetRoute);
+
+    //         // Then fetch user data
+    //         const user = await authApi.getUser();
+    //         console.log(user);
+
+    //     } catch (error) {
+    //         // If login fails, navigate back to login and show an error
+    //         navigate('/login');
+    //         funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.', 'error');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     return (

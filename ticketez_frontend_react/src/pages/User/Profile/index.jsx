@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col } from 'antd';
+import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, Upload } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './Profile.module.scss';
 import authApi from '~/api/user/Security/authApi';
@@ -13,9 +13,9 @@ const EditableProfile = () => {
   const [userData, setUserData] = useState();
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const fileInputRef = useRef();
+  const [editData, setEditData] = useState();
   const [birthday, setBirthday] = useState(null);
+  const [fileList, setFileList] = useState([]);
 
 
   useEffect(() => {
@@ -23,13 +23,19 @@ const EditableProfile = () => {
       try {
         const user = await authApi.getUser();
         setUserData(user);
-        console.log(user);
+        // console.log(user);
         form.setFieldsValue({
           ...user,
           birthday: user.birthday ? dayjs(user.birthday) : null,
-          gender: user.gender
+          gender: user.gender,
+          image: user.image
 
         });
+        const newUploadFile = {
+          name: user.image,
+          url: `http://localhost:8081/api/upload/${user.image}`,
+        };
+        setFileList([newUploadFile]);
         setBirthday(dayjs(user.birthday));
         console.log(user.birthday);
         // funcUtils.notify("Cập nhật thành công", 'success');
@@ -39,14 +45,24 @@ const EditableProfile = () => {
     };
 
     fetchData();
-  }, []);
+  }, [form]);
 
   const onSave = async (values) => {
     try {
       const updatedValues = {
         ...values,
-        birthday: birthday ? birthday.toISOString() : null,
+
       };
+      if (values.image.fileList) {
+        const file = values.image.fileList[0].originFileObj;
+        console.log(file);
+        const image = await uploadApi.put(userData.image, file);
+        values = {
+          ...values,
+          // image: image,
+        };
+      }
+      console.log(values, "sssssssssssss");
 
       console.log(values.birthday);
 
@@ -56,9 +72,9 @@ const EditableProfile = () => {
       localStorage.removeItem('user');
       localStorage.setItem('user', JSON.stringify(response.data));
       funcUtils.notify("Cập nhật thành công", 'success');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // setTimeout(() => {
+      //   // window.location.reload();
+      //};
 
     } catch (error) {
       funcUtils.notify("Cập nhật Thất bại", 'error');
@@ -66,19 +82,13 @@ const EditableProfile = () => {
   };
 
 
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedImage(URL.createObjectURL(file));
-    }
-  };
-
-  const onEditAvatar = () => {
-    fileInputRef.current.click();
-  };
-
-  const onEdit = () => {
+  const onEdit = (values) => {
+    const newUploadFile = {
+      name: values.image,
+      url: `http://localhost:8081/api/upload/${values.image}`,
+    };
+    setFileList([newUploadFile]);
+    setEditData(values);
     setEditing(true);
   };
 
@@ -91,28 +101,29 @@ const EditableProfile = () => {
     console.log('Change password clicked');
   };
 
+  const onChangeUpload = async ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+  const onPreview = async (file) => {
+    let src = file.values;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+
+
   return (
     <div className={styles.profileFormContainer}>
       <Card className={styles.profileFormCard} title="THÔNG TIN TÀI KHOẢN" bordered={false}>
-        {/* <div className="clsss"> <span>Xin chào, {userData.fullname}</span></div> */}
-        <div className={styles.avatarContainer} onClick={editing ? onEditAvatar : undefined}>
-          {selectedImage ? (
-            <img src={selectedImage} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-          ) : (
-            userData?.image ? (
-              <Avatar size={100} src={uploadApi.get(userData.image)} alt={`${userData?.id}'s avatar`} />
-            ) : (
-              <Avatar size={100} icon={<UserOutlined />} />
-            )
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-            accept="image/*"
-          />
-        </div>
+
 
 
         {!editing ? (
@@ -131,6 +142,26 @@ const EditableProfile = () => {
           >
             <Row gutter={16}>
               <Col span={12}>
+
+                <Form.Item
+                  // {...formItemLayout}
+                  label="Ảnh đại diện"
+                  name="image"
+                  rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+                >
+                  <Upload
+                    action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                    accept=".png, .jpg"
+                    listType="picture-card"
+                    onChange={onChangeUpload}
+                    onPreview={onPreview}
+                    fileList={fileList}
+                    name="image"
+                    maxCount={1}
+                  >
+                    {fileList.length < 2 && '+ Upload'}
+                  </Upload>
+                </Form.Item>
                 {/* Left Column */}
                 <Form.Item
                   name="id"

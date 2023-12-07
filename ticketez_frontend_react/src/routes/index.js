@@ -61,6 +61,9 @@ const publicRoutes = [
     { path: '/movie-cinema-complex/:ccxId', component: PageUser.MovieCinemaComplex, layout: DefaultLayout },
 ];
 
-const privateRoutes = [];
+const privateRoutes = [
+
+    
+];
 
 export { publicRoutes, privateRoutes };

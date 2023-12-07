@@ -24,22 +24,28 @@ import funcUtils from '~/utils/funcUtils';
 import uploadApi from '~/api/service/uploadApi';
 
 const Header = () => {
-    const [userData, setUserData] = useState();
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const user = await authApi.getUser();
                 setUserData(user);
                 console.log(user);
+              
             } catch (error) {
                 console.error(error);
+            }
+            finally {
+                setLoading(false); // Stop loading regardless of the outcome
             }
         };
 
         fetchData();
     }, []);
-
+    
     const navigate = useNavigate();
 
     const location = useLocation();
