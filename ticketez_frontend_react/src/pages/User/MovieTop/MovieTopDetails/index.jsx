@@ -123,7 +123,7 @@ const MovieTopDetails = () => {
                                                 </svg>
                                             </div>
                                         </Col>
-                                        <Col lg={17} className="tw-h-[237px]">
+                                        <Col lg={17} className="tw-h-[237px]" style={{overflowY: 'auto' , }}>
                                             <div className="tw-text-left  tw-leading-loose">
                                                 <h1 id={`movie-${index}-${indexValue}`} className="tw-mt-[-12px]">
                                                     {movie.movie.title}
@@ -152,7 +152,7 @@ const MovieTopDetails = () => {
                                                     <span>{movie.movie.description}</span>
                                                 </div>
                                                 <div>
-                                                    <span className="tw-font-bold"> Quốc gia: </span>
+                                                    <span className="tw-font-bold "> Quốc gia: </span>
                                                     <span>{movie.movie.country}</span>
                                                 </div>
                                             </div>

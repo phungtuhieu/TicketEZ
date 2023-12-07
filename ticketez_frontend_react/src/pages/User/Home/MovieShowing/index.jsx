@@ -11,6 +11,8 @@ import funcUtils from '~/utils/funcUtils';
 import { Link } from 'react-router-dom';
 import { CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import img from '~/assets/img';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(style);
 const { Paragraph, Title } = Typography;
@@ -20,6 +22,7 @@ const SampleNextArrow = (props) => {
     return (
         <div className={cx('control-btn')} onClick={onClick}>
             <button className={cx('next')}>
+            <FontAwesomeIcon icon={faChevronCircleRight}/>
                 <i class="fa fa-chevron-right"></i>
             </button>
         </div>

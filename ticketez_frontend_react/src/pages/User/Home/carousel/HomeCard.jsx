@@ -21,7 +21,7 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
         backgroundPosition: 'center',
         width: '100%',
         height: '100%',
-        opacity: 0.8,
+        opacity: 0.9,
         position: 'absolute',
         zIndex: 0,
     };
