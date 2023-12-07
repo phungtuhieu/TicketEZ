@@ -197,12 +197,14 @@ const MovieTopDetails = () => {
                             <Col lg={3}>
                                 {selectedMovie ? (
                                     <img
+                                     alt=''
                                         width={80}
                                         height={130}
                                         className={cx('img-modal')}
                                         src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
                                     />
-                                ) : (
+                                ) : 
+                                (
                                     ''
                                 )}
                             </Col>
