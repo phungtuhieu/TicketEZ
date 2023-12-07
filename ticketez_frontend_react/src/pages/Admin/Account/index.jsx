@@ -38,7 +38,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useDebounce } from '~/hooks';
 import { rule } from 'postcss';
 import { regex } from '~/utils/regex';
-import { SearchOutlined } from '@ant-design/icons';
+import { ExportOutlined, SearchOutlined } from '@ant-design/icons';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -112,6 +112,18 @@ const AdminAccount = () => {
         setReason('');
     };
 
+    //
+    const [isModalOpenLock, setIsModalOpenLock] = useState(false);
+    const showModalLock = () => {
+        setIsModalOpenLock(true);
+    };
+
+    const handleCancelLock = () => {
+        setIsModalOpenLock(false);
+    };
+
+    //
+
     //call api
     useEffect(() => {
         const getList = async () => {
@@ -131,7 +143,16 @@ const AdminAccount = () => {
     }, [currentPage, pageSize, workSomeThing, status, valueSearchDelay]);
 
     const [reason, setReason] = useState('');
-    console.log(reason);
+    // console.log(reason);
+
+    const [accountLockHistory, setAccountLockHistory] = useState('');
+
+    const findByAccountLockHistoryByAccountId = async (accountId) => {
+        // console.log(accountId);
+        const res = await accountApi.AccountLockHistoryFindByAccount(accountId);
+        // console.log(res.data);
+        setAccountLockHistory(res.data);
+    };
 
     const columns = [
         {
@@ -207,7 +228,6 @@ const AdminAccount = () => {
                         {record.status !== 1 && <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />}
                     </Popconfirm>
                     {/*  */}
-
                     {record.status === 1 && (
                         <>
                             <FontAwesomeIcon icon={faLockOpen} className={cx('icon-trash')} onClick={showModalReason} />
@@ -216,13 +236,12 @@ const AdminAccount = () => {
                                 open={isModalOpen}
                                 onOk={() => {
                                     if (reason.trim() !== '') {
-                                      handleStatus(record);
-                                      handleCancelReason();
+                                        handleStatus(record);
+                                        handleCancelReason();
                                     } else {
-                                      funcUtils.notify("Nhập hoặc chọn lí do khoá tài khoản","error")
+                                        funcUtils.notify('Nhập hoặc chọn lí do khoá tài khoản', 'error');
                                     }
-                                  }}
-                            
+                                }}
                                 okText="Đồng ý"
                                 cancelText="Huỷ"
                                 onCancel={handleCancelReason}
@@ -246,6 +265,30 @@ const AdminAccount = () => {
                                         onChange={(e) => onChangeReason(e.target.value)}
                                     />
                                 </AutoComplete>
+                            </Modal>
+                        </>
+                    )}
+                    {/*  */}
+                    {record.status !== 1 && (
+                        <>
+                            <ExportOutlined
+                                onClick={() => {
+                                    showModalLock();
+                                    findByAccountLockHistoryByAccountId(record.id);
+                                }}
+                            />
+
+                            <Modal
+                                title="Lý do bị khoá"
+                                open={isModalOpenLock}
+                                onCancel={handleCancelLock}
+                                footer={
+                                    <Button key="back" onClick={handleCancelLock}>
+                                        Thoát
+                                    </Button>
+                                }
+                            >
+                                <p>{accountLockHistory.reason}</p>
                             </Modal>
                         </>
                     )}
@@ -277,7 +320,7 @@ const AdminAccount = () => {
     };
 
     const handleEditData = (record) => {
-        console.log(record);
+        // console.log(record);
         const newUploadFile = {
             uid: record.phone.toString(),
             name: record.image,
@@ -297,16 +340,16 @@ const AdminAccount = () => {
         setLoading(true);
         try {
             const values = await form.validateFields();
-            console.log('values:::::', values);
+            // console.log('values:::::', values);
             if (fileList.length > 0) {
                 if (editData) {
                     let upl = {
                         ...values,
                     };
-                    console.log(upl);
+                    // console.log(upl);
                     if (upl.image.fileList) {
                         const file = upl.image.fileList[0].originFileObj;
-                        console.log(file);
+                        // console.log(file);
                         const image = await uploadApi.put(editData.image, file);
                         upl = {
                             ...upl,
@@ -337,7 +380,7 @@ const AdminAccount = () => {
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
-        console.log(form);
+        // console.log(form);
     };
 
     const onPreview = async (file) => {
@@ -377,15 +420,14 @@ const AdminAccount = () => {
         },
     ];
 
-
     return (
         <>
             <Row>
-            <Col span={22}>
+                <Col span={22}>
                     <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
 
-                <Col span={24} className=' tw-flex tw-items-center tw-justify-between tw-mb-10'>
+                <Col span={24} className=" tw-flex tw-items-center tw-justify-between tw-mb-10">
                     <Select
                         defaultValue={1}
                         style={{
@@ -402,7 +444,12 @@ const AdminAccount = () => {
                             },
                         ]}
                     />
-                    <Input className='tw-w-[200px]' placeholder="Tìm tên người dùng..." onChange={(e) => setSearch(e.target.value)} prefix={<SearchOutlined />} />
+                    <Input
+                        className="tw-w-[200px]"
+                        placeholder="Tìm tên người dùng..."
+                        onChange={(e) => setSearch(e.target.value)}
+                        prefix={<SearchOutlined />}
+                    />
                 </Col>
 
                 <BaseModal

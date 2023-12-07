@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class VNPayService {
-    public String createOrder(int total, String orderInfor, String bookingId) {
+    public String createOrder(int total, String orderInfor, String bookingId, String showtimeId, String accountId) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -36,7 +36,8 @@ public class VNPayService {
 
         String locate = "vn";
         vnp_Params.put("vnp_Locale", locate);
-        String urlReturn = VNPayConfig.vnp_Returnurl + "/" + bookingId;
+        String urlReturn = VNPayConfig.vnp_Returnurl + "?bookingId=" + bookingId + "&showtimeId=" + showtimeId
+                + "&accountId=" + accountId;
         vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
@@ -108,6 +109,12 @@ public class VNPayService {
         }
         if (fields.containsKey("bookingId")) {
             fields.remove("bookingId");
+        }
+        if (fields.containsKey("accountId")) {
+            fields.remove("accountId");
+        }
+        if (fields.containsKey("showtimeId")) {
+            fields.remove("showtimeId");
         }
         String signValue = VNPayConfig.hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {

@@ -38,7 +38,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useDebounce } from '~/hooks';
 import { rule } from 'postcss';
 import { regex } from '~/utils/regex';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import accountRoleApi from '~/api/admin/managementGeneral/accountRoleApi';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -117,11 +118,11 @@ const AdminAccountStaff = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await accountApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
+                const res = await accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
-                // console.log(res.data);
+                console.log(res.data);
             } catch (error) {
                 console.log(error);
                 // funcUtils.notify(error.response, 'error');
@@ -155,23 +156,28 @@ const AdminAccountStaff = () => {
             // width: '30%',
             // ...getColumnSearchProps('fullname'),
         },
-        {
-            title: 'Ngày sinh',
-            dataIndex: 'birthday',
-        },
-        {
-            title: 'Giới tính',
-            dataIndex: 'gender',
-            render: (_, record) => (record.gender ? 'Nam' : 'Nữ'),
-        },
+        // {
+        //     title: 'Ngày sinh',
+        //     dataIndex: 'birthday',
+        // },
+        // {
+        //     title: 'Giới tính',
+        //     dataIndex: 'gender',
+        //     render: (_, record) => (record.gender ? 'Nam' : 'Nữ'),
+        // },
         {
             title: 'email',
             dataIndex: 'email',
         },
-        {
-            title: 'Địa chỉ',
-            dataIndex: 'address',
-        },
+        // {
+        //     title: 'Địa chỉ',
+        //     dataIndex: 'address',
+        // },
+        // {
+        //     title: 'Chức vụ',
+        //     dataIndex: 'accountRole',
+        //     render: (accountRole) => <span>{accountRole.role.name}</span>       
+        //  },
         {
             title: 'Hoạt động',
             dataIndex: 'status',
@@ -253,7 +259,31 @@ const AdminAccountStaff = () => {
             ),
         },
     ];
-
+    const expandedRowRender = (record) => {
+        return (
+            <div className={cx('flex')}>
+            <div className={cx('flex-1 p-4 m-2')}>
+                <ul className={cx('wrapp-more-info')}>
+                    <li>
+                        <span>
+                            <b>Ngày sinh: </b> {record.birthday}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Giới tính: </b> {record.gender ? 'Nam' : 'Nữ'}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Địa chỉ: </b> {record.address}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        );
+    };
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
@@ -376,6 +406,26 @@ const AdminAccountStaff = () => {
             label: 'Nữ',
         },
     ];
+    const optionsWithDisabledRole = [
+        {
+            value: 3,
+            label: 'Quản lý Phim',
+        },
+        {
+            value: 4,
+            label: 'Quản lý Ghế',
+        },
+        {
+            value: 5,
+            label: 'Quản lý tài khoản',
+        },
+    ];
+    const showModal = () => {
+        form.resetFields();
+        setEditData(null);
+        setOpen(true);
+        setResetForm(true);
+    };
 
 
     return (
@@ -384,7 +434,17 @@ const AdminAccountStaff = () => {
             <Col span={22}>
                     <h1 className="tw-mt-[-7px]">Bảng dữ liệu nhân viên</h1>
                 </Col>
+                <Col span={2}>
+                    <Button
+                        type="primary"
+                        className={cx('button-title')}
+                        icon={<PlusOutlined />}
 
+                        onClick={showModal}
+                    >
+                        Thêm
+                    </Button>
+                </Col>
                 <Col span={24} className=' tw-flex tw-items-center tw-justify-between tw-mb-10'>
                     <Select
                         defaultValue={1}
@@ -409,7 +469,7 @@ const AdminAccountStaff = () => {
                     maskClosable={false}
                     open={open}
                     width={'60%'}
-                    title="Cập nhật"
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
                     onOk={handleOk}
                     onCancel={handleCancel}
                     footer={[
@@ -420,9 +480,10 @@ const AdminAccountStaff = () => {
                             <Button key="reset" onClick={handleResetForm}>
                                 Làm mới
                             </Button>
-                        ),
+                        ), 
+                        // onClick={handleOk}
                         <Button key="submit" type="primary" loading={loading} onClick={() => form.submit()}>
-                            Cập nhật
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
                         </Button>,
                     ]}
                 >
@@ -435,6 +496,14 @@ const AdminAccountStaff = () => {
                             rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
                         >
                             <Input placeholder="Họ và tên" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="password"
+                            label="Mật khẩu"
+                            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+                        >
+                            <Input type="password" placeholder="Mật khẩu" />
                         </Form.Item>
 
                         <Form.Item
@@ -520,6 +589,15 @@ const AdminAccountStaff = () => {
                                 {fileList.length < 2 && '+ Upload'}
                             </Upload>
                         </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="role"
+                            label="Chức vụ"
+                            rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+                        >
+                            {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
+                            <Radio.Group options={optionsWithDisabledRole} optionType="button" buttonStyle="solid" />
+                        </Form.Item>
                     </Form>
                 </BaseModal>
             </Row>
@@ -527,6 +605,7 @@ const AdminAccountStaff = () => {
                 loading={loading}
                 pagination={false}
                 columns={columns}
+                expandable={{ expandedRowRender }}
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,

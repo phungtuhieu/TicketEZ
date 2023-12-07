@@ -30,7 +30,11 @@ import articleApi from '~/api/admin/managementMovie/article';
 import dayjs from 'dayjs';
 import { movieApi } from '~/api/admin';
 import moment from 'moment';
+import classNames from 'classnames/bind';
+import style from './Article.module.scss';
 
+
+const cx = classNames.bind(style);
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
@@ -49,7 +53,6 @@ const Article = () => {
     const [posts, setPosts] = useState([]);
     const [statusValue, setStatusValue] = useState(true);
     const [valueSelectMovie, setValueSelectMovie] = useState([]);
-
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -508,41 +511,55 @@ const Article = () => {
                         return (
                             <div style={{ maxHeight: '400px', overflow: 'auto' }}>
                                 <Descriptions title="Danh sách phim"></Descriptions>
-
                                 <Row>
-                                    {record.movies.map((value, index) => (
+                                    {record.listMovieandGens.map((value, index) => (
                                         <Col lg={8} key={index}>
                                             <Row>
                                                 <Col lg={6}>
                                                     <img
                                                         alt=""
-                                                        src={uploadApi.get(value.poster)}
+                                                        src={uploadApi.get(value.movie.poster)}
                                                         width="100%"
                                                         height={150}
                                                     />
                                                 </Col>
                                                 <Col lg={17} className="tw-ml-3">
                                                     <div>
-                                                        <Tag color={value.mpaaRating.colorCode}>
-                                                            {value.mpaaRating.ratingCode}
+                                                        <Tag color={value.movie.mpaaRating.colorCode}>
+                                                            {value.movie.mpaaRating.ratingCode}
                                                         </Tag>
                                                     </div>
                                                     <div>
                                                         <span className="tw-text-gray-400">Bộ phim:</span>{' '}
                                                         <span className="tw-text-left tw-text-gray-950">
-                                                            {value.title}
+                                                            {value.movie.title}
                                                         </span>
                                                     </div>
                                                     <div>
                                                         <span className="tw-text-gray-400">Thời lượng:</span>{' '}
                                                         <span className="tw-text-left tw-text-gray-950">
-                                                            {value.duration}
+                                                            {value.movie.duration}
                                                         </span>
                                                     </div>
                                                     <div>
                                                         <span className="tw-text-gray-400">Quốc Gia:</span>{' '}
                                                         <span className="tw-text-left tw-text-gray-950">
-                                                            {value.country}
+                                                            {value.movie.country}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="tw-text-gray-400">Thể loại:</span>{' '}
+                                                        <span
+                                                            className={cx(
+                                                                'the-loai-phim',
+                                                                'tw-text-left tw-text-gray-950',
+                                                            )}
+                                                        >
+                                                            {value.genres.map((genres, index) => (
+                                                                <span key={index} className={cx('span')}>
+                                                                    {genres.name}
+                                                                </span>
+                                                            ))}
                                                         </span>
                                                     </div>
                                                     <div>
@@ -551,7 +568,7 @@ const Article = () => {
                                                             className="tw-text-yellow-400 "
                                                         />{' '}
                                                         <span className="tw-text-left tw-text-gray-950 ">
-                                                            {value.rating}
+                                                            {value.movie.rating}
                                                         </span>
                                                     </div>
                                                 </Col>

@@ -171,8 +171,9 @@ function SeatChart(props) {
 
     const handelUpdate = async (dataSeat) => {
         let data = dataSeat;
-
-        const respVip = await axiosClient.put(`seat/update`, data);
+        try {
+            const respVip = await axiosClient.put(`seat/update`, data);
+        } catch (error) {}
     };
     useEffect(() => {}, [seatState]);
 
@@ -205,12 +206,9 @@ function SeatChart(props) {
     const [isTableLoaded, setIsTableLoaded] = useState(false);
 
     useEffect(() => {
-        // Simulate a delay (replace this with your actual data fetching logic)
         const fetchData = async () => {
-            // Simulate data fetching delay
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 4000));
 
-            // Set isTableLoaded to true when data is fetched
             setIsTableLoaded(true);
         };
 
@@ -303,7 +301,7 @@ function SeatChart(props) {
                                         </table>
                                     )}
                                     {!isTableLoaded && (
-                                        <div className="tw-text-white tw-text-2xl" >
+                                        <div className="tw-text-white tw-text-2xl">
                                             <img src={img.loading} />
                                         </div>
                                     )}

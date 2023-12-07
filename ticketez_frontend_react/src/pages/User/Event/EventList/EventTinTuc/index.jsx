@@ -35,7 +35,6 @@ const EventListTinTuc = () => {
                 const res = await fetch(`http://localhost:8081/api/event/get/event-by-news?page=${page}&limit=2`);
 
                 const json = await res.json();
-                console.log(json);
                 setDataCardLoadMore((pre) => [...pre, ...json.data]);
                 setTotalPage(json.totalPages);
                 SetLoadingCard(false);

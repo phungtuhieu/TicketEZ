@@ -72,14 +72,14 @@ const Binhluan = () => {
 
     useEffect(() => {
         const checkPaymentStatus = async () => {
-            // Gọi API hoặc thực hiện kiểm tra trạng thái thanh toán ở đây
             try {
+                const user = authApi.getUser();
                 const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
                 setIsPaid(isPaid);
                 console.log('isPaid', isPaid);
             } catch (error) {
                 console.error('Lỗi khi kiểm tra thanh toán:', error);
-                // Xử lý lỗi theo ý bạn
+            
             }
         };
 
@@ -88,7 +88,6 @@ const Binhluan = () => {
 
     const handleAdd = async () => {
 
-       
         if (!comment.trim()) {
             setCommentError(true);
             return;
@@ -104,7 +103,8 @@ const Binhluan = () => {
         setLoading(true);
         try {
             const user = authApi.getUser();
-            const accountInfo = await reviewApi.getcheckAccountBooking(user.id, movieId);
+            const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
+            setIsPaid(isPaid);
             
             const datareview = {
                 comment,
@@ -150,7 +150,7 @@ const Binhluan = () => {
 
     const handleSaveEdit = async (item) => {
         try {
-            // Thực hiện lưu chỉnh sửa bình luận
+            
             const dulieu = { ...editData, comment: editedComment, rating: rating, editDate: new Date() }
             await reviewApi.put(dulieu);
             funcUtils.notify('Chỉnh sửa bình luận thành công', 'success');

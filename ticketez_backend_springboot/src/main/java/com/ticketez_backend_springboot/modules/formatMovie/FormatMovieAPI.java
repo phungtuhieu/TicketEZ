@@ -42,6 +42,11 @@ public class FormatMovieAPI {
         return ResponseEntity.ok(dao.findById(id).get());
     }
 
+    @GetMapping("by-formatId/{formatId}")
+    public List<FormatMovie> getFormatMoviesByFormatId(@PathVariable("formatId") Long formatId) {
+        return dao.findByFormatId(formatId);
+    }
+
     @GetMapping("/getDistinctMovie")
     public ResponseEntity<?> getDistinctMovie() {
         List<Movie> distinctMovieIds = dao.getDistinctMovie();

@@ -1,5 +1,7 @@
+@import '../../../../scss/global';
 $background-ticket: #fff;
 $background-wrapp: #ececee;
+
 #wrapper-movie-ticket-tabs {
     display: flex;
     justify-content: center;
@@ -10,6 +12,8 @@ $background-wrapp: #ececee;
         padding: 30px 20px 5px 20px;
         width: 100%;
         overflow: auto;
+        display: flex;
+        justify-content: center;
         height: 450px;
         box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;
     }
@@ -18,6 +22,24 @@ $background-wrapp: #ececee;
 .wrapp-logo,
 .wrapp-info-ticket {
     height: 80px;
+}
+.wrapp-btn-download {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 15px;
+    padding-right: 14px;
+    .btn-download-ticket {
+        color: $blue-500;
+    }
+}
+@media print {
+    .custom-print-body {
+        height: 100vh;
+        // width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
 .wrapp-logo {
     background-color: $background-ticket;

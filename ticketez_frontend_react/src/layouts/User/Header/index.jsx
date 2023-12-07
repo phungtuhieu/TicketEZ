@@ -78,7 +78,8 @@ const Header = () => {
         typeof path === 'string' ? location.pathname === path : path.test(location.pathname),
     );
 
-    const items = [
+
+    const itemsAccount = [
         {
             key: '1',
             label: (
@@ -92,7 +93,7 @@ const Header = () => {
         {
             key: '2',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="">
+                <a rel="noopener noreferrer" href="/booking-history">
                     Lịch sử đặt vé
                 </a>
             ),
@@ -118,6 +119,38 @@ const Header = () => {
                 </a>
             ),
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
+        },
+    ];
+    const itemsMovie = [
+        {
+            key: 'a',
+            label: (
+                <a onClick={handleProfile} href="">
+                    Lịch chiếu
+                </a>
+            ),
+
+            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
+        },
+        {
+            key: 'b',
+            label: (
+                <a onClick={handleProfile} href="">
+                    Phim đang chiếu
+                </a>
+            ),
+
+            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
+        },
+        {
+            key: 'c',
+            label: (
+                <a onClick={handleProfile} href="">
+                    Phim sắp chiếu
+                </a>
+            ),
+
+            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
         },
     ];
 
@@ -164,13 +197,19 @@ const Header = () => {
                             </a>
                         </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
-                            <a onClick={scrollToMovieShowing} className="tw-text-gray-700">
-                                Phim đang chiếu
-                            </a>
+                            {/* <Dropdown
+                                menu={{
+                                  items:  itemsMovie,
+                                }}
+                                placement="bottom"
+                                arrow
+                            >
+                               Phim
+                            </Dropdown> */}
                         </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
-                            <a onClick={scrollToMovieUpcoming} className="tw-text-gray-700">
-                                Phim sắp chiếu
+                            <a href="/movieTop" className="tw-text-gray-700">
+                                Top phim
                             </a>
                         </div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] ">
@@ -193,7 +232,7 @@ const Header = () => {
                         {userData ? (
                             <Dropdown
                                 menu={{
-                                    items,
+                                    items: itemsAccount,
                                 }}
                                 placement="bottom"
                                 arrow

@@ -1,4 +1,3 @@
-
 import BaseApi from '~/api/global/baseApi';
 import cinemaComplexApi from '../managementCinema/cinemaComplexApi';
 import axiosClient from '~/api/global/axiosClient';
@@ -23,9 +22,9 @@ class ServiceApi extends BaseApi {
         }
     }
 
-     async put(id, data, cinemaComplexId) {
+    async put(id, data, cinemaComplexId) {
         const cinemaComplex = await cinemaComplexApi.getId(cinemaComplexId);
-        const values = {id: id, ...data, cinemaComplex: cinemaComplex.data };
+        const values = { id: id, ...data, cinemaComplex: cinemaComplex.data };
         return axiosClient.put(url + '/' + id, values);
     }
 }

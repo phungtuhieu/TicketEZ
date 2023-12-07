@@ -23,16 +23,19 @@ public interface PriceDAO extends JpaRepository<Price, Long> {
 
         // Trong interface PriceDAO
         List<Price> findByCinemaComplexIdAndFormatMovie_Movie_Id(Long cinemaComplexId, Long movieId);
-
+        List<Price> findByShowtimesId(Long showtimeId);
         @Query("select p from Price p  " +
                         " join FormatMovie fm " +
                         " on p.formatMovie.id = fm.id  " +
                         " join Movie m  " +
                         " on m.id = fm.movie.id " +
+                        " join Format f  " +
+                        " on f.id = fm.format.id " +
                         " where m.id = :movieId " +
+                        " and f.id = :formatId " +
                         " and p.cinemaComplex.id = :cinemaComplexId  " +
                         " and (CAST(:date AS DATE) BETWEEN CAST(p.startDate AS DATE)  AND CAST(p.endDate AS DATE))")
         List<Price> getPriceByMovieAndCinemaComplexAndDate(@Param("movieId") Long movieId,
-                        @Param("cinemaComplexId") Long cinemaComplexId, @Param("date") LocalDate date);
+                  @Param("formatId") Long formatId, @Param("cinemaComplexId") Long cinemaComplexId, @Param("date") LocalDate date);
 
 }

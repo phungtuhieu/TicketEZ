@@ -36,7 +36,7 @@ const publicRoutes = [
     { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
     { path: '/admin/accountStaff', component: PageAdmin.AdminAccountStaff, layout: AdminLayout },
     // User
-    { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
+    // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: LoginForm, layout: DefaultLayout },
     { path: '/register', component: RegisterForm, layout: DefaultLayout },
@@ -52,12 +52,13 @@ const publicRoutes = [
     { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
-    { path: '/connector-page/:bookingId', component: PageUser.ConnectorPage, layout: null },
+    { path: '/connector-page', component: PageUser.ConnectorPage, layout: null },
     { path: '/booking-info', component: PageUser.BookingInfo, layout: DefaultLayout },
+    { path: '/booking-combo', component: PageUser.BookingCombo, layout: DefaultLayout },
     { path: '/booking-history', component: PageUser.BookingHistory, layout: DefaultLayout },
     { path: '/review/', component: PageUser.ReviewMovie, layout: DefaultLayout },
     { path: '/movieTop/', component: PageUser.MovieTop, layout: DefaultLayout },
-    { path: '/movieTop/1', component: PageUser.MovieTopDetails, layout: DefaultLayout },
+    { path: '/movieTop/:articleId', component: PageUser.MovieTopDetails, layout: DefaultLayout },
     { path: '/movie-cinema-complex/:ccxId', component: PageUser.MovieCinemaComplex, layout: DefaultLayout },
 ];
 

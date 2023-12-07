@@ -266,41 +266,15 @@ const AdminShowtime = () => {
             setLoading(false);
         }
 
-        //lấy price theo cinemacomplex, movie và ngày của showtime nằm trong bảng ngày của price
-        // if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
-        //     const getPriceByMovieAndCinemaComplexAndDate = async () => {
-        //         try {
-        //             if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
-        //                 const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-        //                 const [price, finbyPrice] = await Promise.all([
-        //                     priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
-        //                         valueTimeMovie,
-        //                         valueSelectCinemaComplex,
-        //                         formatDate,
-        //                     ),
-        //                     priceSeatApi.findAllPriceAndPriceSeatTypeDTOByCinemaComplexIdAndMovieId(
-        //                         valueSelectCinemaComplex,
-        //                         valueTimeMovie,
-        //                     ),
-        //                 ]);
-        //                 setValuePriceBySeatType(finbyPrice.data[0].newPriceSeatTypeDTOs);
-        //                 setvaluePrice(price.data);
-        //             }
-        //         } catch (error) {
-        //             console.log(error);
-        //             funcUtils.notify('Không tìm thấy giá phù hợp! Vui lòng kiểm tra lại bảng giá', 'error');
-        //         }
-        //     };
-        //     getPriceByMovieAndCinemaComplexAndDate();
-        // }
 
-        if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate) {
+        if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate && valueFormat) {
             const getPriceByMovieAndCinemaComplexAndDate = async () => {
                 try {
                     const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null) {
+                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null && valueFormat !== null) {
                         const res = await priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
                             valueTimeMovie,
+                            valueFormat,
                             valueSelectCinemaComplex,
                             formatDate,
                         );
@@ -314,7 +288,7 @@ const AdminShowtime = () => {
                         setValuePriceBySeatType(res.data[0].newPriceSeatTypeDTOs);
                     }
                 } catch (error) {
-                    // console.log(error.response.data);
+                     console.log(error.response.data);
                 }
             };
             getPriceByMovieAndCinemaComplexAndDate();
@@ -329,15 +303,9 @@ const AdminShowtime = () => {
         valueSelectPrice,
     ]);
 
+
     const columns = [
-        // {
-        //     title: '#',
-        //     dataIndex: 'id',
-        //     width: '7%',
-        //     defaultSortOrder: 'sorting',
-        //     align: 'center',
-        //     sorter: (a, b) => a.id - b.id,
-        // },
+        
         {
             title: 'Xuất chiếu',
             align: 'center',
@@ -476,6 +444,7 @@ const AdminShowtime = () => {
         setValueEndtimeByTimeMovieAndStartime();
         setValueSeatChartByCinema(null);
         setvaluePrice(null);
+        setvalueSelectPrice(null);
         setValuePriceBySeatType(null);
     };
     const showModal = () => {
@@ -582,9 +551,9 @@ const AdminShowtime = () => {
                 funcUtils.notify(`Thời gian phải hơn thời gian cuối cùng trong ngày là : ${lastArrayEndtime}`, 'error');
                 setOpen(true);
                 setLoading(false);
-            } else if (time < secondToLastArrayEndtime && editData != null) {
+            } else if (secondToLastArrayEndtime != null && time < secondToLastArrayEndtime && editData != null) {
                 funcUtils.notify(
-                    `Thời gian phải hơn thời gian cuối cùng trong ngày là : ${secondToLastArrayEndtime}`,
+                    `Thời gian phải hơn thời gian cuối cùng trong ngày là kk : ${secondToLastArrayEndtime}`,
                     'error',
                 );
                 setOpen(true);
@@ -624,6 +593,7 @@ const AdminShowtime = () => {
                                 funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
                                 setLoading(false);
                             }
+                            funcUtils.notify(error.response.data, 'error');
                             console.log(error);
                         }
                     } else {
@@ -652,7 +622,11 @@ const AdminShowtime = () => {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${lastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
-                    } else if (time < lastTwoEndTimeWithExtra15Minutes && editData != null) {
+                    } else if (
+                        time < lastTwoEndTimeWithExtra15Minutes &&
+                        editData != null &&
+                        secondToLastArrayEndtime != null
+                    ) {
                         funcUtils.notify(`Vui lòng tăng 15 phút để dọn dẹp sau ${secondToLastArrayEndtime}`, 'error');
                         setOpen(true);
                         setLoading(false);
@@ -690,7 +664,9 @@ const AdminShowtime = () => {
                                     funcUtils.notify('Lỗi máy chủ nội bộ, vui lòng thử lại sau!', 'error');
                                     setLoading(false);
                                 }
+                                funcUtils.notify(error.response.data, 'error');
                                 console.log(error);
+                                setLoading(false);
                             }
                         } else {
                             try {

@@ -25,10 +25,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ticketez_backend_springboot.dto.ArticleDTO;
 import com.ticketez_backend_springboot.dto.ArticleMovieDTO;
+import com.ticketez_backend_springboot.dto.ArticleMovieTrueDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovie;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMovieDAO;
 import com.ticketez_backend_springboot.modules.articleMovie.ArticleMoviePK;
+import com.ticketez_backend_springboot.modules.genre.Genre;
+import com.ticketez_backend_springboot.modules.genreMovie.GenreMovie;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @CrossOrigin("*")
@@ -62,13 +65,41 @@ public class ArticleAPI {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Article> findById(@PathVariable("id") Long id) {
-
+    public ResponseEntity<ArticleMovieDTO> findById(@PathVariable("id") Long id) {
         try {
-            if (!dao.existsById(id)) {
+            Optional<Article> articleOptional = dao.findById(id);
+            if (articleOptional.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(dao.findById(id).get());
+
+            Article article = articleOptional.get();
+            ArticleMovieDTO articleMovieDTO = new ArticleMovieDTO();
+            List<ArticleMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+
+            ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new MovieObjResp();
+
+            List<ArticleMovieDTO.MovieObjResp.MovieandGens> listMovieandGens = new ArrayList<>();
+
+            for (ArticleMovie articleMovie : article.getArticleMovies()) {
+                ArticleMovieDTO.MovieObjResp.MovieandGens movieandGens = movieObjResp.new MovieandGens();
+
+                List<Genre> genres = new ArrayList<>();
+
+                for (GenreMovie genreMovie : articleMovie.getMovie().getGenresMovies()) {
+                    genres.add(genreMovie.getGenre());
+                }
+                movieandGens.setMovie(articleMovie.getMovie());
+                movieandGens.setGenres(genres);
+                listMovieandGens.add(movieandGens);
+            }
+
+            movieObjResp.setArticle(article);
+            movieObjResp.setListMovieandGens(listMovieandGens);
+            listMovieObjResp.add(movieObjResp);
+
+            articleMovieDTO.setListMovieObjResp(listMovieObjResp);
+
+            return ResponseEntity.ok(articleMovieDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -162,35 +193,10 @@ public class ArticleAPI {
                     .body("Không thể xóa sự kiện do tài liệu tham khảo hiện có");
         }
     }
-
-    // @GetMapping("/get/article-movie")
-    // public ResponseEntity<?> getArticleMovie() {
-    // try {
-    // // Xử lý kết quả truy vấn và trả get ResponseEntity
-    // List<Article> articles = dao.getArticleMovie();
-    // ArticleMovieDTO articleMovieDTO = new ArticleMovieDTO();
-    // List<ArticleMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
-    // for (Article article : articles) {
-    // ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new
-    // MovieObjResp();
-    // List<Movie> movieList = new ArrayList<>();
-    // for (ArticleMovie articleMovie : article.getArticleMovies()) {
-    // movieList.add(articleMovie.getMovie());
-    // }
-    // movieObjResp.setArticle(article);
-    // movieObjResp.setMovies(movieList);
-    // listMovieObjResp.add(movieObjResp);
-    // articleMovieDTO.setListMovieObjResp(listMovieObjResp);
-    // }
-
-    // return ResponseEntity.ok(articleMovieDTO);
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    // }
-    // }
+    
 
     @GetMapping("/get/article-movie")
-    public ResponseEntity<?> getArticleMovie(@RequestParam("page") Optional<Integer> pageNo,
+     public ResponseEntity<?> getArticleMovie(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
         try {
             if (pageNo.isPresent() && pageNo.get() == 0) {
@@ -206,14 +212,25 @@ public class ArticleAPI {
 
             for (Article article : page.getContent()) {
                 ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new MovieObjResp();
-                List<Movie> movieList = new ArrayList<>();
+
+                List<ArticleMovieDTO.MovieObjResp.MovieandGens> listMovieandGens = new ArrayList<>();
 
                 for (ArticleMovie articleMovie : article.getArticleMovies()) {
-                    movieList.add(articleMovie.getMovie());
+                    ArticleMovieDTO.MovieObjResp.MovieandGens movieandGens = movieObjResp.new MovieandGens();
+
+                    List<Genre> genres = new ArrayList<>();
+
+                    for (GenreMovie genreMovie : articleMovie.getMovie().getGenresMovies()) {
+                        genres.add(genreMovie.getGenre());
+                    }
+                    movieandGens.setMovie(articleMovie.getMovie());
+                    movieandGens.setGenres(genres);
+                    listMovieandGens.add(movieandGens);
+                    // movieList.add(articleMovie.getMovie());
                 }
 
                 movieObjResp.setArticle(article);
-                movieObjResp.setMovies(movieList);
+                movieObjResp.setListMovieandGens(listMovieandGens);
                 listMovieObjResp.add(movieObjResp);
             }
 
@@ -228,7 +245,7 @@ public class ArticleAPI {
         }
     }
 
-     @GetMapping("/get/article-movie-true")
+    @GetMapping("/get/article-movie-true")
     public ResponseEntity<?> getArticleMovieTrue(@RequestParam("page") Optional<Integer> pageNo,
             @RequestParam("limit") Optional<Integer> limit) {
         try {
@@ -240,11 +257,11 @@ public class ArticleAPI {
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
             Page<Article> page = dao.getArticleMovieTrue(pageable);
 
-            ArticleMovieDTO articleMovieDTO = new ArticleMovieDTO();
-            List<ArticleMovieDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
+            ArticleMovieTrueDTO articleMovieDTO = new ArticleMovieTrueDTO();
+            List<ArticleMovieTrueDTO.MovieObjResp> listMovieObjResp = new ArrayList<>();
 
             for (Article article : page.getContent()) {
-                ArticleMovieDTO.MovieObjResp movieObjResp = articleMovieDTO.new MovieObjResp();
+                ArticleMovieTrueDTO.MovieObjResp movieObjResp = articleMovieDTO.new MovieObjResp();
                 List<Movie> movieList = new ArrayList<>();
 
                 for (ArticleMovie articleMovie : article.getArticleMovies()) {

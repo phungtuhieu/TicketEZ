@@ -24,8 +24,8 @@ function BookingDetail(props) {
     const [loading, setLoading] = useState(true);
     const [listPrice, setListPrice] = useState([]);
     const [ellipsis, setEllipsis] = useState(true);
-    const [accout, setAccount] = useState(null);
-
+    const [account, setAccount] = useState(null);
+    const [total, setTotal] = useState(0);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     // Load table
@@ -47,14 +47,13 @@ function BookingDetail(props) {
                     console.log('today', dateNow.toDate().getDay());
                     // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
                     console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
-                    const getPriceListBySeatTypeIdsAsync = async () => {
-                        const listPriceDb = await priceSeatApi.getListPriceDbBySeatType({
-                            cinemaCplxId: showtime.cinema.cinemaComplex.id,
-                            movieId: showtime.formatMovie.movie.id,
-                        });
+
+                    const getPriceList = async () => {
+                        const listPriceDb = await priceSeatApi.findAllPriceAndPriceSeatTypeDTOByShowtimeId(showtime.id);
                         return listPriceDb;
                     };
-                    const listPriceResp = await getPriceListBySeatTypeIdsAsync();
+
+                    const listPriceResp = await getPriceList();
                     console.log('listPriceResp', listPriceResp);
                     let listPr = [];
                     const totalAmount = seatBooking.reduce((total, item) => {
@@ -83,6 +82,7 @@ function BookingDetail(props) {
                         style: 'currency',
                         currency: 'VND',
                     }).format(totalAmount);
+                    setTotal(totalAmount);
                     console.log('totalAmount', totalAmount);
                     console.log('formattedTotalAmount', formattedTotalAmount);
                     const seatInfo = {
@@ -144,8 +144,53 @@ function BookingDetail(props) {
     const handlePurchase = async () => {
         try {
             const values = await form.validateFields();
-            if (!Object.values(values).every((value) => value !== null && value !== undefined)) {
-                funcUtils.notify('Vui lòng điền thông tin người dùng!', 'error');
+            // if (!Object.values(values).every((value) => value !== null && value !== undefined)) {
+            //     funcUtils.notify('Vui lòng điền thông tin người dùng!', 'error');
+            // }
+            console.log('account', account);
+            let accUpdate = {
+                ...account,
+                gender: true,
+                phone: account.phone != null ? account.phone : values.phone,
+                email: account.email != null ? account.email : values.email,
+                fullname: account.fullname != null ? account.fullname : values.fullname,
+            };
+            console.log('accUpdate', accUpdate);
+            const accResp = await accountApi.patchInfoUser(account.id, accUpdate);
+            console.log('accUpdate: ', accResp);
+            if (accResp.status == httpStatus.OK) {
+                try {
+                    const currentDate = new Date();
+                    const bookingId = generateRandomId();
+                    try {
+                        // const booking = {
+                        // id,
+                        // account: account,
+                        // showtime,
+                        // createDate: formattedDate,
+                        // status: 0, // 0: thành công, 1:thanh toán gặp lỗi
+                        // };
+                        console.log('account.id', account.id);
+                        const bookingDto = {
+                            total,
+                            showtimeId: showtime.id,
+                            accountId: account.id,
+                            bookingId,
+                        };
+                        const resp = await bookingApi.create(bookingDto);
+                        const payUrl = resp.data;
+                        window.location.href = payUrl;
+                    } catch (error) {
+                        funcUtils.notify(error.data, 'error');
+                    }
+                } catch (error) {
+                    if (error.hasOwnProperty('response')) {
+                        funcUtils.notify(error.response.data, 'error');
+                    } else {
+                        console.log(error);
+                    }
+                    funcUtils.notify('Có lỗi trong khi thanh toán', 'error');
+                }
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {
@@ -153,33 +198,10 @@ function BookingDetail(props) {
             } else {
                 console.log(error);
             }
-            console.log('errrr');
+            funcUtils.notify('Thông tin khách hàng không hợp lệ', 'error');
         }
         // return;
-        // const currentDate = new Date();
-        // const formattedDate = currentDate.toISOString();
-        // const id = generateRandomId();
-        // try {
-        //     const accResp = await accountApi.getById('user2');
-        //     const booking = {
-        //         id,
-        //         account: accResp.data,
-        //         showtime,
-        //         createDate: formattedDate,
-        //         status: 0, // 0: thành công, 1:thanh toán gặp lỗi
-        //     };
-        //     const bookingDto = {
-        //         booking,
-        //         seats: seatBooking,
-        //         listPrice,
-        //     };
-        //     const resp = await bookingApi.create(bookingDto);
-        //     const payUrl = resp.data;
-        //     window.location.href = payUrl;
-        // } catch (error) {
-        //     funcUtils.notify(error.data, 'error');
-        // }
-        // console.log('id', id);
+        //
     };
     const generateRandomId = () => {
         // Lấy thời gian mili giây hiện tại
@@ -376,7 +398,7 @@ function BookingDetail(props) {
                                                     ]}
                                                 >
                                                     <Input
-                                                        // readOnly={accout.fullname != null}
+                                                        readOnly={account.fullname != null}
                                                         placeholder="Nhập tên của bạn"
                                                     />
                                                 </Form.Item>
@@ -393,7 +415,7 @@ function BookingDetail(props) {
                                                     ]}
                                                 >
                                                     <Input
-                                                        // readOnly={accout.phone != null}
+                                                        readOnly={account.phone != null}
                                                         placeholder="Nhập số điện thoại"
                                                     />
                                                 </Form.Item>
@@ -408,7 +430,7 @@ function BookingDetail(props) {
                                                         },
                                                     ]}
                                                 >
-                                                    <Input readOnly={accout.email != null} placeholder="Nhập email" />
+                                                    <Input readOnly={account.email != null} placeholder="Nhập email" />
                                                 </Form.Item> */}
                                                 <Form.Item
                                                     label="Email"
@@ -420,7 +442,10 @@ function BookingDetail(props) {
                                                         },
                                                     ]}
                                                 >
-                                                    <Input placeholder="Nhập email vào đây" />
+                                                    <Input
+                                                        readOnly={account.email != null}
+                                                        placeholder="Nhập email vào đây"
+                                                    />
                                                 </Form.Item>
                                                 <Form.Item>
                                                     <Space>

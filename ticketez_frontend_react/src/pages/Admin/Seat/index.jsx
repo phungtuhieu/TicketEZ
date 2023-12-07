@@ -9,9 +9,11 @@ import BaseApi from '~/api/global/baseApi';
 import axiosClient from '~/api/global/axiosClient';
 import SeatGenerator from './SeatGenerator';
 
+
 const cx = classNames.bind(style);
 
 function AdminSeat() {
+    
     // Dữ liệu chuỗi rạp chiếu
     const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
     // Dữ liệu cụm rạp
