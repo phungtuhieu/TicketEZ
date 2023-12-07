@@ -117,6 +117,7 @@ function BookingInfo() {
                                 </Button>
                             )}
                         </div>
+                        
                         {/* <TicketDetails></TicketDetails> */}
                         {paymentStatus === 'success' && (
                             <div className={cx('wrapper-ticket-details', 'light')}>

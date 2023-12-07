@@ -72,6 +72,11 @@ const items = [
         'grAccountStaff',
         <FontAwesomeIcon icon={solidIcons.faUsers} />,
     ),
+    getItem(
+        <Link to="/admin/webcam">Webcam</Link>,
+        'webcam',
+        <FontAwesomeIcon icon={solidIcons.faCamera} />,
+    ),
 ];
 function Sidebar() {
     return <Menu mode="inline" items={items} />;
