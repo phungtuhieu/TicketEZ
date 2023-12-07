@@ -3,15 +3,46 @@ $bg-color: #ffffff;
 $text-color-gray: rgb(132, 132, 132);
 $text-color-black: #161616;
 $bg-ticket: $blue-100;
+$background-ticket: #fff;
 .wrapper {
     all: initial;
     // line-height: 1.6rem;
+    position: relative;
 
     .container {
         background-color: $bg-color;
         display: flex;
         justify-content: center;
+        position: relative;
     }
+}
+
+
+.status-ticket-1 {
+    position: absolute;
+    color: red;
+    font-weight: 800;
+    font-size: 40px;
+    border: 5px double red;
+    border-radius: 5px;
+    padding: 5px;
+    transform: translate(45px, -5px) rotate(30deg);
+    z-index: 99;
+    top: 300px;
+    left: 100px;
+}
+.status-ticket-2 {
+    position: absolute;
+    color: black;
+    font-weight: 800;
+    font-size: 40px;
+    border: 5px double black;
+    border-radius: 5px;
+    padding: 5px;
+    transform: translate(45px, -5px) rotate(30deg);
+    z-index: 99;
+    top: 300px;
+    left: 50px;
 }
 
 .wrapper-ticket {
@@ -23,6 +54,7 @@ $bg-ticket: $blue-100;
     border-radius: 4px;
     display: inline-block;
     text-align: left;
+    // position: relative;
 
     // text-transform: uppercase;
     .ticket-head {

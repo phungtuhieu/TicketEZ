@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.dto.BookingAnPaymentInfoAndSeatBookings;
 import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
@@ -370,4 +371,31 @@ public class BookingAPI {
 		}
 
 	}
+
+
+	@GetMapping("/get/booking-payment-info-seat-booking/{bookingId}")
+	public ResponseEntity<?> getBookingPaymentInfoSeatBookings(@PathVariable("bookingId") String bookingId) {
+		try {
+
+			BookingAnPaymentInfoAndSeatBookings dto = new BookingAnPaymentInfoAndSeatBookings();
+
+			if(bookingId != null ){
+				Booking book = dao.getBookingById(bookingId);
+				PaymentInfo paymentInfo = dao.getPaymentInfoById(bookingId);
+				List<SeatBooking> seatBookings = dao.getSeatsBookingById(bookingId);
+
+				dto.setBooking(book);
+				dto.setPaymentInfo(paymentInfo);
+				dto.setSeatBookings(seatBookings);
+			}
+			
+			return ResponseEntity.ok(dto);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+
 }
