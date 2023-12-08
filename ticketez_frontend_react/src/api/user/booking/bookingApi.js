@@ -13,6 +13,8 @@ class BookingApi extends BaseApi {
         return axiosClient.get(`/${url}/payment-info/${id}`);
     }
 
+    
+
     async getBookingByAcc(page = 1, limit = 10, accountId, ticketStatus = 0, search = '') {
         const params = {
             page,
@@ -22,6 +24,11 @@ class BookingApi extends BaseApi {
         };
         const res = await axiosClient.get(`/${url}/get-by-acc/${accountId}`, { params });
         return res.data;
+    }
+
+    // 
+    async getBookingPaymentInfoSeatBooking(bookingId) {
+        return axiosClient.get(`/${url}/get/booking-payment-info-seat-booking/${bookingId}`);
     }
 }
 const bookingApi = new BookingApi();

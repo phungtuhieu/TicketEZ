@@ -8,7 +8,6 @@ import OtpForm from '~/components/Otp/OtpForm';
 import PasswordChangeForm from '~/components/Auth/ChangePassword/ChangePasswordForm';
 
 const publicRoutes = [
-
     // User
     // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
