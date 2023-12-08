@@ -4,7 +4,7 @@ import { AdminLayout, DefaultLayout } from '~/layouts';
 import { Fragment } from 'react';
 import NotFound from './pages/NotFound/notFound';
 import { ToastContainer } from 'react-toastify';
-import { getRolesFromLocalStorage } from './utils/authUtils';
+import { getRolesFromLocalStorage, hasSuperAdminRole } from './utils/authUtils';
 
 function App() {
     const roles = getRolesFromLocalStorage();
@@ -47,12 +47,7 @@ function App() {
                         if (!isAuthenticated || !hasRequiredRole) {
                             return null;
                         }
-                        if (!isAuthenticated || !roles.includes(route.requireRole)) {
-                            return null;
-                        }
-                        if (!hasRequiredRole && route.requireRole === 'SUPER_ADMIN') {
-                            return null;
-                        }
+
                         const Page = route.component;
                         let Layout = route.layout || Fragment;
 
@@ -62,14 +57,15 @@ function App() {
                                 path={route.path}
                                 element={
                                     <Layout>
-                                        <Page />    
+                                        <Page />
                                         <ToastContainer />
                                     </Layout>
                                 }
                             />
                         );
                     })}
-                    
+
+
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>

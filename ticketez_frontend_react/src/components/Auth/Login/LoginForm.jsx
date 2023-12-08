@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import img from '~/assets/img';
 import authApi from '~/api/user/Security/authApi';
-import { getRolesFromLocalStorage } from '~/utils/authUtils';
+import { getRolesFromLocalStorage, hasSuperAdminRole } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import { validateId, validatePassword } from '../Custom';
 
@@ -26,8 +26,8 @@ const LoginForm = () => {
             });
             const user = await authApi.getUser();
             console.log(user);
-            const roles = getRolesFromLocalStorage();
-            if (roles.includes('SUPER_ADMIN')) {
+
+            if (hasSuperAdminRole()) {
                 funcUtils.notify('Đăng nhập thành công!', 'success');
                 navigate('/admin/index');
                 window.location.reload(); //chưa làm đc chuyển trang Route nên tạm này
