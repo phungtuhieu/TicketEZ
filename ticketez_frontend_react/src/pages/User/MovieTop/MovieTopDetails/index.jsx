@@ -123,7 +123,7 @@ const MovieTopDetails = () => {
                                                 </svg>
                                             </div>
                                         </Col>
-                                        <Col lg={17} className="tw-h-[237px]" style={{overflowY: 'auto' , }}>
+                                        <Col lg={17} className="tw-min-h-[237px]" >
                                             <div className="tw-text-left  tw-leading-loose">
                                                 <h1 id={`movie-${index}-${indexValue}`} className="tw-mt-[-12px]">
                                                     {movie.movie.title}
