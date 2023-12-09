@@ -111,6 +111,7 @@ const authApi = {
         }
         return null;
     },
+    
 
     getUser() {
         const user = localStorage.getItem('user');

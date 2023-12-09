@@ -1509,34 +1509,19 @@ VALUES
 (N'SUPER_ADMIN', N'Quyền cao nhất trong hệ thống.'),
 (N'USER', N'Người dùng thông thường'),
 (N'MOVIE_MANAGEMENT_ADMIN', N'Quyền quản lý thông tin về phim'),
-(N'SCHEDULING_PRICING_ADMIN', N'Quyền quản lý lịch chiếu, gia ghế, ghế'),
-(N'USER_MANAGEMENT_ADMIN', N'Quyền quản lý tài khoản và thông tin người dùng.')
+(N'SCHEDULING_PRICING_ADMIN', N'Quyền quản lý lịch chiếu, giá ghế, ghế'),
+(N'USER_MANAGEMENT_ADMIN', N'Quyền quản lý tài khoản và thông tin người dùng.'),
+(N'CINEMA_MANAGEMENT_ADMIN', N'Quyền quản lý rap phim'),
+(N'SERVICE_EVENT_MANAGEMENT_ADMIN', N'Quản lý dịch vụ sự kiện')
+
 GO
 -- Bạn có thể tiếp tục chèn dữ liệu cho các vai khác nếu cần.
 
 -- 17.  thêm dữ liệu bảng accounts
 INSERT INTO Accounts (id, phone, fullname, [image], email, [address], [password], birthday, gender, [status], verified, created_date, points)
 VALUES
-('admin', '0987654321', N'Nguyễn Văn A', 'image1.jpg', 'nguyen.va@gmail.com', N'123 Đường ABC, Quận 1, TP.HCM', 'admin', '1990-01-15', 1, 1, 1, '2023-01-01 08:00:00', 0),
-('user2', '0901234567', N'Trần Thị B', 'image2.jpg', 'tran.thi.b@gmail.com', N'456 Đường XYZ, Quận 2, TP.HCM', 'user2', '1985-03-20', 0, 1, 0, '2023-01-02 09:30:00', 75),
-('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
-('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),
 ('user5', '0965432109', N'Huỳnh Văn E', 'image5.jpg', 'huynh.van.e@gmail.com', N'202 Đường KLM, Quận 5, TP.HCM', 'user5', '1992-09-30', 1, 1, 1, '2023-01-05 16:20:00', 150),
 ('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60),
-('user7', '0909876543', N'Đặng Văn G', 'image7.jpg', 'dang.van.g@gmail.com', N'404 Đường QRS, Quận 7, TP.HCM', 'user7', '1998-02-12', 1, 1, 1, '2023-01-07 21:55:00', 110),
-('user8', '0918765432', N'Lý Thị H', 'image8.jpg', 'ly.thi.h@gmail.com', N'505 Đường TUV, Quận 8, TP.HCM', 'user8', '1993-06-18', 0, 1, 1, '2023-01-08 23:30:00', 80),
-('user9', '0961234876', N'Mai Văn I', 'image9.jpg', 'mai.van.i@gmail.com', N'606 Đường WXY, Quận 9, TP.HCM', 'user9', '1989-04-28', 1, 1, 1, '2023-01-09 02:15:00', 130),
-('user10', '0934785236', N'Ngô Thị K', 'image10.jpg', 'ngo.thi.k@gmail.com', N'707 Đường LMN, Quận 10, TP.HCM', 'user10', '1991-08-08', 0, 1, 1, '2023-01-10 04:50:00', 70),
-('user11', '0987612345', N'Hồ Văn L', 'image11.jpg', 'ho.van.l@gmail.com', N'808 Đường UVW, Quận 11, TP.HCM', 'user11', '1997-10-22', 1, 1, 1, '2023-01-11 07:35:00', 140),
-('user12', '0912345678', N'Phan Văn M', 'image12.jpg', 'phan.van.m@gmail.com', N'909 Đường OPQ, Quận 12, TP.HCM', 'user12', '1987-05-15', 0, 1, 1, '2023-01-12 10:20:00', 95),
-('user13', '0905432s187', N'Chu Thị N', 'image13.jpg', 'chu.thi.n@gmail.com', N'123 Đường STU, Quận Gò Vấp, TP.HCM', 'user13', '1994-01-05', 1, 1, 1, '2023-01-13 13:05:00', 105),
-('user14', '0965432187', N'Bùi Văn O', 'image14.jpg', 'bui.van.o@gmail.com', N'234 Đường Kẹp, Quận Tân Bình, TP.HCM', 'user14', '1996-03-10', 1, 1, 1, '2023-01-14 15:40:00', 65),
-('user15', '0976543298', N'Trương Thị P', 'image15.jpg', 'truong.thi.p@gmail.com', N'345 Đường Xé, Quận Tân Phú, TP.HCM', 'user15', '1999-07-02', 1, 1, 1, '2023-01-15 18:25:00', 125),
-('user16', '0923456789', N'Lê Văn Q', 'image16.jpg', 'le.van.q@gmail.com', N'456 Đường Mãn, Quận Bình Tân, TP.HCM', 'user16', '1993-09-20', 1, 1, 1, '2023-01-16 20:55:00', 75),
-('user17', '0901234567', N'Vũ Thị R', 'image17.jpg', 'vu.thi.r@gmail.com', N'567 Đường Khoá, Quận Thủ Đức, TP.HCM', 'user17', '1990-12-12', 0, 1, 0, '2023-01-17 23:40:00', 110),
-('user18', '0934567890', N'Phạm Thị S', 'image18.jpg', 'pham.thi.s@gmail.com', N'678 Đường Khoá, Quận Củ Chi, TP.HCM', 'user18', '1986-11-08', 0, 1, 1, '2023-01-18 02:25:00', 90),
-('user19', '0918765432', N'Tôn Thị T', 'image19.jpg', 'ton.thi.t@gmail.com', N'789 Đường Lờ, Quận Hóc Môn, TP.HCM', 'user19', '1997-04-28', 1, 1, 1, '2023-01-19 04:55:00', 140),
-('user20', '0987654321', N'Dương Văn U', 'image20.jpg', 'duong.van.u@gmail.com', N'890 Đường Đùi, Quận Nhà Bè, TP.HCM', 'user20', '1995-08-18', 1, 1, 1, '2023-01-20 07:40:00', 80);
 GO
 
 INSERT INTO Accounts_Roles (account_id, role_id)
