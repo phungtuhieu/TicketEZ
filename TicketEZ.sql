@@ -1528,7 +1528,7 @@ VALUES
 ('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
 ('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),
 ('user5', '0965432109', N'Huỳnh Văn E', 'image5.jpg', 'huynh.van.e@gmail.com', N'202 Đường KLM, Quận 5, TP.HCM', 'user5', '1992-09-30', 1, 1, 1, '2023-01-05 16:20:00', 150),
-('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60),
+('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60)
 GO
 
 INSERT INTO Accounts_Roles (account_id, role_id)
