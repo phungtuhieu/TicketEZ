@@ -55,7 +55,7 @@ const ReviewCard = () => {
               <div className="tw-border tw-p-2 tw-pl-4 tw-relative">
                 <div className="tw-relative tw-group">
                   <img
-                    src={uploadApi.get(Item.movie.poster)}
+                    src={uploadApi.get(Item.movie.banner)}
                     alt=""
                     className="tw-w-auto tw-h-[200px] tw-rounded-lg tw-relative tw-transition-transform tw-duration-300 tw-transform group-hover:tw-scale-110"
                   />

@@ -1,8 +1,10 @@
 package com.ticketez_backend_springboot.modules.review;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -145,6 +147,46 @@ public class ReviewAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // @GetMapping("/get/check-account-booking")
+    // public ResponseEntity<?> getCheckAccountBooking(@RequestParam("accountId") String accountId,
+    //         @RequestParam("movieId") Long movieId,
+    //         @RequestParam("bookingStatus") boolean bookingStatus) {
+    //     try {
+    //         Account optionalAccount = accountDAO.findById(accountId).orElse(null);
+    //         Movie optionalMovie = movieDAO.findById(movieId).orElse(null);
+
+    //         if (optionalAccount == null || optionalMovie == null) {
+    //             return new ResponseEntity<>("Không tìm thấy tài khoản hoặc phim", HttpStatus.NOT_FOUND);
+    //         }
+
+    //         if (bookingStatus) {
+
+    //             return ResponseEntity.ok("Đã đặt vé thành công");
+    //         } else {
+    //             List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
+
+    //             if (!reviews.isEmpty()) {
+    //                 boolean check = true;
+    //                 Map<String, Object> response = new HashMap<>();
+    //                 response.put("check", check);
+    //                 response.put("message", "Tài khoản đã thanh toán");
+    //                 return ResponseEntity.ok(response);
+    //             } else {
+    //                 // Additional information for the response
+    //                 boolean check = false;
+    //                 Map<String, Object> response = new HashMap<>();
+    //                 response.put("check", check);
+    //                 response.put("message", "Nếu bạn muốn bình luận, vui lòng thanh toán");
+    //                 return ResponseEntity.ok(response);
+    //             }
+    //         }
+
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     // gọi movie đề lấy reivew của movie đó
 
