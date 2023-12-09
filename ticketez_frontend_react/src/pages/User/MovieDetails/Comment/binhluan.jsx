@@ -5,9 +5,10 @@ import classNames from 'classnames/bind';
 import style from './binhluan.module.scss';
 import reviewApi from '~/api/user/review/reviewApi';
 import funcUtils from './../../../../utils/funcUtils';
-import { accountApi, movieApi } from '~/api/admin';
+import {  movieApi } from '~/api/admin';
 import { useParams } from 'react-router-dom';
 import uploadApi from '~/api/service/uploadApi';
+import PaginationCustom from '~/components/Admin/PaginationCustom';
 
 import moment from 'moment-timezone';
 
@@ -19,7 +20,7 @@ const Binhluan = () => {
     const [loading, setLoading] = useState(false);
 
     const [review, setReview] = useState([]);
-    const [account, setAccount] = useState([]);
+    
     const [workSomeThing, setWorkSomeThing] = useState();
     const [imageUrl, setImageUrl] = useState(null);
     const [isCommentVisible, setCommentVisible] = useState(false); // xử lý mở comment
@@ -36,16 +37,27 @@ const Binhluan = () => {
     const [commentError, setCommentError] = useState(false);
     const [ratingError, setRatingError] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
+    const [totalItems, setTotalItems] = useState(0); // Tổng số mục
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(7);
+    
+    // Xử lý sự kiện thay đổi trang
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
     const user = authApi.getUser();
 
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await reviewApi.getMovieId(movieId);
-
-                setReview(res.data);
+                const res = await reviewApi.getMovieId(movieId, currentPage, pageSize);
+                console.log('tsst', res);
+                setReview(res.data.data);
                 setInitLoading(false);
+                setTotalItems(res.data.totalItems);
+
                 // setData(res.data);
                 // setList(res.data);
                 setLoading(false);
@@ -59,7 +71,7 @@ const Binhluan = () => {
             }
         };
         getList();
-    }, [workSomeThing, movieId]);
+    }, [workSomeThing, movieId, currentPage, pageSize,]);
 
     useEffect(() => {
         const getMovie = async () => {
@@ -79,13 +91,27 @@ const Binhluan = () => {
                 console.log('isPaid', isPaid);
             } catch (error) {
                 console.error('Lỗi khi kiểm tra thanh toán:', error);
-            
+
             }
         };
 
         checkPaymentStatus();
     }, [user.id, movieId]);
 
+    const filterProfanity = (text) => {
+        const profanityList = ['đụ má', 'con mẹ mày', 'vcl', 'phim dở vãi',
+            'fuck', 'cmm', 'như cc', 'nứng cặc',
+            'cdm', 'duma', 'dcm', 'nứng vl', 'chó đẻ',
+            'vãi cứt', 'xàm lồn', 'như lồn', 'cái lồn', 'như l', 'đỉ mẹ', 'loz', 'lol', 'nhu cac','đụ']; // Thêm các từ thô tục vào danh sách
+        let filteredText = text;
+
+        profanityList.forEach((profanity) => {
+            const regex = new RegExp(profanity, 'gi');
+            filteredText = filteredText.replace(regex, '*'.repeat(profanity.length));
+        });
+
+        return filteredText;
+    };
     const handleAdd = async () => {
 
         if (!comment.trim()) {
@@ -105,9 +131,9 @@ const Binhluan = () => {
             const user = authApi.getUser();
             const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
             setIsPaid(isPaid);
-            
+            const censoredComment = filterProfanity(comment);
             const datareview = {
-                comment,
+                comment: censoredComment,
                 rating,
                 createDate: new Date(),
                 editData: null
@@ -150,7 +176,7 @@ const Binhluan = () => {
 
     const handleSaveEdit = async (item) => {
         try {
-            
+
             const dulieu = { ...editData, comment: editedComment, rating: rating, editDate: new Date() }
             await reviewApi.put(dulieu);
             funcUtils.notify('Chỉnh sửa bình luận thành công', 'success');
@@ -203,6 +229,31 @@ const Binhluan = () => {
         setIsEditing(false);
         setEditedComment('');
     };
+    const convertRatingToStatus = (rating) => {
+        if (rating >= 1 && rating <= 2) {
+            return "Rất kém";
+        } else if (rating >= 3 && rating <= 4) {
+            return "Không có hay";
+        } else if (rating >= 5 && rating <= 6) {
+            return "Ở mức trung bình";
+        } else if (rating >= 7 && rating <= 8) {
+            return "Tuyệt vời";
+        } else if (rating >= 9 && rating <= 10) {
+            return "Siêu phẩm";
+        } else {
+            return "Không xác định";
+        }
+    };
+    const reorderComments = (comments, userId) => {
+        const userCommentIndex = comments.findIndex(comment => comment.account.id === userId);
+    
+        if (userCommentIndex !== -1) {
+          const userComment = comments.splice(userCommentIndex, 1)[0];
+          comments.unshift(userComment);
+        }
+    
+        return comments;
+      };
     return (
         <div>
             <Row style={{ width: '1080px' }}>
@@ -221,36 +272,33 @@ const Binhluan = () => {
                     >
                     </Avatar> */}
                     {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
-                      <Space.Compact
-                      className="tw-flex tw-flex-col tw-items-start tw-justify-start"
-                      style={{
-                          width: '90%',
-                      }}
-                  >
-                      <Input.TextArea
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                          placeholder="Bình luận tại đây"
-                          autoSize={{ minRows: 3, maxRows: 3 }}
-                          className='tw-w-full'
-                      />
-                     
-                      <Button
-                          onClick={handleAdd}
-                          className='tw-bg-[var(--primary-background-color)] tw-text-white tw-mt-2' // Thêm margin-top để tạo khoảng cách giữa Input.TextArea và Button
-                
-                      >
-                          Send
-                      </Button>
-                     
-                      {commentError && <span style={{ color: 'red' }}>Vui lòng nhập bình luận</span>}
-                  </Space.Compact>
-                  
-                   
+                        <Space.Compact
+                            className="tw-flex tw-flex-col tw-items-start tw-justify-start"
+                            style={{
+                                width: '90%',
+                            }}
+                        >
+                            <Input.TextArea
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                placeholder="Bình luận tại đây"
+                                autoSize={{ minRows: 3, maxRows: 3 }}
+                                className='tw-w-full'
+                            />
+                            <Button
+                                onClick={handleAdd}
+                                className='tw-bg-[var(--primary-background-color)] tw-text-white tw-mt-2' // Thêm margin-top để tạo khoảng cách giữa Input.TextArea và Button
+
+                            >
+                                Send
+                            </Button>
+
+                            {commentError && <span style={{ color: 'red' }}>Vui lòng nhập bình luận</span>}
+                        </Space.Compact>
                     ) : (
                         // Nếu chưa thanh toán, hiển thị thông báo và ẩn input và nút bình luận
                         <div>
-                            <p>Vui lòng thanh toán để có thể bình luận.</p>
+                            <p className='tw-text-red-500'>Vui lòng thanh toán để có thể bình luận.</p>
                         </div>
                     )}
                 </Col>
@@ -271,18 +319,16 @@ const Binhluan = () => {
                 )}
                 <Col span={16}>
                     {/* <div className="tw-overflow-hidden tw-scrollbar-hidden tw-max-h-[1000px]"> */}
-                    <div style={{ overflowY: 'scroll', maxHeight: '500px', WebkitOverflowScrolling: 'touch' }}>
+                   
                         <List
 
                             className="demo-loadmore-list"
                             loading={initLoading}
                             itemLayout="horizontal"
                             // loadMore={loadMore}
-                            dataSource={review}
+                            dataSource={reorderComments(review, user.id)}
                             renderItem={(item, index) => (
-
                                 <List.Item>
-
                                     <Row>
                                         <Col span={24} style={{ textAlign: 'left', width: '1080px' }}>
                                             <Row>
@@ -313,7 +359,9 @@ const Binhluan = () => {
                                             </Row>
                                         </Col>
                                         <Col span={24} style={{ textAlign: 'left' }}>
-                                            <h4><StarFilled style={{ color: 'yellow', fontSize: '20px' }} /> {item.rating}/10 | Tuyệt vời</h4>
+                                            <h4>
+                                                <StarFilled style={{ color: 'yellow', fontSize: '20px' }} /> {item.rating}/10 | {convertRatingToStatus(item.rating)}
+                                            </h4>                                            
                                             {isEditing && index === indexId ? (
                                                 <div>
                                                     <Rate
@@ -321,7 +369,7 @@ const Binhluan = () => {
                                                         name="rating"
                                                         allowHalf
                                                         defaultValue={rating}
-
+                                                        className='tw-text-gray-400'
                                                         style={{ fontSize: '16px', width: '120px' }}
                                                         onChange={handleRatingChange}
                                                         tooltips={1}
@@ -433,8 +481,14 @@ const Binhluan = () => {
                                 </List.Item>
                             )}
                         />
-                    </div>
-
+                   
+                    <PaginationCustom
+                        howSizeChanger={false}
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={totalItems}
+                        onChange={handlePageChange}
+                    />
                 </Col>
             </Row>
 

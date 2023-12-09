@@ -24,13 +24,13 @@ public interface ReviewDAO extends JpaRepository<Review, Long> {
                         "JOIN Account a ON r.account.id = a.id " +
                         "WHERE o.status = 0 AND o.ticketStatus = 1 AND r.movie.id = :movieId " +
                         "ORDER BY r.createDate DESC")
-        List<Review> findAllByMovieId(@Param("movieId") Long movieId);
+        Page<Review> findAllByMovieId(@Param("movieId") Long movieId, Pageable pageable);
 
         @Query("SELECT r FROM Review r " +
                         "JOIN Booking o ON r.account.id = o.account.id " +
-                        " JOIN o.showtime.formatMovie fm " +
-                        "WHERE o.status = 0 AND o.ticketStatus = 1 AND fm.movie = :movie " +
-                        "AND o.account = :account")
+                        "JOIN o.showtime.formatMovie fm " +
+                        "WHERE (o.status = 0 AND o.ticketStatus = 1 AND fm.movie = :movie AND o.account = :account) " +
+                        "OR (o.status = 1 AND o.ticketStatus = 1 AND fm.movie = :movie AND o.account = :account)")
         List<Review> findByCheckAccBooking(@Param("movie") Movie movie, @Param("account") Account account);
 
         List<Review> findByMovieOrderByIdDesc(Movie movie);

@@ -27,8 +27,9 @@ const reviewApi = {
     delete: async (reviewId) => {
         return axiosClient.delete(url + '/' + reviewId);
     },
-    getMovieId: async (movieId) => {
-        return axiosClient.get(url +  '/get/by-movie/' + movieId);
+    getMovieId: async (movieId, page, limit,) => {
+        const params ={ page, limit}
+        return axiosClient.get(url +  '/get/by-movie/' + movieId, {params});
     },
     getActorAndDirectorId: async (movieId) => {
         return axiosClient.get(urlMovie +  '/get/actor-director-by-movie/' + movieId);

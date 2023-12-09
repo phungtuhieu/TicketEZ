@@ -6,6 +6,8 @@ import reviewApi from '~/api/user/review/reviewApi';
 import funcUtils from './../../../../utils/funcUtils';
 import uploadApi from '~/api/service/uploadApi';
 import moment from 'moment-timezone';
+import PaginationCustom from '~/components/Admin/PaginationCustom';
+
 
 const ReviewCard = () => {
   const [loading, setLoading] = useState(false);
@@ -13,6 +15,13 @@ const ReviewCard = () => {
   const [initLoading, setInitLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [totalItems, setTotalItems] = useState(0); // Tổng số mục
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(7);
+  const handlePageChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setPageSize(pageSize);
+};
 
   const handleOpenModal = (movie) => {
     setSelectedMovie(movie);
@@ -27,7 +36,7 @@ const ReviewCard = () => {
     const getList = async () => {
       setLoading(true);
       try {
-        const res = await reviewApi.getMovieOrReview(1, 10);
+        const res = await reviewApi.getMovieOrReview(1, 11);
 
         setListMovieAndListReviewObjResp(res.data.listMovieAndListReviewObjResp);
         setInitLoading(false);
@@ -41,7 +50,7 @@ const ReviewCard = () => {
       }
     };
     getList();
-  }, []);
+  }, [ currentPage, pageSize]);
 
   return (
     <Row>
@@ -55,7 +64,7 @@ const ReviewCard = () => {
               <div className="tw-border tw-p-2 tw-pl-4 tw-relative">
                 <div className="tw-relative tw-group">
                   <img
-                    src={uploadApi.get(Item.movie.poster)}
+                    src={uploadApi.get(Item.movie.banner)}
                     alt=""
                     className="tw-w-auto tw-h-[200px] tw-rounded-lg tw-relative tw-transition-transform tw-duration-300 tw-transform group-hover:tw-scale-110"
                   />
@@ -91,7 +100,7 @@ const ReviewCard = () => {
                     <Col span={12}>
                       <div><h4>{reviewItem.account.fullname}</h4></div>
                       <div> {moment(reviewItem.createDate).format("MM-DD-YYYY")}
-                       </div>
+                      </div>
                     </Col>
                     <Col span={24} className='tw-pl-5'>
                       <Typography style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -110,6 +119,13 @@ const ReviewCard = () => {
           ))}
         </Row>
       </Col>
+      <PaginationCustom
+                        howSizeChanger={false}
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={totalItems}
+                        onChange={handlePageChange}
+                    />
 
       {/* Modal gọi ở đây */}
       <Modal
@@ -138,18 +154,18 @@ const ReviewCard = () => {
         ></iframe>
         {/* <iframe width="560" height="315" src="https://www.youtube.com/embed/17ywQS6XO-M?si=zXa1Mz3DFEpACBni" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> */}
         <Row gutter={[16, 16]} className="tw-mt-2">
-  <Col span={24} style={{ display: 'flex' }}>
-    <div style={{ marginRight: '16px' }}>
-      <img src={uploadApi.get(selectedMovie?.poster)} alt="" width={155} />
-    </div>
-    <Col span={8}>
-      <div>
-        <p>Thời lượng: {selectedMovie?.duration}</p>
-        <p>Quốc gia: {selectedMovie?.country}</p>
-      </div>
-    </Col>
-  </Col>
-</Row>
+          <Col span={24} style={{ display: 'flex' }}>
+            <div style={{ marginRight: '16px' }}>
+              <img src={uploadApi.get(selectedMovie?.poster)} alt="" width={155} />
+            </div>
+            <Col span={8}>
+              <div>
+                <p>Thời lượng: {selectedMovie?.duration}</p>
+                <p>Quốc gia: {selectedMovie?.country}</p>
+              </div>
+            </Col>
+          </Col>
+        </Row>
 
       </Modal>
     </Row>

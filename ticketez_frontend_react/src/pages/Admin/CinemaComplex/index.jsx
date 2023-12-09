@@ -217,24 +217,22 @@ const AdminCinemaComplex = () => {
             title: 'Địa chỉ',
             dataIndex: 'address',
             width: '30%',
-            ...getColumnSearchProps('address'),
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             with: '10%',
-            ...getColumnSearchProps('phone'),
+
         },
         {
             title: 'Thuộc tỉnh',
             dataIndex: 'province',
-            ...getColumnSearchProps('province'),
             render: (province) => <span>{province.name}</span>
         },
         {
             title: 'Thuộc loại',
             dataIndex: 'cinemaChain',
-            ...getColumnSearchProps('cinemaChain'),
+            
             render: (cinemaChains) => <span>{cinemaChains.name}</span>
         },
         {
