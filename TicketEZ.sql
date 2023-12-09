@@ -320,6 +320,7 @@ GO
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
         [image] NVARCHAR(MAX) NOT NULL,
+        quantity INT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
 GO
@@ -327,6 +328,7 @@ GO
     CREATE TABLE [Service_Choose] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         service_id BIGINT NOT NULL,
+        quantity INT NOT NULL,
         price FLOAT NOT NULL,
     )
 
@@ -1288,25 +1290,25 @@ VALUES
 GO
 
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
-INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
+INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [quantity],[cinema_complex_id])
 VALUES
-    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim', 'food.jpg', 1),
-    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim', 'vip.jpg', 1),
+    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim',  'food.jpg',30, 1),
+    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim',  'vip.jpg',30, 1),
     (N'SPECIAL DRINK FAMILY COMBO', N'04 nước pha chế vừa (nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) + 02 bắp ngọt. Nhận trong ngày xem phim. 
 	Chỉ thêm 5,000đ đổi sang nước lớn.
-	Số lượng quà tặng có giới hạn', '3d_glasses.jpg', 3),
+	Số lượng quà tặng có giới hạn',  '3d_glasses.jpg',30, 3),
     (N'SPECIAL DRINK MD COMBO', N'01 ly nhân vật tùy chọn + 02 nước pha chế vừa ( nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) 
 	+ 01 bắp ngọt - Nhận trong ngày xem phim - Mẫu ly nhân vật phụ thuộc vào số lượng tại rạp 
-	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg', 1),
+	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg',30, 1),
     (N'TRIDENT MY COMBO', N'1 ly Aquaman Trident + 1 nước ngọt siêu lớn + 1 bắp lớn tùy chọn vị
-- Nhận trong ngày xem phim', 'online_booking.jpg', 2),
+- Nhận trong ngày xem phim',  'online_booking.jpg',30, 2),
     (N'GARFIELD TRIPPLE COMBO 2023', N'03 ly nhân vật Garfield (kèm nước) + 01 bắp hai vị
 * Nhận ngay trong ngày xem phim
-** Mẫu ly phụ thuộc vào số lượng của rạp', 'birthday.jpg', 2),
+** Mẫu ly phụ thuộc vào số lượng của rạp',  'birthday.jpg',30, 2),
     (N'GARFIELD DOUBLE COMBO 2023', N'02 ly nhân vật Garfield (kèm nước)
 * Nhận ngay trong ngày xem phim
 ** Thêm 39,000đ nhận ngay 1 bắp ngọt
-*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg', 9)
+*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg',30, 9)
    
 GO
  -- 6. Thêm dữ liệu giá cho dịch vụ Price services
