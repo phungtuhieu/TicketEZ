@@ -23,4 +23,5 @@ const cinemaChainApi = {
         return axiosClient.delete(url + '/' + cinemaChainId);
     }
 }
+
 export default cinemaChainApi;

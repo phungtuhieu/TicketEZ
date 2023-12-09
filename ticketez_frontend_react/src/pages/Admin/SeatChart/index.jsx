@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, Switch } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Upload, Image, Switch, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +10,7 @@ import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import funcUtils from '~/utils/funcUtils';
 import { seatChartApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
+import SeatGenerator from '../Seat/SeatGenerator';
 
 import classNames from 'classnames/bind';
 import style from './SeatType.module.scss';
@@ -34,7 +35,16 @@ const AdminSeatChart = () => {
     const [editData, setEditData] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
     //call api
@@ -110,14 +120,6 @@ const AdminSeatChart = () => {
         setFileList(newFileList);
     };
 
-    const showModal = () => {
-        form.resetFields();
-        setEditData(null);
-        setOpen(true);
-        setResetForm(true);
-        setFileList([]);
-    };
-
     const handleEditData = (record) => {
         setOpen(true);
         setResetForm(false);
@@ -127,44 +129,6 @@ const AdminSeatChart = () => {
         });
     };
 
-    const handleOk = async () => {
-        setLoading(true);
-        try {
-            const values = await form.validateFields();
-            console.log(values.status);
-            if (editData) {
-                let putData = {
-                    id: editData.id,
-                    name: values.name,
-                    status: values.status,
-                };
-
-                try {
-                    const resPatch = await axiosClient.patch(`seatchart/${putData.id}`, putData);
-                    console.log(resPatch);
-                    if (resPatch.status === 200) {
-                        funcUtils.notify('Cập nhật loại ghế thành công', 'success');
-                    }
-                } catch (error) {
-                    if (error.hasOwnProperty('response')) {
-                        message.error(error.response.data);
-                    } else {
-                        console.log(error);
-                    }
-                }
-            }
-            setOpen(false);
-            form.resetFields();
-            setLoading(false);
-            setWorkSomeThing(!workSomeThing);
-        } catch (errorInfo) {
-            console.log('Failed:', errorInfo);
-            setLoading(false);
-        }
-    };
-    const handleCancel = () => {
-        setOpen(false);
-    };
     const handleResetForm = () => {
         form.resetFields();
         setFileList([]);
@@ -190,7 +154,12 @@ const AdminSeatChart = () => {
         <>
             <Row>
                 <Col span={22}>
-                    <h1 className={cx('title')}>Bảng dữ liệu sơ đồ</h1>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                        Thêm
+                    </Button>
                 </Col>
                 <Col span={2}></Col>
                 <BaseModal
@@ -231,13 +200,17 @@ const AdminSeatChart = () => {
                 </BaseModal>
             </Row>
             <BaseTable
-                pagination={false}
                 columns={columns}
                 dataSource={posts.map((post) => ({
                     ...post,
                     key: post.id,
                 }))}
             />
+            <Modal title="Tạo sơ đồ" open={isModalOpen} width={1500} destroyOnClose={true} onOk={handleOk} onCancel={handleCancel}>
+                <div className={cx('modal-content')}>
+                    <SeatGenerator />
+                </div>
+            </Modal>
         </>
     );
 };

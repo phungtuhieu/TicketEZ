@@ -19,6 +19,7 @@ public interface PriceDAO extends JpaRepository<Price, Long> {
         // @Param("cinemaClxId") Long cinemaClxId,
         // @Param("movieId") Long movieId);
 
+        List<Price> findAllByOrderByStartDateDesc();
         // // lấy price theo cinemacomplexId và movieID
 
         // Trong interface PriceDAO
