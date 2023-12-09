@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { cinemaComplexApi } from '~/api/admin';
 import uploadApi from '~/api/service/uploadApi';
 import Mapbox from '~/components/Mapbox';
+import MovieShowing from '../Home/MovieShowing';
 
 
 function MovieCinemaComplex() {
@@ -48,8 +49,7 @@ function MovieCinemaComplex() {
 
     return (
         <Row className=" tw-w-[100%] tw-bg-[#FAFAFA] tw-leading-normal ">
-
-            <Col className='tw-w-[100%] tw-min-h-[65px] tw-bg-slate-800'></Col>
+            <Col className="tw-w-[100%] tw-min-h-[65px] tw-bg-slate-800"></Col>
 
             <Col span={24} className=" tw-h-[450px] tw-bg-gray-500">
                 <div style={style} c>
@@ -69,33 +69,33 @@ function MovieCinemaComplex() {
                                         {dataCcx?.address}
                                     </div>
                                     <div>
-                                        <div onClick={showModal} className="tw-text-[#3b82f6] tw-cursor-pointer tw-w-[100px] tw-text-[14px] tw-font-medium hover:tw-text-blue-700 ">
+                                        <div
+                                            onClick={showModal}
+                                            className="tw-text-[#3b82f6] tw-cursor-pointer tw-w-[100px] tw-text-[14px] tw-font-medium hover:tw-text-blue-700 "
+                                        >
                                             [Xem bản đổ]
                                         </div>
 
                                         <Modal
-                                                    title="Bản đồ"
-                                                    open={isModalOpen}
-                                                    onCancel={handleCancelModal}
-                                                    className="modal-map-lg"
-                                                    footer={
-                                                        <Button
-                                                            className='modal-footer-btn-close'
-                                                            onClick={handleCancelModal}
-                                                        >
-                                                            ĐÓNG
-                                                        </Button>
-                                                    }
-                                                >
-                                                    <div className="map-lg-content">
-                                                        <Mapbox
-                                                            latitude={dataCcx?.latitude}
-                                                            longitude={dataCcx?.longitude}
-                                                            address={dataCcx?.address}
-                                                            title={dataCcx?.name}
-                                                        />
-                                                    </div>
-                                                </Modal>
+                                            title="Bản đồ"
+                                            open={isModalOpen}
+                                            onCancel={handleCancelModal}
+                                            className="modal-map-lg"
+                                            footer={
+                                                <Button className="modal-footer-btn-close" onClick={handleCancelModal}>
+                                                    ĐÓNG
+                                                </Button>
+                                            }
+                                        >
+                                            <div className="map-lg-content">
+                                                <Mapbox
+                                                    latitude={dataCcx?.latitude}
+                                                    longitude={dataCcx?.longitude}
+                                                    address={dataCcx?.address}
+                                                    title={dataCcx?.name}
+                                                />
+                                            </div>
+                                        </Modal>
                                     </div>
                                     <div className=" tw-mt-1 tw-text-[#ff85c0] tw-text-[14px]">
                                         Ưu đãi 89K/vé 2D cả tuần không giới hạn; 69K/vé 2D, tối đa 1 vé/tháng khi thanh
@@ -119,8 +119,8 @@ function MovieCinemaComplex() {
                 </Row>
             </Col>
 
-            <Col className='tw-w-[100%] tw-min-h-[550px]  tw-bg-slate-400'>
-                phim dang chieeu
+            <Col className="tw-w-[100%] tw-min-h-[450px] tw-bg-black">
+                <MovieShowing />
             </Col>
         </Row>
     );

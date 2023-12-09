@@ -123,7 +123,7 @@ const MovieTopDetails = () => {
                                                 </svg>
                                             </div>
                                         </Col>
-                                        <Col lg={17} className="tw-h-[237px]">
+                                        <Col lg={17} className="tw-min-h-[237px]" >
                                             <div className="tw-text-left  tw-leading-loose">
                                                 <h1 id={`movie-${index}-${indexValue}`} className="tw-mt-[-12px]">
                                                     {movie.movie.title}
@@ -152,7 +152,7 @@ const MovieTopDetails = () => {
                                                     <span>{movie.movie.description}</span>
                                                 </div>
                                                 <div>
-                                                    <span className="tw-font-bold"> Quốc gia: </span>
+                                                    <span className="tw-font-bold "> Quốc gia: </span>
                                                     <span>{movie.movie.country}</span>
                                                 </div>
                                             </div>
@@ -197,12 +197,14 @@ const MovieTopDetails = () => {
                             <Col lg={3}>
                                 {selectedMovie ? (
                                     <img
+                                     alt=''
                                         width={80}
                                         height={130}
                                         className={cx('img-modal')}
                                         src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
                                     />
-                                ) : (
+                                ) : 
+                                (
                                     ''
                                 )}
                             </Col>

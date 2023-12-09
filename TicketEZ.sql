@@ -320,6 +320,7 @@ GO
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
         [image] NVARCHAR(MAX) NOT NULL,
+        quantity INT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
 GO
@@ -327,6 +328,7 @@ GO
     CREATE TABLE [Service_Choose] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         service_id BIGINT NOT NULL,
+        quantity INT NOT NULL,
         price FLOAT NOT NULL,
     )
 
@@ -1288,25 +1290,25 @@ VALUES
 GO
 
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
-INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
+INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [quantity],[cinema_complex_id])
 VALUES
-    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim', 'food.jpg', 1),
-    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim', 'vip.jpg', 1),
+    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim',  'food.jpg',30, 1),
+    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim',  'vip.jpg',30, 1),
     (N'SPECIAL DRINK FAMILY COMBO', N'04 nước pha chế vừa (nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) + 02 bắp ngọt. Nhận trong ngày xem phim. 
 	Chỉ thêm 5,000đ đổi sang nước lớn.
-	Số lượng quà tặng có giới hạn', '3d_glasses.jpg', 3),
+	Số lượng quà tặng có giới hạn',  '3d_glasses.jpg',30, 3),
     (N'SPECIAL DRINK MD COMBO', N'01 ly nhân vật tùy chọn + 02 nước pha chế vừa ( nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) 
 	+ 01 bắp ngọt - Nhận trong ngày xem phim - Mẫu ly nhân vật phụ thuộc vào số lượng tại rạp 
-	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg', 1),
+	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg',30, 1),
     (N'TRIDENT MY COMBO', N'1 ly Aquaman Trident + 1 nước ngọt siêu lớn + 1 bắp lớn tùy chọn vị
-- Nhận trong ngày xem phim', 'online_booking.jpg', 2),
+- Nhận trong ngày xem phim',  'online_booking.jpg',30, 2),
     (N'GARFIELD TRIPPLE COMBO 2023', N'03 ly nhân vật Garfield (kèm nước) + 01 bắp hai vị
 * Nhận ngay trong ngày xem phim
-** Mẫu ly phụ thuộc vào số lượng của rạp', 'birthday.jpg', 2),
+** Mẫu ly phụ thuộc vào số lượng của rạp',  'birthday.jpg',30, 2),
     (N'GARFIELD DOUBLE COMBO 2023', N'02 ly nhân vật Garfield (kèm nước)
 * Nhận ngay trong ngày xem phim
 ** Thêm 39,000đ nhận ngay 1 bắp ngọt
-*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg', 9)
+*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg',30, 9)
    
 GO
  -- 6. Thêm dữ liệu giá cho dịch vụ Price services
@@ -1520,13 +1522,18 @@ GO
 -- 17.  thêm dữ liệu bảng accounts
 INSERT INTO Accounts (id, phone, fullname, [image], email, [address], [password], birthday, gender, [status], verified, created_date, points)
 VALUES
+('admin', '0987654321', N'Nguyễn Văn A', 'image1.jpg', 'nguyen.va@gmail.com', N'123 Đường ABC, Quận 1, TP.HCM', 'admin', '1990-01-15', 1, 1, 1, '2023-01-01 08:00:00', 0),
+('admin01',	'0844457992'	,'admin',	NULL,	'admin123@gmail.com',	NULL,N'$2a$10$1nAbLCEE4i/zu.O.6UgwHu84wz5b6PGudB9TwscvHnHI/TAMePINy'	,NULL,	0, 1, 1,	'2023-12-09 16:44:17.837',	0),
+('user2', '0901234567', N'Trần Thị B', 'image2.jpg', 'tran.thi.b@gmail.com', N'456 Đường XYZ, Quận 2, TP.HCM', 'user2', '1985-03-20', 0, 1, 0, '2023-01-02 09:30:00', 75),
+('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
+('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),
 ('user5', '0965432109', N'Huỳnh Văn E', 'image5.jpg', 'huynh.van.e@gmail.com', N'202 Đường KLM, Quận 5, TP.HCM', 'user5', '1992-09-30', 1, 1, 1, '2023-01-05 16:20:00', 150),
 ('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60),
 GO
 
 INSERT INTO Accounts_Roles (account_id, role_id)
 VALUES
-('admin', 1), -- Tài khoản 1 có vai trò "Super Admin"
+('admin01', 1), -- Tài khoản 1 có vai trò "Super Admin"
 ('user2', 2) -- Tài khoản 2 có vai trò "Movie Management Admin"
 GO
 -- 18. thêm dữ liệu bảng actor

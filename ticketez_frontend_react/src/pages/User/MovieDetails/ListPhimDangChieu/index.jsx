@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faChevronCircleLeft, faChevronCircleRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames/bind';
 import style from './listphi.module.scss';
@@ -24,6 +24,8 @@ function MovieDetailsListMovieRight() {
         return (
             <div className={cx('control-btn')} onClick={onClick}>
                 <button className={cx('next')}>
+                    <FontAwesomeIcon icon={faChevronCircleRight} />
+
                     <i class="fa fa-chevron-right"></i>
                 </button>
             </div>
@@ -34,6 +36,7 @@ function MovieDetailsListMovieRight() {
         return (
             <div className={cx('control-btn')} onClick={onClick}>
                 <button className={cx('prev')}>
+                    <FontAwesomeIcon icon={faChevronCircleLeft} />
                     <i class="fa fa-chevron-left"></i>
                 </button>
             </div>

@@ -6,7 +6,7 @@ import { animateScroll as scroll } from 'react-scroll';
 import img from '~/assets/img';
 import { Avatar, Breadcrumb, Divider, Dropdown } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     faAddressCard,
     faChevronRight,
@@ -83,9 +83,9 @@ const Header = () => {
         {
             key: '1',
             label: (
-                <a onClick={handleProfile} href="">
+                <Link onClick={handleProfile} to="/profile">
                     Xem tài khoản
-                </a>
+                </Link>
             ),
 
             icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
@@ -93,21 +93,21 @@ const Header = () => {
         {
             key: '2',
             label: (
-                <a rel="noopener noreferrer" href="/booking-history">
+                <Link rel="noopener noreferrer" to="/booking-history">
                     Lịch sử đặt vé
-                </a>
+                </Link>
             ),
             icon: <FontAwesomeIcon icon={faTicket} />,
         },
-        {
-            key: '3',
-            label: (
-                <a target="_blank" rel="noopener noreferrer" href="">
-                    Lịch sử tích điểm
-                </a>
-            ),
-            icon: <FontAwesomeIcon icon={faCircleCheck} />,
-        },
+        // {
+        //     key: '3',
+        //     label: (
+        //         <a target="_blank" rel="noopener noreferrer" href="">
+        //             Lịch sử tích điểm
+        //         </a>
+        //     ),
+        //     icon: <FontAwesomeIcon icon={faCircleCheck} />,
+        // },
         {
             type: 'divider',
         },
