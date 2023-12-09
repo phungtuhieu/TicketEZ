@@ -24,16 +24,22 @@ import funcUtils from '~/utils/funcUtils';
 import uploadApi from '~/api/service/uploadApi';
 
 const Header = () => {
-    const [userData, setUserData] = useState();
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const user = await authApi.getUser();
                 setUserData(user);
                 console.log(user);
+
             } catch (error) {
                 console.error(error);
+            }
+            finally {
+                setLoading(false);
             }
         };
 
@@ -289,13 +295,12 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/tin-tuc',
-                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage &&
-                                            (location.pathname === '/su-kien/tin-tuc' ||
-                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                                (location.pathname === '/su-kien/tin-tuc' ||
+                                                    /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
                                                 ? 'tw-text-[var(--primary--text-color)]'
                                                 : ''
-                                        }`,
+                                            }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faFireFlameCurved} className="tw-mr-2" />
@@ -309,13 +314,12 @@ const Header = () => {
                                     },
                                     {
                                         href: '/su-kien/khuyen-mai',
-                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${
-                                            isEventPage &&
-                                            (location.pathname === '/su-kien/khuyen-mai' ||
-                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                        className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
+                                                (location.pathname === '/su-kien/khuyen-mai' ||
+                                                    /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
                                                 ? ' tw-text-[var(--primary--text-color)]'
                                                 : ''
-                                        }`,
+                                            }`,
                                         title: (
                                             <>
                                                 <FontAwesomeIcon icon={faNewspaper} className="tw-mr-2" />
