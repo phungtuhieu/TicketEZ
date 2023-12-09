@@ -89,7 +89,11 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
         List<Movie> getMovieByShowtimeShowingByGenres(@Param("genresID") Long genresID);
 
         @Query("SELECT m FROM Movie m JOIN m.genresMovies.genre g" +
-                        " WHERE g.name  LIKE CONCAT('%', :genreName, '%') "
+                        " WHERE EXISTS"
+                        + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
+                        + "AND st.startTime >= CURRENT_TIMESTAMP "
+                        + ") AND "
+                        + "g.name  LIKE CONCAT('%', :genreName, '%') "
                         + "AND m.country  LIKE CONCAT('%', :country, '%') "
                         + "AND YEAR(m.releaseDate)  LIKE CONCAT('%', :year, '%') "
                         + "AND m.title LIKE CONCAT('%', :search, '%') GROUP BY m   ")
