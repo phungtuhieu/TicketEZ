@@ -80,6 +80,9 @@ function SeatChart(props) {
 
     const onClickData = (seat) => {
         const { normalSeat, way } = seatState;
+        if (seatState.normalSeat.indexOf(seat) <= -1) {
+            return;
+        }
         if (selectedSeatType === 'way') {
             while (normalSeat.indexOf(seat) > -1) {
                 normalSeat.splice(normalSeat.indexOf(seat), 1);
