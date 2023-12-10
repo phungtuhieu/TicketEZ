@@ -104,7 +104,7 @@ public interface MovieDAO extends JpaRepository<Movie, Long> {
                         Pageable pageable);
 
         // đổ những bộ phim hiện tại có suất chiếu và đổ lên từ cao tới thấp theo rating
-        @Query("SELECT m FROM Movie m WHERE EXISTS"
+        @Query("SELECT m FROM Movie m JOIN m.genresMovies.genre g WHERE EXISTS"
                         + "(SELECT st FROM Showtime st WHERE m.id = st.formatMovie.movie.id "
                         + "AND st.startTime >= CURRENT_TIMESTAMP "
                         + ") ORDER BY m.rating DESC")
