@@ -123,7 +123,7 @@ function ListPhim({ cinemaComplex }) {
                                     <Col span={22}>
                                         <Row>
                                             <Col span={24} className={cx('ten-rap')}>
-                                                <Link to={'/movie-cinema-complex/'+ cinemaComplex?.id} className=" tw-text-[#262626] tw-min-w-[100px] hover:tw-text-[var(--pink)] tw-cursor-pointer ">
+                                                <Link to={'/movie-cinema-complex/'+ cinemaComplex?.id} className=" tw-text-[var(--primary--text-color)] tw-min-w-[100px] hover:tw-text-[var(--primany-text-hover-color)] tw-cursor-pointer ">
                                                     {'Lịch chiếu phim ' + (cinemaComplex?.name ?? '')}
                                                 </Link>
                                             </Col>
@@ -177,12 +177,12 @@ function ListPhim({ cinemaComplex }) {
                                 </div>
                             ))}
                         </Col>
-                        <Col span={24} className={cx('col1-su-kien')}>
+                        {/* <Col span={24} className={cx('col1-su-kien')}>
                             <div className={cx('title-event')}>
                                 Ưu đãi 89K/vé 2D cả tuần không giới hạn; 69K/vé 2D, tối đa 1 vé/tháng khi thanh toán
                                 bằng Ví Trả Sau
                             </div>
-                        </Col>
+                        </Col> */}
                     </Row>
                 </Col>
                 <Col span={24} className={cx('col2')}>

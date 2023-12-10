@@ -78,13 +78,14 @@
 .active {
     cursor: default;
     .border {
-        border-color: #eb2f96 !important;
+        border-color:var(--primary--text-color) !important;
     }
 
     .title {
         font-weight: 600;
-        --tw-text-opacity: 1;
-        color: rgb(235 47 150 / var(--tw-text-opacity));
+        color: var(--primary--text-color);
+        // --tw-text-opacity: 1;
+        // color: rgb(235 47 150 / var(--tw-text-opacity));
     }
 }
 
