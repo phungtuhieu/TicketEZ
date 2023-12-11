@@ -18,3 +18,11 @@ export { default as ReviewMovie } from './Review';
 export { default as MovieTop } from './MovieTop';
 export { default as MovieTopDetails } from './MovieTop/MovieTopDetails';
 export { default as MovieCinemaComplex } from './MovieCinemaComplex';
+
+export { default as RegisterForm } from '~/components/Auth/Register/RegisterForm';
+export { default as LoginForm } from '~/components/Auth/Login/LoginForm';
+export { default as OtpForm } from '~/components/Otp/OtpForm';
+export { default as PasswordChangeForm } from '~/components/Auth/ChangePassword/ChangePasswordForm';
+
+
+

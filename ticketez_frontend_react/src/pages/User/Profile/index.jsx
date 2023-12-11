@@ -23,21 +23,21 @@ const EditableProfile = () => {
       try {
         const user = await authApi.getUser();
         setUserData(user);
-        // console.log(user);
         form.setFieldsValue({
           ...user,
           birthday: user.birthday ? dayjs(user.birthday) : null,
           gender: user.gender,
           image: user.image
 
+
         });
         const newUploadFile = {
           name: user.image,
           url: `http://localhost:8081/api/upload/${user.image}`,
         };
+        console.log(newUploadFile);
         setFileList([newUploadFile]);
         setBirthday(dayjs(user.birthday));
-        console.log(user.birthday);
         // funcUtils.notify("Cập nhật thành công", 'success');
       } catch (error) {
         // funcUtils.notify("Cập nhật Thất bại", 'error');
@@ -49,33 +49,28 @@ const EditableProfile = () => {
 
   const onSave = async (values) => {
     try {
-      const updatedValues = {
+      let updatedValues = {
         ...values,
 
       };
       if (values.image.fileList) {
         const file = values.image.fileList[0].originFileObj;
-        console.log(file);
+        // console.log(file);
         const image = await uploadApi.put(userData.image, file);
-        values = {
-          ...values,
-          // image: image,
+        updatedValues = {
+          ...updatedValues,
+          image: image,
         };
       }
-      console.log(values, "sssssssssssss");
+      console.log(updatedValues, "sssssssssssss");
 
-      console.log(values.birthday);
-
-      const response = await profileApi.putUser(userData.id, updatedValues);
+      const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
       localStorage.removeItem('user');
       localStorage.setItem('user', JSON.stringify(response.data));
       funcUtils.notify("Cập nhật thành công", 'success');
-      // setTimeout(() => {
-      //   // window.location.reload();
-      //};
-
+      window.location.reload();
     } catch (error) {
       funcUtils.notify("Cập nhật Thất bại", 'error');
     }
@@ -83,11 +78,11 @@ const EditableProfile = () => {
 
 
   const onEdit = (values) => {
-    const newUploadFile = {
-      name: values.image,
-      url: `http://localhost:8081/api/upload/${values.image}`,
-    };
-    setFileList([newUploadFile]);
+    // const newUploadFile = {
+    //   name: values.image,
+    //   url: `http://localhost:8081/api/upload/${values.image}`,
+    // };
+    // setFileList([newUploadFile]);
     setEditData(values);
     setEditing(true);
   };
@@ -123,13 +118,20 @@ const EditableProfile = () => {
   return (
     <div className={styles.profileFormContainer}>
       <Card className={styles.profileFormCard} title="THÔNG TIN TÀI KHOẢN" bordered={false}>
-
-
-
         {!editing ? (
           <div className={styles.profileDisplay}>
+            <div>
+              {userData?.image && (
+                <Avatar
+                  size={64}
+                  src={`http://localhost:8081/api/upload/${userData.image}`}
+                />
+              )}
+              {!userData?.image && <Avatar size={64} icon={<UserOutlined />} />}
+              <h3>{userData?.fullname}</h3>
+            </div>
             <p>Chọn vào để sửa</p>
-            <Button onClick={onEdit} type="primary">
+            <Button onClick={() => onEdit(userData)} type="primary">
               Sửa thông tin cá nhân
             </Button>
           </div>

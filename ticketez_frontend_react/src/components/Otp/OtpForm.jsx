@@ -48,7 +48,7 @@ const OtpForm = () => {
             funcUtils.notify('Xác Minh thành công !', 'success');
             navigate('/login');
         } catch (error) {
-            funcUtils.notify('Kiểm tra Mã OTP', 'error');
+            funcUtils.notify('Kiểm tra tài khoản và Mã OTP đúng chưa', 'error');
         } finally {
             setLoading(false);
         }
