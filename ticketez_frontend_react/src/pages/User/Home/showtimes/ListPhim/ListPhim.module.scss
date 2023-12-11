@@ -18,10 +18,11 @@
 
 .col1 {
     // background-color: aqua;
-    height: 176px;
+    // height: 176px;
     position: sticky;
     top: 0;
     z-index: 1;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 
     .col1-dia-chi {
         display: flex;
@@ -140,18 +141,22 @@
         }
 
         .active {
-            border: 1px solid #c1177c;
+            // border: 1px solid #c1177c;
+            border-color: var(--primary--text-color);
             font-size: 100px;
             &:hover {
-                border: 1px solid #c1177c;
+                // border: 1px solid #c1177c;
+                border-color: var(--primary--text-color);
             }
             .ngay {
-                background-color: var(--pink);
+                // background-color: var(--pink);
+                background-color: var(--primary--text-color);
                 color: #ffffff;
             }
             .thu {
                 background-color: #ffffff;
-                color: var(--pink);
+                // color: var(--pink);
+                color: var(--primary--text-color);
             }
         }
     }

@@ -12,6 +12,7 @@ import { QrReader } from 'react-qr-reader';
 import axiosClient from '~/api/global/axiosClient';
 import { bookingApi } from '~/api/user';
 import { data, info } from 'autoprefixer';
+import funcUtils from '~/utils/funcUtils';
 
 const cx = classNames.bind(style);
 
@@ -21,6 +22,13 @@ function Webcam({ paymentInfoDTO }) {
     const [data, setData] = useState('');
     const [dataDTO, setDataDTO] = useState({});
     const [bookingNew, setBookingNew] = useState({});
+
+    const [workSomeThing, setWorkSomeThing] = useState(false);
+    const [infoTicket, setInfoTicket] = useState({});
+
+    const [checkStatus, setCheckStatus] = useState('');
+
+    useEffect(() => {});
 
     useEffect(() => {
         const get = async () => {
@@ -38,19 +46,29 @@ function Webcam({ paymentInfoDTO }) {
                             ...res.data,
                             booking: resBookingNew.data,
                         });
+                        setWorkSomeThing(!workSomeThing);
                     }
+
                     setDataDTO(res.data);
+                    funcUtils.notify('Soát vé thành công ', 'success');
+
+                    // if (dataDTO.booking.ticketStatus === 1) {
+                    //     funcUtils.notify('Vé đã sử dụng ', 'warning');
+                    // } else if (dataDTO.booking.ticketStatus === 2) {
+                    //     funcUtils.notify('Vé hết hạn ', 'warning');
+                    // }
                 }
             } catch (error) {
                 console.log(error);
+                funcUtils.notify('Vé không tồn tại', 'error');
+                setInfoTicket({});
             }
         };
         get();
-    }, [data]);
+    }, [data, workSomeThing]);
 
     useEffect(() => {});
 
-    const [infoTicket, setInfoTicket] = useState({});
     const { booking, paymentInfo, seatBookings } = dataDTO;
 
     // Lấy dữ liệu từ state
@@ -61,11 +79,11 @@ function Webcam({ paymentInfoDTO }) {
 
         if (booking ?? paymentInfo ?? seatBookings) {
             const movie = {
-                ...booking.showtime.formatMovie.movie,
-                format: booking.showtime.formatMovie.fomat,
+                ...booking?.showtime?.formatMovie?.movie,
+                format: booking?.showtime?.formatMovie?.fomat,
             };
 
-            const showtime = booking.showtime;
+            const showtime = booking?.showtime;
             const cinemaComplex = booking?.showtime?.cinema?.cinemaComplex;
 
             const capitalizeFirstLetter = (inputString) => {
@@ -74,35 +92,35 @@ function Webcam({ paymentInfoDTO }) {
             const info = {
                 // ratingCode: movie.mpaaRating.ratingCode,
                 booking: {
-                    ticketStatus: booking.ticketStatus,
+                    ticketStatus: booking?.ticketStatus,
                 },
                 movie: {
-                    title: movie.title,
-                    poster: movie.poster,
-                    format: showtime.formatMovie.format.name,
+                    title: movie?.title,
+                    poster: movie?.poster,
+                    format: showtime?.formatMovie?.format?.name,
                 },
                 time: {
-                    startTime: moment(showtime.startTime).format('HH:mm'),
-                    endTime: moment(showtime.endTime).format('HH:mm'),
-                    showDate: capitalizeFirstLetter(moment(showtime.startDate).format('dddd, DD/MM/YYYY')),
+                    startTime: moment(showtime?.startTime).format('HH:mm'),
+                    endTime: moment(showtime?.endTime).format('HH:mm'),
+                    showDate: capitalizeFirstLetter(moment(showtime?.startDate).format('dddd, DD/MM/YYYY')),
                 },
                 // seat,
                 cinemaComplex: {
-                    name: cinemaComplex.name,
-                    image: cinemaComplex.cinemaChain.image,
-                    address: cinemaComplex.address,
+                    name: cinemaComplex?.name,
+                    image: cinemaComplex?.cinemaChain?.image,
+                    address: cinemaComplex?.address,
                 },
-                cinemaName: showtime.cinema.name,
-                seatNumber: seatBookings.length.toString().padStart(2, '0'),
-                seatNames: seatBookings.map((sb) => sb.seat.name).join(', '),
+                cinemaName: showtime?.cinema?.name,
+                seatNumber: seatBookings?.length?.toString()?.padStart(2, '0'),
+                seatNames: seatBookings?.map((sb) => sb?.seat?.name).join(', '),
                 paymentInfo: {
-                    ticketId: booking.id,
+                    ticketId: booking?.id,
                     amount: new Intl.NumberFormat('vi-VN', {
                         style: 'currency',
                         currency: 'VND',
-                    }).format(paymentInfo.amount),
-                    transactionId: paymentInfo.transactionId,
-                    payDate: moment(paymentInfo.payDate).format('HH:mm - DD/MM/YYYY'),
+                    }).format(paymentInfo?.amount),
+                    transactionId: paymentInfo?.transactionId,
+                    payDate: moment(paymentInfo?.payDate).format('HH:mm - DD/MM/YYYY'),
                 },
             };
             // console.log('', info);
@@ -119,15 +137,15 @@ function Webcam({ paymentInfoDTO }) {
     return (
         <>
             <Row>
-                <Col span={12} className=" tw-bg-slate-300">
+                <Col span={12} className=" tw-px-20 ">
+                    <h2 className=' tw-flex tw-justify-center tw-items-center'>Kiểm soát vé</h2>
                     <QrReader
-                        scanDelay={300}
-                        className="tw-w-[500px]"
+                        scanDelay={300} // 0.3s
+                        className="tw-w-[100%]"
                         onResult={(result, error) => {
                             if (!!result) {
                                 setData(result?.text);
                             }
-
                             if (!!error) {
                                 console.info(error);
                             }
@@ -135,23 +153,23 @@ function Webcam({ paymentInfoDTO }) {
                     />
                     <p>{data}</p>
                 </Col>
-                <Col span={12} className=" tw-bg-slate-700">
+                <Col span={12} className=" ">
                     {' '}
                     {Object.keys(infoTicket).length > 0 && (
                         <div className={cx('wrapper')}>
                             <div className={cx('container')}>
-                                {booking.ticketStatus === ticketStatus.USED && (
+                                {booking?.ticketStatus === ticketStatus.USED && (
                                     <div className={cx('status-ticket-1', ' tw-opacity-100')}>Vé đã sử dụng</div>
                                 )}
-                                {booking.ticketStatus === ticketStatus.EXPIRES && (
+                                {booking?.ticketStatus === ticketStatus.EXPIRES && (
                                     <div className={cx('status-ticket-2', ' tw-opacity-100')}>Hết hạn sử dụng</div>
                                 )}
                                 <div
                                     className={cx(
                                         'wrapper-ticket',
                                         'light',
-                                        booking.ticketStatus === ticketStatus.USED ||
-                                            booking.ticketStatus === ticketStatus.EXPIRES
+                                        booking?.ticketStatus === ticketStatus.USED ||
+                                            booking?.ticketStatus === ticketStatus.EXPIRES
                                             ? 'tw-opacity-50'
                                             : '',
                                     )}
@@ -160,11 +178,10 @@ function Webcam({ paymentInfoDTO }) {
                                         <Row>
                                             <Col span={7} className={cx('wrapp-movie-poster')}>
                                                 <div className={cx('box-movie-poster')}>
-                                                    <a href="">
+                                                    <a href="#poster">
                                                         <img
                                                             className={cx('poster')}
                                                             src={uploadApi.get(infoTicket.movie.poster)}
-                                                            // src={datrungphuongnamImg}
                                                             alt=""
                                                         />
                                                     </a>
