@@ -13,12 +13,13 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
     };
 
     const backgroundImage = {
-        backgroundImage: `linear-gradient(to right, black 0%, black 10%, transparent 20%, transparent 80%, black 90%, black 100%), url(${uploadApi.get(
+        backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 20%, rgba(0, 0, 0, 0) 80%, rgba(0, 0, 0, 0) 100%), url(${uploadApi.get(
             movie.banner,
         )})`,
+
         backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        // backgroundSize: 'cover',
+        // backgroundPosition: 'center',
         width: '100%',
         height: '100%',
         opacity: 0.8,
@@ -28,17 +29,12 @@ const HomeCard = ({ item: { movie, actors, genres } }) => {
 
     return (
         <>
-            <Row className='tw-bg-black'>
+            <Row className="tw-bg-black">
                 {' '}
                 <div style={backgroundImage}></div>
-                <Col style={{ backgroundColor: 'red' }}>
-                    {/* <div className="coverImage">
-                        <img src={uploadApi.get(movie.banner)} alt="" />
-                    </div> */}
-                </Col>
                 <Col>
                     <Row>
-                        <Col span={18} className="col-title">
+                        <Col style={{height:'1000px'}} span={18} className="col-title">
                             <div className="movie-title">{movie.title}</div>
                             <div className="rating ">
                                 <i className="fa fa-star"></i>

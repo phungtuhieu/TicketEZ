@@ -26,8 +26,8 @@ function Mapbox({ latitude, longitude, address, title }) {
                 zoom: 16,
             }}
             style={{
-                height: '70vh',
-                width: '100vh'
+                height: '71vh',
+                width: '99vh'
             }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
             mapboxAccessToken="pk.eyJ1Ijoibmd1eWVudmFuaHV1dGFpIiwiYSI6ImNsbnU0N29jazBiemwyaW9kbGZyZnAxZjkifQ.C0_aqS6mFyHpXwUBBSLzqA"

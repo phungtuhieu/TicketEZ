@@ -10,6 +10,8 @@ const hasSuperAdminRole = () => {
     roles.includes('SUPER_ADMIN') ||
     roles.includes('MOVIE_MANAGEMENT_ADMIN') ||
     roles.includes('SCHEDULING_PRICING_ADMIN') ||
+    roles.includes('CINEMA_MANAGEMENT_ADMIN') ||
+    roles.includes('SERVICE_EVENT_MANAGEMENT_ADMIN') ||
     roles.includes('USER_MANAGEMENT_ADMIN')
   );
 };

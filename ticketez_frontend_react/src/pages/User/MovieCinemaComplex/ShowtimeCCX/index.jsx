@@ -93,12 +93,12 @@ function Showtime() {
                         </div>
                     ))}
                 </Col>
-                <Col span={24} className={cx('col1-su-kien')}>
+                {/* <Col span={24} className={cx('col1-su-kien')}>
                     <div className={cx('title-event')}>
                         Ưu đãi 89K/vé 2D cả tuần không giới hạn; 69K/vé 2D, tối đa 1 vé/tháng khi thanh toán bằng Ví Trả
                         Sau
                     </div>
-                </Col>
+                </Col> */}
 
                 <Col span={24} className={cx('col2')}>
                     {loading && (

@@ -43,7 +43,6 @@ function AdminPriceService() {
 
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
-    const [statusValue, setStatusValue] = useState(1);
 
     useEffect(() => {
         const getList = async () => {
@@ -100,7 +99,7 @@ function AdminPriceService() {
             title: 'Thời Gian bắt đầu',
             dataIndex: 'startDate',
             render: (startDate) => {
-                return startDate ? moment(startDate).format('DD-MM-YYYY HH:mm:ss') : '';
+                return startDate ? moment(startDate).format('DD-MM-YYYY ') : '';
             },
             // ...getColumnSearchProps('description'),
         },
@@ -109,7 +108,7 @@ function AdminPriceService() {
             dataIndex: 'endDate',
 
             render: (endTime) => {
-                return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
+                return endTime ? moment(endTime).format('DD-MM-YYYY ') : '';
             },
         },
 
@@ -166,8 +165,8 @@ function AdminPriceService() {
     };
 
     const handleEditData = (record) => {
-        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD HH:mm:ss');
-        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD HH:mm:ss');
+        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD ');
+        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD ');
 
         form.setFieldsValue({
             ...record,
@@ -176,10 +175,10 @@ function AdminPriceService() {
             cinemaComplex: record.service.cinemaComplex?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
+        console.log(record.startDate);
 
         setDataStartTime(formattedStartTime);
         setDataEndTime(formattedEndTime);
-        setStatusValue(record.status);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -363,7 +362,7 @@ function AdminPriceService() {
                         <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
                             <RangePicker
                                 showTime
-                                format="DD-MM-YYYY HH:mm:ss"
+                                format="DD-MM-YYYY "
                                 value={[dataStartTime, dataEndTime]}
                                 onChange={onChangeDate}
                             />
@@ -382,6 +381,17 @@ function AdminPriceService() {
                 }))}
             />
         </>
+
+        // <BaseTable
+        //     pagination={false}
+        //     columns={columns}
+        //     dataSource={posts.map((post) => ({
+        //         ...post,
+        //         key: post.id,
+        //         //  nameCinemaComplex: post.cinemaComplex.name,
+        //     }))}
+        // />
+        // </>
     );
 }
 

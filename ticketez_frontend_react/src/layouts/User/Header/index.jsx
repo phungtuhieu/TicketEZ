@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from 'react';
 import './header.scss';
 import { animateScroll as scroll } from 'react-scroll';
@@ -34,25 +32,24 @@ const Header = () => {
                 const user = await authApi.getUser();
                 setUserData(user);
                 console.log(user);
-
             } catch (error) {
                 console.error(error);
-            }
-            finally {
+            } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
-    }, []);
+    }, [loading]);
+
+  
 
     const navigate = useNavigate();
-
     const location = useLocation();
 
     const handleLogin = async () => {
         navigate('/login');
     };
+
     const handleProfile = async () => {
         navigate('/profile');
     };
@@ -78,7 +75,6 @@ const Header = () => {
         typeof path === 'string' ? location.pathname === path : path.test(location.pathname),
     );
 
-
     const itemsAccount = [
         {
             key: '1',
@@ -87,7 +83,6 @@ const Header = () => {
                     Xem tài khoản
                 </Link>
             ),
-
             icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
         },
         {
@@ -99,15 +94,6 @@ const Header = () => {
             ),
             icon: <FontAwesomeIcon icon={faTicket} />,
         },
-        // {
-        //     key: '3',
-        //     label: (
-        //         <a target="_blank" rel="noopener noreferrer" href="">
-        //             Lịch sử tích điểm
-        //         </a>
-        //     ),
-        //     icon: <FontAwesomeIcon icon={faCircleCheck} />,
-        // },
         {
             type: 'divider',
         },
@@ -121,56 +107,25 @@ const Header = () => {
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,
         },
     ];
-    const itemsMovie = [
-        {
-            key: 'a',
-            label: (
-                <a onClick={handleProfile} href="">
-                    Lịch chiếu
-                </a>
-            ),
-
-            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
-        },
-        {
-            key: 'b',
-            label: (
-                <a onClick={handleProfile} href="">
-                    Phim đang chiếu
-                </a>
-            ),
-
-            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
-        },
-        {
-            key: 'c',
-            label: (
-                <a onClick={handleProfile} href="">
-                    Phim sắp chiếu
-                </a>
-            ),
-
-            icon: <FontAwesomeIcon icon={faAddressCard} className="text-4xl" />,
-        },
-    ];
 
     const scrollToShowTimes = () => {
         navigate('/');
         scroll.scrollTo(1800);
     };
+
     const scrollToMovieUpcoming = () => {
         navigate('/');
-        // Assuming you are using a library like react-scroll for scrolling
-        // Replace 'scrollTo' with the actual scrolling logic you are using
         scroll.scrollTo(1200);
     };
+
     const scrollToMovieShowing = () => {
         navigate('/');
         scroll.scrollTo(600);
     };
+
     return (
         <>
-            <nav className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0 ">
+            <nav  className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0 ">
                 <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-border-b tw-container tw-mx-auto tw-px-[150px]">
                     <a href="/" className="tw-text-gray-700">
                         <div className="tw-flex tw-items-center tw-gap-2">
@@ -196,17 +151,7 @@ const Header = () => {
                                 Lịch chiếu
                             </a>
                         </div>
-                        <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
-                            {/* <Dropdown
-                                menu={{
-                                  items:  itemsMovie,
-                                }}
-                                placement="bottom"
-                                arrow
-                            >
-                               Phim
-                            </Dropdown> */}
-                        </div>
+                        <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700"></div>
                         <div className="tw-xl:tw-hidden tw-mr-[20px] tw-text-gray-700">
                             <a href="/movieTop" className="tw-text-gray-700">
                                 Top phim
@@ -257,20 +202,11 @@ const Header = () => {
                                         Đăng nhập
                                     </button>
                                 </div>
-
-                                {/* <a onClick={handleLogin} className="tw-text-gray-700 flex items-center" href="">
-                                <span className="name-short">Đăng nhập</span>
-                                <Avatar
-                                    style={{ backgroundColor: '#87d068' }}
-                                    className="tw-ml-2"
-                                    icon={<UserOutlined />}
-                                />
-                            </a> */}
                             </>
                         )}
                     </div>
                 </div>
-                {isEventPage && ( // Render additional code only if isEventPage is true
+                {isEventPage && (
                     <>
                         <Divider className="tw-mt-[-5px]" />
                         <div className="tw-container tw-mx-auto tw-px-[150px] tw-mt-[-10px] tw-mb-[10px] tw-text-gray-700 tw-font-2xl tw-font-[var(--font-family)]">
@@ -296,10 +232,10 @@ const Header = () => {
                                     {
                                         href: '/su-kien/tin-tuc',
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                                (location.pathname === '/su-kien/tin-tuc' ||
-                                                    /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
-                                                ? 'tw-text-[var(--primary--text-color)]'
-                                                : ''
+                                            (location.pathname === '/su-kien/tin-tuc' ||
+                                                /^\/su-kien\/tin-tuc\/\d+$/.test(location.pathname))
+                                            ? 'tw-text-[var(--primary--text-color)]'
+                                            : ''
                                             }`,
                                         title: (
                                             <>
@@ -315,10 +251,10 @@ const Header = () => {
                                     {
                                         href: '/su-kien/khuyen-mai',
                                         className: `focus:tw-text-[var(--primary--text-color)] hover:tw-text-[var(--primary--text-color)] tw-cursor-pointer  tw-text-gray-500  tw-font-[var(--font-family)] ${isEventPage &&
-                                                (location.pathname === '/su-kien/khuyen-mai' ||
-                                                    /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
-                                                ? ' tw-text-[var(--primary--text-color)]'
-                                                : ''
+                                            (location.pathname === '/su-kien/khuyen-mai' ||
+                                                /^\/su-kien\/khuyen-mai\/\d+$/.test(location.pathname))
+                                            ? ' tw-text-[var(--primary--text-color)]'
+                                            : ''
                                             }`,
                                         title: (
                                             <>
