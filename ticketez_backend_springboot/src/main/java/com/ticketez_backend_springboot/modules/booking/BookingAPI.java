@@ -32,12 +32,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.BookingAnPaymentInfoAndSeatBookings;
+import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
 import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
+import com.ticketez_backend_springboot.dto.PriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
 import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.account.AccountDAO;
+import com.ticketez_backend_springboot.modules.actor.Actor;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieAPI;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
@@ -72,6 +75,12 @@ public class BookingAPI {
 	@Autowired
 	private BookingDAO dao;
 	private static final Logger logger = LoggerFactory.getLogger(MovieAPI.class);
+
+	@GetMapping("/get/all")
+	public ResponseEntity<List<Booking>> findAll() {
+		List<Booking> bookings = dao.findAll();
+		return ResponseEntity.ok(bookings);
+	}
 
 	@GetMapping
 	public ResponseEntity<?> findByPage(
@@ -372,14 +381,13 @@ public class BookingAPI {
 
 	}
 
-
 	@GetMapping("/get/booking-payment-info-seat-booking/{bookingId}")
 	public ResponseEntity<?> getBookingPaymentInfoSeatBookings(@PathVariable("bookingId") String bookingId) {
 		try {
 
 			BookingAnPaymentInfoAndSeatBookings dto = new BookingAnPaymentInfoAndSeatBookings();
 
-			if(bookingId != null ){
+			if (bookingId != null) {
 				Booking book = dao.getBookingById(bookingId);
 				PaymentInfo paymentInfo = dao.getPaymentInfoById(bookingId);
 				List<SeatBooking> seatBookings = dao.getSeatsBookingById(bookingId);
@@ -388,7 +396,7 @@ public class BookingAPI {
 				dto.setPaymentInfo(paymentInfo);
 				dto.setSeatBookings(seatBookings);
 			}
-			
+
 			return ResponseEntity.ok(dto);
 
 		} catch (Exception e) {
@@ -396,6 +404,8 @@ public class BookingAPI {
 		}
 
 	}
+
+
 
 
 }
