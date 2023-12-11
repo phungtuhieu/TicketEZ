@@ -5,7 +5,9 @@ const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 const numericRegex = /\d/;
 const uppercaseRegex = /[A-Z]/;
 const lowercaseRegex = /[a-z]/;
-const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+const phoneRegex = /^(0[1-9][0-9]{8}|84[1-9][0-9]{7})$/;
+const regexFullname = /^[A-ZĐÂÊÔƠƯ][a-zđâêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵ]+(\s[A-ZĐÂÊÔƠƯ][a-zđâêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵ]+)*$/;
+const repeatingCharsRegex = /(.)\1{2,}/; 
 
 export const validateId = (id) => {
     if (id.length < 6) {
@@ -70,5 +72,51 @@ export const validatePhone = (phone) => {
         funcUtils.notify('Số điện thoại không hợp lệ! Vui lòng nhập số điện thoại gồm 10 chữ số.', 'error');
         return false;
     }
+    if (!phoneRegex.test(phone)) {
+        funcUtils.notify('Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.', 'error');
+        return false;
+    }
     return true;
 };
+
+export const validateFullname = (fullname) => {
+
+
+    if (repeatingCharsRegex.test(fullname)) {
+      funcUtils.notify('Tên không hợp lệ. Không được nhập ký tự lặp lại nhiều lần liên tiếp.', 'error');
+      return false;
+    }
+    if (specialCharRegex.test(fullname)) {
+        funcUtils.notify('Tên không hợp lệ. Không được nhập ký tự đặc biệt.', 'error');
+        return false;
+      }
+    
+    if (!regexFullname.test(fullname)) {
+      funcUtils.notify('Tên không hợp lệ. Vui lòng nhập tên đúng định dạng ', 'error');
+      return false;
+    }
+
+    const nameParts = fullname.trim().split(' ');
+    if (nameParts.length < 1) {
+      funcUtils.notify('Tên không hợp lệ. Vui lòng nhập đầy đủ họ và tên.', 'error');
+      return false;
+    }
+  
+    return true;
+  };
+  
+  export const validatEaddress = (address) => {
+
+
+
+    if (specialCharRegex.test(address)) {
+        funcUtils.notify('Địa chỉ không hợp lệ. Không được nhập ký tự đặc biệt.', 'error');
+        return false;
+      }
+
+
+
+    return true;
+  };
+  
+  

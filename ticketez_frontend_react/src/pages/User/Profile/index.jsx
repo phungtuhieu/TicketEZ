@@ -8,6 +8,7 @@ import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+import { validatEaddress, validateEmail, validateFullname, validatePhone } from '~/components/Auth/Custom';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
@@ -58,8 +59,20 @@ const EditableProfile = () => {
           image: image,
         };
       }
-      console.log(updatedValues, "sssssssssssss");
+      if (values.birthday) {
+        const selectedDate = values.birthday.toDate(); 
+        const currentDate = new Date();
 
+        if (selectedDate > currentDate) {
+          funcUtils.notify('Ngày sinh không được vượt quá thời gian hiện tại.', 'error');
+          return;
+        }
+      }
+      if (!validateEmail(values.email)) return;
+      if (!validatePhone(values.phone)) return;
+      if (!validateFullname(values.fullname)) return;
+      if (!validatEaddress(values.address)) return;
+      
       const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
