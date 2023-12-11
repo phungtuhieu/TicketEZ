@@ -12,6 +12,7 @@ function App() {
     const isAuthenticated = !!localStorage.getItem('token');
     console.log(isAuthenticated);
     console.log(roles);
+    
     return (
         <Router>
             <div className="App">

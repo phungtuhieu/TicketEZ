@@ -45,7 +45,7 @@ function AdminPriceService() {
 
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
-    const [statusValue, setStatusValue] = useState(1);
+
 
 
     useEffect(() => {
@@ -103,7 +103,7 @@ function AdminPriceService() {
             title: 'Thời Gian bắt đầu',
             dataIndex: 'startDate',
             render: (startDate) => {
-                return startDate ? moment(startDate).format('DD-MM-YYYY HH:mm:ss') : '';
+                return startDate ? moment(startDate).format('DD-MM-YYYY ') : '';
             },
             // ...getColumnSearchProps('description'),
 
@@ -113,7 +113,7 @@ function AdminPriceService() {
             dataIndex: 'endDate',
 
             render: (endTime) => {
-                return endTime ? moment(endTime).format('DD-MM-YYYY HH:mm:ss') : '';
+                return endTime ? moment(endTime).format('DD-MM-YYYY ') : '';
             },
         },
 
@@ -171,8 +171,9 @@ function AdminPriceService() {
 
 
     const handleEditData = (record) => {
-        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD HH:mm:ss');
-        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD HH:mm:ss');
+        const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD ');
+        const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD ');
+        
 
         form.setFieldsValue({
             ...record,
@@ -181,11 +182,11 @@ function AdminPriceService() {
             cinemaComplex: record.service.cinemaComplex?.id,
             'range-time-picker': [formattedStartTime, formattedEndTime],
         });
+        console.log(record.startDate);
 
 
         setDataStartTime(formattedStartTime);
         setDataEndTime(formattedEndTime);
-        setStatusValue(record.status);
         setOpen(true);
         setResetForm(false);
         setEditData(record);
@@ -261,28 +262,6 @@ function AdminPriceService() {
         form.resetFields();
         setFileList([]);
         console.log(form);
-    };
-
-    const onPreview = async (file) => {
-        let src = file.url;
-        if (!src) {
-            src = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file.originFileObj);
-                reader.onload = () => resolve(reader.result);
-            });
-        }
-        const image = new Image();
-        image.src = src;
-        const imgWindow = window.open(src);
-        imgWindow?.document.write(image.outerHTML);
-    };
-
-
-    // Xử lý sự kiện thay đổi trang
-    const handlePageChange = (page, pageSize) => {
-        setCurrentPage(page);
-        setPageSize(pageSize);
     };
 
 
@@ -384,7 +363,7 @@ function AdminPriceService() {
 
                         <RangePicker
                             showTime
-                            format="DD-MM-YYYY HH:mm:ss"
+                            format="DD-MM-YYYY "
                             value={[dataStartTime, dataEndTime]}
                             onChange={onChangeDate}
                         />

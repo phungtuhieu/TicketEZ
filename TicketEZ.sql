@@ -1523,7 +1523,7 @@ GO
 INSERT INTO Accounts (id, phone, fullname, [image], email, [address], [password], birthday, gender, [status], verified, created_date, points)
 VALUES
 ('admin', '0987654321', N'Nguyễn Văn A', 'image1.jpg', 'nguyen.va@gmail.com', N'123 Đường ABC, Quận 1, TP.HCM', 'admin', '1990-01-15', 1, 1, 1, '2023-01-01 08:00:00', 0),
-('admin01',	'0844457992'	,'admin',	NULL,	'admin123@gmail.com',	NULL,N'$2a$10$1nAbLCEE4i/zu.O.6UgwHu84wz5b6PGudB9TwscvHnHI/TAMePINy'	,NULL,	0, 1, 1,	'2023-12-09 16:44:17.837',	0),
+('admin01',	'0844457992'	,'admin',	'a480eae8-382f-4e07-af9f-09d351b587a4_user.jpg',	'admin123@gmail.com',	NULL,N'$2a$10$1nAbLCEE4i/zu.O.6UgwHu84wz5b6PGudB9TwscvHnHI/TAMePINy'	,NULL,	0, 1, 1,	'2023-12-09 16:44:17.837',	0),
 ('user2', '0901234567', N'Trần Thị B', 'image2.jpg', 'tran.thi.b@gmail.com', N'456 Đường XYZ, Quận 2, TP.HCM', 'user2', '1985-03-20', 0, 1, 0, '2023-01-02 09:30:00', 75),
 ('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
 ('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),

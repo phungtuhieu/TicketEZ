@@ -24,6 +24,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (!isAuthenticated || !hasRequiredRole) {
     return <NotFound />;
   }
+  if (!hasRequiredRole) {
+    return <Navigate to="/" />;
+  }
+  
+
 
   if (!userHasRequiredRole) {
     return <Unauthorized />;
