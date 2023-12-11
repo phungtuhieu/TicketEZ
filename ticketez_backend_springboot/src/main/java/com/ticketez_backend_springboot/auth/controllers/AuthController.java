@@ -319,64 +319,9 @@ public class AuthController {
 
   }
 
-  // @PutMapping("/{id}")
-  // public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody Map<String, Object> updates) {
-  //   try {
-  //     // Kiểm tra xem tài khoản có tồn tại không
-  //     if (!accountRepository.existsById(id)) {
-  //       return new ResponseEntity<>("Tài khoản không tồn tại", HttpStatus.NOT_FOUND);
-  //     }
-
-  //     // Lấy thông tin tài khoản hiện có từ cơ sở dữ liệu
-  //     SecurityAccount existingAccount = accountRepository.findById(id).orElse(null);
-
-  //     if (existingAccount == null) {
-  //       return new ResponseEntity<>("Tài khoản không tồn tại", HttpStatus.NOT_FOUND);
-  //     }
-
-  //     if (updates.containsKey("phone")) {
-  //       existingAccount.setPhone((String) updates.get("phone"));
-  //     }
-  //     if (updates.containsKey("fullname")) {
-  //       existingAccount.setFullname((String) updates.get("fullname"));
-  //     }
-  //     if (updates.containsKey("email")) {
-  //       existingAccount.setEmail((String) updates.get("email"));
-  //     }
-  //     if (updates.containsKey("address")) {
-  //       existingAccount.setAddress((String) updates.get("address"));
-  //     }
-  //     if (updates.containsKey("gender")) {
-  //       existingAccount.setGender((Boolean) updates.get("gender"));
-  //     }
-  //     SecurityAccount updatedAccount = accountRepository.save(existingAccount);
-
-  //     // return ResponseEntity.ok(updatedAccount);
-
-  //     UserDto userDto = new UserDto(
-  //         updatedAccount.getId(),
-  //         updatedAccount.getPhone(),
-  //         updatedAccount.getFullname(),
-  //         updatedAccount.getEmail(),
-  //         updatedAccount.getAddress(),
-  //         updatedAccount.getBirthday(),
-  //         updatedAccount.getGender(),
-  //         updatedAccount.getImage()
-  //     // "Bearer" // type
-
-  //     );
-  //     return ResponseEntity.ok(userDto);
-
-  //   } catch (Exception e) {
-  //     return new ResponseEntity<>("Lỗi máy chủ, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-
-  // Inside your AuthController class
 
 @PutMapping("/{id}")
 public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestBody UserDto userDto) {
-    // Find the existing account by ID
     Optional<SecurityAccount> existingAccountOpt = accountRepository.findById(id);
     
     if (!existingAccountOpt.isPresent()) {
@@ -384,8 +329,7 @@ public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestB
     }
     
     SecurityAccount existingAccount = existingAccountOpt.get();
-    
-    // Update the account details with the values from the UserDto
+  
     existingAccount.setPhone(userDto.getPhone());
     existingAccount.setFullname(userDto.getFullname());
     existingAccount.setEmail(userDto.getEmail());
@@ -393,12 +337,9 @@ public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestB
     existingAccount.setBirthday(userDto.getBirthday());
     existingAccount.setGender(userDto.getGender());
     existingAccount.setImage(userDto.getImage());
-    // ... set other fields as needed
     
-    // Save the updated account details
     SecurityAccount updatedAccount = accountRepository.save(existingAccount);
     
-    // Create a response DTO if needed, otherwise you can just return the updated account
     UserDto responseDto = new UserDto(
         updatedAccount.getId(),
         updatedAccount.getPhone(),
@@ -410,7 +351,7 @@ public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestB
         updatedAccount.getImage()
     );
     
-    // Return a successful response
+
     return ResponseEntity.ok(responseDto);
 }
 

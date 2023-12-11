@@ -3,20 +3,19 @@ import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, Upload 
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './Profile.module.scss';
 import authApi from '~/api/user/Security/authApi';
-import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(false);
-  const [editData, setEditData] = useState();
   const [birthday, setBirthday] = useState(null);
   const [fileList, setFileList] = useState([]);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,9 +37,7 @@ const EditableProfile = () => {
         console.log(newUploadFile);
         setFileList([newUploadFile]);
         setBirthday(dayjs(user.birthday));
-        // funcUtils.notify("Cập nhật thành công", 'success');
       } catch (error) {
-        // funcUtils.notify("Cập nhật Thất bại", 'error');
       }
     };
 
@@ -55,7 +52,6 @@ const EditableProfile = () => {
       };
       if (values.image.fileList) {
         const file = values.image.fileList[0].originFileObj;
-        // console.log(file);
         const image = await uploadApi.put(userData.image, file);
         updatedValues = {
           ...updatedValues,
@@ -77,13 +73,7 @@ const EditableProfile = () => {
   };
 
 
-  const onEdit = (values) => {
-    // const newUploadFile = {
-    //   name: values.image,
-    //   url: `http://localhost:8081/api/upload/${values.image}`,
-    // };
-    // setFileList([newUploadFile]);
-    setEditData(values);
+  const onEdit = () => {
     setEditing(true);
   };
 
@@ -93,7 +83,7 @@ const EditableProfile = () => {
 
 
   const onChangePassword = () => {
-    console.log('Change password clicked');
+    navigate('/changepassword');
   };
 
   const onChangeUpload = async ({ fileList: newFileList }) => {
@@ -165,7 +155,7 @@ const EditableProfile = () => {
                   </Upload>
                 </Form.Item>
                 {/* Left Column */}
-                <Form.Item
+                {/* <Form.Item
                   name="id"
                   label="Tên Tài khoản"
                   rules={[{ required: true, message: 'Vui lòng nhập tên tài khoản' }]}
@@ -176,7 +166,7 @@ const EditableProfile = () => {
                     disabled
                     readOnly
                   />
-                </Form.Item>
+                </Form.Item> */}
 
 
                 <Form.Item
