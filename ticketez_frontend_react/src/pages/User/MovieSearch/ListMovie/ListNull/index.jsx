@@ -33,7 +33,8 @@ function ListNull() {
                 </h1>
             </Col>
             <h1 className="tw-text-[14px] tw-font-semibold tw-text-center  tw-text-[#878787] tw-leading-loose tw-pl-6 ">
-            ĐỀ XUẤT PHIM CHO BẠN 
+            {/* ĐỀ XUẤT PHIM CHO BẠN  */}
+            TẤT CẢ PHIM ĐANG CHIẾU
             </h1>
 
             <Col span={24} className="  tw-grid tw-grid-cols-5 tw-gap-3">

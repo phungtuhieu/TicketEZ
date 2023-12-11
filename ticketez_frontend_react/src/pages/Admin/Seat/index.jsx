@@ -378,14 +378,14 @@ function AdminSeat() {
                                     footer={null}
                                 >
                                     <div className={cx('modal-content')}>
-                                        <SeatGenerator />
+                                        <SeatGenerator record ={cinemaDaTa} iD={idCinema}/>
                                     </div>
                                 </Modal>
 
                                 <Select
                                     className={cx('select')}
                                     showSearch
-                                    placeholder="Select a person"
+                                    placeholder="Chọn sơ đồ rạp"
                                     optionFilterProp="children"
                                     onChange={onChange}
                                     onSearch={onSearch}
@@ -401,7 +401,7 @@ function AdminSeat() {
                                 <Select
                                     className={cx('select')}
                                     showSearch
-                                    placeholder="Select a person"
+                                    placeholder="Chọn suất chiếu"
                                     optionFilterProp="children"
                                     onChange={onChangeShowTime}
                                     onSearch={onSearch}

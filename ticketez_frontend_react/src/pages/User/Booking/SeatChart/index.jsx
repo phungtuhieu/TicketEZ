@@ -6,11 +6,13 @@ import '../SeatChart/chart.scss';
 import axiosClient from '~/api/global/axiosClient';
 import { ShoppingOutlined } from '@ant-design/icons';
 import funcUtils from '~/utils/funcUtils';
-import { BookingDetail } from '../..';
+import { BookingCombo, BookingDetail } from '../..';
 import { sassFalse } from 'sass';
 import img, { listIcon } from '~/assets/img';
 import uploadApi from '~/api/service/uploadApi';
 import authApi from '~/api/user/Security/authApi';
+import priceSeatApi from '~/api/admin/managementSeat/priceApi';
+import priceServiceApi from '~/api/admin/ManageCombosAndEvents/priceServiceApi';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -40,7 +42,7 @@ function SeatChart(props) {
         setIsModalOpenSeatType(false);
     };
     const createSeatArray = () => {
-        console.log(allSeats);
+        // console.log(allSeats);
         let seatRows = showtime.seatChart.rows; // Số hàng
         let seatColumns = showtime.seatChart.columns; // Số cột
 
@@ -122,6 +124,7 @@ function SeatChart(props) {
             setSeatArray(newObj);
         }
     };
+
     const fetchDaTaSeatType = async () => {
         const respAll = await axiosClient.get(`seatType/getAll`);
         setSeatType(respAll.data);
@@ -170,12 +173,32 @@ function SeatChart(props) {
         }
     };
     const [account, setAccount] = useState(null);
+    const [isService, setIsService] = useState(false);
     useEffect(() => {
-        const acc = authApi.getUser();
-        if (acc != null) {
-            setAccount(acc);
+        const loadServices = async () => {
+            try {
+                const resp = await priceServiceApi.findByCplx(showtime.id);
+                console.log('priceService: 11 ', resp);
+                if (resp.data.length >= 0) {
+                    setIsService(true);
+                } else {
+                    setIsService(false);
+                }
+            } catch (error) {
+                setIsService(false);
+            }
+        };
+        try {
+            const acc = authApi.getUser();
+            loadServices();
+            if (acc != null) {
+                setAccount(acc);
+            }
+        } catch (error) {
+            console.log('error - get acc: ', error);
         }
-    }, []);
+        // setCinemaComplexId(showtime.cinema.cinemaComplex.id);
+    }, [isModalOpenBooking]);
     useEffect(() => {
         const fetchDataInterval = setInterval(() => {
             fetchDataSeatChoose();
@@ -258,7 +281,9 @@ function SeatChart(props) {
 
     const [priceSeats, setPriceSeats] = useState(0);
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
-        console.log(prices);
+        console.log(seatStateArray);
+        console.log(seat);
+        console.log(seatTypeId);
         let result = null;
         let finalRS = null;
         seatStateArray.forEach((seatItem) => {
@@ -303,6 +328,7 @@ function SeatChart(props) {
             seatType.forEach((value) => {
                 if (value.nickName === name) {
                     const priceResult = findPriceBySeatType(data, seat, value.id);
+                    console.log(priceResult);
                     if (priceResult !== null) {
                         Object.assign(rs, {
                             seatType: value,
@@ -313,8 +339,8 @@ function SeatChart(props) {
                 }
             });
         });
+        console.log(rs);
         const seatPrices = getSeatPrice(rs);
-
         if (seatReserved.indexOf(seat) > -1) {
             setPriceSeats(priceSeats - seatPrices);
             seatReserved.splice(seatReserved.indexOf(seat), 1);
@@ -760,15 +786,24 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            {account != null &&  <BookingDetail
-                showtime={showtime}
-                seatBooking={seatBooking}
-                open={isModalOpenBooking}
-                onCancel={handleCancel}
-                destroyOnClose={true}
-            />}
-           
-            ,{/* )} */}
+            {account != null && isService && (
+                <BookingCombo
+                    showtime={showtime}
+                    seatBooking={seatBooking}
+                    open={isModalOpenBooking}
+                    onCancel={handleCancel}
+                    destroyOnClose={true}
+                />
+            )}
+            {account != null && isService === false && (
+                <BookingDetail
+                    showtime={showtime}
+                    seatBooking={seatBooking}
+                    open={isModalOpenBooking}
+                    onCancel={handleCancel}
+                    destroyOnClose={true}
+                />
+            )}
         </>
     );
 }

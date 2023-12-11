@@ -12,7 +12,8 @@ import Item from 'antd/es/list/Item';
 import priceServiceApi from '~/api/admin/ManageCombosAndEvents/priceServiceApi';
 import uploadApi from '~/api/service/uploadApi';
 const cx = classNames.bind(styles);
-function BookingCombo() {
+function BookingCombo(props) {
+    const { showtime, seatBooking } = props;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [comboQuantities, setComboQuantities] = useState({});
     const [total, setTotal] = useState(0.0);
@@ -63,10 +64,11 @@ function BookingCombo() {
             <div className={cx('wrapper')}>
                 <Button onClick={showModal}>Open</Button>
                 <Modal
+                    {...props}
                     title="Combo - bắp nước"
-                    open={isModalOpen}
+                    // open={isModalOpen}
                     width={520}
-                    onCancel={handleCancel}
+                    // onCancel={handleCancel}
                     footer={[
                         <div key="wrappFooter" className={cx('wrapp-footer-modal')}>
                             <div className={cx('info-total')}>

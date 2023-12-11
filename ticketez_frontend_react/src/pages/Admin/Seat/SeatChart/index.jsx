@@ -163,9 +163,11 @@ function SeatChart(props) {
     useEffect(() => {
         if (showInfo === 'success') {
             funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'success');
+            setShowInfo('s');
         }
         if (showInfo === 'error') {
             funcUtils.notify('Sửa thành công dữ liệu trong bảng', 'error');
+            setShowInfo('s');
         }
     }, [showInfo]);
 

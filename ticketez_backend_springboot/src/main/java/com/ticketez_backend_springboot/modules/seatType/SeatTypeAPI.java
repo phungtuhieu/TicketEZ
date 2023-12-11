@@ -31,17 +31,22 @@ public class SeatTypeAPI {
         return ResponseEntity.ok(seatTypeDAO.findAllByOrderByIdDesc());
     }
 
-        @GetMapping("bySeatChart/{seatChartId}")
+    @GetMapping("bySeatChart/{seatChartId}")
     public ResponseEntity<List<SeatType>> getSeatTypesBySeatChartId(@PathVariable Long seatChartId) {
         Optional<SeatType> seatChartOptional = seatTypeDAO.findById(seatChartId);
 
         if (seatChartOptional.isPresent()) {
             SeatType seatChart = seatChartOptional.get();
-            List<SeatType> seatTypes =seatTypeDAO.findSeatTypesBySeatChartId(seatChart.getId());
+            List<SeatType> seatTypes = seatTypeDAO.findSeatTypesBySeatChartId(seatChart.getId());
             return new ResponseEntity<>(seatTypes, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("byCinemaComplexId/{cinemaComplexId}")
+    public List<SeatType> getSeatTypesByCinemaComplex(@PathVariable("cinemaComplexId") Long cinemaComplexId) {
+        return seatTypeDAO.findSeatTypesByCinemaComplexId(cinemaComplexId);
     }
 
     @GetMapping("/{id}")

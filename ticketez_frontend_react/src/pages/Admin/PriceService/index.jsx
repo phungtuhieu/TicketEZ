@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Col, DatePicker, Form, Popconfirm, Row, Select, Space, message } from 'antd';
 import Image from 'antd/lib/image';
 import React, { useRef, useState, useEffect } from 'react';
-import priceServiceApi from "~/api/admin/ManageCombosAndEvents/priceServiceApi";
+import priceServiceApi from '~/api/admin/ManageCombosAndEvents/priceServiceApi';
 import style from './PriceService.module.scss';
 import classNames from 'classnames/bind';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -18,14 +18,12 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 const cx = classNames.bind(style);
 
-
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
 
 function AdminPriceService() {
-
     const { RangePicker } = DatePicker;
     const searchInput = useRef(null);
     const [loading, setLoading] = useState(false);
@@ -45,8 +43,6 @@ function AdminPriceService() {
 
     const [dataStartTime, setDataStartTime] = useState();
     const [dataEndTime, setDataEndTime] = useState();
-
-
 
     useEffect(() => {
         const getList = async () => {
@@ -106,7 +102,6 @@ function AdminPriceService() {
                 return startDate ? moment(startDate).format('DD-MM-YYYY ') : '';
             },
             // ...getColumnSearchProps('description'),
-
         },
         {
             title: 'Thời Gian kết thúc',
@@ -169,11 +164,9 @@ function AdminPriceService() {
         setWorkSomeThing(!workSomeThing);
     };
 
-
     const handleEditData = (record) => {
         const formattedStartTime = dayjs(record.startDate, 'YYYY-MM-DD ');
         const formattedEndTime = dayjs(record.endDate, 'YYYY-MM-DD ');
-        
 
         form.setFieldsValue({
             ...record,
@@ -184,7 +177,6 @@ function AdminPriceService() {
         });
         console.log(record.startDate);
 
-
         setDataStartTime(formattedStartTime);
         setDataEndTime(formattedEndTime);
         setOpen(true);
@@ -192,23 +184,21 @@ function AdminPriceService() {
         setEditData(record);
     };
 
-
     const handleOk = async () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
             console.log(values.service);
-             let putData = {
+            let putData = {
                 ...values,
                 startDate: new Date(dataStartTime),
                 endDate: new Date(dataEndTime),
-               
             };
             console.log(values);
             if (editData) {
                 const resp = await priceServiceApi.put(editData.id, putData, putData.service);
                 console.log(resp);
-                funcUtils.notify("Cập nhật thành công", 'success');
+                funcUtils.notify('Cập nhật thành công', 'success');
             }
             if (!editData) {
                 try {
@@ -217,7 +207,6 @@ function AdminPriceService() {
                     if (resp.status === 200) {
                         funcUtils.notify('Thêm giá dịch vụ thành công', 'success');
                     }
-
                 } catch (error) {
                     console.log(error);
                     funcUtils.notify(error.response.data, 'error');
@@ -235,7 +224,6 @@ function AdminPriceService() {
     const handleCancel = () => {
         setOpen(false);
     };
-
 
     const rangeConfig = {
         labelCol: { span: 4 },
@@ -256,7 +244,6 @@ function AdminPriceService() {
         }
     };
 
-
     //form
     const handleResetForm = () => {
         form.resetFields();
@@ -264,76 +251,91 @@ function AdminPriceService() {
         console.log(form);
     };
 
+    const onPreview = async (file) => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+        const image = new Image();
+        image.src = src;
+        const imgWindow = window.open(src);
+        imgWindow?.document.write(image.outerHTML);
+    };
 
-    return <>
+    // Xử lý sự kiện thay đổi trang
+    const handlePageChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSize(pageSize);
+    };
 
-        <Row>
-            <Col span={22}>
-                <h1 className={cx('title')}>Bảng dữ liệu</h1>
-            </Col>
-            <Col span={2}>
-                <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
-                    Thêm
-                </Button>
-            </Col>
-            <BaseModal
-                maskClosable={false}
-                open={open}
-                width={'60%'}
-                title={editData ? 'Cập nhật' : 'Thêm mới'}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="back" onClick={handleCancel}>
-                        Thoát
-                    </Button>,
-                    resetForm && (
-                        <Button key="reset" onClick={handleResetForm}>
-                            Làm mới
-                        </Button>
-                    ),
-                    <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                        {editData ? 'Cập nhật' : 'Thêm mới'}
-                    </Button>,
-                ]}
-            >
-                <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+    return (
+        <>
+            <Row>
+                <Col span={22}>
+                    <h1 className={cx('title')}>Bảng dữ liệu</h1>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
+                        Thêm
+                    </Button>
+                </Col>
+                <BaseModal
+                    maskClosable={false}
+                    open={open}
+                    width={'60%'}
+                    title={editData ? 'Cập nhật' : 'Thêm mới'}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Thoát
+                        </Button>,
+                        resetForm && (
+                            <Button key="reset" onClick={handleResetForm}>
+                                Làm mới
+                            </Button>
+                        ),
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                            {editData ? 'Cập nhật' : 'Thêm mới'}
+                        </Button>,
+                    ]}
+                >
+                    <Form form={form} name="dynamic_rule" style={{ maxWidth: 1000 }}>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="service"
+                            label="Chọn Tên dịch vụ"
+                            rules={[{ required: true, message: 'Vui lòng chọn' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn Rap"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={selectService?.map((service) => ({
+                                    value: service.id,
+                                    label: service.name,
+                                }))}
+                            />
+                        </Form.Item>
 
-                    <Form.Item
-                        {...formItemLayout}
-                        name="service"
-                        label="Chọn Tên dịch vụ"
-                        rules={[{ required: true, message: 'Vui lòng chọn' }]}
-                    >
+                        <Form.Item
+                            {...formItemLayout}
+                            name="price"
+                            label="Giá dịch vụ"
+                            rules={[{ required: true, message: 'Vui lòng nhập giá dịch vụ' }]}
+                        >
+                            <Input placeholder="Giá dịch vụ" />
+                        </Form.Item>
 
-
-                        <Select
-                            style={{ width: '100%' }}
-                            showSearch
-                            placeholder="Chọn Rap"
-                            optionFilterProp="children"
-                            filterOption={(input, option) =>
-                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            }
-                            options={selectService?.map((service) => ({
-                                value: service.id,
-                                label: service.name,
-
-                            }))}
-
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        {...formItemLayout}
-                        name="price"
-                        label="Giá dịch vụ"
-                        rules={[{ required: true, message: 'Vui lòng nhập giá dịch vụ' }]}
-                    >
-                        <Input placeholder="Giá dịch vụ" />
-                    </Form.Item>
-
-                    {/* <Form.Item
+                        {/* <Form.Item
                         {...formItemLayout}
                         name="cinemaComplex"
                         label="Chọn Rạp"
@@ -357,34 +359,40 @@ function AdminPriceService() {
 
                         />
                     </Form.Item> */}
-                    <Form.Item
-                        name="range-time-picker"
-                        label="Ngày giờ" {...rangeConfig} >
+                        <Form.Item name="range-time-picker" label="Ngày giờ" {...rangeConfig}>
+                            <RangePicker
+                                showTime
+                                format="DD-MM-YYYY "
+                                value={[dataStartTime, dataEndTime]}
+                                onChange={onChangeDate}
+                            />
+                        </Form.Item>
+                    </Form>
+                </BaseModal>
+            </Row>
 
-                        <RangePicker
-                            showTime
-                            format="DD-MM-YYYY "
-                            value={[dataStartTime, dataEndTime]}
-                            onChange={onChangeDate}
-                        />
-                    </Form.Item>
+            <BaseTable
+                pagination={false}
+                columns={columns}
+                dataSource={posts.map((post) => ({
+                    ...post,
+                    key: post.id,
+                    //  nameCinemaComplex: post.cinemaComplex.name,
+                }))}
+            />
+        </>
 
-                </Form>
-            </BaseModal>
-        </Row>
-
-        <BaseTable
-            pagination={false}
-            columns={columns}
-            dataSource={posts.map((post) => ({
-                ...post,
-                key: post.id,
-                //  nameCinemaComplex: post.cinemaComplex.name,
-            }))}
-        />
-
-    </>
-
+        // <BaseTable
+        //     pagination={false}
+        //     columns={columns}
+        //     dataSource={posts.map((post) => ({
+        //         ...post,
+        //         key: post.id,
+        //         //  nameCinemaComplex: post.cinemaComplex.name,
+        //     }))}
+        // />
+        // </>
+    );
 }
 
 export default AdminPriceService;
