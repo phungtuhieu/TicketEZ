@@ -92,6 +92,7 @@ function BookingDetail(props) {
                     console.log('totalAmount', totalAmount);
                     const infoS = {
                         ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
+                        colorCode: showtime.formatMovie.movie.mpaaRating.colorCode,
                         movieTitle: showtime.formatMovie.movie.title,
                         format: showtime.formatMovie.format.name,
                         time: {
@@ -151,16 +152,16 @@ function BookingDetail(props) {
             let accUpdate = {
                 ...account,
                 gender: true,
-                phone: account?.phone  ? account.phone : values.phone,
-                email: account?.email  ? account.email : values.email,
-                fullname: account?.fullname  ? account.fullname : values.fullname,
+                phone: account?.phone ? account.phone : values.phone,
+                email: account?.email ? account.email : values.email,
+                fullname: account?.fullname ? account.fullname : values.fullname,
             };
             console.log('accUpdate', accUpdate);
             const accResp = await accountApi.patchInfoUser(account.id, accUpdate);
             console.log('accUpdate: ', accResp);
             if (accResp.status == httpStatus.OK) {
                 try {
-                    const currentDate = new Date();
+                    // const currentDate = new Date();
                     const bookingId = generateRandomId();
                     try {
                         // const booking = {
@@ -204,7 +205,6 @@ function BookingDetail(props) {
         //
     };
     const generateRandomId = () => {
-        // Lấy thời gian mili giây hiện tại
         const timestamp = Date.now().toString();
 
         // Tạo chuỗi ngẫu nhiên từ thời gian mili giây
@@ -216,7 +216,6 @@ function BookingDetail(props) {
         // Tạo mã băm SHA-256 từ chuỗi kết hợp
         const hash = CryptoJS.SHA256(combinedString).toString();
 
-        // Lấy 10 ký tự đầu tiên của mã băm
         const randomId = hash.substring(0, 10);
 
         // Chuyển đổi chuỗi thành số ngẫu nhiên và giữ lại tối đa 10 ký tự
@@ -253,7 +252,7 @@ function BookingDetail(props) {
                             <Row className={cx('content-info-details', 'ps-0')}>
                                 <Col span={13} className="pe-20">
                                     <div className={cx('wrapp-title-movie')}>
-                                        <Tag className={cx('mpaa-movie')} color="blue-inverse">
+                                        <Tag className={cx('mpaa-movie')} color={showtimeInfo.colorCode}>
                                             {showtimeInfo.ratingCode}
                                         </Tag>
                                         <h3 className={cx('title-movie')} level={4}>

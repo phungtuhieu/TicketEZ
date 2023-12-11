@@ -98,19 +98,22 @@ public class PriceServiceAPI {
 				serviceIds.add(service.getId());
 			}
 			List<PriceService> priceServices = dao.findByCplxAndService(serviceIds);
-			List<PriceServiceDTO> priceServiceDTOs = new ArrayList<>();
-			for (Service service : services) {
-				for (PriceService priceService : priceServices) {
-					if (priceService.getService().getId() == service.getId()) {
-						PriceServiceDTO priceServiceDTO = new PriceServiceDTO();
-						priceServiceDTO.setPrice(priceService);
-						priceServiceDTO.setService(service);
-						priceServiceDTOs.add(priceServiceDTO);
-					}
-				}
-
+			if (priceServices.isEmpty()) {
+				return new ResponseEntity<>("Không tìm thấy giá dịch vụ!", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			return ResponseEntity.ok(priceServiceDTOs);
+			// List<PriceServiceDTO> priceServiceDTOs = new ArrayList<>();
+			// for (Service service : services) {
+			// for (PriceService priceService : priceServices) {
+			// if (priceService.getService().getId() == service.getId()) {
+			// PriceServiceDTO priceServiceDTO = new PriceServiceDTO();
+			// priceServiceDTO.setPrice(priceService);
+			// priceServiceDTO.setService(service);
+			// priceServiceDTOs.add(priceServiceDTO);
+			// }
+			// }
+
+			// }
+			return ResponseEntity.ok(priceServices);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(" Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
