@@ -81,7 +81,6 @@ export const validatePhone = (phone) => {
 
 export const validateFullname = (fullname) => {
 
-
     if (repeatingCharsRegex.test(fullname)) {
       funcUtils.notify('Tên không hợp lệ. Không được nhập ký tự lặp lại nhiều lần liên tiếp.', 'error');
       return false;
@@ -106,16 +105,10 @@ export const validateFullname = (fullname) => {
   };
   
   export const validatEaddress = (address) => {
-
-
-
     if (specialCharRegex.test(address)) {
         funcUtils.notify('Địa chỉ không hợp lệ. Không được nhập ký tự đặc biệt.', 'error');
         return false;
       }
-
-
-
     return true;
   };
   

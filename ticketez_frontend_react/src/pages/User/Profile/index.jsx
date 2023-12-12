@@ -126,7 +126,7 @@ const EditableProfile = () => {
             <div>
               {userData?.image && (
                 <Avatar
-                  size={64}
+                  size={80}
                   src={`http://localhost:8081/api/upload/${userData.image}`}
                 />
               )}
@@ -167,21 +167,6 @@ const EditableProfile = () => {
                     {fileList.length < 2 && '+ Upload'}
                   </Upload>
                 </Form.Item>
-                {/* Left Column */}
-                {/* <Form.Item
-                  name="id"
-                  label="Tên Tài khoản"
-                  rules={[{ required: true, message: 'Vui lòng nhập tên tài khoản' }]}
-                >
-                  <Input
-                    placeholder="Tên tài khoản"
-                    value={userData?.id} s
-                    disabled
-                    readOnly
-                  />
-                </Form.Item> */}
-
-
                 <Form.Item
                   name="fullname"
                   initialValue={userData.fullname}
@@ -202,7 +187,6 @@ const EditableProfile = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                {/* Right Column */}
                 <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]} initialValue={userData.phone}>
                   <Input />
                 </Form.Item>
@@ -220,11 +204,7 @@ const EditableProfile = () => {
                     format="DD-MM-YYYY"
                     style={{ width: '100%' }}
                   />
-
                 </Form.Item>
-
-
-
                 <Form.Item name="" label="Đổi mật khẩu" >
                   <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">
                     Đổi mật khẩu

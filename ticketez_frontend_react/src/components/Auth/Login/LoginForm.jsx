@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Form, Input, Button, Checkbox, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import img from '~/assets/img';
 import { SyncOutlined } from '@ant-design/icons';
@@ -56,7 +56,7 @@ const LoginForm = () => {
                 setTimeout(() => {
                     funcUtils.notify('Đăng nhập thành công!', 'success');
                 }, 500);
-                    navigate('/');
+                navigate('/');
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
@@ -76,17 +76,17 @@ const LoginForm = () => {
     };
     const onFinishCaptcha = async () => {
         issetLoading(true);
-         setTimeout(async () => {
+        setTimeout(async () => {
             issetLoading(false);
-        if (userInput === captcha) {
-            setIsCaptchaVerified(true);
-            funcUtils.notify('Captcha xác thực thành công!', 'success');
-            setIsModalVisible(false);
-        } else {
-            funcUtils.notify('Xác thực không hợp lệ', 'error');
-            setCaptcha(generateCaptcha());
-        }
-    }, 1000);
+            if (userInput === captcha) {
+                setIsCaptchaVerified(true);
+                funcUtils.notify('Captcha xác thực thành công!', 'success');
+                setIsModalVisible(false);
+            } else {
+                funcUtils.notify('Xác thực không hợp lệ', 'error');
+                setCaptcha(generateCaptcha());
+            }
+        }, 1000);
     };
 
 
@@ -147,9 +147,9 @@ const LoginForm = () => {
 
                             <Form.Item className={styles.formItem}>
                                 <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
-                                <a className={styles.forgot} href="">
+                                <Link className={styles.forgot} to="/forgotpassword">
                                     Quên mật khẩu
-                                </a>
+                                </Link>
                             </Form.Item>
 
                             <Form.Item className={styles.formItem}>
@@ -157,7 +157,10 @@ const LoginForm = () => {
                                     Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>
-                                    Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>
+                                    Bạn chưa có tài khoản
+                                    <Link className={styles.forgot} to="/Register">
+                                        Đăng Ký
+                                    </Link>
                                 </p>
                             </Form.Item>
                         </Form>
