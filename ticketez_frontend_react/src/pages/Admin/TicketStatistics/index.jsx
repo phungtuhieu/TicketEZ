@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
-import { Col, Row, DatePicker, Button } from 'antd';
+import { Col, Row, DatePicker, Button, Select } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
-
+import dayjs from 'dayjs';
 const { RangePicker } = DatePicker;
 
 const AdminTicketStatistics = () => {
@@ -16,17 +16,29 @@ const AdminTicketStatistics = () => {
         },
         labels: labels,
     });
+    const onChange = (value) => {
+        if (value === 1) {
+            fetchDataBookingDataDTO('cinemaChain');
+        }
+        if (value === 2) {
+            fetchDataBookingDataDTO('cinemaComplex');
+        }
+        console.log(`selected ${value}`);
+    };
+    const onSearch = (value) => {
+        console.log('search:', value);
+    };
 
-    const fetchDatabookingDataDTO = async () => {
+    const fetchDataBookingDataDTO = async (cinema) => {
         try {
-            const res = await axiosClient.get(`cinemaChain/cinemaChainBookingDTO`);
+            const res = await axiosClient.get(`${cinema}/${cinema}BookingDTO`);
             setBookingDataDTO(res.data);
         } catch (error) {
             console.error('Error fetching booking data:', error);
         }
     };
 
-    const getBestMovie = (idCinemaChain) => {
+    const getBestMovieCinemaChain = (idCinemaChain) => {
         const movieBookingCount = {};
         // Lặp qua mảng bookingDataDTO và cập nhật số lượng đặt vé cho từng bộ phim
         bookingDataDTO.forEach((bookingData) => {
@@ -72,41 +84,146 @@ const AdminTicketStatistics = () => {
         return mostBookedMovie?.showtime.formatMovie.movie.title;
     };
 
+    const getBestMovieCinemaComplex = (idCinemaComplex) => {
+        const movieBookingCount = {};
+        // Lặp qua mảng bookingDataDTO và cập nhật số lượng đặt vé cho từng bộ phim
+        bookingDataDTO.forEach((bookingData) => {
+            if (idCinemaComplex === bookingData.cinemaComplex.id) {
+                if (bookingData.bookings) {
+                    bookingData.bookings.forEach((booking) => {
+                        const movieId = booking.showtime.formatMovie.movie.id;
+
+                        if (movieBookingCount[movieId]) {
+                            movieBookingCount[movieId]++;
+                        } else {
+                            movieBookingCount[movieId] = 1;
+                        }
+                    });
+                }
+            }
+        });
+
+        if (Object.keys(movieBookingCount).length === 0) {
+            return;
+        }
+        // Tìm bộ phim có lượt đặt vé nhiều nhất
+        const mostBookedMovieId = Object.keys(movieBookingCount).reduce((a, b) =>
+            movieBookingCount[a] > movieBookingCount[b] ? a : b,
+        );
+
+        // Tìm thông tin của bộ phim có lượt đặt vé nhiều nhất
+        const mostBookedMovie = bookingDataDTO.reduce((acc, bookingData) => {
+            if (bookingData.bookings) {
+                const movie = bookingData.bookings.find(
+                    (booking) => booking.showtime.formatMovie.movie.id === parseInt(mostBookedMovieId, 10),
+                );
+
+                if (movie && (!acc || movie.createDate > acc.createDate)) {
+                    return movie;
+                }
+            }
+
+            return acc;
+        }, null);
+
+        console.log('Bộ phim có lượt đặt vé nhiều nhất:', mostBookedMovie?.showtime.formatMovie.movie.title);
+        return mostBookedMovie?.showtime.formatMovie.movie.title;
+    };
+
     useEffect(() => {
-        fetchDatabookingDataDTO();
+        fetchDataBookingDataDTO('cinemaChain');
     }, []);
 
     useEffect(() => {
-        const newLabels = bookingDataDTO.map((data) => data.cinemaChain.name);
+        const newLabels = bookingDataDTO.map((data) =>
+            data.cinemaChain ? data.cinemaChain.name : data.cinemaComplex.name,
+        );
         const newSeries = bookingDataDTO.map((data) => (data.bookings ? data.bookings.length : 0));
 
         setLabels(newLabels);
         setSeries(newSeries);
+        console.log(newLabels);
+        console.log(newSeries);
         setOptions({
             chart: {
                 type: 'donut',
             },
-            labels: newLabels ,
+            labels: newLabels,
         });
     }, [bookingDataDTO]);
+    const filterOption = (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+    const optionsSelect = [
+        {
+            value: 1,
+            label: 'Chuỗi rạp',
+        },
+        {
+            value: 2,
+            label: 'Cụm rạp',
+        },
+    ];
+    const [selectedDate, setSelectedDate] = useState([]);
+    const handleDateChange = (dates) => {
+        setSelectedDate(dates);
+
+        // Kiểm tra nếu có ngày bắt đầu và kết thúc
+        if (dates && dates.length === 2) {
+            const startDate = new Date(dates[0]);
+            const endDate = new Date(dates[1]);
+
+            const filteredBookingDataDTO = bookingDataDTO.filter((bookingDTO) => {
+                const bookingsInDateRange = bookingDTO.bookings.some((booking) => {
+                    // Ensure createdDate is a valid string
+                    const createdDate = new Date(booking.account.createdDate);
+
+                    // Check if createdDate is a valid Date object before using isBetween
+                    if (!isNaN(createdDate.getTime())) {
+                        return createdDate >= startDate && createdDate <= endDate;
+                    } else {
+                        // Handle invalid date, e.g., log an error or skip this booking
+                        console.error('Invalid createdDate:', booking.account.createdDate);
+                        return false;
+                    }
+                });
+
+                return bookingsInDateRange;
+            });
+
+            setBookingDataDTO(filteredBookingDataDTO)
+            console.log('Booking Data DTO with Bookings in date range:', filteredBookingDataDTO);
+        }
+    };
 
     return (
         <>
             <Row>
-                <Col span={24}>
+                <Col span={24} className="tw-mb-8">
                     <Row>
-                        <Col span={12}></Col>
                         <Col span={12}>
-                            <RangePicker />
+                            <Select
+                                showSearch
+                                defaultValue={1}
+                                placeholder="Select a person"
+                                optionFilterProp="children"
+                                onChange={onChange}
+                                onSearch={onSearch}
+                                filterOption={filterOption}
+                                options={optionsSelect}
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <RangePicker onChange={handleDateChange} />
                         </Col>
                     </Row>
                 </Col>
-                <Col span={16}>
+                <Col span={14}>
                     <BaseTable
                         columns={[
                             {
                                 title: 'Tên chuỗi rạp',
-                                render: (_, record) => record.cinemaChain.name,
+                                render: (_, record) =>
+                                    record.cinemaChain ? record.cinemaChain.name : record.cinemaComplex.name,
                             },
                             {
                                 title: 'Số lượng vé bán',
@@ -114,19 +231,22 @@ const AdminTicketStatistics = () => {
                             },
                             {
                                 title: 'Phim có số vé cao nhất',
-                                render: (_, record) => getBestMovie( record.cinemaChain.id),
+                                render: (_, record) =>
+                                    record.cinemaChain
+                                        ? getBestMovieCinemaChain(record.cinemaChain.id)
+                                        : getBestMovieCinemaComplex(record.cinemaComplex.id),
                             },
                         ]}
                         dataSource={bookingDataDTO.map((post) => ({
                             ...post,
-                            key: post.cinemaChain.id,
+                            key: post.cinemaChain ? post.cinemaChain.id : post.cinemaComplex.id,
                         }))}
                     />
                 </Col>
-                <Col span={8}>
+                <Col span={10}>
                     {bookingDataDTO.length > 0 && (
                         <div className="donut">
-                            <Chart options={options} series={series} type="donut" width="380" />
+                            <Chart options={options} series={series} type="donut" width="480" />
                         </div>
                     )}
                 </Col>
