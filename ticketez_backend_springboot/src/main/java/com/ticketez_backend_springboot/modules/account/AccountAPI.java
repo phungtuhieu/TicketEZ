@@ -21,11 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.auth.OTP.util.EmailUtil;
 import com.ticketez_backend_springboot.dto.AccountDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistory;
 import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistoryDAO;
+import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.movie.MovieDAO;
+
 
 @CrossOrigin("*")
 @RestController
@@ -34,6 +38,12 @@ public class AccountAPI {
 
     @Autowired
     AccountDAO accountDAO;
+    
+    @Autowired
+    MovieDAO movieDAO;
+
+    @Autowired 
+    EmailUtil emailUtil;
 
     @Autowired
     AccountLockHistoryDAO accountLockHistoryDAO;
@@ -204,6 +214,27 @@ public class AccountAPI {
         try {
             List<TotalDashboardAdmin> account = accountDAO.getTotalUser();
             return ResponseEntity.ok(account);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    //  
+
+    @GetMapping("/email/accounts/{movieId}")
+    public ResponseEntity<?> listAccount(@PathVariable("movieId") Long movieId) {
+        try {
+            Movie movie = movieDAO.findById(movieId).get();
+            List<Account> accounts = accountDAO.listAccount(movie.getId());
+
+            
+            for (Account account : accounts) {
+                emailUtil.sendEmailAccount(movie, account);
+            }
+
+            return ResponseEntity.ok(accounts);
 
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
