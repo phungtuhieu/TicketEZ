@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './movieUpcoming.module.scss';
 import Slider from 'react-slick';
-import { Col, Modal, Row, Tag, Typography } from 'antd';
+import { Button, Col, Modal, Row, Tag, Typography } from 'antd';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MovieShowingUserAPI } from '~/api/user/carousel';
@@ -125,7 +125,7 @@ const MovieShowing = () => {
         }, 1000);
     }, []);
     return (
-        <div className={cx('body','tw-mb-[130px]')}>
+        <div className={cx('body', 'tw-mb-[130px]')}>
             <h1 className="tw-text-[var(--primary--text-color)]">Phim sắp chiếu</h1>
 
             {isLoadingPage && (
@@ -268,12 +268,26 @@ const MovieShowing = () => {
                                               }
                                             : false
                                     }
-                                    style={{ color: 'gray' }}
+                                    style={{ color: 'gray', minHeight: '50px' }}
                                 >
                                     {selectedMovie ? selectedMovie.movie.description : ''}
                                 </Paragraph>
                             </Col>
                         </Row>
+                        <div className="tw-mt-[-20px]">
+                            <Button
+                                href={`/movie-details/${selectedMovie?.movie.id}`}
+                                className="tw-bg-[var(--primary--text-color)]  tw-border-[var(--primary--text-color))] tw-text-white tw-font-medium"
+                            >
+                                Đặt vé
+                            </Button>
+                            <Button
+                                onClick={handleCancel}
+                                className="tw-bg-gray-500 tw-border-gray-500 tw-text-white tw-font-medium"
+                            >
+                                Đóng
+                            </Button>
+                        </div>
                     </>,
                 ]}
             >
