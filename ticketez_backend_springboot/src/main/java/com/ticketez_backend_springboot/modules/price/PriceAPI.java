@@ -44,7 +44,7 @@ public class PriceAPI {
 
     @GetMapping("/get/all")
     public ResponseEntity<List<Price>> getAll() {
-        return ResponseEntity.ok(priceDAO.findAll());
+        return ResponseEntity.ok(priceDAO.findAllByOrderByStartDateDesc());
     }
 
     @GetMapping("/{id}")
@@ -120,7 +120,7 @@ public class PriceAPI {
     // Tìm price và mảng PriceSeatType
     @GetMapping("/price-price-seat-type-dto")
     public ResponseEntity<List<PriceAndPriceSeatTypeDTO>> findAllPriceAndPriceSeatTypeDTO() {
-        List<Price> prices = priceDAO.findAll();
+        List<Price> prices = priceDAO.findAllByOrderByStartDateDesc();
 
         List<PriceAndPriceSeatTypeDTO> rspList = new ArrayList<>();
 

@@ -36,7 +36,7 @@ const ReviewCard = () => {
     const getList = async () => {
       setLoading(true);
       try {
-        const res = await reviewApi.getMovieOrReview(1, 11);
+        const res = await reviewApi.getMovieOrReview(1, 12);
 
         setListMovieAndListReviewObjResp(res.data.listMovieAndListReviewObjResp);
         setInitLoading(false);
@@ -66,7 +66,7 @@ const ReviewCard = () => {
                   <img
                     src={uploadApi.get(Item.movie.banner)}
                     alt=""
-                    className="tw-w-auto tw-h-[200px] tw-rounded-lg tw-relative tw-transition-transform tw-duration-300 tw-transform group-hover:tw-scale-110"
+                    className="tw-w-[350px] tw-h-[200px] tw-rounded-lg tw-relative tw-transition-transform tw-duration-300 tw-transform group-hover:tw-scale-110"
                   />
                   <div className="tw-absolute tw-top-1/2 tw-left-[150px] tw-transform tw--translate-x-1/2 tw--translate-y-1/2 tw-opacity-0 group-hover:tw-opacity-100">
                     {/* Icon nút play */}
@@ -92,17 +92,68 @@ const ReviewCard = () => {
                   </div>
                 </div>
 
-                {Item.review.slice(0, 2).map((reviewItem, reviewIndex) => (
-                  <Row key={reviewIndex} className='tw-w-[355px]  tw-h-[200px]tw-items-center tw-bg-gray-200 tw-rounded-b-lg tw-border tw-mt-0'>
-                    <Col span={5}>
-                      <Avatar size={40} src={uploadApi.get(reviewItem.account.image)} />
+                <div className="tw-grid tw-grid-cols-1 tw-gap-y-4 tw-px-4 tw-py-5 tw-items-start">
+                {Item.review.slice(0, 2).map((reviewItem, reviewIndex) =>(
+          <div key={index} className="tw-relative tw-flex tw-flex-nowrap tw-mb-4">
+            {/* Avatar */}
+            <img
+             src={uploadApi.get(reviewItem.account.image)}
+              alt={reviewItem.account.fullname}
+              width="80"
+              height="80"
+              loading="lazy"
+              className="tw-z-2 tw-overflow-hidden tw-rounded-full tw-object-cover tw-h-16 tw-w-16"
+            />
+
+            <div className="tw-ml-1 tw-flex-1 tw-flex tw-flex-col">
+              <div className="tw-text-xs tw-font-bold">
+                <span className="tw-text-[12px] tw-mr-[100px]">
+                  <span className="tw-text-gray-700">{reviewItem.account.fullname}</span>
+                  <span className="tw-inline-block tw-text-xs tw-font-normal tw-text-gray-400"> {moment(reviewItem.createDate).format("MM-DD-YYYY")}
+                  </span>
+                </span>
+              </div>
+              {/* Content */}
+              <div className="tw-mt-1 tw-ml-[12px] tw-text-justify tw-whitespace-pre-wrap tw-items-start  tw-text-xl tw-text-gray-700 hover:tw-text-gray-500">
+              {reviewItem.comment.length > 100 ? reviewItem.comment.slice(0, 200) + '...' : reviewItem.comment}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {Item.review.slice(0, 1).map((reviewItem, reviewIndex) =>
+          <a
+          href={`/movie-details/${reviewItem.movie.id}`}
+          className="tw-flex tw-cursor-pointer tw-items-center tw-space-x-1 tw-pl-10 tw-text-xs tw-font-bold tw-underline hover:tw-text-[#176b87]"
+        >
+          <span>Xem thêm</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            aria-hidden="true"
+            className="tw-h-4 tw-w-4 tw-opacity-60"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </a>
+        )}
+      
+      </div>
+
+                {/* {Item.review.slice(0, 2).map((reviewItem, reviewIndex) => (
+                  <Row gutter={[16, 16]} key={reviewIndex} className='tw-w-[355px]  tw-h-[200px]tw-items-center tw-bg-gray-200 tw-rounded-b-lg tw-border tw-mt-0'>
+                    <Col span={3}>
+                    <Avatar size={40} src={uploadApi.get(reviewItem.account.image)} />
                     </Col>
-                    <Col span={12}>
-                      <div><h4>{reviewItem.account.fullname}</h4></div>
+                    <Col span={8}>
+                      <div className='tw-w-[130px]'>{reviewItem.account.fullname}</div>
                       <div> {moment(reviewItem.createDate).format("MM-DD-YYYY")}
                       </div>
                     </Col>
-                    <Col span={24} className='tw-pl-5'>
+                    <Col span={17} className='tw-pl-5 tw-items-start tw-justify-start'>
                       <Typography style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {reviewItem.comment.length > 100 ? reviewItem.comment.slice(0, 200) + '...' : reviewItem.comment}
                       </Typography>
@@ -113,9 +164,10 @@ const ReviewCard = () => {
                       </Link>
                     </Col>
                   </Row>
-                ))}
+                ))} */}
               </div>
             </Col>
+            
           ))}
         </Row>
       </Col>
@@ -127,13 +179,12 @@ const ReviewCard = () => {
                         onChange={handlePageChange}
                     />
 
-      {/* Modal gọi ở đây */}
       <Modal
         title={selectedMovie?.title}
         visible={modalVisible}
         onCancel={handleCloseModal}
         footer={[
-          <Button key="bookTicket" type="primary">
+          <Button key="bookTicket" className='tw-bg-[#176b87]' href={`/movie-details/${selectedMovie?.id}`}>
             Đặt vé
           </Button>,
           <Button key="close" onClick={handleCloseModal}>
@@ -158,10 +209,12 @@ const ReviewCard = () => {
             <div style={{ marginRight: '16px' }}>
               <img src={uploadApi.get(selectedMovie?.poster)} alt="" width={155} />
             </div>
-            <Col span={8}>
+            <Col span={16}>
               <div>
-                <p>Thời lượng: {selectedMovie?.duration}</p>
-                <p>Quốc gia: {selectedMovie?.country}</p>
+                <p><span className='tw-font-bold'>Thời lượng: </span> {selectedMovie?.duration}</p>
+                <p><span className='tw-font-bold'>Quốc gia: </span> {selectedMovie?.country}</p>
+                <p><span className='tw-font-bold'>Đánh giá: </span> {selectedMovie?.rating} <StarFilled className='tw-text-yellow-500'></StarFilled></p>
+                <p><span className='tw-font-bold'>Nội dung: </span> {selectedMovie?.description}</p>
               </div>
             </Col>
           </Col>

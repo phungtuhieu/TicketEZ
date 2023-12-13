@@ -1,6 +1,7 @@
 //
 
 import { formToJSON } from 'axios';
+import AdminComment from './CommentModeration/index';
 export { default as AdminIndex } from './Home';
 export { default as AdminMovie } from './Movie';
 export { default as AdminCinemaComplex } from './CinemaComplex';
@@ -22,9 +23,14 @@ export { default as AdminArticle } from './Article';
 export { default as AdminCinemaChains } from './CinemaChains';
 export { default as AdminProducer } from './Producer';
 export { default as AdminAccountStaff } from './AccountStaff';
+export { default as AdminComment } from './CommentModeration';
 
 export { default as AdminEvent } from './Event';
 export { default as AdminMpaaRating } from './mpaaRating';
 export { default as AdminService } from './ServiceCombo';
 export { default as AdminPriceService } from './PriceService';
 export { default as AdminPrice } from './Price';
+
+export { default as AdminWebcam } from './Webcam';
+
+

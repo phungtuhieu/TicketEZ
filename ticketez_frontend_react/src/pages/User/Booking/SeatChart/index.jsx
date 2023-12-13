@@ -258,7 +258,9 @@ function SeatChart(props) {
 
     const [priceSeats, setPriceSeats] = useState(0);
     const findPriceBySeatType = (seatStateArray, seat, seatTypeId) => {
-        console.log(prices);
+        console.log(seatStateArray);
+        console.log(seat);
+        console.log(seatTypeId);
         let result = null;
         let finalRS = null;
         seatStateArray.forEach((seatItem) => {
@@ -303,6 +305,7 @@ function SeatChart(props) {
             seatType.forEach((value) => {
                 if (value.nickName === name) {
                     const priceResult = findPriceBySeatType(data, seat, value.id);
+                    console.log(priceResult);
                     if (priceResult !== null) {
                         Object.assign(rs, {
                             seatType: value,
@@ -313,8 +316,8 @@ function SeatChart(props) {
                 }
             });
         });
+        console.log(rs);
         const seatPrices = getSeatPrice(rs);
-
         if (seatReserved.indexOf(seat) > -1) {
             setPriceSeats(priceSeats - seatPrices);
             seatReserved.splice(seatReserved.indexOf(seat), 1);
@@ -760,13 +763,14 @@ function SeatChart(props) {
                     </Col>
                 </Row>
             </Card>
-            <BookingDetail
+            {account != null &&  <BookingDetail
                 showtime={showtime}
                 seatBooking={seatBooking}
                 open={isModalOpenBooking}
                 onCancel={handleCancel}
                 destroyOnClose={true}
-            />
+            />}
+           
             ,{/* )} */}
         </>
     );

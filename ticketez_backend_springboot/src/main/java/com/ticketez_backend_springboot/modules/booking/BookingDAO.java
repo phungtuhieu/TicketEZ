@@ -10,7 +10,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
+import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.movie.Movie;
+import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
+import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 
 @Repository
 public interface BookingDAO extends JpaRepository<Booking, String> {
@@ -49,5 +52,25 @@ public interface BookingDAO extends JpaRepository<Booking, String> {
                         @Param("ticketStatus") Integer ticketStatus,
                         @Param("accId") String accId,
                         Pageable pageable);
+
+        // web cam
+
+        @Query("SELECT b FROM Booking b WHERE b.id = :bookingId")
+        Booking getBookingById(@Param("bookingId") String bookingId);
+
+        @Query("SELECT pi FROM PaymentInfo pi WHERE pi.booking.id = :bookingId")
+        PaymentInfo getPaymentInfoById(@Param("bookingId") String bookingId);
+
+        @Query("SELECT sb FROM SeatBooking sb WHERE sb.booking.id = :bookingId")
+        List<SeatBooking> getSeatsBookingById(@Param("bookingId") String bookingId);
+
+        // Tìm kiếm các Booking đã thanh toán và có vé sử dụng cho một bộ phim cụ thể và
+        // một tài khoản cụ thể
+        @Query("SELECT b FROM Booking b " +
+                        "JOIN b.showtime.formatMovie fm " +
+                        "WHERE b.status = 1 AND b.ticketStatus = 1 AND fm.movie = :movie AND b.account = :account")
+        List<Booking> findPaidAndUsedBookingsByMovieAndAccount(
+                        @Param("movie") Movie movie,
+                        @Param("account") Account account);
 
 }

@@ -122,6 +122,15 @@ const ModalPrice = (props) => {
         }
     };
 
+    const fetchAllDataCinemaComplex = async () => {
+        try {
+            const resp = await axiosClient.get(`cinemaComplex/get/all`);
+            const dataCinemaComplex = resp.data;
+            setCinemaComplexDaTa(dataCinemaComplex);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const fetchDataSeatType = async () => {
         try {
             const resp = await axiosClient.get(`seatType/getAll`);
@@ -159,6 +168,16 @@ const ModalPrice = (props) => {
     const fetchDataFormatMovie = async (formatId) => {
         try {
             const resp = await axiosClient.get(`formatMovie/by-formatId/${formatId}`);
+            const dataFormatMovie = resp.data;
+            setFormatMovieData(dataFormatMovie);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchAllDataFormatMovie = async () => {
+        try {
+            const resp = await axiosClient.get(`formatMovie`);
             const dataFormatMovie = resp.data;
             setFormatMovieData(dataFormatMovie);
         } catch (error) {
@@ -209,10 +228,10 @@ const ModalPrice = (props) => {
     useEffect(() => {
         fetchDataCinemaChain();
         fetchDataFormat();
-        fetchDataCinemaComplex(1);
+        fetchAllDataCinemaComplex();
         fetchDataSeatType();
         fetchDataMovie();
-        fetchDataFormatMovie(1);
+        fetchAllDataFormatMovie();
         fetchDataShowtime();
     }, [record]);
 
@@ -224,10 +243,10 @@ const ModalPrice = (props) => {
             await Promise.all([
                 fetchDataCinemaChain(),
                 fetchDataFormat(),
-                fetchDataCinemaComplex(1),
+                fetchAllDataCinemaComplex(),
                 fetchDataSeatType(),
                 fetchDataMovie(),
-                fetchDataFormatMovie(1),
+                fetchAllDataFormatMovie(),
                 fetchDataShowtime(),
             ]);
 
@@ -455,6 +474,7 @@ const ModalPrice = (props) => {
                         <Select
                             className="tw-width-100"
                             showSearch
+                            defaultValue={record ? record.price.cinemaComplex.cinemaChain.id : null}
                             placeholder="Chọn chuỗi rạp"
                             optionFilterProp="children"
                             onChange={onChangeCinemaChain}
@@ -479,13 +499,14 @@ const ModalPrice = (props) => {
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             options={options}
-                            defaultValue={cinemaComplexChoose ? cinemaComplexChoose : null}
+                            value={cinemaComplexChoose ? cinemaComplexChoose : null}
                             disabled={isFirstRowVisible === true || selectedCinemaChain === false}
                         />
                     </Col>
                     <Col span={24}>
                         <p className="tw-font-medium tw-mb-3">Phân loại phim :</p>
                         <Select
+                            defaultValue={record ? record.price.formatMovie.format.id : null}
                             className="tw-width-100"
                             showSearch
                             placeholder="Chọn phân loại phim"
@@ -512,7 +533,7 @@ const ModalPrice = (props) => {
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             options={optionFormatMovieSelect}
-                            defaultValue={formatMovieChoose ? formatMovieChoose : null}
+                            value={formatMovieChoose ? formatMovieChoose : null}
                             disabled={isFirstRowVisible === true || selectedFormat === false}
                         />
                     </Col>

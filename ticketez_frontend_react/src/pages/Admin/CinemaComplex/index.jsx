@@ -7,10 +7,8 @@ import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import style from './CinemaComplex.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-import axiosClient from '~/api/global/axiosClient';
 import { cinemaComplexApi, provinceApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
@@ -264,7 +262,7 @@ const AdminCinemaComplex = () => {
      
     const cinemabyCinemaComplex = (record) => {
         setCinemaComplex(record);
-        console.log('123',record);
+        // console.log('123',record);
     }
 
     const openCinemaModal = () => {
@@ -384,10 +382,6 @@ const AdminCinemaComplex = () => {
             longitude: 105.72801667411835, latitude: 9.296098750825891, address: ""
         })
     };
-
-    useEffect(() => {
-
-    }, []);
 
     //form
     const handleResetForm = () => {

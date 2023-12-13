@@ -51,7 +51,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
         const response = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${clickedLongitude},${clickedLatitude}.json?access_token=${mapboxAccessToken}`
         );
-        // console.log(response);
+        console.log(response);
 
         const placeInfo = response.data.features[0];
         // console.log(response.data.features[0].place_name);

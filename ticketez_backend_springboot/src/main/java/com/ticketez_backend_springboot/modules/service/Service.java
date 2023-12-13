@@ -28,16 +28,17 @@ public class Service {
 	private String name;
 	private String description;
 	private String image;
+	private Integer quantity;
 
 	@ManyToOne
 	@JoinColumn(name = "cinema_complex_id")
 	private CinemaComplex cinemaComplex;
 
-	@JsonIgnore 
+	@JsonIgnore
 	@OneToMany(mappedBy = "service")
 	private List<PriceService> priceServices;
-	
-	@JsonIgnore 
+
+	@JsonIgnore
 	@OneToMany(mappedBy = "service")
 	private List<ServiceBooking> servicesBookings;
 

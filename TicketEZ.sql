@@ -75,7 +75,8 @@ GO
         create_date DATETIME NOT NULL,
         edit_date DATETIME,
         account_id NVARCHAR(20) NOT NULL,
-        movie_id BIGINT NOT NULL
+        movie_id BIGINT NOT NULL,
+        [status] INT NOT NULL 0  --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
     )
 GO
     CREATE TABLE Genres (
@@ -320,6 +321,7 @@ GO
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
         [image] NVARCHAR(MAX) NOT NULL,
+        quantity INT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
 GO
@@ -327,6 +329,7 @@ GO
     CREATE TABLE [Service_Choose] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         service_id BIGINT NOT NULL,
+        quantity INT NOT NULL,
         price FLOAT NOT NULL,
     )
 
@@ -1222,11 +1225,11 @@ GO
 
 INSERT INTO Cinema_Chains ([name],[image],[banner],[description])
 VALUES
-(N'CGV',N'3c762e0c-be53-4688-b2eb-d8736f13943b_cgv.jpg',N'28a71603-d310-4097-8e47-085b87842135_cgvbanner.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
-(N'Lotte Cinema', N'6c37626e-97f7-4977-a4ba-f93afe7560b9_lotte.jpg',N'09670227-8a38-4d94-b9ff-cdae1d189a61_lottebanner.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
-(N'BHD Star Cineplex',N'f542d66c-b864-41b5-91f3-e1b8915a5a8b_bhp.jpg',N'86cb21b9-c1ec-4108-ada8-262a1f4ef37e_bhpbanner.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
-(N'Megastar Cineplex',N'7716ed22-db94-43f0-8df9-60196ac0cda7_mega.jpg',N'af84ac18-5ed7-4332-a7cf-9453a8e01f33_megaBannner.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
-(N'Galaxy Cinema',N'a2ff9ea8-3091-49e9-870d-f280e10439a9_galaci_cinema.jpg',N'970bc718-30f3-4cb8-be7a-153e5b4f6233_galaci_cinema_banner.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
+(N'CGV',N'cgv.jpg',N'cgvbanner.jpg', N'Rạp chiếu phim CGV - Mạng lưới rạp phim lớn tại Việt Nam.'),
+(N'Lotte Cinema', N'lotte.jpg',N'lottebanner.jpg',N'Nhà mạng lưới rạp chiếu phim của Lotte tại Việt Nam.'),
+(N'BHD Star Cineplex',N'bhp.jpg',N'bhpbanner.jpg',N'Nhà mạng lưới rạp BHD Star Cineplex tại Việt Nam.'),
+(N'Megastar Cineplex',N'mega.jpg',N'megaBannner.jpg', N'Rạp chiếu phim Megastar Cineplex - Một trong những mạng lưới phòng chiếu lớn tại Việt Nam.'),
+(N'Galaxy Cinema',N'galaci_cinema.jpg',N'galaci_cinema_banner.jpg', N'Galaxy Cinema - Mạng lưới rạp chiếu phim phổ biến tại Việt Nam.');
 GO
 -- 2. thêm dữ liệu bảng cinema complex
   INSERT INTO [TicketEZ].[dbo].[Cinema_Complex] ([name], [address], [phone], [opening_time], [closing_time],[latitude],[longitude], [cinema_chain_id],[province_id])
@@ -1288,25 +1291,25 @@ VALUES
 GO
 
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
-INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
+INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [quantity],[cinema_complex_id])
 VALUES
-    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim', 'food.jpg', 1),
-    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim', 'vip.jpg', 1),
+    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim',  'food.jpg',30, 1),
+    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim',  'vip.jpg',30, 1),
     (N'SPECIAL DRINK FAMILY COMBO', N'04 nước pha chế vừa (nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) + 02 bắp ngọt. Nhận trong ngày xem phim. 
 	Chỉ thêm 5,000đ đổi sang nước lớn.
-	Số lượng quà tặng có giới hạn', '3d_glasses.jpg', 3),
+	Số lượng quà tặng có giới hạn',  '3d_glasses.jpg',30, 3),
     (N'SPECIAL DRINK MD COMBO', N'01 ly nhân vật tùy chọn + 02 nước pha chế vừa ( nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) 
 	+ 01 bắp ngọt - Nhận trong ngày xem phim - Mẫu ly nhân vật phụ thuộc vào số lượng tại rạp 
-	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg', 1),
+	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg',30, 1),
     (N'TRIDENT MY COMBO', N'1 ly Aquaman Trident + 1 nước ngọt siêu lớn + 1 bắp lớn tùy chọn vị
-- Nhận trong ngày xem phim', 'online_booking.jpg', 2),
+- Nhận trong ngày xem phim',  'online_booking.jpg',30, 2),
     (N'GARFIELD TRIPPLE COMBO 2023', N'03 ly nhân vật Garfield (kèm nước) + 01 bắp hai vị
 * Nhận ngay trong ngày xem phim
-** Mẫu ly phụ thuộc vào số lượng của rạp', 'birthday.jpg', 2),
+** Mẫu ly phụ thuộc vào số lượng của rạp',  'birthday.jpg',30, 2),
     (N'GARFIELD DOUBLE COMBO 2023', N'02 ly nhân vật Garfield (kèm nước)
 * Nhận ngay trong ngày xem phim
 ** Thêm 39,000đ nhận ngay 1 bắp ngọt
-*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg', 9)
+*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg',30, 9)
    
 GO
  -- 6. Thêm dữ liệu giá cho dịch vụ Price services
@@ -1326,12 +1329,12 @@ GO
   -- 7. Thêm dữ liệu về loại ghế (Seat Types)
 INSERT INTO [TicketEZ].[dbo].[Seat_Types] ([name],[nick_name],[color],[width], [image], [description])
 VALUES
-    (N'Ghế thường','normalSeat','#7C25CE',1, '70ac78bd-5eb3-4122-8ef7-7da8920fd387_normal.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
-    (N'Ghế VIP','vipSeat','#B32225',1, 'fb3e3785-83ee-4e3d-87d8-5db008633444_vip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
-	(N'Ghế đôi','coupleSeat','#AD1859',2,'40f43f58-1b7c-4c0d-8bdf-110b2830f155_coupelseat.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
-    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'57b23dfc-0264-4d25-84dd-ad55affeb73b_ghetua.jpg', N'Loại ghế tựa về sao.'),
-    (N'Ghế trẻ em','kidSeat','#10B785',1, 'aee1468c-b7ae-4357-b38b-d53ecdfa7e5e_kid.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
-    (N'Ghế Sofa','sofaSeat','#C58B0B',1, '954ff02e-b68c-4bf6-858c-751c40f3009e_sofa.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
+    (N'Ghế thường','normalSeat','#7C25CE',1, 'normal.jpg', N'Loại ghế thông thường sử dụng cho tất cả khách hàng.'),
+    (N'Ghế VIP','vipSeat','#B32225',1, 'vip.jpg', N'Loại ghế VIP dành cho các khách hàng có vé VIP.'),  
+	(N'Ghế đôi','coupleSeat','#AD1859',2,'coupelseat.jpg', N'Loại ghế đôi thích hợp cho các cặp đôi xem phim.'),
+    (N'Ghế tựa','reclinerSeat','#0891B2',1 ,'ghetua.jpg', N'Loại ghế tựa về sao.'),
+    (N'Ghế trẻ em','kidSeat','#10B785',1, 'kid.jpg', N'Loại ghế dành cho trẻ em, có kích thước nhỏ hơn.'),
+    (N'Ghế Sofa','sofaSeat','#C58B0B',1, 'sofa.jpg', N'Loại ghế có thiết kế đặc biệt để tạo sự thoải mái khi xem phim.'),
 	(N'đường đi','way','#121B2B',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là loại dùng để đo kích thước của đường đi'),
 	(N'Ghế đã đặt','seatUnavailable','#404040',1 ,'url_anh_ghethoaithoaimai.jpg', N'đây là màu ghế đã đặt'),
 	(N'Ghế chọn','seatReserved','#16A34A',1 ,'url_anh_ghethoaithoaimai.jpg', N'Đây là màu ghế đã chọn');
@@ -1420,12 +1423,12 @@ GO
 INSERT INTO [TicketEZ].[dbo].[Studios] 
     ([name],[image], [founded_date], [country], [email],[address],[website], [description])
 VALUES
-    ('Walt Disney Pictures',N'2429086a-2c63-432d-ad32-e6eb3d9fc997_Walt-Disney.jpg', '2003-02-01', N'Hoa Kỳ', 'tuhieu@disney.com', N'Address1', N'website1', N'Studio sản xuất phim của Disney.'),
-    ('Warner Bros. Pictures', N'd5459db7-355b-4537-b6e7-a3d19766b87b_warner-bros.jpg', '2003-02-01',N'Hoa Kỳ', 'phungtuhieut@warnerbros.com',  N'Address1', N'website1',N'Studio sản xuất phim của Warner Bros.'),
-    ('Paramount Pictures',N'7dd31b5f-2fad-4183-a266-fbe668a7b44b_Paramount-Pictures-logo.jpg', '2003-02-01', N'Canada', 'hieutuphung@paramount.com',  N'Address1', N'website1',N'Studio sản xuất phim của Paramount.'),
-    ('Universal Pictures', N'2522e1df-3370-405f-a7c3-4826f08c9b45_Universal_Pictures.jpg', '2003-02-01',N'Anh', 'nguyenhoangdinh@universal.com',  N'Address1', N'website1',N'Studio sản xuất phim của Universal.'),
-    ('20th Century Studios',N'611960fc-8b7a-4fda-a9d7-c025a6f45050_20th_Century_Studios.jpg', '2003-02-01', N'Anh', 'dinhnguyen@20thcentury.com', N'Address1', N'website1', N'Studio sản xuất phim của 20th Century.'),
-    ('Sony Pictures Entertainment',N'b97ad77f-9101-4498-95aa-93a6b3ee74ff_Sony_Pictures_Entertainment.jpg', '2003-02-01',	N'Mỹ', 'hieupt@sony.com', N'Address1', N'website1', N'Studio sản xuất phim của Sony.');
+    ('Walt Disney Pictures',N'Walt-Disney.jpg', '2003-02-01', N'Hoa Kỳ', 'tuhieu@disney.com', N'Address1', N'website1', N'Studio sản xuất phim của Disney.'),
+    ('Warner Bros. Pictures', N'warner-bros.jpg', '2003-02-01',N'Hoa Kỳ', 'phungtuhieut@warnerbros.com',  N'Address1', N'website1',N'Studio sản xuất phim của Warner Bros.'),
+    ('Paramount Pictures',N'Paramount-Pictures-logo.jpg', '2003-02-01', N'Canada', 'hieutuphung@paramount.com',  N'Address1', N'website1',N'Studio sản xuất phim của Paramount.'),
+    ('Universal Pictures', N'Universal_Pictures.jpg', '2003-02-01',N'Anh', 'nguyenhoangdinh@universal.com',  N'Address1', N'website1',N'Studio sản xuất phim của Universal.'),
+    ('20th Century Studios',N'20th_Century_Studios.jpg', '2003-02-01', N'Anh', 'dinhnguyen@20thcentury.com', N'Address1', N'website1', N'Studio sản xuất phim của 20th Century.'),
+    ('Sony Pictures Entertainment',N'Sony_Pictures_Entertainment.jpg', '2003-02-01',	N'Mỹ', 'hieupt@sony.com', N'Address1', N'website1', N'Studio sản xuất phim của Sony.');
 GO
  -- 10. Chèn dữ liệu vào bảng MPAA_Rating
 INSERT INTO [TicketEZ].[dbo].[MPAA_Rating] ([rating_code], [icon],[color_code], [description])
@@ -1438,16 +1441,16 @@ VALUES
 GO
 INSERT INTO Movies (title, poster,banner,[description], duration, release_date, country, rating, video_trailer, MPAA_rating_id)
 VALUES
-(N'Wonka', N'32595166-9640-4f04-aaed-7d3e769e39be_wonka.jpg',N'1a102436-e82c-4955-8321-c768a221eee1_wonkabanner.jpg',N'Dựa trên nhân vật từ quyến sách gối đầu giường của các em nhỏ trên toàn thế giới "Charlie và Nhà Máy Sôcôla" và phiên bản phim điện ảnh cùng tên vào năm 2005, WONKA kể câu chuyện kỳ diệu về hành trình của nhà phát minh, ảo thuật gia và nhà sản xuất sôcôla vĩ đại nhất thế giới trở thành WILLY WONKA đáng yêu mà chúng ta biết ngày nay. Từ đạo diễn loạt phim Paddington và nhà sản xuất loạt phim chuyển thể đình đám Harry Potter, WONKA hứa hẹn sẽ là một bộ phim đầy vui nhộn và màu sắc cho khán giả dịp Lễ Giáng Sinh năm nay.', '02:15:00', '2023-09-15', N'Việt Nam', 7.5,  'https://www.youtube.com/embed/1JHj4hc5MEI?si=5_ztvPzfFkUiDsaD', 1),
-(N'Người Mặt Trời', N'013066e1-ce40-4034-b7a9-f6a32c79bd65_nguoimattroi.jpg',N'4ce7bdeb-883a-448c-9983-15a3685a2b93_nguoimattroibanner.jpg',N'400 năm qua, loài Ma Cà Rồng đã bí mật sống giữa loài người trong hòa bình, nhưng hiểm họa bỗng ập đến khi một cô gái loài người phát hiện được thân phận của hai anh em Ma Cà Rồng. Người anh khát máu quyết săn lùng cô để bảo vệ bí mật giống loài, trong khi người còn lại chạy đua với thời gian để bảo vệ cô bằng mọi giá', '02:00:00', '2023-07-20', N'Việt Nam', 8.2,  'https://www.youtube.com/embed/L3t9jW4eRAs?si=PYjnv8njj25lUAi0', 2),
-(N'Bỗng Dưng Trúng Mánh', N'c4ec3220-7230-4c50-987c-d8bf65c4075a_bongdungtrungmanh.jpg',N'a38fb35e-0791-4810-98c6-0a0d2bde4b00_bongdungtrungmanhbanner.jpg',N'Bỗng Dưng Trúng Mánh là câu chuyện từ cá biệt toàn trường hoá tài phiệt học đường của Lee Kang-jin (Yoo Seon-ho) - một nam sinh thường xuyên bị bạn học bắt nạt. Tình cờ nhặt được chiếc phong bì chứa đầy tiền mặt của ông trùm cho vay nặng lãi Rang (Yoon Byung-hee), cuộc đời Kang-jin đã hoàn toàn thay đổi. Rang dạy Kang-jin những bài học đầu tiên về nghề cho vay siêu lợi nhuận, từ đó biến cậu học trò lầm lì trở thành “chiến thần tài chính”, đại gia mới nổi, “ông hoàng” cho vay nặng lãi của trường trung học Geumhwa', '02:30:00', '2023-06-10', N'Việt Nam', 6.8,  'https://www.youtube.com/embed/cH2lE3fxelc?si=th2RZVLkoslRHewS', 3),
-(N'Đường Hầm Tới Mùa Hạ, Lối Thoát Của Biệt Ly', N'f71a7431-2344-4804-9f17-312e61f7c121_duongham.jpg',N'4ebc9c31-b85d-48ec-864a-b806ca22ee84_duonghambanner.jpg', N'Dựa trên cuốn tiểu thuyết đạt giải thưởng. Bộ phim chuyển thể giành giải thưởng Paul Grimault tại Liên hoan phim hoạt hình quốc tế Annecy 2023. Một đường hầm bí ẩn tên Urashima có thể thực hiện bất kỳ điều ước nào…nhưng bạn sẽ phải đánh đổi bằng thời gian. Cậu học sinh trung học Kaoru, bị ám ảnh bởi quá khứ, cùng với Anzu, một cô gái luôn đấu tranh để đạt được ước mơ của mình bước vào đường hầm. Nhưng thứ họ phải đánh đổi là quá lớn. Đây là một câu chuyện mùa hè khó quên về nỗi nhớ, thời gian và tình yêu của tuổi trẻ', '01:45:00', '2023-05-05', N'Việt Nam', 9.1,  'https://www.youtube.com/embed/38B5-Ft_doo?si=riDFqsOfOdm7Pvee', 4),
-(N'Đế Chế Napoleon', N'eeae65a5-d921-4741-b40c-146cb30728e4_napoleon.jpg',N'98679b39-cbe3-45b3-ac6e-4391ba508775_napoleonbanner.jpg',N'Một góc nhìn riêng tư về nguồn gốc và quá trình leo lên ngôi hoàng đế nhanh chóng và tàn nhẫn của nhà cầm quân người Pháp. Câu chuyện được nhìn qua lăng kính mối quan hệ đầy đam mê và biến động giữa Napoleon với vợ và tình yêu đích thực của ông, Josephine.', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 'https://www.youtube.com/embed/2t6lSTexflk?si=vmRl58Y91yF55uwg', 5),
-(N'Cô Giáo Em Là Số 1', N'e656d640-074e-46c9-8cf9-3d7507396ff3_cogiaolaso1.jpg',N'cb96f159-fd2d-43da-b0bf-a251eca49bbf_cogiaolaso1banner.jpg', N'Si-min (do Shin Hae-sun thủ vai) là một võ sĩ quyền anh đầy triển vọng nhưng đã từ bỏ quyền thi đấu tại kỳ Thế vận hội Olympic để lấy tiền trả nợ cho cha. Từ đó, Si-min cũng nhận ra rằng, cuộc sống vốn không công bằng và “công lý không thể mài ra cơm”. Si-min gạt phăng giấc mơ trở thành võ sĩ quyền anh và quyết tâm trở thành giáo viên, với mong muốn về một cuộc sống ổn định hơn. Cô trở thành giáo viên hợp đồng của một trường trung học có tiếng cùng mục tiêu trở thành giáo viên chính thức ở đây. Để có thể nhanh chóng hoàn thành nguyện vọng, cô đã nỗ lực kìm nén cái tôi xuống đáy, luôn mỉm cười cho qua, bất chấp mọi tình huống trớ trêu xảy đến với mình. Tuy nhiên, Su-gang (do Lee Jun-young thủ vai) - kẻ cầm đầu của một băng đảng quậy phá, chuyên đi bắt nạt và hành hạ người yếu thế đã phá vỡ quy tắc của Si-min. Không thể chịu đựng được những hành vi bạo lực học đường của Su-gang, Si-min đeo lên một chiếc mặt nạ mèo và dạy cho tên côn đồ một bài học đáng nhớ. Nhận thấy quyền lực của mình bị đe dọa, Su-gang điên cuồng tìm kiếm người đeo mặt nạ mèo, Si-min đứng trước nguy cơ bị bại lộ danh tính và phải đối mặt với sự lựa chọn giữa “CÔNG LÝ hay CÔNG VIỆC.”', '02:10:00', '2023-02-01', N'Việt Nam', 6.5,  'https://www.youtube.com/embed/XieLp58PaJg?si=YM4zlkwkXCyw12Jk', 3),
-(N'Yêu Lại Vợ Ngầu', N'c554f0c4-c935-436f-9985-c4a921249f58_yeulaivongau.jpg',N'a173cc0f-fc9b-4222-8457-49e19fd741f9_yeulaivongaubanner.jpg', N'Cặp vợ chồng trẻ No Jung Yeol (Kang Ha-neul) và Hong Na Ra (Jung So-min) từ cuộc sống hôn nhân màu hồng dần “hiện nguyên hình” trở thành cái gai trong mắt đối phương với vô vàn thói hư, tật xấu. Không thể đi đến tiếng nói chung, Jung Yeol và Na Ra quyết định ra toà ly dị. Tuy nhiên, họ phải chờ 30 ngày cho đến khi mọi thủ tục chính thức được hoàn tất. Trong khoảng thời gian này, một vụ tai nạn xảy ra khiến cả hai mất đi ký ức và không nhớ người kia là ai. Từ thời gian 30 ngày chờ đợi để được “đường ai nấy đi”, tình huống trớ trêu khiến cả hai bắt đầu nảy sinh tình cảm trở lại. Liệu khi nhớ ra mọi thứ, họ vẫn sẽ ký tên vào tờ giấy ly hôn?', '01:55:00', '2023-01-10', N'Việt Nam', 8.7,  'https://www.youtube.com/embed/081I7DXNknc?si=jGn73WInT9nFXtjI', 2),
-(N'Bạn Không Thân', N'4f918076-73ed-46ba-a04d-74c802b8bc8b_bankhongthan.jpg',N'5eb46536-a8f5-4d36-bb66-9e5115e4cc37_bankhongthanbanner.jpg' ,N'Một nhóm học sinh trung học, với niềm đam mê làm phim chung, quyết định thực hiện một bộ phim ngắn dựa trên cuộc đời của bạn học yêu quý của họ. Nhưng họ không biết rằng, nỗ lực của họ sẽ khiến họ khám phá ra những bí mật ẩn giấu của người bạn đó, có thể thay đổi quan điểm của họ về đam mê mãi mãi.', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 'https://www.youtube.com/embed/jXuDMm55GYo?si=8B23gjAUGSPJN2iF', 1),
-(N'Ác Mộng Tuổi 21', N'9eb0c8b3-e256-4103-bec8-2af03f72d915_acmongtuoi21.jpg',N'2e002cd8-b71d-4048-87c1-23f58f9ffd4b_acmongtuoi21banner.jpg', N'Ác Mộng Tuổi 21 theo chân Sreynit - cô gái luôn bị ám ảnh bởi những giấc mơ khủng khiếp đến mức có thể giết chết cô khi ngủ. Một thầy bói từng nói với cô rằng cuộc sống của cô sẽ trở lại bình thường nếu cô sống sót qua sinh nhật thứ 21 của mình. Tuy nhiên, vào đêm trước khi cô bước sang tuổi 21, một giấc mơ đã đưa cô quay trở lại quá khứ, nơi cô và hai chàng trai khác có liên quan đến cái chết của một người bạn thời thơ ấu', '02:25:00', '2023-11-20', N'Việt Nam', 8.5,  'https://www.youtube.com/embed/RfFJFi1CErA?si=WNyu_bANIy9wLp4j', 4),
-(N'Điều Ước', N'15d85428-651b-4621-a482-f2a472aa3c79_dieuuoc.jpg',N'6685fefa-bcdd-42c0-9db8-3c52962f464c_dieuuocbanner.jpg',N'Một bộ phim hoạt hình hoàn toàn mới với chủ đề về những ngôi sao ước vọng. Phim có Ariana DeBose lồng tiếng vai Asha và được đạo diễn bởi Chris Buck & Fawn Veerasunthorn, sản xuất bởi Peter Del Vecho & Juan Pablo Reyes với các bài hát được Julia Michaels sáng tác mới hoàn toàn', '02:15:00', '2023-12-10', N'Việt Nam', 9.2,  'https://www.youtube.com/embed/ctlz0R1tSZE?si=W0LwG0DZXsaNBfhd', 5);
+(N'Wonka', N'wonka.jpg',N'wonkabanner.jpg',N'Dựa trên nhân vật từ quyến sách gối đầu giường của các em nhỏ trên toàn thế giới "Charlie và Nhà Máy Sôcôla" và phiên bản phim điện ảnh cùng tên vào năm 2005, WONKA kể câu chuyện kỳ diệu về hành trình của nhà phát minh, ảo thuật gia và nhà sản xuất sôcôla vĩ đại nhất thế giới trở thành WILLY WONKA đáng yêu mà chúng ta biết ngày nay. Từ đạo diễn loạt phim Paddington và nhà sản xuất loạt phim chuyển thể đình đám Harry Potter, WONKA hứa hẹn sẽ là một bộ phim đầy vui nhộn và màu sắc cho khán giả dịp Lễ Giáng Sinh năm nay.', '02:15:00', '2023-09-15', N'Việt Nam', 7.5,  'https://www.youtube.com/embed/1JHj4hc5MEI?si=5_ztvPzfFkUiDsaD', 1),
+(N'Người Mặt Trời', N'nguoimattroi.jpg',N'nguoimattroibanner.jpg',N'400 năm qua, loài Ma Cà Rồng đã bí mật sống giữa loài người trong hòa bình, nhưng hiểm họa bỗng ập đến khi một cô gái loài người phát hiện được thân phận của hai anh em Ma Cà Rồng. Người anh khát máu quyết săn lùng cô để bảo vệ bí mật giống loài, trong khi người còn lại chạy đua với thời gian để bảo vệ cô bằng mọi giá', '02:00:00', '2023-07-20', N'Việt Nam', 8.2,  'https://www.youtube.com/embed/L3t9jW4eRAs?si=PYjnv8njj25lUAi0', 2),
+(N'Bỗng Dưng Trúng Mánh', N'bongdungtrungmanh.jpg',N'bongdungtrungmanhbanner.jpg',N'Bỗng Dưng Trúng Mánh là câu chuyện từ cá biệt toàn trường hoá tài phiệt học đường của Lee Kang-jin (Yoo Seon-ho) - một nam sinh thường xuyên bị bạn học bắt nạt. Tình cờ nhặt được chiếc phong bì chứa đầy tiền mặt của ông trùm cho vay nặng lãi Rang (Yoon Byung-hee), cuộc đời Kang-jin đã hoàn toàn thay đổi. Rang dạy Kang-jin những bài học đầu tiên về nghề cho vay siêu lợi nhuận, từ đó biến cậu học trò lầm lì trở thành “chiến thần tài chính”, đại gia mới nổi, “ông hoàng” cho vay nặng lãi của trường trung học Geumhwa', '02:30:00', '2023-06-10', N'Việt Nam', 6.8,  'https://www.youtube.com/embed/cH2lE3fxelc?si=th2RZVLkoslRHewS', 3),
+(N'Đường Hầm Tới Mùa Hạ, Lối Thoát Của Biệt Ly', N'duongham.jpg',N'duonghambanner.jpg', N'Dựa trên cuốn tiểu thuyết đạt giải thưởng. Bộ phim chuyển thể giành giải thưởng Paul Grimault tại Liên hoan phim hoạt hình quốc tế Annecy 2023. Một đường hầm bí ẩn tên Urashima có thể thực hiện bất kỳ điều ước nào…nhưng bạn sẽ phải đánh đổi bằng thời gian. Cậu học sinh trung học Kaoru, bị ám ảnh bởi quá khứ, cùng với Anzu, một cô gái luôn đấu tranh để đạt được ước mơ của mình bước vào đường hầm. Nhưng thứ họ phải đánh đổi là quá lớn. Đây là một câu chuyện mùa hè khó quên về nỗi nhớ, thời gian và tình yêu của tuổi trẻ', '01:45:00', '2023-05-05', N'Việt Nam', 9.1,  'https://www.youtube.com/embed/38B5-Ft_doo?si=riDFqsOfOdm7Pvee', 4),
+(N'Đế Chế Napoleon', N'napoleon.jpg',N'napoleonbanner.jpg',N'Một góc nhìn riêng tư về nguồn gốc và quá trình leo lên ngôi hoàng đế nhanh chóng và tàn nhẫn của nhà cầm quân người Pháp. Câu chuyện được nhìn qua lăng kính mối quan hệ đầy đam mê và biến động giữa Napoleon với vợ và tình yêu đích thực của ông, Josephine.', '02:20:00', '2023-03-15', N'Việt Nam', 7.9, 'https://www.youtube.com/embed/2t6lSTexflk?si=vmRl58Y91yF55uwg', 5),
+(N'Cô Giáo Em Là Số 1', N'cogiaolaso1.jpg',N'cogiaolaso1banner.jpg', N'Si-min (do Shin Hae-sun thủ vai) là một võ sĩ quyền anh đầy triển vọng nhưng đã từ bỏ quyền thi đấu tại kỳ Thế vận hội Olympic để lấy tiền trả nợ cho cha. Từ đó, Si-min cũng nhận ra rằng, cuộc sống vốn không công bằng và “công lý không thể mài ra cơm”. Si-min gạt phăng giấc mơ trở thành võ sĩ quyền anh và quyết tâm trở thành giáo viên, với mong muốn về một cuộc sống ổn định hơn. Cô trở thành giáo viên hợp đồng của một trường trung học có tiếng cùng mục tiêu trở thành giáo viên chính thức ở đây. Để có thể nhanh chóng hoàn thành nguyện vọng, cô đã nỗ lực kìm nén cái tôi xuống đáy, luôn mỉm cười cho qua, bất chấp mọi tình huống trớ trêu xảy đến với mình. Tuy nhiên, Su-gang (do Lee Jun-young thủ vai) - kẻ cầm đầu của một băng đảng quậy phá, chuyên đi bắt nạt và hành hạ người yếu thế đã phá vỡ quy tắc của Si-min. Không thể chịu đựng được những hành vi bạo lực học đường của Su-gang, Si-min đeo lên một chiếc mặt nạ mèo và dạy cho tên côn đồ một bài học đáng nhớ. Nhận thấy quyền lực của mình bị đe dọa, Su-gang điên cuồng tìm kiếm người đeo mặt nạ mèo, Si-min đứng trước nguy cơ bị bại lộ danh tính và phải đối mặt với sự lựa chọn giữa “CÔNG LÝ hay CÔNG VIỆC.”', '02:10:00', '2023-02-01', N'Việt Nam', 6.5,  'https://www.youtube.com/embed/XieLp58PaJg?si=YM4zlkwkXCyw12Jk', 3),
+(N'Yêu Lại Vợ Ngầu', N'yeulaivongau.jpg',N'yeulaivongaubanner.jpg', N'Cặp vợ chồng trẻ No Jung Yeol (Kang Ha-neul) và Hong Na Ra (Jung So-min) từ cuộc sống hôn nhân màu hồng dần “hiện nguyên hình” trở thành cái gai trong mắt đối phương với vô vàn thói hư, tật xấu. Không thể đi đến tiếng nói chung, Jung Yeol và Na Ra quyết định ra toà ly dị. Tuy nhiên, họ phải chờ 30 ngày cho đến khi mọi thủ tục chính thức được hoàn tất. Trong khoảng thời gian này, một vụ tai nạn xảy ra khiến cả hai mất đi ký ức và không nhớ người kia là ai. Từ thời gian 30 ngày chờ đợi để được “đường ai nấy đi”, tình huống trớ trêu khiến cả hai bắt đầu nảy sinh tình cảm trở lại. Liệu khi nhớ ra mọi thứ, họ vẫn sẽ ký tên vào tờ giấy ly hôn?', '01:55:00', '2023-01-10', N'Việt Nam', 8.7,  'https://www.youtube.com/embed/081I7DXNknc?si=jGn73WInT9nFXtjI', 2),
+(N'Bạn Không Thân', N'bankhongthan.jpg',N'bankhongthanbanner.jpg' ,N'Một nhóm học sinh trung học, với niềm đam mê làm phim chung, quyết định thực hiện một bộ phim ngắn dựa trên cuộc đời của bạn học yêu quý của họ. Nhưng họ không biết rằng, nỗ lực của họ sẽ khiến họ khám phá ra những bí mật ẩn giấu của người bạn đó, có thể thay đổi quan điểm của họ về đam mê mãi mãi.', '02:05:00', '2023-10-05', N'Việt Nam', 7.1, 'https://www.youtube.com/embed/jXuDMm55GYo?si=8B23gjAUGSPJN2iF', 1),
+(N'Ác Mộng Tuổi 21', N'acmongtuoi21.jpg',N'acmongtuoi21banner.jpg', N'Ác Mộng Tuổi 21 theo chân Sreynit - cô gái luôn bị ám ảnh bởi những giấc mơ khủng khiếp đến mức có thể giết chết cô khi ngủ. Một thầy bói từng nói với cô rằng cuộc sống của cô sẽ trở lại bình thường nếu cô sống sót qua sinh nhật thứ 21 của mình. Tuy nhiên, vào đêm trước khi cô bước sang tuổi 21, một giấc mơ đã đưa cô quay trở lại quá khứ, nơi cô và hai chàng trai khác có liên quan đến cái chết của một người bạn thời thơ ấu', '02:25:00', '2023-11-20', N'Việt Nam', 8.5,  'https://www.youtube.com/embed/RfFJFi1CErA?si=WNyu_bANIy9wLp4j', 4),
+(N'Điều Ước', N'dieuuoc.jpg',N'dieuuocbanner.jpg',N'Một bộ phim hoạt hình hoàn toàn mới với chủ đề về những ngôi sao ước vọng. Phim có Ariana DeBose lồng tiếng vai Asha và được đạo diễn bởi Chris Buck & Fawn Veerasunthorn, sản xuất bởi Peter Del Vecho & Juan Pablo Reyes với các bài hát được Julia Michaels sáng tác mới hoàn toàn', '02:15:00', '2023-12-10', N'Việt Nam', 9.2,  'https://www.youtube.com/embed/ctlz0R1tSZE?si=W0LwG0DZXsaNBfhd', 5);
 GO
 INSERT INTO [TicketEZ].[dbo].[Movies_Producers](movie_id, producer_id)
 VALUES
@@ -1518,6 +1521,7 @@ GO
 INSERT INTO Accounts (id, phone, fullname, [image], email, [address], [password], birthday, gender, [status], verified, created_date, points)
 VALUES
 ('admin', '0987654321', N'Nguyễn Văn A', 'image1.jpg', 'nguyen.va@gmail.com', N'123 Đường ABC, Quận 1, TP.HCM', 'admin', '1990-01-15', 1, 1, 1, '2023-01-01 08:00:00', 0),
+('admin01',	'0844457992'	,'admin',	NULL,	'admin123@gmail.com',	NULL,N'$2a$10$1nAbLCEE4i/zu.O.6UgwHu84wz5b6PGudB9TwscvHnHI/TAMePINy'	,NULL,	0, 1, 1,	'2023-12-09 16:44:17.837',	0),
 ('user2', '0901234567', N'Trần Thị B', 'image2.jpg', 'tran.thi.b@gmail.com', N'456 Đường XYZ, Quận 2, TP.HCM', 'user2', '1985-03-20', 0, 1, 0, '2023-01-02 09:30:00', 75),
 ('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
 ('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),
@@ -1541,30 +1545,30 @@ GO
 
 INSERT INTO Accounts_Roles (account_id, role_id)
 VALUES
-('admin', 1), -- Tài khoản 1 có vai trò "Super Admin"
+('admin01', 1), -- Tài khoản 1 có vai trò "Super Admin"
 ('user2', 2) -- Tài khoản 2 có vai trò "Movie Management Admin"
 GO
 -- 18. thêm dữ liệu bảng actor
 
   INSERT INTO [TicketEZ].[dbo].[Actors] ([fullname], [gender], [birthday],[country], [avatar],[email],[biography])
-VALUES (N'Nguyễn Văn Thanh',1, '1990-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
- (N'Nguyễn Tuấn',0, '1993-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-  (N'Trấn Thành',0, '1989-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-  (N'Trương Thế Vinh',0, '1988-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-   (N'Võ Thành Tâm ',0, '1994-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-    (N'Thanh Trúc',1, '1995-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-	 (N'Hứa Minh Đạt', 0,'1990-01-01','VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-	  (N'Lâm Chấn Khang', 0,'1996-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-	   (N'Chris Hemsworth',0, '1996-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-	    (N'Tom Hiddleston ',1, '1999-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-		 (N'Benedict Cumberbatch',0, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-		  (N'Scarlett Johansson',0, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-		   (N'NTom Holland',1, '2000-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-		    (N'Chadwick Boseman',0, '1990-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-			 (N'Brie Larson',1, '1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-			  (N'Sebastian Stan',1, '1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-			   (N'Anthony Mackie ',0, '1990-01-01','VN',  'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sửa'),
-			    (N'Idris Elba', 1,'1990-01-01', 'VN', 'actor_image1.jpg',N'email123@gmail.com',N'Tiểu sử');
+VALUES (N'Phương Anh Đào',1, '1990-01-01','VN', 'PhuongAnhDao.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+ (N'Tuấn Trần',0, '1993-01-01','VN', 'TuanTran.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Trấn Thành',0, '1989-01-01','VN', 'tranthanh.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+  (N'Trương Thế Vinh',0, '1988-01-01','VN', 'truongthevinh.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+   (N'Võ Thành Tâm ',0, '1994-01-01','VN', 'vothanhtam.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+    (N'Thanh Trúc',1, '1995-01-01','VN', 'THANH_TRUC.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	 (N'Hứa Minh Đạt', 0,'1990-01-01','VN', 'huaminhdat.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	  (N'Lâm Chấn Khang', 0,'1996-01-01','VN',  'lamchankhanh.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	   (N'Chris Hemsworth',0, '1996-01-01','VN',  'ChrisHemsworth.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+	    (N'Tom Hiddleston ',1, '1999-01-01','VN',  'Tom_Hiddleston.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		 (N'Benedict Cumberbatch',0, '2000-01-01','VN',  'BenedictCumberbatch.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		  (N'Scarlett Johansson',0, '2000-01-01','VN',  'ScarlettJohansson.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		   (N'NTom Holland',1, '2000-01-01','VN',  'Tom_Holland_by_Gage_Skidmore.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+		    (N'Chadwick Boseman',0, '1990-01-01','VN',  'ChadwickBoseman.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			 (N'Brie Larson',1, '1990-01-01', 'VN', 'BrieLarson.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			  (N'Sebastian Stan',1, '1990-01-01', 'VN', 'SebastianStan.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			   (N'Anthony Mackie ',0, '1990-01-01','VN',  'AnthonyMackie.jpg',N'email123@gmail.com',N'Tiểu sửa'),
+			    (N'Idris Elba', 1,'1990-01-01', 'VN', 'IdrisElba.jpg',N'email123@gmail.com',N'Tiểu sử');
 GO
 -- 19. thêm dữ liệu  actors_movie
  INSERT INTO [TicketEZ].[dbo].[Actors_Movies] ([actor_id], [movie_id])
@@ -1699,30 +1703,30 @@ GO
 FROM [TicketEZ].[dbo].[Reviews]
 WHERE [movie_id] = 1;
 
-  INSERT INTO [TicketEZ].[dbo].[Reviews] ([comment], [rating], [create_date], [edit_date], [account_id], [movie_id])
+  INSERT INTO [TicketEZ].[dbo].[Reviews] ([comment], [rating], [create_date], [edit_date], [account_id], [movie_id], [status])
 VALUES 
 (N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
 Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
-Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 1),
-(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 1),
-(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 1),
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 1, 0),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 1, 0),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 1,0),
 (N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 1),
-(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 1),
-(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 1),
-(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 1),
-(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 1),
-(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 1),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 1, 0),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 1, 0),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 1, 1),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 1, 0),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 1, 1),
 (N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
 Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
-Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 2),
-(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 2),
-(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 2),
-(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 2),
-(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 2),
-(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 2),
-(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 2),
-(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2),
-(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2);
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 2, 0),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 2, 0),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 2, 1),
+(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 2, 1),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user6', 2, 0),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user7', 2, 1),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user8', 2, 0),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user9', 2, 0),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user10', 2, 0);
 
 
 

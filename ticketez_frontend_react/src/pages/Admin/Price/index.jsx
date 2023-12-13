@@ -43,6 +43,7 @@ const AdminPrice = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    
     //call api
     const getList = async () => {
         setLoading(true);
@@ -225,7 +226,6 @@ const AdminPrice = () => {
                 </Modal>
             </Row>
             <BaseTable
-                pagination={false}
                 columns={columns}
                 dataSource={posts.map((post) => ({
                     ...post,
