@@ -1,82 +1,89 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col } from 'antd';
+import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, Upload } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './Profile.module.scss';
 import authApi from '~/api/user/Security/authApi';
-import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
+import { validatEaddress, validateEmail, validateFullname, validatePhone } from '~/components/Auth/Custom';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const fileInputRef = useRef();
   const [birthday, setBirthday] = useState(null);
-
+  const [fileList, setFileList] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = await authApi.getUser();
         setUserData(user);
-        console.log(user);
         form.setFieldsValue({
           ...user,
           birthday: user.birthday ? dayjs(user.birthday) : null,
-          gender: user.gender
+          gender: user.gender,
+          image: user.image
+
 
         });
+        
+        const newUploadFile = {
+          name: user.image,
+          url: `http://localhost:8081/api/upload/${user.image}`,
+        };
+        console.log(newUploadFile);
+        setFileList([newUploadFile]);
         setBirthday(dayjs(user.birthday));
-        console.log(user.birthday);
-        // funcUtils.notify("Cập nhật thành công", 'success');
       } catch (error) {
-        // funcUtils.notify("Cập nhật Thất bại", 'error');
       }
     };
 
     fetchData();
-  }, []);
+  }, [form]);
 
   const onSave = async (values) => {
     try {
-      const updatedValues = {
+
+      let updatedValues = {
         ...values,
-        birthday: birthday ? birthday.toISOString() : null,
+
       };
+      
 
-      console.log(values.birthday);
+      if (values.image.fileList) {
+        const file = values.image.fileList[0].originFileObj;
+        const image = await uploadApi.put(userData.image, file);
+        updatedValues = {
+          ...updatedValues,
+          image: image,
+        };
+      }
+      if (values.birthday) {
+        const selectedDate = values.birthday.toDate();
+        const currentDate = new Date();
 
-      const response = await profileApi.putUser(userData.id, updatedValues);
+        if (selectedDate > currentDate) {
+          funcUtils.notify('Ngày sinh không được vượt quá thời gian hiện tại.', 'error');
+          return;
+        }
+      }
+      const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
       localStorage.removeItem('user');
       localStorage.setItem('user', JSON.stringify(response.data));
       funcUtils.notify("Cập nhật thành công", 'success');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-
+      window.location.reload();
     } catch (error) {
       funcUtils.notify("Cập nhật Thất bại", 'error');
     }
   };
 
-
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedImage(URL.createObjectURL(file));
-    }
-  };
-
-  const onEditAvatar = () => {
-    fileInputRef.current.click();
-  };
 
   const onEdit = () => {
     setEditing(true);
@@ -88,37 +95,45 @@ const EditableProfile = () => {
 
 
   const onChangePassword = () => {
-    console.log('Change password clicked');
+    navigate('/changepassword');
   };
+
+  const onChangeUpload = async ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+  const onPreview = async (file) => {
+    let src = file.values;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+
 
   return (
     <div className={styles.profileFormContainer}>
       <Card className={styles.profileFormCard} title="THÔNG TIN TÀI KHOẢN" bordered={false}>
-        {/* <div className="clsss"> <span>Xin chào, {userData.fullname}</span></div> */}
-        <div className={styles.avatarContainer} onClick={editing ? onEditAvatar : undefined}>
-          {selectedImage ? (
-            <img src={selectedImage} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-          ) : (
-            userData?.image ? (
-              <Avatar size={100} src={uploadApi.get(userData.image)} alt={`${userData?.id}'s avatar`} />
-            ) : (
-              <Avatar size={100} icon={<UserOutlined />} />
-            )
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-            accept="image/*"
-          />
-        </div>
-
-
         {!editing ? (
           <div className={styles.profileDisplay}>
+            <div>
+              {userData?.image && (
+                <Avatar
+                  size={80}
+                  src={`http://localhost:8081/api/upload/${userData.image}`}
+                />
+              )}
+              {!userData?.image && <Avatar size={64} icon={<UserOutlined />} />}
+              <h3>{userData?.fullname}</h3>
+            </div>
             <p>Chọn vào để sửa</p>
-            <Button onClick={onEdit} type="primary">
+            <Button onClick={() => onEdit(userData)} type="primary">
               Sửa thông tin cá nhân
             </Button>
           </div>
@@ -131,26 +146,33 @@ const EditableProfile = () => {
           >
             <Row gutter={16}>
               <Col span={12}>
-                {/* Left Column */}
+
                 <Form.Item
-                  name="id"
-                  label="Tên Tài khoản"
-                  rules={[{ required: true, message: 'Vui lòng nhập tên tài khoản' }]}
+                  // {...formItemLayout}
+                  label="Ảnh đại diện"
+                  name="image"
+                  rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
                 >
-                  <Input
-                    placeholder="Tên tài khoản"
-                    value={userData?.id} s
-                    disabled
-                    readOnly
-                  />
+                  <Upload
+                    action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                    accept=".png, .jpg"
+                    listType="picture-card"
+                    onChange={onChangeUpload}
+                    onPreview={onPreview}
+                    fileList={fileList}
+                    name="image"
+                    maxCount={1}
+                  >
+                    {fileList.length < 1 && '+ Tải lên'}
+                  </Upload>
                 </Form.Item>
-
-
                 <Form.Item
                   name="fullname"
                   initialValue={userData.fullname}
                   label="Họ & Tên"
-                  rules={[{ required: true, message: 'Vui lòng nhập họ và' }]} >
+                  rules={[
+                    { validator: validateFullname },
+                  ]} >
                   <Input />
                 </Form.Item>
                 <Form.Item name="gender" label="Giới tính">
@@ -161,16 +183,27 @@ const EditableProfile = () => {
                 </Form.Item>
 
 
-                <Form.Item name="address" label="Địa chỉii" rules={[{ required: true }]} initialValue={userData.address}>
+                <Form.Item name="address" label="Địa chỉ"
+                  rules={[
+                    { validator: validatEaddress },
+                  ]}
+                  initialValue={userData.address}>
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                {/* Right Column */}
-                <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]} initialValue={userData.phone}>
+                <Form.Item name="phone" label="Số điện thoại"
+                  rules={[
+                    { validator: validatePhone },
+                  ]}
+                  initialValue={userData.phone}>
                   <Input />
                 </Form.Item>
-                <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
+                <Form.Item name="email" label="Email"
+                  rules={[
+                    { validator: validateEmail },
+                  ]}
+                  initialValue={userData.email}>
                   <Input />
                 </Form.Item>
                 <Form.Item
@@ -184,11 +217,7 @@ const EditableProfile = () => {
                     format="DD-MM-YYYY"
                     style={{ width: '100%' }}
                   />
-
                 </Form.Item>
-
-
-
                 <Form.Item name="" label="Đổi mật khẩu" >
                   <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">
                     Đổi mật khẩu

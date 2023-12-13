@@ -108,11 +108,11 @@
 }
 
 .active {
-    background-color: #fff0f6;
+    background-color: #e2eef3;
     cursor: default;
 
     &:hover {
-        background-color: #fff0f6;
+        background-color: #e2eef3;
     }
 }
 
@@ -125,8 +125,8 @@
     backdrop-filter: blur(0px); 
     
     .imgL {
-        margin-top: 150px;
+        margin-top: 170px;
         font-size: 50px;
-        color: var(--pink);
+        color: var(--primary--text-color);
     }
 }

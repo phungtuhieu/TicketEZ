@@ -1,61 +1,143 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Form, Input, Button, Checkbox } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Layout, Form, Input, Button, Checkbox, Modal } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import img from '~/assets/img';
+import { SyncOutlined } from '@ant-design/icons';
 import authApi from '~/api/user/Security/authApi';
-import { getRolesFromLocalStorage } from '~/utils/authUtils';
+import { hasSuperAdminRole } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
-import { validateId, validatePassword } from '../Custom';
+import {validateId, validatePassword } from '../Custom';
+const { Content } = Layout;
 
-
-const { Header, Content } = Layout;
-
+const generateCaptcha = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+};
 
 const LoginForm = () => {
+    const [canRefresh, setCanRefresh] = useState(true);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [captcha, setCaptcha] = useState(generateCaptcha());
+    const [userInput, setUserInput] = useState('');
+    const [form] = Form.useForm();
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [isCaptchaVerified, setIsCaptchaVerified] = useState(null);
+    const [isloading, issetLoading] = useState(false);
+
 
     const onFinish = async (values) => {
-        if (!validateId(values.id) || !validatePassword(values.password)) return;
+        // if (!validateId(values.id) || !validatePassword(values.password))
+        //     return;
+        // if (!isCaptchaVerified) {
+        //     setIsModalVisible(true);
+        //     return;
+        // }
         setLoading(true);
         try {
             const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
             });
-            const user = await authApi.getUser();
-            console.log(user);
-            const roles = getRolesFromLocalStorage();
-            if (roles.includes('SUPER_ADMIN')) {
-                funcUtils.notify('Đăng nhập thành công!', 'success');
+            if (hasSuperAdminRole()) {
                 navigate('/admin/index');
+                setTimeout(() => {
+                    funcUtils.notify('Đăng nhập thành công!', 'success');
+                }, 500);
+
             } else {
-                funcUtils.notify('Đăng nhập thành công!', 'success');
+                setTimeout(() => {
+                    funcUtils.notify('Đăng nhập thành công!', 'success');
+                }, 500);
                 navigate('/');
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             }
+            setIsModalVisible(true);
+
         } catch (error) {
             if (error.response && error.response.status === 403) {
                 funcUtils.notify('Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.', 'info');
                 navigate('/otp');
             } else {
-                funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.', 'error');
+                funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại Tài khoản mật khẩu.', 'error');
             }
         } finally {
             setLoading(false);
         }
     };
 
+    const onFinishCaptcha = () => {
+        issetLoading(true);
+        setTimeout(() => {
+            issetLoading(false);
+            if (userInput.trim().toLowerCase() === captcha.trim().toLowerCase()) {
+                setIsCaptchaVerified(true);
+                funcUtils.notify('Captcha xác thực thành công!', 'success');
+                setIsModalVisible(false);
+            } else {
+                setIsCaptchaVerified(false);
+                funcUtils.notify('Xác thực không hợp lệ', 'error');
+                setCaptcha(generateCaptcha());
+            }
+        }, 1000);
+    };
+
+
+
+
+    const onRefresh = () => {
+        if (canRefresh) {
+            setCaptcha(generateCaptcha());
+            setCanRefresh(false);
+            setTimeLeft(5);
+        }
+    };
+    useEffect(() => {
+        let timer = null;
+        if (timeLeft != null) {
+            timer = setTimeout(() => {
+                setTimeLeft(prevTimeLeft => prevTimeLeft - 1);
+            }, 1000);
+        }
+        if (timeLeft === 0) {
+            setCanRefresh(true);
+            setTimeLeft(null);
+        }
+        return () => clearTimeout(timer);
+    }, [timeLeft]);
+
+
+    const handleModalClose = () => {
+        form.resetFields();
+        setCaptcha(generateCaptcha());
+        setIsCaptchaVerified(false);
+        setUserInput('');
+        setIsModalVisible(false);
+    };
+
+    const onCaptchaChange = (e) => {
+        setUserInput(e.target.value);
+        if (isCaptchaVerified === false) {
+            setIsCaptchaVerified(null);
+        }
+    };
+
 
     return (
         <Layout className="layout">
-
             <Content className={styles.content}>
                 <div className={styles.wrapper}>
                     <div className={styles.loginContainer}>
                         <h1 className={styles.title}>Đăng nhập</h1>
-                        <p className={styles.welcomeText}>Chào mừng bạn đến giao diện người dùng TicketEZ Vui lòng nhập thông tin của bạn dưới đây để đăng nhập.</p>
+                        <p className={styles.welcomeText}>Chào mừng bạn đến giao diện người dùng TicketEZ. Vui lòng nhập thông tin của bạn dưới đây để đăng nhập.</p>
                         <Form
                             name="basic"
                             className={styles.loginForm}
@@ -63,53 +145,121 @@ const LoginForm = () => {
                             onFinish={onFinish}
                             autoComplete="off"
                         >
-                            <div className='formLabel'>
-                                <p className={styles.formLabel}><h4>Tên Tài khoản:</h4></p>
-                            </div>
                             <Form.Item
-                                // label="Tên tài khoản"
                                 name="id"
-                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản !' }]}
+                                rules={[
+                                    { validator: validateId }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
                             </Form.Item>
 
-                            <div className='formLabel'>
-                                <p className={styles.formLabelPassword}><h4>Mật khẩu:</h4></p>
-                            </div>
                             <Form.Item
-                                // label="Mật khẩu"
                                 name="password"
-                                rules={[{ required: true, message: 'Không được bỏ trống mật khẩu !' }]}
+                                rules={[
+                                    { validator: validatePassword }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />
-
                             </Form.Item>
+
                             <Form.Item className={styles.formItem}>
                                 <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
-                                <a className={styles.forgot} href="">
-                                    Quên mât khẩu
-                                </a>
-
+                                <Link className={styles.forgot} to="/forgotpassword">
+                                    Quên mật khẩu
+                                </Link>
                             </Form.Item>
+
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
                                     Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>
-                                    Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>
+                                    Bạn chưa có tài khoản
+                                    <Link className={styles.forgot} to="/Register">
+                                        Đăng Ký
+                                    </Link>
                                 </p>
                             </Form.Item>
-
                         </Form>
                     </div>
                 </div>
+
                 <div className={styles.rightContainer}>
                     <img src={img.logoLogin1} alt="Login" className={styles.imageStyle} />
                 </div>
             </Content>
+            <Modal
+                title="Xác thực bạn có phải người máy không !"
+                visible={isModalVisible}
+                onCancel={handleModalClose}
+                footer={null}
+                centered
+                style={{ textAlign: 'center' }}
+            >
+                <Form form={form} onFinish={onFinishCaptcha} className="captcha-form">
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+                        <div style={{ padding: '5px' }}>
+                            <div style={{ marginRight: '5px', fontSize: '24px', letterSpacing: '10px' }}>
+                                {captcha.slice(0, 6)}
+                            </div>
+                        </div>
+
+                        <div style={{ border: '1px solid gray', borderRadius: '5px', marginLeft: '10px' }}>
+                            <Button
+                                icon={
+                                    <div style={{ position: 'relative' }}>
+                                        <SyncOutlined spin={!canRefresh} />
+                                        {!canRefresh && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                color: 'black',
+                                                fontSize: '12px',
+                                                lineHeight: '12px'
+                                            }}>
+                                                {timeLeft}
+                                            </span>
+                                        )}
+                                    </div>
+                                }
+                                onClick={onRefresh}
+                                disabled={!canRefresh}
+                                style={{ border: 'none' }}
+                            />
+                        </div>
+                    </div>
+                    <Form.Item
+                        name="captcha"
+                        rules={[
+                            { required: true, message: 'Vui lòng nhập captcha!' },
+                            { max: 6, message: 'Mã captcha chỉ được tối đa 6 kí tự!' }
+                        ]}
+                        className={styles.captchaInput}
+                        validateStatus={isCaptchaVerified !== null ? (isCaptchaVerified ? 'success' : 'error') : undefined}
+                        help={isCaptchaVerified === false ? 'Captcha không đúng, vui lòng thử lại.' : undefined}
+                    >
+                        <Input
+                            placeholder="Nhập mã captcha"
+                            onChange={onCaptchaChange}
+                            maxLength={6}
+                        />
+
+                    </Form.Item>
+
+
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" block loading={isloading}>
+                            Xác thực
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
 
         </Layout>
     );

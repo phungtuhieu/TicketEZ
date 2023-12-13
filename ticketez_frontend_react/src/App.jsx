@@ -1,10 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { publicRoutes } from '~/routes';
-import { DefaultLayout } from '~/layouts';
+import { privateRoutes, publicRoutes } from '~/routes';
+import { AdminLayout, DefaultLayout } from '~/layouts';
 import { Fragment } from 'react';
 import NotFound from './pages/NotFound/notFound';
 import { ToastContainer } from 'react-toastify';
+import { getRolesFromLocalStorage, hasSuperAdminRole } from './utils/authUtils';
+import ProtectedRoute from '~/api/user/Security/ProtectedRoute';
+
 function App() {
+    const roles = getRolesFromLocalStorage();
+    const isAuthenticated = !!localStorage.getItem('token');
+    console.log(isAuthenticated);
+    console.log(roles);
+    
     return (
         <Router>
             <div className="App">
@@ -26,6 +34,25 @@ function App() {
                                         <Page />
                                         <ToastContainer />
                                     </Layout>
+                                }
+                            />
+                        );
+
+                    })}
+                    {privateRoutes.map((route, index) => {
+                        const Page = route.component;
+                        let Layout = route.layout || Fragment;
+                        return (
+                            <Route
+                                key={index}
+                                path={route.path}
+                                element={
+                                    <ProtectedRoute allowedRoles={route.allowedRoles}>
+                                        <Layout>
+                                            <Page />
+                                            <ToastContainer />
+                                        </Layout>
+                                    </ProtectedRoute>
                                 }
                             />
                         );

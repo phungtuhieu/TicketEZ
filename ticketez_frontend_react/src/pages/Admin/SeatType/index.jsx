@@ -86,7 +86,7 @@ const AdminSeatType = () => {
             render: (_, record) => <ColorPicker disabled value={record.color} showText />,
         },
         {
-            title: 'Chiệu rộng',
+            title: 'Sức chứa',
             dataIndex: 'width',
         },
         {
@@ -397,14 +397,14 @@ const AdminSeatType = () => {
                         <Form.Item
                             {...formItemLayout}
                             name="width"
-                            label="Chiếu rộng ghế "
+                            label="Sức chứa "
                             initialValue={1}
                             rules={[
-                                { required: true, message: 'Vui lòng nhập chiều rộng ghế' },
+                                { required: true, message: 'Vui lòng nhập Sức chứa ghế' },
                                 { pattern: /^[0-9]*$/, message: 'Vui lòng chỉ nhập số' },
                             ]}
                         >
-                            <Input width={200} placeholder="chiều rộng ghế" />
+                            <Input width={200} placeholder="Sức chứa ghế" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -438,7 +438,6 @@ const AdminSeatType = () => {
                 </BaseModal>
             </Row>
             <BaseTable
-                pagination={false}
                 columns={columns}
                 dataSource={posts.map((post) => ({
                     ...post,

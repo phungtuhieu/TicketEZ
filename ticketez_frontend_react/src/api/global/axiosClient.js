@@ -13,33 +13,33 @@ const axiosClient = axios.create({
     },
     // withCredentials: true,
 });
-axiosClient.interceptors.response.use(
-    (response) => {
-        if (response && response.data) {
-            return response;
-        }
-        return response;
-    },
-    (error) => {
-        if (error.response) {
-            switch (error.response.status) {
-                case httpStatus.INTERNAL_SERVER_ERROR:
-                    funcUtils.notify('Lỗi kết nối server', 'error');
-                    break;
-                // case 401:
-                //     funcUtils.notify(error.response.data.message, 'error');
-                //     break;
-                // case httpStatus.CONFLICT:
-                //     funcUtils.notify(error.response.data, 'error');
-                //     break;
-                default:
-                    console.log(error);
-                    break;
-            }
-        }
-        return Promise.reject(error);
-    },
-);
+// axiosClient.interceptors.response.use(
+//     (response) => {
+//         if (response && response.data) {
+//             return response;
+//         }
+//         return response;
+//     },
+//     (error) => {
+//         if (error.response) {
+//             switch (error.response.status) {
+//                 case httpStatus.INTERNAL_SERVER_ERROR:
+//                     funcUtils.notify('Lỗi kết nối server', 'error');
+//                     break;
+//                 // case 401:
+//                 //     funcUtils.notify(error.response.data.message, 'error');
+//                 //     break;
+//                 // case httpStatus.CONFLICT:
+//                 //     funcUtils.notify(error.response.data, 'error');
+//                 //     break;
+//                 default:
+//                     console.log(error);
+//                     break;
+//             }
+//         }
+//         return Promise.reject(error);
+//     },
+// );
 
 axiosClient.interceptors.request.use(
     (config) => {

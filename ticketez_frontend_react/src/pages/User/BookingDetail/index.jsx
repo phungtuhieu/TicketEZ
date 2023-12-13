@@ -15,10 +15,11 @@ import httpStatus from '~/api/global/httpStatus';
 import funcUtils from '~/utils/funcUtils';
 import { useNavigate } from 'react-router-dom';
 import authApi from '~/api/user/Security/authApi';
+import { serviceChooseApi } from '~/api/user';
 const cx = classNames.bind(style);
 
 function BookingDetail(props) {
-    const { showtime, seatBooking } = props;
+    const { showtime, seatBooking, selectedCombos = [] } = props;
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
     const [loading, setLoading] = useState(true);
@@ -27,11 +28,11 @@ function BookingDetail(props) {
     const [account, setAccount] = useState(null);
     const [total, setTotal] = useState(0);
     const [form] = Form.useForm();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     // Load table
     useEffect(() => {
-        console.log('seatBooking2a', seatBooking);
-
+        // console.log('seatBooking2a', seatBooking);
+        // console.log('selectedCombos', selectedCombos);
         const fetchData = async () => {
             if (showtime != null) {
                 if (seatBooking != null) {
@@ -43,10 +44,10 @@ function BookingDetail(props) {
 
                     const dateNow = moment();
                     const today = dateNow.toDate().getDay();
-                    console.log('seatBooking1', seatBooking);
-                    console.log('today', dateNow.toDate().getDay());
+                    // console.log('seatBooking1', seatBooking);
+                    // console.log('today', dateNow.toDate().getDay());
                     // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
-                    console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
+                    // console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
 
                     const getPriceList = async () => {
                         const listPriceDb = await priceSeatApi.findAllPriceAndPriceSeatTypeDTOByShowtimeId(showtime.id);
@@ -54,9 +55,9 @@ function BookingDetail(props) {
                     };
 
                     const listPriceResp = await getPriceList();
-                    console.log('listPriceResp', listPriceResp);
+                    // console.log('listPriceResp', listPriceResp);
                     let listPr = [];
-                    const totalAmount = seatBooking.reduce((total, item) => {
+                    let totalAmount = seatBooking.reduce((total, item) => {
                         const seatTypeAndPrice = {
                             seatTypeId: 0,
                             price: 0.0,
@@ -82,16 +83,24 @@ function BookingDetail(props) {
                         style: 'currency',
                         currency: 'VND',
                     }).format(totalAmount);
-                    setTotal(totalAmount);
-                    console.log('totalAmount', totalAmount);
-                    console.log('formattedTotalAmount', formattedTotalAmount);
+                    let totalAll = 0;
+                    if (selectedCombos.length > 0) {
+                        let totalPriceService = selectedCombos.reduce((total, item) => total + item.price, 0);
+                        totalAll = totalAmount + totalPriceService;
+                    } else {
+                        totalAll = totalAmount;
+                    }
+                    setTotal(totalAll);
+                    // console.log('totalAmount', totalAmount);
+                    // console.log('formattedTotalAmount', formattedTotalAmount);
                     const seatInfo = {
                         listSeat: seatBooking,
                         totalAmount: formattedTotalAmount,
                     };
-                    console.log('totalAmount', totalAmount);
+                    // console.log('totalAmount', totalAmount);
                     const infoS = {
                         ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
+                        colorCode: showtime.formatMovie.movie.mpaaRating.colorCode,
                         movieTitle: showtime.formatMovie.movie.title,
                         format: showtime.formatMovie.format.name,
                         time: {
@@ -117,15 +126,15 @@ function BookingDetail(props) {
                                 email: acc.email,
                                 phone: acc.phone,
                             };
-                            console.log('acc', acc);
+                            // console.log('acc', acc);
                             setAccount(acc);
                             form.setFieldsValue(accInfo);
                         }
                     } catch (error) {
                         console.log(error);
                     }
-                    console.log('showtime', showtime);
-                    console.log('seatBooking', seatBooking);
+                    // console.log('showtime', showtime);
+                    // console.log('seatBooking', seatBooking);
                     // const acc = authApi.getUser();
                     // form.setFieldValue({
                     //     fullname: acc.fullname,
@@ -139,7 +148,7 @@ function BookingDetail(props) {
         };
 
         fetchData();
-    }, [showtime, seatBooking]);
+    }, [showtime, seatBooking, selectedCombos]);
 
     const handlePurchase = async () => {
         try {
@@ -147,20 +156,24 @@ function BookingDetail(props) {
             // if (!Object.values(values).every((value) => value !== null && value !== undefined)) {
             //     funcUtils.notify('Vui lòng điền thông tin người dùng!', 'error');
             // }
-            console.log('account', account);
+            // console.log('account', account);
+            if (selectedCombos.length > 0) {
+                const respServiceChoice = await serviceChooseApi.createListServiceChoose(selectedCombos);
+                console.log('respServiceChoice: ', respServiceChoice);
+            }
             let accUpdate = {
                 ...account,
                 gender: true,
-                phone: account?.phone  ? account.phone : values.phone,
-                email: account?.email  ? account.email : values.email,
-                fullname: account?.fullname  ? account.fullname : values.fullname,
+                phone: account?.phone ? account.phone : values.phone,
+                email: account?.email ? account.email : values.email,
+                fullname: account?.fullname ? account.fullname : values.fullname,
             };
             console.log('accUpdate', accUpdate);
             const accResp = await accountApi.patchInfoUser(account.id, accUpdate);
             console.log('accUpdate: ', accResp);
             if (accResp.status == httpStatus.OK) {
                 try {
-                    const currentDate = new Date();
+                    // const currentDate = new Date();
                     const bookingId = generateRandomId();
                     try {
                         // const booking = {
@@ -204,7 +217,6 @@ function BookingDetail(props) {
         //
     };
     const generateRandomId = () => {
-        // Lấy thời gian mili giây hiện tại
         const timestamp = Date.now().toString();
 
         // Tạo chuỗi ngẫu nhiên từ thời gian mili giây
@@ -216,21 +228,20 @@ function BookingDetail(props) {
         // Tạo mã băm SHA-256 từ chuỗi kết hợp
         const hash = CryptoJS.SHA256(combinedString).toString();
 
-        // Lấy 10 ký tự đầu tiên của mã băm
         const randomId = hash.substring(0, 10);
 
         // Chuyển đổi chuỗi thành số ngẫu nhiên và giữ lại tối đa 10 ký tự
         const randomNumber = parseInt(randomId, 16) % Math.pow(10, 10);
 
         // Hiển thị log với màu sắc và định dạng thời gian
-        console.log({
-            timestamp: timestamp,
-            randomString: randomString,
-            combinedString: combinedString,
-            hash: hash,
-            randomId: randomId,
-            randomNumber: randomNumber,
-        });
+        // console.log({
+        //     timestamp: timestamp,
+        //     randomString: randomString,
+        //     combinedString: combinedString,
+        //     hash: hash,
+        //     randomId: randomId,
+        //     randomNumber: randomNumber,
+        // });
 
         return JSON.stringify(randomNumber);
     };
@@ -253,7 +264,7 @@ function BookingDetail(props) {
                             <Row className={cx('content-info-details', 'ps-0')}>
                                 <Col span={13} className="pe-20">
                                     <div className={cx('wrapp-title-movie')}>
-                                        <Tag className={cx('mpaa-movie')} color="blue-inverse">
+                                        <Tag className={cx('mpaa-movie')} color={showtimeInfo.colorCode}>
                                             {showtimeInfo.ratingCode}
                                         </Tag>
                                         <h3 className={cx('title-movie')} level={4}>
@@ -332,6 +343,11 @@ function BookingDetail(props) {
                                                         {showtimeInfo.seatInfo.listSeat
                                                             .map((item) => item.name)
                                                             .join(', ')}
+                                                        {
+                                                            // listCombo.lenght > 0 && listCombo.map((combo) => {
+                                                            //     combo
+                                                            // })
+                                                        }
                                                     </b>
                                                 </li>
                                             </ul>
@@ -345,6 +361,31 @@ function BookingDetail(props) {
                                             </ul>
                                         </Col>
                                     </Row>
+                                    {selectedCombos.length > 0 && (
+                                        <div className={cx('wrapp-combo-info')}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Bắp - nước</li>
+                                                {selectedCombos.map((combo) => (
+                                                    <li className={cx('info-inner', 'tw-flex tw-justify-between')}>
+                                                        <b>
+                                                            <span className={cx('combo-quantity')}>
+                                                                {combo.quantity}
+                                                            </span>
+                                                            <span className={cx('combo-name')}>
+                                                                &nbsp;X {combo.service.name}
+                                                            </span>
+                                                        </b>
+                                                        <b>
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(combo.price)}
+                                                        </b>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                     <Divider dashed className={cx('divider-custom')} plain></Divider>
                                     <Row className={cx('wrapp-price-ticket')}>
                                         <Col span={12}>
@@ -357,7 +398,12 @@ function BookingDetail(props) {
                                         <Col span={12}>
                                             <ul className={cx('wrapp-info-details')}>
                                                 <li className={cx('info-inner', 'text-end')}>
-                                                    <b>{showtimeInfo.seatInfo.totalAmount}</b>{' '}
+                                                    <b>
+                                                        {new Intl.NumberFormat('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        }).format(total)}
+                                                    </b>{' '}
                                                 </li>
                                             </ul>
                                         </Col>

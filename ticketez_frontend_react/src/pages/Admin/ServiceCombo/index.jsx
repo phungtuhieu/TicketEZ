@@ -44,7 +44,7 @@ const AdminService = () => {
             try {
                 const [res, cinemaComplex] = await Promise.all([
                     serviceApi.getByPage(currentPage, pageSize),
-                    cinemaComplexApi.getPage(),
+                    cinemaComplexApi.get(),
                 ]);
                 console.log(cinemaComplex.data);
                 console.log(res);
@@ -169,29 +169,17 @@ const AdminService = () => {
     });
 
     const columns = [
-        {
-            title: 'Mã',
-            dataIndex: 'id',
-            width: '10%',
-            sorter: (a, b) => a.id - b.id,
-        },
+        // {
+        //     title: 'Mã',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     sorter: (a, b) => a.id - b.id,
+        // },
         {
             title: 'Tên dịch vụ',
             dataIndex: 'name',
             width: '30%',
             // ...getColumnSearchProps('name'),
-        },
-        {
-            title: 'Mô tả dịch vụ',
-            dataIndex: 'description',
-            width: '30%',
-            // ...getColumnSearchProps('description'),
-        },
-        {
-            title: 'Rạp',
-            dataIndex: 'nameCinemaComplex',
-            width: '20%',
-            // ...getColumnSearchProps('cinemaComplex'),
         },
         {
             title: 'Ảnh đại diện',
@@ -209,8 +197,27 @@ const AdminService = () => {
             ),
         },
         {
-            title: 'Thao tác',
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            width: '10%',
+            // ...getColumnSearchProps('description'),
+        },
+        {
+            title: 'Mô tả dịch vụ',
+            dataIndex: 'description',
             width: '30%',
+            // ...getColumnSearchProps('description'),
+        },
+        {
+            title: 'Rạp',
+            dataIndex: 'nameCinemaComplex',
+            width: '20%',
+            // ...getColumnSearchProps('cinemaComplex'),
+        },
+
+        {
+            title: 'Thao tác',
+            width: '20%',
             render: (_, record) => (
                 <Space size="middle">
                     <FontAwesomeIcon
@@ -251,8 +258,6 @@ const AdminService = () => {
         });
         console.log(record);
     };
-    
-
 
     const onChangeUpload = async ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -285,7 +290,6 @@ const AdminService = () => {
         setWorkSomeThing(!workSomeThing);
     };
 
-  
     const handleOk = async () => {
         setLoading(true);
         try {
@@ -430,7 +434,15 @@ const AdminService = () => {
                             label="Tên dịch vụ"
                             rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ' }]}
                         >
-                            <Input placeholder="Họ và tên" />
+                            <Input placeholder="Tên dịch vụ" />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="quantity"
+                            label="Số lượng"
+                            rules={[{ required: true, message: 'Vui lòng nhập số lượng' }]}
+                        >
+                            <Input placeholder="Số lượng" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -438,7 +450,7 @@ const AdminService = () => {
                             label="Mô tả dịch vụ"
                             rules={[{ required: true, message: 'Vui lòng nhập mô tả dịch vụ' }]}
                         >
-                            <Input placeholder="Họ và tên" />
+                            <Input placeholder="Mô tả" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}

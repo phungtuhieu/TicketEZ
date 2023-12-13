@@ -13,14 +13,16 @@ import img, { listIcon } from '~/assets/img';
 
 const cx = classNames.bind(style);
 
-export default function SeatGenerator() {
+export default function SeatGenerator(props) {
+    const { record, iD } = props;
+
     const [isTableLoaded, setIsTableLoaded] = useState(true);
     // Dữ liệu chuỗi rạp chiếu
     const [cinemaChainDaTa, setCinemaChainDaTa] = useState([]);
     // Dữ liệu cụm rạp
     const [cinemaComplexDaTa, setCinemaComplexDaTa] = useState([]);
     // Dữ liệu rạp
-    const [cinemaDaTa, setCinemaDaTa] = useState([]);
+    const [cinemaDaTa, setCinemaDaTa] = useState(record ? record : null);
     // Lưu id rạp
     const [idCinema, setIdCinema] = useState();
     // Lưu id seatChart
@@ -33,9 +35,9 @@ export default function SeatGenerator() {
     // ẩn hiện chọn cụm rạp là phải check lúc bấm vào chuỗi rạp
     const [selectedCinemaChain, setSelectedCinemaChain] = useState(false);
     // ẩn hiện chọn rạp là phải check lúc bấm vào cụm rạp
-    const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(false);
+    const [selectedCinemaComplex, setSelectedCinemaComplex] = useState(record ? true : false);
     // Ẩn hiện sơ đồ là phải check lúc bấm vào rập
-    const [selectedOptionCinema, setSelectedOptionCinema] = useState(false);
+    const [selectedOptionCinema, setSelectedOptionCinema] = useState(record ? true : false);
 
     // Sử dụng một biến state để theo dõi sự thay đổi của row và col
     const [firstChartDataChanged, setFirstChartDataChanged] = useState(false);
@@ -120,34 +122,11 @@ export default function SeatGenerator() {
     };
     const [seatState, setSeatState] = useState(createSeatArray());
 
-    // Create Seat
-    const createSeatDB = async (idChart) => {
-        try {
-            const dataArray = seatState.seatHeader.map((header, rowIndex) =>
-                seatState.seat[rowIndex].map((seat_no) => ({
-                    name: seat_no,
-                    status: 1,
-                    description: 'ghế thông thường',
-                    seatType: {
-                        id: 1,
-                    },
-                    seatChart: {
-                        id: idChart,
-                    },
-                })),
-            );
-            const flattenedArray = [].concat(...dataArray);
-
-            const resp = await axiosClient.post(`seat`, flattenedArray);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     // Thêm sơ đồ mới
 
     const postDataSeatChart = async () => {
-        setIsTableLoaded(false)
+        setIsTableLoaded(false);
         try {
             const data = {
                 name: inputValue,
@@ -155,7 +134,7 @@ export default function SeatGenerator() {
                 columns: col,
                 status: true,
                 cinema: {
-                    id: idCinema,
+                    id: record? iD: idCinema,
                 },
             };
 
@@ -165,7 +144,7 @@ export default function SeatGenerator() {
             setIdSeatChart(resp.data.id);
             // createSeatDB(resp.data.id);
             setShowInfo('success');
-            setIsTableLoaded(true)
+            setIsTableLoaded(true);
         } catch (error) {
             console.error(error);
         }
@@ -228,10 +207,10 @@ export default function SeatGenerator() {
 
     // Cinema
 
-    const optionsCinema = cinemaDaTa.map((cinema) => ({
-        value: cinema.id,
-        label: cinema.name,
-    }));
+        const optionsCinema = cinemaDaTa? cinemaDaTa.map((cinema) => ({
+            value: cinema.id,
+            label: cinema.name,
+        })) : null;
 
     const onChangeCinema = (value) => {
         setSelectedOptionCinema(true);
@@ -271,19 +250,24 @@ export default function SeatGenerator() {
             <Row className={cx('container')} style={{ width: '100%' }}>
                 <Col style={{ backgroundColor: 'transparent' }} className={cx('col-first')} span={8}>
                     <Card className={cx('card')} title="chỗ nhập liệu" bordered={true} style={{ width: 300 }}>
-                        <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
-                        <Select
-                            className={cx('select')}
-                            showSearch
-                            placeholder="Chọn chuỗi rạp"
-                            optionFilterProp="children"
-                            onChange={onChangeCinemaChain}
-                            onSearch={onSearchCinemaChain}
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            options={optionsCinemaChain}
-                        />
+                        {!record && (
+                            <>
+                                <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
+                                <Select
+                                    className={cx('select')}
+                                    showSearch
+                                    placeholder="Chọn chuỗi rạp"
+                                    optionFilterProp="children"
+                                    onChange={onChangeCinemaChain}
+                                    onSearch={onSearchCinemaChain}
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    options={optionsCinemaChain}
+                                />
+                            </>
+                        )}
+
                         {selectedCinemaChain && (
                             <>
                                 <p className="tw-font-medium tw-mb-3">Chọn cụm rạp :</p>
@@ -307,6 +291,7 @@ export default function SeatGenerator() {
                                 <Select
                                     className={cx('select')}
                                     showSearch
+                                    value={iD ? iD : idCinema}
                                     placeholder="Chọn cụm rạp"
                                     optionFilterProp="children"
                                     onChange={onChangeCinema}

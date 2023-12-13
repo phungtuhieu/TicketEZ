@@ -10,7 +10,7 @@ import anhReview from './hinhanhReview.webp';
 
 //
 import logoComment from './logo-cmt.webp';
-import notFoundLogo from './not-found.svg';
+import notFoundLogo from './logo-dinh-moi-them.png';
 import gifLoading from './loading.gif';
 import nenReviews from './nenReview.png';
 import mapr from './mapr.png';

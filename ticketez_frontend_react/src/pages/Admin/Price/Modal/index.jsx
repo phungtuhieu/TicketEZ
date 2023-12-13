@@ -19,15 +19,26 @@ const ModalPrice = (props) => {
     // Check xem showtime có trong price không mới được sửa
     // ẩn hiện chọn cụm rạp là phải check lúc bấm vào chuỗi rạp
     const [selectedCinemaChain, setSelectedCinemaChain] = useState(false);
+    // Ẩn hiện foramtmovie
     const [selectedFormat, setSelectedFormat] = useState(false);
+    // lưu dữ liệu showtime
     const [showtimeData, setShowtimeData] = useState([]);
+    // Lưu dữ liệu seatType
     const [seatTypeData, setSeatTypeData] = useState([]);
+    // lưu dữ liệu của các seatType theo cinemaComplex để bắt lỗi
+    const [seatTypeByCinemaComplexData, setSeatTypeByCinemaComplexData] = useState([]);
+    // Lưu dữ liệu format movie
     const [formatMovieData, setFormatMovieData] = useState([]);
+    // Lưu id cinemaComplex
     const [cinemaComplexChoose, setCinemaComplexChoose] = useState(record ? record.price.cinemaComplex.id : null);
     const [movieChoose, setMovieChoose] = useState(record ? record.price.formatMovie.movie.id : null);
+    //   lưu id formatMovie
     const [formatMovieChoose, setFormatMovieChoose] = useState(record ? record.price.formatMovie.id : null);
+    //   Lưu ngày bắt đầu chọn
     const [startDateChoose, setStartDateChoose] = useState(record ? dayjs(record.price.startDate) : dayjs());
+    //  Lưu ngày kết thúc chọn
     const [endDateChoose, setEndDateChoose] = useState(record ? dayjs(record.price.endDate) : dayjs());
+    //    các seatType trong modal
     const [seatTypeOnModal, setSeatTypeOnModal] = useState([]);
     // lưu giá khi chọn
 
@@ -67,10 +78,21 @@ const ModalPrice = (props) => {
     // Trường hợp sửa giá mặc định
 
     const handelCreateSeatType = () => {
-        // Bắt lỗi ghế đã có rồi mà chọn thêm nữa
+        // Bắt lỗi khi tạo giá cho loại ghế mà cinemacomplex đó nó không có loại ghế đó every là tất cả
+        if (
+            seatTypeByCinemaComplexData &&
+            seatTypeByCinemaComplexData.every((seatType) => seatType.id !== seatTypeOnModal)
+        ) {
+            console.log(seatTypeByCinemaComplexData);
+          setShowInfo('errorNoLikeSeatType')
+            showModal(true);
+            return;
+        }
+
+        // Bắt lỗi ghế đã có rồi mà chọn thêm nữa some là ít nhất
         const seatTypes = newPriceSeatTypeDTOs ? newPriceSeatTypeDTOs.map((item) => item.seatType) : null;
         if (seatTypes && seatTypes.some((seatType) => seatTypeOnModal === seatType.id)) {
-            alert('Ghế này đã có trong giá');
+            setShowInfo('errorSeatTypeAlreadyExists')
             showModal(true);
             return;
         }
@@ -122,6 +144,28 @@ const ModalPrice = (props) => {
         }
     };
 
+    const fetchDataSeatTypeByCinemaComplex = async (idCinemaComplex) => {
+        try {
+            const resp = await axiosClient.get(
+                `seatType/byCinemaComplexId/${idCinemaComplex ? idCinemaComplex : cinemaComplexChoose}`,
+            );
+            const dataSeatType = resp.data;
+
+            setSeatTypeByCinemaComplexData(dataSeatType);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchAllDataCinemaComplex = async () => {
+        try {
+            const resp = await axiosClient.get(`cinemaComplex/get/all`);
+            const dataCinemaComplex = resp.data;
+            setCinemaComplexDaTa(dataCinemaComplex);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const fetchDataSeatType = async () => {
         try {
             const resp = await axiosClient.get(`seatType/getAll`);
@@ -159,6 +203,16 @@ const ModalPrice = (props) => {
     const fetchDataFormatMovie = async (formatId) => {
         try {
             const resp = await axiosClient.get(`formatMovie/by-formatId/${formatId}`);
+            const dataFormatMovie = resp.data;
+            setFormatMovieData(dataFormatMovie);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchAllDataFormatMovie = async () => {
+        try {
+            const resp = await axiosClient.get(`formatMovie`);
             const dataFormatMovie = resp.data;
             setFormatMovieData(dataFormatMovie);
         } catch (error) {
@@ -206,29 +260,32 @@ const ModalPrice = (props) => {
         label: formatMovie.format.name + ' ' + formatMovie.movie.title,
     }));
 
-    useEffect(() => {
-        fetchDataCinemaChain();
-        fetchDataFormat();
-        fetchDataCinemaComplex(1);
-        fetchDataSeatType();
-        fetchDataMovie();
-        fetchDataFormatMovie(1);
-        fetchDataShowtime();
-    }, [record]);
+    // useEffect(() => {
+    //     fetchDataCinemaChain();
+    //     fetchDataFormat();
+    //     fetchAllDataCinemaComplex();
+    //     fetchDataSeatType();
+    //     fetchDataMovie();
+    //     fetchAllDataFormatMovie();
+    //     fetchDataShowtime();
+    //     fetchDataSeatTypeByCinemaComplex();
+    // }, [record]);
 
     const [isTableLoaded, setIsTableLoaded] = useState(false);
 
     useEffect(() => {
+        setIsTableLoaded(false);
         const fetchData = async () => {
             // Sử dụng Promise.all để đợi tất cả các promise hoàn thành
             await Promise.all([
                 fetchDataCinemaChain(),
                 fetchDataFormat(),
-                fetchDataCinemaComplex(1),
+                fetchAllDataCinemaComplex(),
                 fetchDataSeatType(),
                 fetchDataMovie(),
-                fetchDataFormatMovie(1),
+                fetchAllDataFormatMovie(),
                 fetchDataShowtime(),
+                fetchDataSeatTypeByCinemaComplex(),
             ]);
 
             // Tất cả các promise đã hoàn thành, set setIsTableLoaded(true)
@@ -236,7 +293,7 @@ const ModalPrice = (props) => {
         };
 
         fetchData();
-    }, []);
+    }, [record]);
 
     const onChangeCinemaChain = (value) => {
         fetchDataCinemaComplex(value);
@@ -259,6 +316,7 @@ const ModalPrice = (props) => {
 
     const onChangeCinemaComplex = (value) => {
         setCinemaComplexChoose(value);
+        fetchDataSeatTypeByCinemaComplex(value);
     };
     const onSearchMovie = (value) => {};
 
@@ -332,6 +390,14 @@ const ModalPrice = (props) => {
         }
         if (showInfo === 'errorEdit') {
             funcUtils.notify('Do tiền này nằm trong suất chiếu nên không thể sửa đổi !', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorNoLikeSeatType') {
+            funcUtils.notify('Ghế này không tồn tại trong rạp !', 'error');
+            setShowInfo('es');
+        }
+        if (showInfo === 'errorSeatTypeAlreadyExists') {
+            funcUtils.notify('Ghế này đã tồn tại trong giá !', 'error');
             setShowInfo('es');
         }
     }, [showInfo]);
@@ -455,6 +521,7 @@ const ModalPrice = (props) => {
                         <Select
                             className="tw-width-100"
                             showSearch
+                            defaultValue={record ? record.price.cinemaComplex.cinemaChain.id : null}
                             placeholder="Chọn chuỗi rạp"
                             optionFilterProp="children"
                             onChange={onChangeCinemaChain}
@@ -479,13 +546,14 @@ const ModalPrice = (props) => {
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             options={options}
-                            defaultValue={cinemaComplexChoose ? cinemaComplexChoose : null}
+                            value={cinemaComplexChoose ? cinemaComplexChoose : null}
                             disabled={isFirstRowVisible === true || selectedCinemaChain === false}
                         />
                     </Col>
                     <Col span={24}>
                         <p className="tw-font-medium tw-mb-3">Phân loại phim :</p>
                         <Select
+                            defaultValue={record ? record.price.formatMovie.format.id : null}
                             className="tw-width-100"
                             showSearch
                             placeholder="Chọn phân loại phim"
@@ -512,7 +580,7 @@ const ModalPrice = (props) => {
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             options={optionFormatMovieSelect}
-                            defaultValue={formatMovieChoose ? formatMovieChoose : null}
+                            value={formatMovieChoose ? formatMovieChoose : null}
                             disabled={isFirstRowVisible === true || selectedFormat === false}
                         />
                     </Col>

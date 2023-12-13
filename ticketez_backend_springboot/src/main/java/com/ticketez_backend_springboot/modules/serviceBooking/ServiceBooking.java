@@ -29,6 +29,7 @@ public class ServiceBooking {
 	@JoinColumn(name = "service_id", insertable = false, updatable = false)
 	private Service service;
 
+	private Integer quantity;
 	private Double price;
 
 }

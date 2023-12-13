@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.priceService.PriceService;
 import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,17 +29,22 @@ public class Service {
 	private String name;
 	private String description;
 	private String image;
+	private Integer quantity;
 
 	@ManyToOne
 	@JoinColumn(name = "cinema_complex_id")
 	private CinemaComplex cinemaComplex;
 
-	@JsonIgnore 
+	@JsonIgnore
 	@OneToMany(mappedBy = "service")
 	private List<PriceService> priceServices;
-	
-	@JsonIgnore 
+
+	@JsonIgnore
 	@OneToMany(mappedBy = "service")
 	private List<ServiceBooking> servicesBookings;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "service")
+	private List<ServiceChoose> serviceChooses;
 
 }
