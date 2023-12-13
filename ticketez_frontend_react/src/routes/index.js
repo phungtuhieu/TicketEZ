@@ -41,6 +41,7 @@ const publicRoutes = [
     { path: '/register', component: PageUser.RegisterForm, layout: DefaultLayout },
     { path: '/otp', component: PageUser.OtpForm, layout: DefaultLayout },
     { path: '/changepassword', component: PageUser.PasswordChangeForm, layout: DefaultLayout },
+    { path: '/forgotpassword', component: PageUser.ResetPasswordFrom, layout: DefaultLayout },
     //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
     { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },

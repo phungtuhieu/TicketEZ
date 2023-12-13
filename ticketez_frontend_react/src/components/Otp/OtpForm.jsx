@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import styles from './OtpForm.module.scss';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
+import {validateId} from '../Auth/Custom/index';
 
-
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 
 const OtpForm = () => {
     const [loading, setLoading] = useState(false);
-    const [countdown, setCountdown] = useState(0);
+    const [countdown, setCountdown] = useState(300);
     const [emailForOtp, setEmailForOtp] = useState('');
     const [isOtpButtonDisabled, setOtpButtonDisabled] = useState(false);
     const [otpExpired, setOtpExpired] = useState(false);
@@ -62,7 +62,7 @@ const OtpForm = () => {
         }
         setOtpExpired(false);
         setOtpButtonDisabled(true);
-        setCountdown(60);
+        setCountdown(5);
         try {
             const response = await authApi.regenerateOtp(emailForOtp);
             funcUtils.notify('Mã OTP đã được gửi. Vui lòng xác minh tài khoản trong vòng 1 phút!', 'success');
@@ -73,12 +73,11 @@ const OtpForm = () => {
 
         setTimeout(() => {
             setOtpButtonDisabled(true);
-        }, 60000);
+        }, 300000);
     };
 
     return (
         <Layout className="layout">
-
             <Content className={styles.content}>
                 <div className={styles.wrapper}>
                     <div className={styles.loginContainer}>
@@ -89,66 +88,54 @@ const OtpForm = () => {
                             onFinish={onFinish}
                             autoComplete="off"
                         >
-                            <div className='formLabel'>
-                                <p className={styles.formLabel}><h3>Xác thực tài khoản:</h3></p>
-                            </div>
+                            <h3 className={styles.formTitle}>Xác thực tài khoản</h3>
+
                             <Form.Item
-                                // label="Tên tài khoản"
                                 name="id"
-                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản !' }]}
+                                rules={[
+                                    { validator: validateId}, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
                             </Form.Item>
+
                             <Form.Item
                                 name="otp"
-                                rules={[
-                                    { required: true, message: 'Vui lòng nhập mã OTP!' },
-                                    { len: 6, message: 'Mã OTP phải gồm 6 chữ số!' }
-                                ]}
+                                rules={[{ required: true, message: 'Vui lòng nhập mã OTP!' }, 
+                                { max: 6, message: 'Mã OTP phải gồm 6 chữ số!' }]}
                                 className={styles.formItem}
                             >
+                                <Input placeholder="Nhập mã OTP" maxLength={6} className={styles.input} />
+                            </Form.Item>
+
+                            <div className={styles.resendContainer}>
                                 <Input
-                                    placeholder="Nhập mã OTP"
-                                    maxLength={6}
+                                    placeholder="Email để nhận mã OTP"
+                                    name='email'
+                                    value={emailForOtp}
+                                    onChange={(e) => setEmailForOtp(e.target.value)}
                                     className={styles.input}
                                 />
-                            </Form.Item>
-
-                            <Form.Item className={styles.formItem}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Input
-                                        style={{ flex: 1, marginRight: '8px' }}
-                                        placeholder="Email để nhận mã OTP"
-                                        name='email'
-                                        value={emailForOtp}
-                                        onChange={(e) => setEmailForOtp(e.target.value)}
-                                        className={styles.input}
-                                    />
-                                    <Button
-                                        onClick={handleResendOtp}
-                                        disabled={isOtpButtonDisabled}
-                                        className={styles.input}
-                                    >
-                                        {isOtpButtonDisabled ? `Gửi lại sau (${countdown}s)` : 'Gửi mã'}
-                                    </Button>
-
-                                </div>
-                            </Form.Item>
-
-                            <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
-                                    Xác nhận
+                                <Button
+                                    onClick={handleResendOtp}
+                                    disabled={isOtpButtonDisabled}
+                                    className={styles.resendButton}
+                                >
+                                    {isOtpButtonDisabled ? `Gửi lại sau (${countdown}s)` : 'Gửi mã'}
                                 </Button>
-                            </Form.Item>
+                            </div>
 
+                            <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
+                                Xác nhận
+                            </Button>
                         </Form>
                     </div>
                 </div>
             </Content>
-
         </Layout>
     );
+
 };
 
 export default OtpForm;

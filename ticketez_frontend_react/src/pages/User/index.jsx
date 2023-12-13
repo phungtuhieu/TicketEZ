@@ -23,6 +23,11 @@ export { default as RegisterForm } from '~/components/Auth/Register/RegisterForm
 export { default as LoginForm } from '~/components/Auth/Login/LoginForm';
 export { default as OtpForm } from '~/components/Otp/OtpForm';
 export { default as PasswordChangeForm } from '~/components/Auth/ChangePassword/ChangePasswordForm';
+export { default as ResetPasswordFrom } from '~/components/Auth/ResetPassword/ResetPasswordFrom';
+
+
+
+
 
 
 

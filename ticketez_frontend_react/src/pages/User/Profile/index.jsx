@@ -3,20 +3,20 @@ import { Form, Input, Radio, Button, Card, Avatar, DatePicker, Row, Col, Upload 
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './Profile.module.scss';
 import authApi from '~/api/user/Security/authApi';
-import moment from 'moment';
 import uploadApi from '~/api/service/uploadApi';
 import profileApi from '~/api/user/profile/profile';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
+import { validatEaddress, validateEmail, validateFullname, validatePhone } from '~/components/Auth/Custom';
 
 const EditableProfile = () => {
   const [userData, setUserData] = useState();
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(false);
-  const [editData, setEditData] = useState();
   const [birthday, setBirthday] = useState(null);
   const [fileList, setFileList] = useState([]);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +31,7 @@ const EditableProfile = () => {
 
 
         });
+        
         const newUploadFile = {
           name: user.image,
           url: `http://localhost:8081/api/upload/${user.image}`,
@@ -38,9 +39,7 @@ const EditableProfile = () => {
         console.log(newUploadFile);
         setFileList([newUploadFile]);
         setBirthday(dayjs(user.birthday));
-        // funcUtils.notify("Cập nhật thành công", 'success');
       } catch (error) {
-        // funcUtils.notify("Cập nhật Thất bại", 'error');
       }
     };
 
@@ -49,21 +48,30 @@ const EditableProfile = () => {
 
   const onSave = async (values) => {
     try {
+
       let updatedValues = {
         ...values,
 
       };
+      
+
       if (values.image.fileList) {
         const file = values.image.fileList[0].originFileObj;
-        // console.log(file);
         const image = await uploadApi.put(userData.image, file);
         updatedValues = {
           ...updatedValues,
           image: image,
         };
       }
-      console.log(updatedValues, "sssssssssssss");
+      if (values.birthday) {
+        const selectedDate = values.birthday.toDate();
+        const currentDate = new Date();
 
+        if (selectedDate > currentDate) {
+          funcUtils.notify('Ngày sinh không được vượt quá thời gian hiện tại.', 'error');
+          return;
+        }
+      }
       const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
@@ -77,13 +85,7 @@ const EditableProfile = () => {
   };
 
 
-  const onEdit = (values) => {
-    // const newUploadFile = {
-    //   name: values.image,
-    //   url: `http://localhost:8081/api/upload/${values.image}`,
-    // };
-    // setFileList([newUploadFile]);
-    setEditData(values);
+  const onEdit = () => {
     setEditing(true);
   };
 
@@ -93,7 +95,7 @@ const EditableProfile = () => {
 
 
   const onChangePassword = () => {
-    console.log('Change password clicked');
+    navigate('/changepassword');
   };
 
   const onChangeUpload = async ({ fileList: newFileList }) => {
@@ -123,7 +125,7 @@ const EditableProfile = () => {
             <div>
               {userData?.image && (
                 <Avatar
-                  size={64}
+                  size={80}
                   src={`http://localhost:8081/api/upload/${userData.image}`}
                 />
               )}
@@ -161,29 +163,16 @@ const EditableProfile = () => {
                     name="image"
                     maxCount={1}
                   >
-                    {fileList.length < 2 && '+ Upload'}
+                    {fileList.length < 1 && '+ Tải lên'}
                   </Upload>
                 </Form.Item>
-                {/* Left Column */}
-                <Form.Item
-                  name="id"
-                  label="Tên Tài khoản"
-                  rules={[{ required: true, message: 'Vui lòng nhập tên tài khoản' }]}
-                >
-                  <Input
-                    placeholder="Tên tài khoản"
-                    value={userData?.id} s
-                    disabled
-                    readOnly
-                  />
-                </Form.Item>
-
-
                 <Form.Item
                   name="fullname"
                   initialValue={userData.fullname}
                   label="Họ & Tên"
-                  rules={[{ required: true, message: 'Vui lòng nhập họ và' }]} >
+                  rules={[
+                    { validator: validateFullname },
+                  ]} >
                   <Input />
                 </Form.Item>
                 <Form.Item name="gender" label="Giới tính">
@@ -194,16 +183,27 @@ const EditableProfile = () => {
                 </Form.Item>
 
 
-                <Form.Item name="address" label="Địa chỉii" rules={[{ required: true }]} initialValue={userData.address}>
+                <Form.Item name="address" label="Địa chỉ"
+                  rules={[
+                    { validator: validatEaddress },
+                  ]}
+                  initialValue={userData.address}>
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                {/* Right Column */}
-                <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]} initialValue={userData.phone}>
+                <Form.Item name="phone" label="Số điện thoại"
+                  rules={[
+                    { validator: validatePhone },
+                  ]}
+                  initialValue={userData.phone}>
                   <Input />
                 </Form.Item>
-                <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
+                <Form.Item name="email" label="Email"
+                  rules={[
+                    { validator: validateEmail },
+                  ]}
+                  initialValue={userData.email}>
                   <Input />
                 </Form.Item>
                 <Form.Item
@@ -217,11 +217,7 @@ const EditableProfile = () => {
                     format="DD-MM-YYYY"
                     style={{ width: '100%' }}
                   />
-
                 </Form.Item>
-
-
-
                 <Form.Item name="" label="Đổi mật khẩu" >
                   <Button onClick={onChangePassword} icon={<LockOutlined />} type="default">
                     Đổi mật khẩu

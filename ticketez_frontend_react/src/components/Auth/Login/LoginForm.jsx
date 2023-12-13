@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Form, Input, Button, Checkbox, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './loginForm.module.scss';
 import img from '~/assets/img';
 import { SyncOutlined } from '@ant-design/icons';
 import authApi from '~/api/user/Security/authApi';
 import { hasSuperAdminRole } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
-import { validateId, validatePassword } from '../Custom';
-
+import {validateId, validatePassword } from '../Custom';
 const { Content } = Layout;
 
 const generateCaptcha = () => {
@@ -29,17 +28,17 @@ const LoginForm = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
+    const [isCaptchaVerified, setIsCaptchaVerified] = useState(null);
     const [isloading, issetLoading] = useState(false);
 
 
     const onFinish = async (values) => {
-        if (!validateId(values.id) || !validatePassword(values.password))
-            return;
-        if (!isCaptchaVerified) {
-            setIsModalVisible(true);
-            return;
-        }
+        // if (!validateId(values.id) || !validatePassword(values.password))
+        //     return;
+        // if (!isCaptchaVerified) {
+        //     setIsModalVisible(true);
+        //     return;
+        // }
         setLoading(true);
         try {
             const response = await authApi.getLogin({
@@ -56,7 +55,7 @@ const LoginForm = () => {
                 setTimeout(() => {
                     funcUtils.notify('Đăng nhập thành công!', 'success');
                 }, 500);
-                    navigate('/');
+                navigate('/');
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
@@ -68,26 +67,30 @@ const LoginForm = () => {
                 funcUtils.notify('Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.', 'info');
                 navigate('/otp');
             } else {
-                funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.', 'error');
+                funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại Tài khoản mật khẩu.', 'error');
             }
         } finally {
             setLoading(false);
         }
     };
-    const onFinishCaptcha = async () => {
+
+    const onFinishCaptcha = () => {
         issetLoading(true);
-         setTimeout(async () => {
+        setTimeout(() => {
             issetLoading(false);
-        if (userInput === captcha) {
-            setIsCaptchaVerified(true);
-            funcUtils.notify('Captcha xác thực thành công!', 'success');
-            setIsModalVisible(false);
-        } else {
-            funcUtils.notify('Xác thực không hợp lệ', 'error');
-            setCaptcha(generateCaptcha());
-        }
-    }, 1000);
+            if (userInput.trim().toLowerCase() === captcha.trim().toLowerCase()) {
+                setIsCaptchaVerified(true);
+                funcUtils.notify('Captcha xác thực thành công!', 'success');
+                setIsModalVisible(false);
+            } else {
+                setIsCaptchaVerified(false);
+                funcUtils.notify('Xác thực không hợp lệ', 'error');
+                setCaptcha(generateCaptcha());
+            }
+        }, 1000);
     };
+
+
 
 
     const onRefresh = () => {
@@ -113,8 +116,21 @@ const LoginForm = () => {
 
 
     const handleModalClose = () => {
+        form.resetFields();
+        setCaptcha(generateCaptcha());
+        setIsCaptchaVerified(false);
+        setUserInput('');
         setIsModalVisible(false);
     };
+
+    const onCaptchaChange = (e) => {
+        setUserInput(e.target.value);
+        if (isCaptchaVerified === false) {
+            setIsCaptchaVerified(null);
+        }
+    };
+
+
     return (
         <Layout className="layout">
             <Content className={styles.content}>
@@ -131,7 +147,9 @@ const LoginForm = () => {
                         >
                             <Form.Item
                                 name="id"
-                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản !' }]}
+                                rules={[
+                                    { validator: validateId }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
@@ -139,7 +157,9 @@ const LoginForm = () => {
 
                             <Form.Item
                                 name="password"
-                                rules={[{ required: true, message: 'Không được bỏ trống mật khẩu !' }]}
+                                rules={[
+                                    { validator: validatePassword }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />
@@ -147,9 +167,9 @@ const LoginForm = () => {
 
                             <Form.Item className={styles.formItem}>
                                 <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
-                                <a className={styles.forgot} href="">
+                                <Link className={styles.forgot} to="/forgotpassword">
                                     Quên mật khẩu
-                                </a>
+                                </Link>
                             </Form.Item>
 
                             <Form.Item className={styles.formItem}>
@@ -157,7 +177,10 @@ const LoginForm = () => {
                                     Đăng nhập
                                 </Button>
                                 <p className={styles.signup}>
-                                    Bạn chưa có tài khoản <a href="http://localhost:3000/Register">Đăng ký</a>
+                                    Bạn chưa có tài khoản
+                                    <Link className={styles.forgot} to="/Register">
+                                        Đăng Ký
+                                    </Link>
                                 </p>
                             </Form.Item>
                         </Form>
@@ -178,7 +201,7 @@ const LoginForm = () => {
             >
                 <Form form={form} onFinish={onFinishCaptcha} className="captcha-form">
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                        <div style={{ backgroundColor: 'lightblue', padding: '5px' }}>
+                        <div style={{ padding: '5px' }}>
                             <div style={{ marginRight: '5px', fontSize: '24px', letterSpacing: '10px' }}>
                                 {captcha.slice(0, 6)}
                             </div>
@@ -216,14 +239,18 @@ const LoginForm = () => {
                             { required: true, message: 'Vui lòng nhập captcha!' },
                             { max: 6, message: 'Mã captcha chỉ được tối đa 6 kí tự!' }
                         ]}
-                        style={{ marginBottom: '10px' }}
+                        className={styles.captchaInput}
+                        validateStatus={isCaptchaVerified !== null ? (isCaptchaVerified ? 'success' : 'error') : undefined}
+                        help={isCaptchaVerified === false ? 'Captcha không đúng, vui lòng thử lại.' : undefined}
                     >
                         <Input
                             placeholder="Nhập mã captcha"
-                            onChange={(e) => setUserInput(e.target.value)}
+                            onChange={onCaptchaChange}
                             maxLength={6}
                         />
+
                     </Form.Item>
+
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit" block loading={isloading}>

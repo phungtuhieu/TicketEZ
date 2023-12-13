@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ChangePasswordForm.module.scss';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
-
+import { validateEmail, validateId, validatePassword, validatePhone, validateFullname } from '../Custom';
 const { Content } = Layout;
 
 const PasswordChangeForm = () => {
@@ -41,64 +41,73 @@ const PasswordChangeForm = () => {
         }
     };
 
+
     return (
         <Layout className="layout">
             <Content className={styles.content}>
-                <div className={styles.wrapper}>
-                    <div className={styles.loginContainer}>
-                        <Form
-                            name="passwordChange"
-                            className={styles.loginForm}
-                            onFinish={onFinish}
-                            autoComplete="off"
+                <div className={styles.formContainer}>
+                    <Form
+                        name="passwordChange"
+                        onFinish={onFinish}
+                        autoComplete="off"
+                        className={styles.passwordChangeForm}
+                    >
+                        <h3 className={styles.formTitle}>Đổi Mật Khẩu</h3>
+                        <Form.Item
+                            name="id"
+                            rules={[
+                                { validator: validateId },
+                            ]}
                         >
-                            <div className='formLabel'>
-                                <p className={styles.formLabel}><h3>Đổi Mật Khẩu:</h3></p>
-                            </div>
-                            <Form.Item
-                                name="id"
-                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản!' }]}
-                                className={styles.formItem}
-                            >
-                                <Input placeholder="Tên Tài khoản" className={styles.input} />
-                            </Form.Item>
-                            <Form.Item
-                                name="oldPassword"
-                                rules={[
-                                    { required: true, message: 'Vui lòng nhập mật khẩu cũ!' },
-                                ]}
-                                className={styles.formItem}
-                            >
-                                <Input.Password placeholder="Mật khẩu cũ" className={styles.input} />
-                            </Form.Item>
-                            <Form.Item
-                                name="newPassword"
-                                rules={[
-                                    { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
-                                ]}
-                                className={styles.formItem}
-                            >
-                                <Input.Password placeholder="Mật khẩu mới" className={styles.input} />
-                            </Form.Item>
-                            <Form.Item
-                                name="confirmNewPassword"
-                                rules={[
-                                    { required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },
-                                ]}
-                                className={styles.formItem}
-                            >
-                                <Input.Password placeholder="Xác nhận mật khẩu mới" className={styles.input} />
-                            </Form.Item>
-                            <Form.Item className={styles.formItem}>
-                                <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
-                                    Đổi mật khẩu
-                                </Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
+                            <Input placeholder="Tên Tài khoản" />
+                        </Form.Item>
+                        <Form.Item
+                            name="oldPassword"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập mật khẩu cũ!' },
+                                { validator: validatePassword },
+                            ]}
+                        >
+                            <Input.Password />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="newPassword"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
+                                { validator: validatePassword },
+                            ]}
+                        >
+                            <Input.Password placeholder="Mật khẩu mới" />
+                        </Form.Item>
+                        <Form.Item
+                            name="confirmNewPassword"
+                            dependencies={['newPassword']}
+                            hasFeedback
+                            rules={[
+                                { required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('newPassword') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                                    },
+                                }),
+                            ]}
+                        >
+                            <Input.Password placeholder="Xác nhận mật khẩu mới" />
+                        </Form.Item>
+                        {/* Submit Button */}
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit" block loading={loading}>
+                                Đổi mật khẩu
+                            </Button>
+                        </Form.Item>
+                    </Form>
                 </div>
             </Content>
-        </Layout>
+        </Layout >
     );
 };
 

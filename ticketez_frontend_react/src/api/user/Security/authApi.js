@@ -7,7 +7,9 @@ const endpoints = {
     logout: 'auth/logout',
     regenerateOtp: 'auth/regenerate-otp',
     verifyAccount: 'auth/verify-account',
-    changePassword: 'auth/change-password'
+    changePassword: 'auth/change-password',
+    SendOtpEmail: 'auth/forgot-password',
+    ResetPassword: 'auth/reset-password'
 };
 
 
@@ -96,6 +98,30 @@ const authApi = {
         }
     },
 
+    
+
+    ResetPasswordNew: async (values) => {
+        try {
+
+            const response = await axiosClient.put(endpoints.ResetPassword, values);
+            return response.data;
+        } catch (error) {
+            console.error('Lỗi Đổi mật khẩu:', error);
+            throw error;
+        } 
+    },
+
+    sendOtpEmailNew: async (values) => {
+        try {
+            const response = await axiosClient.put(endpoints.SendOtpEmail, values);
+            return response.data; 
+        } catch (error) {
+            console.error('Lỗi gửi email:', error);
+            throw error; 
+        }
+    },
+    
+
 
 
 
@@ -111,7 +137,7 @@ const authApi = {
         }
         return null;
     },
-    
+
 
     getUser() {
         const user = localStorage.getItem('user');
