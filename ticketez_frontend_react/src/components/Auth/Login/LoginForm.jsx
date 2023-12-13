@@ -7,7 +7,7 @@ import { SyncOutlined } from '@ant-design/icons';
 import authApi from '~/api/user/Security/authApi';
 import { hasSuperAdminRole } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
-import {validateId, validatePassword } from '../Custom';
+import { validateId, validatePassword } from '../Custom';
 const { Content } = Layout;
 
 const generateCaptcha = () => {
@@ -33,18 +33,18 @@ const LoginForm = () => {
 
 
     const onFinish = async (values) => {
-        // if (!validateId(values.id) || !validatePassword(values.password))
-        //     return;
-        // if (!isCaptchaVerified) {
-        //     setIsModalVisible(true);
-        //     return;
-        // }
+        if (!isCaptchaVerified) {
+            setIsModalVisible(true);
+            return;
+        }
         setLoading(true);
         try {
+
             const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
             });
+
             if (hasSuperAdminRole()) {
                 navigate('/admin/index');
                 setTimeout(() => {
@@ -60,8 +60,8 @@ const LoginForm = () => {
                     window.location.reload();
                 }, 500);
             }
-            setIsModalVisible(true);
 
+            setIsModalVisible(true);
         } catch (error) {
             if (error.response && error.response.status === 403) {
                 funcUtils.notify('Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.', 'info');
@@ -148,8 +148,8 @@ const LoginForm = () => {
                             <Form.Item
                                 name="id"
                                 rules={[
-                                    { validator: validateId }, 
-                                  ]}
+                                    { validator: validateId },
+                                ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
@@ -158,8 +158,8 @@ const LoginForm = () => {
                             <Form.Item
                                 name="password"
                                 rules={[
-                                    { validator: validatePassword }, 
-                                  ]}
+                                    { validator: validatePassword },
+                                ]}
                                 className={styles.formItem}
                             >
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />

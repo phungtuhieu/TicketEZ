@@ -2,14 +2,50 @@ import { SearchOutlined } from '@ant-design/icons';
 import { faBell, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, Row, Input, Dropdown } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
 import { Menu } from 'antd';
+import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(style);
 
+
+
 function HeaderAdminRight() {
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const user = await authApi.getUser();
+                setUserData(user);
+                console.log(user);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [loading]);
+
+    const handleLogout = async () => {
+        try {
+            authApi.logout();
+            localStorage.clear();
+            funcUtils.notify('Đăng Xuất thành công!', 'success');
+            navigate('/');
+        } catch (error) {
+            funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
+        }
+    };
+
     const itemsBell = [
         {
             key: '1',
@@ -41,8 +77,8 @@ function HeaderAdminRight() {
         {
             key: '1',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                    cài đặt 1
+                <a target="_self" onClick={handleLogout} rel="noopener noreferrer">
+                    Đăng xuất
                 </a>
             ),
         },
@@ -87,7 +123,12 @@ function HeaderAdminRight() {
                         <span className={cx('title-left')}>Home /</span>
                         <span className={cx('name-left')}> Dashboard</span>
                     </div> */}
-                    <span>Xin chào, Minh khôi</span>
+                    <span className="name-short">
+                        Xin chào,{' '}
+                        {userData?.fullname == null || userData?.fullname == undefined
+                            ? ''
+                            : userData.fullname.split(' ').pop()}
+                    </span>
                 </Col>
                 <Col lg={9} xs={24} className={cx('item-hearder-right')} flex={1}>
                     <Input
