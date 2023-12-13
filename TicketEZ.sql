@@ -320,6 +320,7 @@ GO
         [name] NVARCHAR(200) NOT NULL,
         [description] NVARCHAR(MAX),
         [image] NVARCHAR(MAX) NOT NULL,
+        quantity INT NOT NULL,
         cinema_complex_id BIGINT NOT NULL
     )
 GO
@@ -327,6 +328,7 @@ GO
     CREATE TABLE [Service_Choose] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
         service_id BIGINT NOT NULL,
+        quantity INT NOT NULL,
         price FLOAT NOT NULL,
     )
 
@@ -1288,25 +1290,25 @@ VALUES
 GO
 
 -- 5. Thêm dữ liệu cho dịch vụ của rạp phim services
-INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [cinema_complex_id])
+INSERT INTO [TicketEZ].[dbo].[Services] ([name], [description], [image], [quantity],[cinema_complex_id])
 VALUES
-    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim', 'food.jpg', 1),
-    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim', 'vip.jpg', 1),
+    (N'My combo', N'1 bắp lớn + 1 nước siêu lớn. Nhận trong ngày xem phim',  'food.jpg',30, 1),
+    (N'CGV Combo', N'1 bắp lớn + 2 nước siêu lớn. Nhận trong ngày xem phim',  'vip.jpg',30, 1),
     (N'SPECIAL DRINK FAMILY COMBO', N'04 nước pha chế vừa (nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) + 02 bắp ngọt. Nhận trong ngày xem phim. 
 	Chỉ thêm 5,000đ đổi sang nước lớn.
-	Số lượng quà tặng có giới hạn', '3d_glasses.jpg', 3),
+	Số lượng quà tặng có giới hạn',  '3d_glasses.jpg',30, 3),
     (N'SPECIAL DRINK MD COMBO', N'01 ly nhân vật tùy chọn + 02 nước pha chế vừa ( nước trái cây xoài đào / trà sữa đường nâu / trà vải / milo ) 
 	+ 01 bắp ngọt - Nhận trong ngày xem phim - Mẫu ly nhân vật phụ thuộc vào số lượng tại rạp 
-	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg', 1),
+	- Không áp dụng đối với mẫu ly mới ra mắt - Số lượng quà tặng có giới hạn', 'parking.jpg',30, 1),
     (N'TRIDENT MY COMBO', N'1 ly Aquaman Trident + 1 nước ngọt siêu lớn + 1 bắp lớn tùy chọn vị
-- Nhận trong ngày xem phim', 'online_booking.jpg', 2),
+- Nhận trong ngày xem phim',  'online_booking.jpg',30, 2),
     (N'GARFIELD TRIPPLE COMBO 2023', N'03 ly nhân vật Garfield (kèm nước) + 01 bắp hai vị
 * Nhận ngay trong ngày xem phim
-** Mẫu ly phụ thuộc vào số lượng của rạp', 'birthday.jpg', 2),
+** Mẫu ly phụ thuộc vào số lượng của rạp',  'birthday.jpg',30, 2),
     (N'GARFIELD DOUBLE COMBO 2023', N'02 ly nhân vật Garfield (kèm nước)
 * Nhận ngay trong ngày xem phim
 ** Thêm 39,000đ nhận ngay 1 bắp ngọt
-*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg', 9)
+*** Mẫu ly phụ thuộc vào số lượng của rạp', 'private_screening.jpg',30, 9)
    
 GO
  -- 6. Thêm dữ liệu giá cho dịch vụ Price services
@@ -1509,8 +1511,11 @@ VALUES
 (N'SUPER_ADMIN', N'Quyền cao nhất trong hệ thống.'),
 (N'USER', N'Người dùng thông thường'),
 (N'MOVIE_MANAGEMENT_ADMIN', N'Quyền quản lý thông tin về phim'),
-(N'SCHEDULING_PRICING_ADMIN', N'Quyền quản lý lịch chiếu, gia ghế, ghế'),
-(N'USER_MANAGEMENT_ADMIN', N'Quyền quản lý tài khoản và thông tin người dùng.')
+(N'SCHEDULING_PRICING_ADMIN', N'Quyền quản lý lịch chiếu, giá ghế, ghế'),
+(N'USER_MANAGEMENT_ADMIN', N'Quyền quản lý tài khoản và thông tin người dùng.'),
+(N'CINEMA_MANAGEMENT_ADMIN', N'Quyền quản lý rap phim'),
+(N'SERVICE_EVENT_MANAGEMENT_ADMIN', N'Quản lý dịch vụ sự kiện')
+
 GO
 -- Bạn có thể tiếp tục chèn dữ liệu cho các vai khác nếu cần.
 
@@ -1518,30 +1523,17 @@ GO
 INSERT INTO Accounts (id, phone, fullname, [image], email, [address], [password], birthday, gender, [status], verified, created_date, points)
 VALUES
 ('admin', '0987654321', N'Nguyễn Văn A', 'image1.jpg', 'nguyen.va@gmail.com', N'123 Đường ABC, Quận 1, TP.HCM', 'admin', '1990-01-15', 1, 1, 1, '2023-01-01 08:00:00', 0),
+('admin01',	'0844457992'	,'admin',	'a480eae8-382f-4e07-af9f-09d351b587a4_user.jpg',	'admin123@gmail.com',	NULL,N'$2a$10$1nAbLCEE4i/zu.O.6UgwHu84wz5b6PGudB9TwscvHnHI/TAMePINy'	,NULL,	0, 1, 1,	'2023-12-09 16:44:17.837',	0),
 ('user2', '0901234567', N'Trần Thị B', 'image2.jpg', 'tran.thi.b@gmail.com', N'456 Đường XYZ, Quận 2, TP.HCM', 'user2', '1985-03-20', 0, 1, 0, '2023-01-02 09:30:00', 75),
 ('user3', '0912345678', N'Lê Văn C', 'image3.jpg', 'le.van.c@gmail.com', N'789 Đường DEF, Quận 3, TP.HCM', 'user3', '1995-11-10', 1, 1, 1, '2023-01-03 11:15:00', 120),
 ('user4', '0976543210', N'Phạm Thị D', 'image4.jpg', 'pham.thi.d@gmail.com', N'101 Đường GHI, Quận 4, TP.HCM', 'user4', '1988-07-05', 0, 1, 1, '2023-01-04 13:45:00', 90),
 ('user5', '0965432109', N'Huỳnh Văn E', 'image5.jpg', 'huynh.van.e@gmail.com', N'202 Đường KLM, Quận 5, TP.HCM', 'user5', '1992-09-30', 1, 1, 1, '2023-01-05 16:20:00', 150),
-('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60),
-('user7', '0909876543', N'Đặng Văn G', 'image7.jpg', 'dang.van.g@gmail.com', N'404 Đường QRS, Quận 7, TP.HCM', 'user7', '1998-02-12', 1, 1, 1, '2023-01-07 21:55:00', 110),
-('user8', '0918765432', N'Lý Thị H', 'image8.jpg', 'ly.thi.h@gmail.com', N'505 Đường TUV, Quận 8, TP.HCM', 'user8', '1993-06-18', 0, 1, 1, '2023-01-08 23:30:00', 80),
-('user9', '0961234876', N'Mai Văn I', 'image9.jpg', 'mai.van.i@gmail.com', N'606 Đường WXY, Quận 9, TP.HCM', 'user9', '1989-04-28', 1, 1, 1, '2023-01-09 02:15:00', 130),
-('user10', '0934785236', N'Ngô Thị K', 'image10.jpg', 'ngo.thi.k@gmail.com', N'707 Đường LMN, Quận 10, TP.HCM', 'user10', '1991-08-08', 0, 1, 1, '2023-01-10 04:50:00', 70),
-('user11', '0987612345', N'Hồ Văn L', 'image11.jpg', 'ho.van.l@gmail.com', N'808 Đường UVW, Quận 11, TP.HCM', 'user11', '1997-10-22', 1, 1, 1, '2023-01-11 07:35:00', 140),
-('user12', '0912345678', N'Phan Văn M', 'image12.jpg', 'phan.van.m@gmail.com', N'909 Đường OPQ, Quận 12, TP.HCM', 'user12', '1987-05-15', 0, 1, 1, '2023-01-12 10:20:00', 95),
-('user13', '0905432s187', N'Chu Thị N', 'image13.jpg', 'chu.thi.n@gmail.com', N'123 Đường STU, Quận Gò Vấp, TP.HCM', 'user13', '1994-01-05', 1, 1, 1, '2023-01-13 13:05:00', 105),
-('user14', '0965432187', N'Bùi Văn O', 'image14.jpg', 'bui.van.o@gmail.com', N'234 Đường Kẹp, Quận Tân Bình, TP.HCM', 'user14', '1996-03-10', 1, 1, 1, '2023-01-14 15:40:00', 65),
-('user15', '0976543298', N'Trương Thị P', 'image15.jpg', 'truong.thi.p@gmail.com', N'345 Đường Xé, Quận Tân Phú, TP.HCM', 'user15', '1999-07-02', 1, 1, 1, '2023-01-15 18:25:00', 125),
-('user16', '0923456789', N'Lê Văn Q', 'image16.jpg', 'le.van.q@gmail.com', N'456 Đường Mãn, Quận Bình Tân, TP.HCM', 'user16', '1993-09-20', 1, 1, 1, '2023-01-16 20:55:00', 75),
-('user17', '0901234567', N'Vũ Thị R', 'image17.jpg', 'vu.thi.r@gmail.com', N'567 Đường Khoá, Quận Thủ Đức, TP.HCM', 'user17', '1990-12-12', 0, 1, 0, '2023-01-17 23:40:00', 110),
-('user18', '0934567890', N'Phạm Thị S', 'image18.jpg', 'pham.thi.s@gmail.com', N'678 Đường Khoá, Quận Củ Chi, TP.HCM', 'user18', '1986-11-08', 0, 1, 1, '2023-01-18 02:25:00', 90),
-('user19', '0918765432', N'Tôn Thị T', 'image19.jpg', 'ton.thi.t@gmail.com', N'789 Đường Lờ, Quận Hóc Môn, TP.HCM', 'user19', '1997-04-28', 1, 1, 1, '2023-01-19 04:55:00', 140),
-('user20', '0987654321', N'Dương Văn U', 'image20.jpg', 'duong.van.u@gmail.com', N'890 Đường Đùi, Quận Nhà Bè, TP.HCM', 'user20', '1995-08-18', 1, 1, 1, '2023-01-20 07:40:00', 80);
+('user6', '0981234567', N'Võ Thị F', 'image6.jpg', 'vo.thi.f@gmail.com', N'303 Đường NOP, Quận 6, TP.HCM', 'user6', '1984-12-25', 0, 1, 0, '2023-01-06 19:10:00', 60)
 GO
 
 INSERT INTO Accounts_Roles (account_id, role_id)
 VALUES
-('admin', 1), -- Tài khoản 1 có vai trò "Super Admin"
+('admin01', 1), -- Tài khoản 1 có vai trò "Super Admin"
 ('user2', 2) -- Tài khoản 2 có vai trò "Movie Management Admin"
 GO
 -- 18. thêm dữ liệu bảng actor

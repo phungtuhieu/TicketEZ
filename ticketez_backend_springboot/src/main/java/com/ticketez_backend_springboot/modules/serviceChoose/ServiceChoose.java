@@ -27,6 +27,6 @@ public class ServiceChoose {
     @ManyToOne
     @JoinColumn(name = "service_id")
     private Service service;
-
+    private Integer quantity;
     private Double price;
 }

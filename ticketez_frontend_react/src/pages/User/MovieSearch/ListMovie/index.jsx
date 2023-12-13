@@ -123,7 +123,7 @@ function ListMovie() {
                     valueTL,
                     valueQG.code,
                     valueN,
-                    searchValue,
+                    debounce,
                 );
                 setTotalItems(resss.totalItems);
                 setData(resss.listMovieObjResp);
@@ -136,7 +136,7 @@ function ListMovie() {
             }
         };
         res();
-    }, [currentPage, pageSize, valueTL, valueQG, searchValue, valueN]);
+    }, [currentPage, pageSize, valueTL, valueQG, debounce, valueN]);
 
     return (
         <Row className=" tw-relative tw-w-[80%] tw-h-[100%]">
@@ -148,7 +148,7 @@ function ListMovie() {
             <Col span={24} className=" tw-h-[65px] tw-mb-[25px] ">
                 <Row className="tw-h-[100%] tw-flex tw-items-center tw-justify-center">
                     <Col span={12} className=" tw-flex tw-items-center  tw-h-[100%]">
-                        <h1 className="tw-text-[24px] tw-text-[var(--pink)]"> Tìm phim chiếu rạp trên MoMo</h1>
+                        <h1 className="tw-text-[24px] tw-text-[var(--primary--text-color)]"> Tìm phim chiếu rạp trên MoMo</h1>
                     </Col>
                     <Col span={12} className=" tw-flex tw-items-center  tw-justify-center  tw-h-[100%]">
                         {/* select Thể loại */}
@@ -158,7 +158,7 @@ function ListMovie() {
                                 className="tw-w-[120px] tw-cursor-pointer tw-h-[36px] tw-bg-white tw-text-[#000000] tw-font-normal tw-text-[14px] tw-p-[9px] tw-rounded  tw-border-[1px] tw-border-slate-300 tw-text-left  "
                             >
                                 <div className="tw-truncate tw-w-[84px]">
-                                    <Tooltip title={valueTL === 'tất cả' ? '' : valueTL} color="#d82f8b">
+                                    <Tooltip title={valueTL === 'tất cả' ? '' : valueTL} color="#176b87">
                                         {valueTL === 'tất cả' ? 'Thể loại' : valueTL}
                                     </Tooltip>
                                 </div>
@@ -184,7 +184,7 @@ function ListMovie() {
                                                 onClick={() => handleValueTL(item.name)}
                                                 className={valueTL === item.name ? 'btn btn-active' : 'btn btn-text'}
                                             >
-                                                <Tooltip title={item.name} color="#d82f8b">
+                                                <Tooltip title={item.name} color="#176b87">
                                                     <span className="tw-truncate">{item.name}</span>
                                                 </Tooltip>
                                             </Button>
@@ -201,7 +201,7 @@ function ListMovie() {
                                 className="tw-w-[120px]  tw-cursor-pointer tw-bg-white tw-text-[#000000] tw-font-normal tw-text-[14px] tw-p-[9px] tw-rounded  tw-border-[1px] tw-border-slate-300 tw-text-left  "
                             >
                                 <div className="tw-truncate tw-w-[84px]">
-                                    <Tooltip title={valueQG.code === 'tc' ? '' : valueQG.name} color="#d82f8b">
+                                    <Tooltip title={valueQG.code === 'tc' ? '' : valueQG.name} color="#176b87">
                                         {valueQG.code === 'tc' ? 'Quốc gia' : valueQG.name}
                                     </Tooltip>
                                 </div>

@@ -266,12 +266,16 @@ const AdminShowtime = () => {
             setLoading(false);
         }
 
-
         if (valueSelectCinemaComplex && valueTimeMovie && valueSelectDate && valueFormat) {
             const getPriceByMovieAndCinemaComplexAndDate = async () => {
                 try {
                     const formatDate = moment(valueSelectDate).format('YYYY-MM-DD');
-                    if (valueSelectCinemaComplex !== null && valueTimeMovie !== null && valueSelectDate !== null && valueFormat !== null) {
+                    if (
+                        valueSelectCinemaComplex !== null &&
+                        valueTimeMovie !== null &&
+                        valueSelectDate !== null &&
+                        valueFormat !== null
+                    ) {
                         const res = await priceSeatApi.getPriceByMovieAndCinemaComplexAndDate(
                             valueTimeMovie,
                             valueFormat,
@@ -288,7 +292,7 @@ const AdminShowtime = () => {
                         setValuePriceBySeatType(res.data[0].newPriceSeatTypeDTOs);
                     }
                 } catch (error) {
-                     console.log(error.response.data);
+                    console.log(error.response.data);
                 }
             };
             getPriceByMovieAndCinemaComplexAndDate();
@@ -303,9 +307,7 @@ const AdminShowtime = () => {
         valueSelectPrice,
     ]);
 
-
     const columns = [
-        
         {
             title: 'Xuất chiếu',
             align: 'center',
@@ -492,6 +494,7 @@ const AdminShowtime = () => {
         setValueStartTimeEdit(record.endTime);
         setValueEndtimeByTimeMovieAndStartime(time);
         setvaluePrice(record.price.id);
+        setvalueSelectPrice(record.price.id);
         setSelectedOption1(record.cinema.cinemaComplex.province ? record.cinema.cinemaComplex.province.id : null);
         setSelectedOption2(record.cinema.cinemaComplex ? record.cinema.cinemaComplex.id : null);
         setSelectedOption3(record.cinema ? record.cinema.id : null);
@@ -733,6 +736,10 @@ const AdminShowtime = () => {
         setSelectedOption5(null);
         setSelectedOption6(null);
         setSelectedOption7(null);
+        setvaluePrice(null);
+        setvalueSelectPrice(null);
+        setValuePriceBySeatType(null);
+        setvalueShowtimeByEndtime(null);
         form.setFieldsValue({
             format: null,
             seatChart: null,
@@ -745,9 +752,13 @@ const AdminShowtime = () => {
     const onChangSelectFormat = (value) => {
         setSelectedOption5(value);
         setValueFormat(value);
+        setSelectedOption7(null);
+        setvaluePrice(null);
+        setvalueSelectPrice(null);
+        setvalueShowtimeByEndtime(null);
+        setValuePriceBySeatType(null);
         form.setFieldsValue({
-            time: null,
-            date: null,
+            price: null,
         });
         setvalueShowtimeByEndtime(null);
     };

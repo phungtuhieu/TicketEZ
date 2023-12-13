@@ -250,7 +250,7 @@ const Binhluan = () => {
                     ) : (
                         // Nếu chưa thanh toán, hiển thị thông báo và ẩn input và nút bình luận
                         <div>
-                            <p>Vui lòng thanh toán để có thể bình luận.</p>
+                            <p className="tw-text-red-400">Vui lòng thanh toán để có thể bình luận.</p>
                         </div>
                     )}
                 </Col>

@@ -113,6 +113,7 @@ function MovieTickets() {
                     <div className={cx('wrapp-btn-download')}>
                         <Button onClick={handleSavePdf} className={cx('btn-download-ticket')}>
                             <FontAwesomeIcon icon={solidIcons.faFileExport} />
+                            
                         </Button>
                     </div>
 
