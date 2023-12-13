@@ -275,6 +275,7 @@ GO
 		last_selected_time DATETIME,
 		[seat_id] BIGINT NOT NULL,
 		showtime_id BIGINT NOT NULL,
+		account_id NVARCHAR(20) NOT NULL
     )
 GO
     CREATE TABLE Price (
@@ -327,6 +328,7 @@ GO
 
     CREATE TABLE [Service_Choose] (
         id BIGINT IDENTITY(1, 1) NOT NULL,
+        account_id NVARCHAR(20) NOT NULL,
         service_id BIGINT NOT NULL,
         quantity INT NOT NULL,
         price FLOAT NOT NULL,
@@ -415,6 +417,7 @@ GO
     CREATE TABLE Services_Booking (
         booking_id NVARCHAR(10)NOT NULL,
         service_id BIGINT NOT NULL,
+		quantity INT NOT NULL,
 		price FLOAT NOT NULL
     )
 GO
@@ -983,6 +986,11 @@ ALTER TABLE
 ADD
     CONSTRAINT FK_Service_Choose_Service FOREIGN KEY (service_id) REFERENCES Services(id)
 GO
+ALTER TABLE
+    [Service_Choose]
+ADD
+    CONSTRAINT FK_Service_Choose_Account FOREIGN KEY (account_id) REFERENCES Accounts(id)
+GO
     -- /Services_Booking
     -- Payment_Info
 ALTER TABLE
@@ -999,8 +1007,13 @@ GO
     [Seats_Choose]
 ADD
     CONSTRAINT FK_Choose_Seat_showtime FOREIGN KEY (showtime_id) REFERENCES Showtimes(id)
+	GO
     -- /seatChoose
-
+		ALTER TABLE
+    [Seats_Choose]
+ADD
+    CONSTRAINT FK_Choose_Seat_Account FOREIGN KEY (account_id) REFERENCES Accounts(id)
+	GO
 		ALTER TABLE
     [Price_Seat_Types]
 ADD

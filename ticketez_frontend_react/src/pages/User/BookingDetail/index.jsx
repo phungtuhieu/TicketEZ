@@ -15,10 +15,11 @@ import httpStatus from '~/api/global/httpStatus';
 import funcUtils from '~/utils/funcUtils';
 import { useNavigate } from 'react-router-dom';
 import authApi from '~/api/user/Security/authApi';
+import { serviceChooseApi } from '~/api/user';
 const cx = classNames.bind(style);
 
 function BookingDetail(props) {
-    const { showtime, seatBooking } = props;
+    const { showtime, seatBooking, selectedCombos = [] } = props;
     const [text, setText] = useState('https://ant.design/');
     const [showtimeInfo, setShowtimeInfo] = useState({});
     const [loading, setLoading] = useState(true);
@@ -27,11 +28,11 @@ function BookingDetail(props) {
     const [account, setAccount] = useState(null);
     const [total, setTotal] = useState(0);
     const [form] = Form.useForm();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     // Load table
     useEffect(() => {
-        console.log('seatBooking2a', seatBooking);
-
+        // console.log('seatBooking2a', seatBooking);
+        // console.log('selectedCombos', selectedCombos);
         const fetchData = async () => {
             if (showtime != null) {
                 if (seatBooking != null) {
@@ -43,10 +44,10 @@ function BookingDetail(props) {
 
                     const dateNow = moment();
                     const today = dateNow.toDate().getDay();
-                    console.log('seatBooking1', seatBooking);
-                    console.log('today', dateNow.toDate().getDay());
+                    // console.log('seatBooking1', seatBooking);
+                    // console.log('today', dateNow.toDate().getDay());
                     // const seatTypeIds = seatBooking.map((item) => item.seatType.id);
-                    console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
+                    // console.log('showtime cinema', showtime.cinema.cinemaComplex.id);
 
                     const getPriceList = async () => {
                         const listPriceDb = await priceSeatApi.findAllPriceAndPriceSeatTypeDTOByShowtimeId(showtime.id);
@@ -54,9 +55,9 @@ function BookingDetail(props) {
                     };
 
                     const listPriceResp = await getPriceList();
-                    console.log('listPriceResp', listPriceResp);
+                    // console.log('listPriceResp', listPriceResp);
                     let listPr = [];
-                    const totalAmount = seatBooking.reduce((total, item) => {
+                    let totalAmount = seatBooking.reduce((total, item) => {
                         const seatTypeAndPrice = {
                             seatTypeId: 0,
                             price: 0.0,
@@ -82,14 +83,21 @@ function BookingDetail(props) {
                         style: 'currency',
                         currency: 'VND',
                     }).format(totalAmount);
-                    setTotal(totalAmount);
-                    console.log('totalAmount', totalAmount);
-                    console.log('formattedTotalAmount', formattedTotalAmount);
+                    let totalAll = 0;
+                    if (selectedCombos.length > 0) {
+                        let totalPriceService = selectedCombos.reduce((total, item) => total + item.price, 0);
+                        totalAll = totalAmount + totalPriceService;
+                    } else {
+                        totalAll = totalAmount;
+                    }
+                    setTotal(totalAll);
+                    // console.log('totalAmount', totalAmount);
+                    // console.log('formattedTotalAmount', formattedTotalAmount);
                     const seatInfo = {
                         listSeat: seatBooking,
                         totalAmount: formattedTotalAmount,
                     };
-                    console.log('totalAmount', totalAmount);
+                    // console.log('totalAmount', totalAmount);
                     const infoS = {
                         ratingCode: showtime.formatMovie.movie.mpaaRating.ratingCode,
                         colorCode: showtime.formatMovie.movie.mpaaRating.colorCode,
@@ -118,15 +126,15 @@ function BookingDetail(props) {
                                 email: acc.email,
                                 phone: acc.phone,
                             };
-                            console.log('acc', acc);
+                            // console.log('acc', acc);
                             setAccount(acc);
                             form.setFieldsValue(accInfo);
                         }
                     } catch (error) {
                         console.log(error);
                     }
-                    console.log('showtime', showtime);
-                    console.log('seatBooking', seatBooking);
+                    // console.log('showtime', showtime);
+                    // console.log('seatBooking', seatBooking);
                     // const acc = authApi.getUser();
                     // form.setFieldValue({
                     //     fullname: acc.fullname,
@@ -140,7 +148,7 @@ function BookingDetail(props) {
         };
 
         fetchData();
-    }, [showtime, seatBooking]);
+    }, [showtime, seatBooking, selectedCombos]);
 
     const handlePurchase = async () => {
         try {
@@ -148,7 +156,11 @@ function BookingDetail(props) {
             // if (!Object.values(values).every((value) => value !== null && value !== undefined)) {
             //     funcUtils.notify('Vui lòng điền thông tin người dùng!', 'error');
             // }
-            console.log('account', account);
+            // console.log('account', account);
+            if (selectedCombos.length > 0) {
+                const respServiceChoice = await serviceChooseApi.createListServiceChoose(selectedCombos);
+                console.log('respServiceChoice: ', respServiceChoice);
+            }
             let accUpdate = {
                 ...account,
                 gender: true,
@@ -222,14 +234,14 @@ function BookingDetail(props) {
         const randomNumber = parseInt(randomId, 16) % Math.pow(10, 10);
 
         // Hiển thị log với màu sắc và định dạng thời gian
-        console.log({
-            timestamp: timestamp,
-            randomString: randomString,
-            combinedString: combinedString,
-            hash: hash,
-            randomId: randomId,
-            randomNumber: randomNumber,
-        });
+        // console.log({
+        //     timestamp: timestamp,
+        //     randomString: randomString,
+        //     combinedString: combinedString,
+        //     hash: hash,
+        //     randomId: randomId,
+        //     randomNumber: randomNumber,
+        // });
 
         return JSON.stringify(randomNumber);
     };
@@ -331,6 +343,11 @@ function BookingDetail(props) {
                                                         {showtimeInfo.seatInfo.listSeat
                                                             .map((item) => item.name)
                                                             .join(', ')}
+                                                        {
+                                                            // listCombo.lenght > 0 && listCombo.map((combo) => {
+                                                            //     combo
+                                                            // })
+                                                        }
                                                     </b>
                                                 </li>
                                             </ul>
@@ -344,6 +361,31 @@ function BookingDetail(props) {
                                             </ul>
                                         </Col>
                                     </Row>
+                                    {selectedCombos.length > 0 && (
+                                        <div className={cx('wrapp-combo-info')}>
+                                            <ul className={cx('wrapp-info-details')}>
+                                                <li className={cx('label-inner', 'text-gray-500')}>Bắp - nước</li>
+                                                {selectedCombos.map((combo) => (
+                                                    <li className={cx('info-inner', 'tw-flex tw-justify-between')}>
+                                                        <b>
+                                                            <span className={cx('combo-quantity')}>
+                                                                {combo.quantity}
+                                                            </span>
+                                                            <span className={cx('combo-name')}>
+                                                                &nbsp;X {combo.service.name}
+                                                            </span>
+                                                        </b>
+                                                        <b>
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(combo.price)}
+                                                        </b>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                     <Divider dashed className={cx('divider-custom')} plain></Divider>
                                     <Row className={cx('wrapp-price-ticket')}>
                                         <Col span={12}>
@@ -356,7 +398,12 @@ function BookingDetail(props) {
                                         <Col span={12}>
                                             <ul className={cx('wrapp-info-details')}>
                                                 <li className={cx('info-inner', 'text-end')}>
-                                                    <b>{showtimeInfo.seatInfo.totalAmount}</b>{' '}
+                                                    <b>
+                                                        {new Intl.NumberFormat('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        }).format(total)}
+                                                    </b>{' '}
                                                 </li>
                                             </ul>
                                         </Col>
