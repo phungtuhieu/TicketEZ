@@ -10,6 +10,8 @@ import com.ticketez_backend_springboot.modules.activityLog.ActivityLog;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.review.Review;
+import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
 import com.ticketez_backend_springboot.modules.verification.Verification;
 
 import jakarta.persistence.CascadeType;
@@ -49,6 +51,12 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	private List<Review> reviews;
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	private List<ServiceChoose> serviceChooses;
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	private List<SeatChoose> seatChooses;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")

@@ -53,6 +53,13 @@ import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChooseDao;
+import com.ticketez_backend_springboot.modules.service.Service;
+import com.ticketez_backend_springboot.modules.service.ServiceDAO;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBookingDAO;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBookingPK;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChooseDAO;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
 
@@ -217,6 +224,15 @@ public class BookingAPI {
 	SeatChooseDao seatChooseDao;
 
 	@Autowired
+	ServiceBookingDAO serviceBookingDAO;
+
+	@Autowired
+	ServiceChooseDAO serviceChooseDAO;
+
+	@Autowired
+	ServiceDAO serviceDAO;
+
+	@Autowired
 	PriceDAO priceDAO;
 
 	@Autowired
@@ -248,9 +264,10 @@ public class BookingAPI {
 			booking.setShowtime(showtime);
 
 			Booking bCreated = dao.save(booking);
+			// String accountId = booking.getAccount().getId();
 			List<Price> prices = priceDAO.findByShowtimesId(showtime.getId());
 			List<String> weekends = new ArrayList<>(Arrays.asList("Friday", "Saturday", "Sunday"));
-			List<SeatChoose> seatChooses = seatChooseDao.findByShowtimeId(showtime.getId());
+			List<SeatChoose> seatChooses = seatChooseDao.findByShowtimeIdAndAccountId(showtime.getId(), accountId);
 
 			// Kiểm tra cuối tuần
 			Date currentDate = new Date();
@@ -258,7 +275,23 @@ public class BookingAPI {
 			String dayOfWeek = sdf.format(currentDate);
 			boolean isWeekend = weekends.contains(dayOfWeek);
 			List<SeatBooking> lBookings = new ArrayList<>();
+			List<ServiceBooking> listServiceBookings = new ArrayList<>();
 
+			List<ServiceChoose> serviceChooses = serviceChooseDAO.findByAccountId(accountId);
+
+			for (ServiceChoose svc : serviceChooses) {
+				ServiceBooking svbNew = new ServiceBooking();
+				ServiceBookingPK svbPK = new ServiceBookingPK();
+				svbPK.setBookingID(booking.getId());
+				svbPK.setServiceID(svc.getService().getId());
+
+				svbNew.setServiceBookingPK(svbPK);
+				svbNew.setBooking(booking);
+				svbNew.setPrice(svc.getPrice());
+				svbNew.setQuantity(svc.getQuantity());
+				svbNew.setService(svc.getService());
+				listServiceBookings.add(svbNew);
+			}
 			// Lặp qua các ghế mà người dùng đã chọn
 			for (SeatChoose seatChoose : seatChooses) {
 				SeatBooking seatBooking = new SeatBooking();
@@ -282,6 +315,7 @@ public class BookingAPI {
 					}
 				}
 			}
+			serviceBookingDAO.saveAll(listServiceBookings);
 			seatBookingDao.saveAll(lBookings);
 
 			String orderInfo = request.getParameter("vnp_OrderInfo");
@@ -289,14 +323,20 @@ public class BookingAPI {
 			String paymentTime = request.getParameter("vnp_PayDate");
 			String transactionId = request.getParameter("vnp_TransactionNo");
 			String totalPrice = request.getParameter("vnp_Amount");
-			System.out.println("------------- totalPrice: " + totalPrice);
-			System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
+			// System.out.println("------------- totalPrice: " + totalPrice);
+			// System.out.println("-------------Double totalPrice: " +
+			// Double.valueOf(totalPrice));
 			String bankCode = request.getParameter("vnp_BankCode");
 			String transactionStatus = request.getParameter("vnp_TransactionStatus");
 
 			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			PaymentInfo paymentInfo = new PaymentInfo();
+			List<Long> seatChooseIdsDel = seatChooses.stream().map(seat -> seat.getId())
+					.collect(Collectors.toList());
+
+			List<Long> serviceChooseIdsDel = serviceChooses.stream().map(svc -> svc.getId())
+					.collect(Collectors.toList());
 
 			try {
 				Date date = inputFormat.parse(paymentTime);
@@ -313,14 +353,26 @@ public class BookingAPI {
 				paymentInfo.setPayDate(payDate);
 				paymentInfo.setTransactionStatus(transactionStatus);
 				System.out.println();
-				List<Long> seatChooseIdsDel = seatChooses.stream().map(seat -> seat.getId())
+				List<Long> serviceIds = serviceChooses.stream().map(svc -> svc.getService().getId())
 						.collect(Collectors.toList());
-				seatChooseDao
-						.deleteAllById(seatChooseIdsDel);
+				List<Service> servicesDb = serviceDAO.findAllById(serviceIds);
+				List<Service> servicesUpdated = new ArrayList<>();
+				for (Service svDB : servicesDb) {
+					for (ServiceChoose svc : serviceChooses) {
+						if (svDB.getId() == svc.getService().getId()) {
+							svDB.setQuantity(svDB.getQuantity() - svc.getQuantity());
+							servicesUpdated.add(svDB);
+						}
+					}
+				}
+				serviceDAO.saveAll(servicesUpdated);
 			} catch (ParseException e) {
 				e.printStackTrace();
 				return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 						HttpStatus.CONFLICT);
+			} finally {
+				seatChooseDao.deleteAllById(seatChooseIdsDel);
+				serviceChooseDAO.deleteAllById(serviceChooseIdsDel);
 			}
 			PaymentInfo pInfo = pmIDao.save(paymentInfo);
 			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
@@ -404,8 +456,5 @@ public class BookingAPI {
 		}
 
 	}
-
-
-
 
 }

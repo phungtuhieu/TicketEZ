@@ -89,13 +89,17 @@ public class PriceServiceAPI {
 
 	@GetMapping("/find-by-cinema-complex/{idCplx}")
 	public ResponseEntity<?> findByCplx(@PathVariable("idCplx") Long idCplx) {
-		System.out.println("-------------------------idCplx" + idCplx);
 		try {
+
 			List<Service> services = serviceDAO.findByCinemaComplexId(idCplx);
 			List<Long> serviceIds = new ArrayList<>();
+			// System.out.println("services" + services.size());
 			for (Service service : services) {
+				// System.out.println("-------------------------idCplx1" + idCplx);
+
 				System.out.println("--------------------" + service.getId());
 				serviceIds.add(service.getId());
+				// System.out.println("-------------------------serviceIds" + idCplx);
 			}
 			List<PriceService> priceServices = dao.findByCplxAndService(serviceIds);
 			if (priceServices.isEmpty()) {

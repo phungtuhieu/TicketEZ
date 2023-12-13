@@ -4,23 +4,26 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Embeddable
 @Setter
 @Getter
-@Data
+// @AllArgsConstructor
+@NoArgsConstructor
 public class ServiceBookingPK implements Serializable {
 	@Column(name = "booking_id", insertable = false, updatable = false)
-	private Long bookingID;
+	private String bookingID;
 
 	@Column(name = "service_id", insertable = false, updatable = false)
 	private Long serviceID;
 
 	// Thêm constructor chấp nhận hai tham số Long
-	public ServiceBookingPK(Long bookingID, Long serviceID) {
+	public ServiceBookingPK(String bookingID, Long serviceID) {
 		this.bookingID = bookingID;
 		this.serviceID = serviceID;
 	}

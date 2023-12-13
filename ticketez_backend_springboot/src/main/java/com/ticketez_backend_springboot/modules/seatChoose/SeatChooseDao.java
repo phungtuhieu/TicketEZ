@@ -22,5 +22,5 @@ public interface SeatChooseDao extends JpaRepository<SeatChoose, Long> {
     @Query("DELETE FROM SeatChoose s WHERE s IN :seatChooseList")
     void deleteAllByIdIn(@Param("seatChooseList") List<SeatChoose> seatChooseList);
 
-    List<SeatChoose> findByShowtimeId(Long showtimeId);
+    List<SeatChoose> findByShowtimeIdAndAccountId(Long showtimeId, String accountId);
 }
