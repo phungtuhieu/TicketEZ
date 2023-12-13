@@ -48,22 +48,22 @@ const AdminSeatChart = () => {
     const [workSomeThing, setWorkSomeThing] = useState(false);
 
     //call api
-    useEffect(() => {
-        const getList = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosClient.get(`seatchart/getAll`);
-                console.log(res);
-                setPosts(res.data);
-                setLoading(false);
-            } catch (error) {
-                if (error.hasOwnProperty('response')) {
-                    message.error(error.response.data);
-                } else {
-                    console.log(error);
-                }
+    const getList = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosClient.get(`seatchart/getAll`);
+            console.log(res);
+            setPosts(res.data);
+            setLoading(false);
+        } catch (error) {
+            if (error.hasOwnProperty('response')) {
+                message.error(error.response.data);
+            } else {
+                console.log(error);
             }
-        };
+        }
+    };
+    useEffect(() => {
         getList();
     }, [workSomeThing]);
 
@@ -120,6 +120,24 @@ const AdminSeatChart = () => {
         setFileList(newFileList);
     };
 
+    const handleEditCancel = () => {
+        setOpen(false);
+    };
+    const handleOkEdit = async () => {
+        const values = await form.validateFields();
+        let putData = {
+            id: editData.id,
+            ...values,
+        };
+
+        console.log(putData);
+
+        const resp = await axiosClient.patch(`seatchart/${editData.id}`, putData);
+        console.log(resp);
+        funcUtils.notify('Cập nhật sơ đồ thành công', 'success');
+        getList();
+        setOpen(false);
+    };
     const handleEditData = (record) => {
         setOpen(true);
         setResetForm(false);
@@ -153,6 +171,7 @@ const AdminSeatChart = () => {
     return (
         <>
             <Row>
+            
                 <Col span={22}>
                     <h1 className={cx('title')}>Bảng dữ liệu</h1>
                 </Col>
@@ -168,9 +187,9 @@ const AdminSeatChart = () => {
                     width={'60%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
                     onOk={handleOk}
-                    onCancel={handleCancel}
+                    onCancel={handleEditCancel}
                     footer={[
-                        <Button key="back" onClick={handleCancel}>
+                        <Button key="back" onClick={handleEditCancel}>
                             Thoát
                         </Button>,
                         resetForm && (
@@ -178,7 +197,7 @@ const AdminSeatChart = () => {
                                 Làm mới
                             </Button>
                         ),
-                        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                        <Button key="submit" type="primary" loading={loading} onClick={handleOkEdit}>
                             {editData ? 'Cập nhật' : 'Thêm mới'}
                         </Button>,
                     ]}
@@ -206,7 +225,15 @@ const AdminSeatChart = () => {
                     key: post.id,
                 }))}
             />
-            <Modal title="Tạo sơ đồ" open={isModalOpen} width={1500} destroyOnClose={true} onOk={handleOk} onCancel={handleCancel}>
+            <Modal
+                title="Tạo sơ đồ"
+                open={isModalOpen}
+                width={1500}
+                destroyOnClose={true}
+                footer={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+            >
                 <div className={cx('modal-content')}>
                     <SeatGenerator />
                 </div>

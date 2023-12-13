@@ -37,6 +37,11 @@ public class SeatChartAPI {
         return ResponseEntity.ok(seatCharts);
     }
 
+      @GetMapping("/getbyname/{name}")
+    public ResponseEntity<List<SeatChart>> getbyname(@PathVariable String name) {
+        List<SeatChart> seatCharts = dao.findByName(name);
+        return ResponseEntity.ok(seatCharts);
+    }
     // Lấy danh sách rạp theo cụm rạp (theo ID của cụm rạp)
     @GetMapping("/by-cinema/{cinemaId}")
     public ResponseEntity<List<SeatChart>> getSeatChartsByCinema(
