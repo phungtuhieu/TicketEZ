@@ -31,6 +31,7 @@ const EditableProfile = () => {
 
 
         });
+        
         const newUploadFile = {
           name: user.image,
           url: `http://localhost:8081/api/upload/${user.image}`,
@@ -47,10 +48,13 @@ const EditableProfile = () => {
 
   const onSave = async (values) => {
     try {
+
       let updatedValues = {
         ...values,
 
       };
+      
+
       if (values.image.fileList) {
         const file = values.image.fileList[0].originFileObj;
         const image = await uploadApi.put(userData.image, file);
@@ -60,7 +64,7 @@ const EditableProfile = () => {
         };
       }
       if (values.birthday) {
-        const selectedDate = values.birthday.toDate(); 
+        const selectedDate = values.birthday.toDate();
         const currentDate = new Date();
 
         if (selectedDate > currentDate) {
@@ -68,11 +72,6 @@ const EditableProfile = () => {
           return;
         }
       }
-      if (!validateEmail(values.email)) return;
-      if (!validatePhone(values.phone)) return;
-      if (!validateFullname(values.fullname)) return;
-      if (!validatEaddress(values.address)) return;
-      
       const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
       setEditing(false);
@@ -164,14 +163,16 @@ const EditableProfile = () => {
                     name="image"
                     maxCount={1}
                   >
-                    {fileList.length < 2 && '+ Upload'}
+                    {fileList.length < 1 && '+ Tải lên'}
                   </Upload>
                 </Form.Item>
                 <Form.Item
                   name="fullname"
                   initialValue={userData.fullname}
                   label="Họ & Tên"
-                  rules={[{ required: true, message: 'Vui lòng nhập họ và' }]} >
+                  rules={[
+                    { validator: validateFullname },
+                  ]} >
                   <Input />
                 </Form.Item>
                 <Form.Item name="gender" label="Giới tính">
@@ -182,15 +183,27 @@ const EditableProfile = () => {
                 </Form.Item>
 
 
-                <Form.Item name="address" label="Địa chỉii" rules={[{ required: true }]} initialValue={userData.address}>
+                <Form.Item name="address" label="Địa chỉ"
+                  rules={[
+                    { validator: validatEaddress },
+                  ]}
+                  initialValue={userData.address}>
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]} initialValue={userData.phone}>
+                <Form.Item name="phone" label="Số điện thoại"
+                  rules={[
+                    { validator: validatePhone },
+                  ]}
+                  initialValue={userData.phone}>
                   <Input />
                 </Form.Item>
-                <Form.Item name="email" label="Emailiii" rules={[{ required: true }]} initialValue={userData.email}>
+                <Form.Item name="email" label="Email"
+                  rules={[
+                    { validator: validateEmail },
+                  ]}
+                  initialValue={userData.email}>
                   <Input />
                 </Form.Item>
                 <Form.Item

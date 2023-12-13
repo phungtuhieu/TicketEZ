@@ -4,24 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import styles from './RegisterForm.module.scss';
 import img from '~/assets/img';
 import authApi from '~/api/user/Security/authApi';
-import { getRolesFromLocalStorage } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
 import backgroundImage from '~/assets/img/texure.jpg';
-import { validateEmail, validateId, validatePassword, validatePhone } from '../Custom';
+import { validateEmail, validateId, validatePassword, validatePhone ,validateFullname} from '../Custom';
 
 const { Header, Content } = Layout;
 
 
 const RegisterForm = () => {
     const [loading, setLoading] = useState(false);
-    const [signupError, setSignupError] = useState('');
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
-        if (!validateId(values.id)) return;
-        if (!validateEmail(values.email)) return;
-        if (!validatePassword(values.password)) return;
-        if (!validatePhone(values.phone)) return;
         setLoading(true);
         try {
             await authApi.signup({
@@ -65,7 +59,9 @@ const RegisterForm = () => {
                             <Form.Item
                                 // label="Tên tài khoản"
                                 name="id"
-                                rules={[{ required: true, message: 'Không được bỏ trống tài khoản !' }]}
+                                rules={[
+                                    { validator: validateId }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
@@ -77,7 +73,9 @@ const RegisterForm = () => {
                             <Form.Item
                                 // label="Tên tài khoản"
                                 name="fullname"
-                                rules={[{ required: true, message: 'Không được bỏ trống Họ và tên !' }]}
+                                rules={[
+                                    { validator: validateFullname }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Họ và tên" className={styles.input} />
@@ -88,9 +86,8 @@ const RegisterForm = () => {
                             <Form.Item
                                 name="phone"
                                 rules={[
-                                    { required: true, message: 'Không được bỏ trống số điện thoại !' },
-
-                                ]}
+                                    { validator: validatePhone }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Số điện thoại" className={styles.input} />
@@ -102,8 +99,8 @@ const RegisterForm = () => {
                             <Form.Item
                                 name="email"
                                 rules={[
-                                    { required: true, message: 'Không được bỏ trống Email !' },
-                                ]}
+                                    { validator: validateEmail }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Email" className={styles.input} />
@@ -124,7 +121,9 @@ const RegisterForm = () => {
                             <Form.Item
                                 // label="Mật khẩu"
                                 name="password"
-                                rules={[{ required: true, message: 'Không được bỏ trống mật khẩu !' }]}
+                                rules={[
+                                    { validator: validatePassword }, 
+                                  ]}
                                 className={styles.formItem}
                             >
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ResetPasswordFrom.module.scss';
 import authApi from '~/api/user/Security/authApi';
 import funcUtils from '~/utils/funcUtils';
-
+import { validateEmail, validateId, validatePassword, validatePhone, validateFullname } from '../Custom';
 const { Content } = Layout;
 
 const ResetPasswordForm = () => {
@@ -22,6 +22,7 @@ const ResetPasswordForm = () => {
 
     const onEmailSubmit = async (values) => {
         setLoading(true);
+   
         try {
             await authApi.sendOtpEmailNew({
                 email: values.email
@@ -29,7 +30,7 @@ const ResetPasswordForm = () => {
             showModal();
             funcUtils.notify('Mã OTP đã được gửi đến email của bạn.', 'success');
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra!';
+            const errorMessage = error.response?.data?.message || 'Email không tồn tại !';
             funcUtils.notify(errorMessage, 'error');
         } finally {
             setLoading(false);
@@ -48,7 +49,7 @@ const ResetPasswordForm = () => {
             navigate('/login');
         }
         catch (error) {
-            funcUtils.notify('Kiểm tra mã Otp!', 'error');
+            funcUtils.notify('Kiểm tra mã OTP!', 'error');
         }
         finally {
             setLoading(false);
@@ -58,20 +59,34 @@ const ResetPasswordForm = () => {
     return (
         <Layout className="layout">
             <Content className={styles.content}>
-                {/* Email Form */}
-                <Form onFinish={onEmailSubmit}>
-                    <Form.Item
-                        name="email"
-                        rules={[{ required: true, message: 'Vui lòng nhập Email!' }]}
+                <div className={styles.formContainer}>
+                    <Form
+                        onFinish={onEmailSubmit}
+                        className={styles.resetForm}
+                        layout="vertical"
                     >
-                        <Input placeholder="Email" />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={loading}>
-                            Gửi mã OTP
-                        </Button>
-                    </Form.Item>
-                </Form>
+                        <h3 className={styles.title}>Đặt lại mật khẩu của bạn</h3>
+                        <Form.Item
+                            name="email"
+                            rules={[
+                                { validator: validateEmail },
+                            ]}
+                        >
+                            <Input placeholder="Email" className={styles.inputField} />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                loading={loading}
+                                className={styles.submitButton}
+                                block
+                            >
+                                Gửi email
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
 
                 {/* OTP and New Password Modal */}
                 <Modal
@@ -79,22 +94,38 @@ const ResetPasswordForm = () => {
                     visible={isModalVisible}
                     onCancel={hideModal}
                     footer={null}
+                    className={styles.modal}
                 >
-                    <Form onFinish={onResetPasswordSubmit}>
+                    <Form
+                        onFinish={onResetPasswordSubmit}
+                        className={styles.resetForm}
+                        layout="vertical"
+                    >
                         <Form.Item
                             name="code"
-                            rules={[{ required: true, message: 'Vui lòng nhập mã OTP!' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập mã OTP!' },
+                            { max: 6, message: 'Mã OTP phải có 6 ký tự!' },
+                            ]}
                         >
-                            <Input placeholder="Mã OTP" />
+                            <Input placeholder="Mã OTP" className={styles.inputField} />
                         </Form.Item>
                         <Form.Item
                             name="newPassword"
-                            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' }]}
+                            rules={[
+                                { validator: validatePassword },
+                            ]}
                         >
-                            <Input.Password placeholder="Mật khẩu mới" />
+                            <Input.Password placeholder="Mật khẩu mới" className={styles.inputField} />
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" loading={loading}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                loading={loading}
+                                className={styles.submitButton}
+                                block
+                            >
+
                                 Đặt lại mật khẩu
                             </Button>
                         </Form.Item>
