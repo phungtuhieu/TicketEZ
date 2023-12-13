@@ -44,6 +44,10 @@ const items = [
         getItem(<Link to="/admin/seat-type">Loại ghế</Link>, 'seatType', null),
         getItem(<Link to="/admin/seat-chart">Sơ đồ ghế</Link>, 'seatChart', null),
     ]),
+    // Thống kê
+    getItem('Thống kê', 'grStatic', <FontAwesomeIcon icon={solidIcons.faChartSimple} />, [
+        getItem(<Link to="/admin/ticket-statistics">Thống kê vé theo chuỗi rạp</Link>, 'static', null)
+    ]),
 
     // Quản lý dịch vụ, sự kiện
     getItem('Dịch vụ & sự kiện', 'grServiceEvent', <FontAwesomeIcon icon={solidIcons.faCalendarCheck} />, [

@@ -274,6 +274,7 @@ const ModalPrice = (props) => {
     const [isTableLoaded, setIsTableLoaded] = useState(false);
 
     useEffect(() => {
+        setIsTableLoaded(false);
         const fetchData = async () => {
             // Sử dụng Promise.all để đợi tất cả các promise hoàn thành
             await Promise.all([
