@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './home.scss';
-import { homeData } from '~/dummyData';
-import Home from './carousel/Home';
 import axiosClient from '~/api/global/axiosClient';
 
 import { Col, Row } from 'antd';
 import ShowTimes from './showtimes';
 import MovieShowing from './MovieShowing';
 import MovieUpcoming from './MovieUpcoming';
-import MovieType from './MovieType';
+import HomeIndex from './Home';
 
 const Homes = () => {
     const [items, setItems] = useState(null);
@@ -30,11 +28,14 @@ const Homes = () => {
         <>
             <Row className="home">
                 <Col span={24}>
-                {items && (
                     <Col span={24}>
-                        <Home items={items} />
+                        <HomeIndex items={items} />
                     </Col>
-                )}
+                    {/* {items && (
+                        <Col span={24}>
+                            <Home items={items} />
+                        </Col>
+                    )} */}
                 </Col>
                 <Col span={24}>
                     <MovieShowing />
@@ -45,17 +46,22 @@ const Homes = () => {
                 {/* <Col span={24}>
                     <MovieType />
                 </Col> */}
+                <Col span={24}>
+                    <h1 className="tw-text-[var(--primary--text-color)] tw-text-center">Lịch chiếu</h1>
+                </Col>
+               
                 <Col
                     span={24}
                     style={{
-                        backgroundColor: '#ffffff',
+                        // backgroundColor: '#ffffff',
                         height: 1000,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        marginTop: '-160px',
                     }}
                 >
-                    <ShowTimes  />
+                    <ShowTimes />
                 </Col>
             </Row>
         </>

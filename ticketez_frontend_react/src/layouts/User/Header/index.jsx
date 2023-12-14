@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     faAddressCard,
     faChevronRight,
-    faCircleCheck,
     faFireFlameCurved,
     faHome,
     faNewspaper,
