@@ -6,7 +6,6 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,14 +18,11 @@ import org.springframework.util.StreamUtils;
 import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
-
-
 @Component
 public class EmailUtil {
 
   private final JavaMailSender javaMailSender;
 
-  @Autowired
   public EmailUtil(JavaMailSender javaMailSender) {
     this.javaMailSender = javaMailSender;
   }
@@ -80,47 +76,48 @@ public class EmailUtil {
         "</html>";
   }
 
-
   //
 
-  String htmlcuatao(Movie movie, Account account){
+  String htmlcuatao(Movie movie, Account account) {
     return "<html><body>"
-  + "<div"
-  + " style='font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;'>"
-  + "<h2 style='margin-top: 0;'>Chia sẻ sản phẩm sách</h2>"
-  + " <p>Xin chào,  <strong>" + account.getFullname() + "</strong></p>"
-  + "<p>Tôi muốn chia sẻ với bạn một sản phẩm sách thú vị. Dưới đây là thông tin về sách:</p>"
-  + "<div style='display: flex; align-items: center; margin-bottom: 20px; '>"
-  + "<img style='width: 165px; height: auto; margin-right: 20px;'"
-  + "   src='cid:image' alt='Lỗi hình ảnh'>"
-  + " <div style=' width: auto;  margin-bottom: 30px;'>"
-  + "    <h3 style='font-size: 18px; font-weight: bold; margin: 0; '>" + movie.getTitle() + "</h3>"
-  // + "   <p style='font-size: 14px; color: #c71b1b; margin: 0; margin-top: 10px;'>Giá: "
-  // + "book.getPrice()" + " VNĐ</p>"
-  + "     <div"
-  + "          style='margin-top: 30px; min-height: 51.2px;  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;'>"
-  + "          " +movie.getDescription() + ""
-  + "       </div>"
-  + "    </div>"
-  + " </div>"
-  + " <p>Bạn có thể tìm hiểu thêm về sách này và đặt mua tại <a href='http://localhost:3000/movie-details/"
-  + movie.getId() + "'>đường dẫn"
-  + "          sách</a>.</p>"
-  + " <p>Hy vọng bạn sẽ thích quyển sách này! Nếu bạn có bất kỳ câu hỏi hoặc cần thêm thông tin, hãy liên hệ với tôi."
-  + " </p>"
-  + "<p>Trân trọng,<br><strong>Success 202 - BOOKWORLD</strong> </p>"
-  + " <p>&copy; 2023 Tất cả các quyền được bảo lưu.</p>"
-  + "</div>"
-  + "</body></html>";
+        + "<div"
+        + " style='font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;'>"
+        + "<h2 style='margin-top: 0;'>TicketEZ,Đề xuất phim cho bạn</h2>"
+        + " <p>Xin chào,  <strong>" + account.getFullname() + "</strong></p>"
+        + "<p>Chúng tôi muốn đề xuất cho bạn với bạn một bộ phim có thể bạn thích. Dưới đây là thông tin về phim:</p>"
+        + "<div style='display: flex; align-items: center; margin-bottom: 20px; '>"
+        + "<img style='width: 165px; height: auto; margin-right: 20px;'"
+        + "   src='cid:image' alt='Lỗi hình ảnh'>"
+        + " <div style=' width: auto;  margin-bottom: 30px;'>"
+        + "    <h3 style='font-size: 18px; font-weight: bold; margin: 0; '>" + movie.getTitle() + "</h3>"
+        + "   <p style='font-size: 14px; margin: 0; margin-top: 10px;'>Khởi chiếu: "
+        + movie.getReleaseDate() + "</p>"
+        + "   <p style='font-size: 14px; margin: 0; margin-top: 10px;'>Thời gian: "
+        + movie.getDuration() + "</p>"
+        + "   <div style='font-size: 14px; margin: 0; margin-top: 10px;'>Đánh giá: "
+        + "   " + movie.getRating()
+        + "</div>"
+        + "     <p"
+        + "          style='font-size: 14px; min-height: 51.2px;  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;'>"
+        + "          " + "Mô tả:" + movie.getDescription() + ""
+        + "       </p>"
+        + "    </div>"
+        + " </div>"
+        + " <p>Bạn có thể tìm hiểu thêm về phim này và đặt vé tại <a href='http://localhost:3000/movie-details/"
+        + movie.getId() + "'>đường dẫn"
+        + "          phim</a>.</p>"
+        + " <p>Hy vọng bạn sẽ thích bộ phim này và hẹn gặp bạn ở rạp ^^ ! Nếu bạn có bất kỳ câu hỏi hoặc cần thêm thông tin, hãy liên hệ với chúng tôi."
+        + " </p>"
+        + "<p>Trân trọng,<br><strong>TicketEZ</strong> </p>"
+        + " <p>&copy; 2023 Tất cả các quyền được bảo lưu.</p>"
+        + "</div>"
+        + "</body></html>";
   }
 
-
-
-  
-  public void sendEmailAccount( Movie movie,Account account) throws MessagingException, IOException {
+  public void sendEmailAccount(Movie movie, Account account) throws MessagingException, IOException {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-     
+
     helper.setTo(account.getEmail());
     helper.setSubject("TicketEz");
     helper.setText(htmlcuatao(movie, account), true);

@@ -12,14 +12,11 @@ import com.ticketez_backend_springboot.modules.event.Event;
 import com.ticketez_backend_springboot.modules.review.Review;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
 import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
-import com.ticketez_backend_springboot.modules.verification.Verification;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;

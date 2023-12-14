@@ -2,7 +2,6 @@ package com.ticketez_backend_springboot.modules.account;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,10 +225,18 @@ public class AccountAPI {
     @GetMapping("/email/accounts/{movieId}")
     public ResponseEntity<?> listAccount(@PathVariable("movieId") Long movieId) {
         try {
-            Movie movie = movieDAO.findById(movieId).get();
+            Movie movie = movieDAO.findById(movieId).orElse(null);
+
+            if (movie == null) {
+                return new ResponseEntity<>("Không tìm thấy phim với ID: " + movieId, HttpStatus.NOT_FOUND);
+            }
+
             List<Account> accounts = accountDAO.listAccount(movie.getId());
 
-            
+            if (accounts.isEmpty()) {
+                return new ResponseEntity<>("Không tìm thấy người dùng để gữi Email ", HttpStatus.NOT_FOUND);
+            }
+
             for (Account account : accounts) {
                 emailUtil.sendEmailAccount(movie, account);
             }
@@ -239,7 +246,6 @@ public class AccountAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }

@@ -61,6 +61,9 @@ class AccountApi extends BaseApi {
     async AccountLockHistoryFindByAccount(accountId) {
         return axiosClient.get('account-lock-history/' + accountId);
     }
+    async getSendEmail(movieId) {
+        return axiosClient.get('account/email/accounts/' + movieId);
+    }
 }
 const accountApi = new AccountApi();
 export default accountApi;
