@@ -83,6 +83,10 @@ const data = [
         url: '/article',
         title: 'Danh sách phim',
     },
+    {
+        url: '/sendEmail',
+        title: 'Gữi email cho người dùng',
+    },
 ];
 
 const Bread = ({ path }) => {

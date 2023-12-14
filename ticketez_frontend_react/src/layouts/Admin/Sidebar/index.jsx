@@ -46,7 +46,7 @@ const items = [
     ]),
     // Thống kê
     getItem('Thống kê', 'grStatic', <FontAwesomeIcon icon={solidIcons.faChartSimple} />, [
-        getItem(<Link to="/admin/ticket-statistics">Thống kê vé theo chuỗi rạp</Link>, 'static', null)
+        getItem(<Link to="/admin/ticket-statistics">Thống kê vé theo chuỗi rạp</Link>, 'static', null),
     ]),
 
     // Quản lý dịch vụ, sự kiện
@@ -76,10 +76,11 @@ const items = [
         'grAccountStaff',
         <FontAwesomeIcon icon={solidIcons.faUsers} />,
     ),
+    getItem(<Link to="/admin/webcam">Soát vé</Link>, 'webcam', <FontAwesomeIcon icon={solidIcons.faCamera} />),
     getItem(
-        <Link to="/admin/webcam">Webcam</Link>,
-        'webcam',
-        <FontAwesomeIcon icon={solidIcons.faCamera} />,
+        <Link to="/admin/sendEmail">Gữi Email</Link>,
+        'sendEmail',
+        <FontAwesomeIcon icon={solidIcons.faEnvelope} />,
     ),
 ];
 function Sidebar() {

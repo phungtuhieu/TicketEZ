@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import style from './movieUpcoming.module.scss';
+import style from './sendEmail.module.scss';
 import Slider from 'react-slick';
 import { Button, Col, Modal, Row, Tag, Typography } from 'antd';
 import 'slick-carousel/slick/slick.css';
@@ -13,6 +13,8 @@ import img from '~/assets/img';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronCircleLeft, faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+import { accountApi } from '~/api/admin';
 
 const cx = classNames.bind(style);
 const { Paragraph, Title } = Typography;
@@ -24,7 +26,7 @@ const SampleNextArrow = (props) => {
             <button className={cx('next')}>
                 <FontAwesomeIcon icon={faChevronCircleRight} />
 
-                <i class="fa fa-chevron-right"></i>
+                <i className="fa fa-chevron-right"></i>
             </button>
         </div>
     );
@@ -35,7 +37,7 @@ const SamplePrevArrow = (props) => {
         <div className={cx('control-btn')} onClick={onClick}>
             <button className={cx('prev')}>
                 <FontAwesomeIcon icon={faChevronCircleLeft} />
-                <i class="fa fa-chevron-left"></i>
+                <i className="fa fa-chevron-left"></i>
             </button>
         </div>
     );
@@ -43,6 +45,10 @@ const SamplePrevArrow = (props) => {
 
 const MovieShowing = () => {
     const [getMovieByShowtimeShowing, setGetMovieByShowtimeShowing] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState(null);
+    const [valueMovieId, setValueMovieId] = useState(null);
+    const [ellipsis] = useState(true);
     useEffect(() => {
         //đổ dữ liệu
         const getMovieByShowtimeShowing = async () => {
@@ -54,19 +60,30 @@ const MovieShowing = () => {
             }
         };
         getMovieByShowtimeShowing();
-    }, []);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedMovie, setSelectedMovie] = useState(null);
-    const [setLoading] = useState(false);
-    const [ellipsis] = useState(true);
+        if (valueMovieId) {
+            // setLoadingStates({});
+            const getSendEmail = async () => {
+                try {
+                   const res =  await accountApi.getSendEmail(valueMovieId);
+                    console.log(res, 'error');
+                    funcUtils.notify('Gữi Email cho người dùng thành công', 'success');
+                    setLoadingStates(res);
+                } catch (error) {
+                    funcUtils.notify(error.response.data, 'error');
+                    console.log(error, 'error');
+                    setLoadingStates(error);
+                }
+            };
+            getSendEmail();
+        }
+    }, [valueMovieId]);
 
     const showModal = (movie) => {
         setSelectedMovie(movie);
         setIsModalOpen(true);
     };
     const handleOk = () => {
-        setLoading(true);
         setIsModalOpen(false);
     };
 
@@ -124,9 +141,19 @@ const MovieShowing = () => {
             setIsLoading(false);
         }, 1000);
     }, []);
+
+    const [loadingStates, setLoadingStates] = useState({});
+    const handleSendEmail = (values) => {
+        setLoadingStates((prevLoadingStates) => ({
+            ...prevLoadingStates,
+            [values.movie.id]: true,
+        }));
+        setValueMovieId(values.movie.id);
+    };
+
     return (
         <div className={cx('body', 'tw-mb-[130px]')}>
-            <h1 className="tw-text-[var(--primary--text-color)]">Phim sắp chiếu</h1>
+            <h1 className="tw-text-[var(--primary--text-color)]">Danh sách phim sắp chiếu</h1>
 
             {isLoadingPage && (
                 <div style={{ height: '100px' }}>
@@ -135,6 +162,7 @@ const MovieShowing = () => {
                     </div>
                 </div>
             )}
+
             {!isLoadingPage && (
                 <Slider
                     {...settings}
@@ -143,7 +171,7 @@ const MovieShowing = () => {
                         alignItems: 'center',
                         display: 'flex',
                         margin: '0 auto',
-                        marginTop: '-20px',
+                        marginTop: '0px',
                     }}
                 >
                     {getMovieByShowtimeShowing && getMovieByShowtimeShowing.length > 0 ? (
@@ -201,6 +229,9 @@ const MovieShowing = () => {
                                                 </g>
                                             </g>
                                         </svg>
+                                        <span className={cx('id-overlay')} style={{ color: '#ffffff' }}>
+                                            {index + 1}
+                                        </span>
                                     </div>
                                     <div>
                                         <Title level={5} className={cx('name-movie')} style={{ color: '#000' }}>
@@ -215,13 +246,41 @@ const MovieShowing = () => {
                                             <br />
                                         </Title>
                                     </div>
+                                    <Button
+                                        // href={`/movie-details/${selectedMovie?.movie.id}`}
+
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleSendEmail(slide);
+                                        }}
+                                        className="tw-bg-[var(--primary--text-color)]  tw-border-[var(--primary--text-color))] tw-text-white tw-font-medium"
+                                    >
+                                        {loadingStates[slide.movie.id] ? (
+                                            <span>
+                                                <span className="tw-mr-2"> Đang gữi</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="tw-mr-2 tw-inline-block tw-h-5 tw-w-[10px] tw-animate-bounce tw-fill-white hover:tw-fill-white"
+                                                    height="1em"
+                                                    viewBox="0 0 384 512"
+                                                >
+                                                    <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
+                                                </svg>
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <span className="tw-mr-2"> Gữi Email</span>{' '}
+                                                <FontAwesomeIcon icon={faEnvelope} />
+                                            </>
+                                        )}
+                                    </Button>
                                 </Link>
                             </>
                         ))
                     ) : (
                         <div>
-                            <img src={img.notFoundLogo} alt="" style={{ marginLeft: '100px' }} />
-                            <span className="tw-text-gray-600 ">Không tìm thấy phim chiếu ngày hôm nay</span>
+                            <img src={img.notFoundLogo} alt="" style={{ marginLeft: '60px' }} />
+                            <span className="tw-text-gray-600 ">Không tìm thấy phim sắp chiếu </span>
                         </div>
                     )}
                 </Slider>

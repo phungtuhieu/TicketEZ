@@ -302,7 +302,7 @@ const MovieShowing = () => {
                         <div className="tw-mt-[-20px]">
                             <Button
                                 href={`/movie-details/${selectedMovie?.movie.id}`}
-                                className="tw-bg-[var(--pink)] tw-border-[var(--pink)] tw-text-white tw-font-medium"
+                                className="tw-bg-[var(--primary--text-color)]  tw-border-[var(--primary--text-color))] tw-text-white tw-font-medium"
                             >
                                 Đặt vé
                             </Button>
