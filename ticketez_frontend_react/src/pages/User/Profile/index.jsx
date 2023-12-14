@@ -31,7 +31,7 @@ const EditableProfile = () => {
 
 
         });
-        
+
         const newUploadFile = {
           name: user.image,
           url: `http://localhost:8081/api/upload/${user.image}`,
@@ -53,7 +53,7 @@ const EditableProfile = () => {
         ...values,
 
       };
-      
+
 
       if (values.image.fileList) {
         const file = values.image.fileList[0].originFileObj;
@@ -71,6 +71,7 @@ const EditableProfile = () => {
           funcUtils.notify('Ngày sinh không được vượt quá thời gian hiện tại.', 'error');
           return;
         }
+        
       }
       const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
@@ -79,6 +80,7 @@ const EditableProfile = () => {
       localStorage.setItem('user', JSON.stringify(response.data));
       funcUtils.notify("Cập nhật thành công", 'success');
       window.location.reload();
+      
     } catch (error) {
       funcUtils.notify("Cập nhật Thất bại", 'error');
     }
@@ -148,24 +150,25 @@ const EditableProfile = () => {
               <Col span={12}>
 
                 <Form.Item
-                  // {...formItemLayout}
                   label="Ảnh đại diện"
                   name="image"
-                  rules={[{ required: true, message: 'Vui lòng chọn ảnh đại diện' }]}
+            
                 >
                   <Upload
                     action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
                     accept=".png, .jpg"
                     listType="picture-card"
                     onChange={onChangeUpload}
-                    onPreview={onPreview}
+                    // onPreview={onPreview}
                     fileList={fileList}
                     name="image"
                     maxCount={1}
+                    className={styles.avatarUpload} // Áp dụng class mới ở đây
                   >
                     {fileList.length < 1 && '+ Tải lên'}
                   </Upload>
                 </Form.Item>
+
                 <Form.Item
                   name="fullname"
                   initialValue={userData.fullname}
@@ -237,7 +240,7 @@ const EditableProfile = () => {
           </Form>
         )}
       </Card>
-    </div>
+    </div >
   );
 };
 
