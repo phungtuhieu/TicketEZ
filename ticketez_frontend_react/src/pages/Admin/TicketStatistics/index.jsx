@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Chart from 'react-apexcharts';
-import { Col, Row, DatePicker, Button, Select } from 'antd';
+import { Col, Row, DatePicker, Button, Select, Space, Modal } from 'antd';
 import axiosClient from '~/api/global/axiosClient';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import dayjs from 'dayjs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const { RangePicker } = DatePicker;
 
 const AdminTicketStatistics = () => {
@@ -190,9 +192,25 @@ const AdminTicketStatistics = () => {
                 return bookingsInDateRange;
             });
 
-            setBookingDataDTO(filteredBookingDataDTO)
+            setBookingDataDTO(filteredBookingDataDTO);
             console.log('Booking Data DTO with Bookings in date range:', filteredBookingDataDTO);
         }
+    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+    const [dataModal, setDataModal] = useState([]);
+
+    const handleEditData = (record) => {
+        setDataModal(record.bookings);
+        showModal();
     };
 
     return (
@@ -236,6 +254,20 @@ const AdminTicketStatistics = () => {
                                         ? getBestMovieCinemaChain(record.cinemaChain.id)
                                         : getBestMovieCinemaComplex(record.cinemaComplex.id),
                             },
+                            {
+                                title: 'Thao tác',
+                                render: (_, record) => (
+                                    <Space size="middle">
+                                        <FontAwesomeIcon
+                                            icon={faPen}
+                                            onClick={() => {
+                                                handleEditData(record);
+                                            }}
+                                            className="tw-cursor-pointer hover:tw-cursor-pointer" // Thêm lớp Tailwind CSS
+                                        />
+                                    </Space>
+                                ),
+                            },
                         ]}
                         dataSource={bookingDataDTO.map((post) => ({
                             ...post,
@@ -251,6 +283,40 @@ const AdminTicketStatistics = () => {
                     )}
                 </Col>
             </Row>
+            <Modal
+                title="Chi tiết"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={1000}
+                footer={null}
+            >
+                {dataModal && (
+                    <BaseTable
+                        columns={[
+                            {
+                                title: 'Phim',
+                                render: (_, record) => record.showtime.formatMovie.movie.title,
+                            },
+                            {
+                                title: 'Người mua',
+                                render: (_, record) => record.account.fullname,
+                            },
+                            {
+                                title: 'Thuộc suất chiếu',
+                                render: (_, record) =>
+                                    new Date(record.showtime.startTime).toLocaleDateString() +
+                                    ' - ' +
+                                    new Date(record.showtime.endTime).toLocaleDateString(),
+                            },
+                        ]}
+                        dataSource={dataModal.map((post) => ({
+                            ...post,
+                            key: post.id,
+                        }))}
+                    />
+                )}
+            </Modal>
         </>
     );
 };
