@@ -199,7 +199,7 @@ const AdminCinemaType = () =>  {
             title: 'Mô tả',
             dataIndex: 'description',
             width: '50%',
-            ...getColumnSearchProps('description'),
+            
         },
         {
             title: 'Action',

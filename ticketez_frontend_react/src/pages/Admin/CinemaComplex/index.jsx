@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, DatePicker, Pagination, Select } from 'antd';
+import { Button, Input, Space, Col, Row, Form, message, Popconfirm, Table, DatePicker, Pagination, Select, Modal } from 'antd';
 import { SearchOutlined, PlusOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
@@ -7,10 +7,8 @@ import BaseModal from '~/components/Admin/BaseModal/BaseModal';
 import style from './CinemaComplex.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-import axiosClient from '~/api/global/axiosClient';
 import { cinemaComplexApi, provinceApi } from '~/api/admin';
 import funcUtils from '~/utils/funcUtils';
 import dayjs from 'dayjs';
@@ -20,6 +18,7 @@ import cinemaChainsApi from '~/api/admin/managementCinema/cinemaChainApi';
 import Mapbox from '~/components/Mapbox';
 import MapboxCcx from './MapboxCcx/mapbox';
 import AdminCinema from './../Cinema/index';
+import AdminProvince from './Province';
 
 dayjs.extend(customParseFormat);
 
@@ -52,6 +51,7 @@ const AdminCinemaComplex = () => {
     const [openingTime, setOpeningTime] = useState(null);
     const [closingTime, setClosingTime] = useState(null);
     const [isCinemaModalOpen, setCinemaModalOpen] = useState(null);
+    const [isProvinceModalOpen, setProvinceModalOpen] = useState(null);
     const [cinemaComplex, setCinemaComplex] = useState(null);
 
 
@@ -217,24 +217,22 @@ const AdminCinemaComplex = () => {
             title: 'Địa chỉ',
             dataIndex: 'address',
             width: '30%',
-            ...getColumnSearchProps('address'),
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             with: '10%',
-            ...getColumnSearchProps('phone'),
+
         },
         {
             title: 'Thuộc tỉnh',
             dataIndex: 'province',
-            ...getColumnSearchProps('province'),
             render: (province) => <span>{province.name}</span>
         },
         {
             title: 'Thuộc loại',
             dataIndex: 'cinemaChain',
-            ...getColumnSearchProps('cinemaChain'),
+            
             render: (cinemaChains) => <span>{cinemaChains.name}</span>
         },
         {
@@ -257,7 +255,7 @@ const AdminCinemaComplex = () => {
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </Popconfirm>
-                    <Button onClick={() => { openCinemaModal(); cinemabyCinemaComplex(record); }}>Rạp</Button>
+                    <Button onClick={() => { openCinemaModal(); cinemabyCinemaComplex(record); }}>Phòng chiếu</Button>
 
                 </Space>
             ),
@@ -266,7 +264,7 @@ const AdminCinemaComplex = () => {
      
     const cinemabyCinemaComplex = (record) => {
         setCinemaComplex(record);
-        console.log('123',record);
+        // console.log('123',record);
     }
 
     const openCinemaModal = () => {
@@ -274,6 +272,14 @@ const AdminCinemaComplex = () => {
         // console.log(record);
       };
     
+    const openProvinceModal = () => {
+        setProvinceModalOpen(true);
+        // console.log(record);
+      };
+    
+      const closeProvinceModal = () => {
+        setProvinceModalOpen(false);
+      };
       const closeCinemaModal = () => {
         setCinemaModalOpen(false);
       };
@@ -386,10 +392,6 @@ const AdminCinemaComplex = () => {
             longitude: 105.72801667411835, latitude: 9.296098750825891, address: ""
         })
     };
-
-    useEffect(() => {
-
-    }, []);
 
     //form
     const handleResetForm = () => {
@@ -560,7 +562,7 @@ const AdminCinemaComplex = () => {
                             {...formItemLayout}
                             name="province"
                             label="Thuộc tỉnh"
-                            rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn tỉnh' }]}
                         >
                             <Select
                                 style={{ width: '100%' }}
@@ -582,6 +584,11 @@ const AdminCinemaComplex = () => {
                                 ]}
                                 allowClear
                             />
+                            <Col span={2}>
+                            <Button onClick={() => { openProvinceModal(); 
+                                // cinemabyCinemaComplex(record); 
+                                }}>+</Button>
+                        </Col>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -652,6 +659,14 @@ const AdminCinemaComplex = () => {
       >
         <AdminCinema cinemaComplexId={cinemaComplex}/>
       </BaseModal>
+      <Modal
+       open={isProvinceModalOpen}
+       width={'80%'}
+       title={'QUẢN LÝ CÁC TỈNH'}
+       onCancel={closeProvinceModal}
+      >
+        <AdminProvince></AdminProvince>
+      </Modal>
         </>
     );
 };

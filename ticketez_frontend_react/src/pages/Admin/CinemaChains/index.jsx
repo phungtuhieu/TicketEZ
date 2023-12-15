@@ -229,7 +229,6 @@ const AdminCinemaChains = () =>  {
             title: 'Mô tả',
             dataIndex: 'description',
             width: '20%',
-            ...getColumnSearchProps('description'),
         },
         {
             title: 'Action',

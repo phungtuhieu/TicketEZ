@@ -35,6 +35,7 @@ const publicRoutes = [
     { path: '/admin/sendEmail', component: PageAdmin.AdminSendEmail, layout: AdminLayout },
     { path: '/admin/ticket-statistics', component: PageAdmin.AdminTicKetStatistics, layout: AdminLayout },
     // User
+    { path: '/admin/comentModeration', component: PageAdmin.AdminComment, layout: AdminLayout },
 
     // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },

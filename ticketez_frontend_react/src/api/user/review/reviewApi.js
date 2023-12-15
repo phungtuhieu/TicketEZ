@@ -10,6 +10,14 @@ const reviewApi = {
     get: async () => {
         return axiosClient.get(url + '/get/all');
     },
+    getPage: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        const res = await axiosClient.get(url, { params });
+        return res.data;
+    },
     post: async (data, accountId, movieId) => {
         const [account, movie] = await Promise.all([
             accountApi.getById(accountId),
@@ -24,11 +32,15 @@ const reviewApi = {
         const values = { ...data };
         return axiosClient.put(url + '/' + values.id ,  values);
     },
+    patch: async (id) => {
+        return axiosClient.patch(url + '/status/' + id);
+    },
     delete: async (reviewId) => {
         return axiosClient.delete(url + '/' + reviewId);
     },
-    getMovieId: async (movieId) => {
-        return axiosClient.get(url +  '/get/by-movie/' + movieId);
+    getMovieId: async (movieId, page, limit) => {
+        const params ={ page, limit}
+        return axiosClient.get(url +  '/get/by-movie/' + movieId, {params});
     },
     getActorAndDirectorId: async (movieId) => {
         return axiosClient.get(urlMovie +  '/get/actor-director-by-movie/' + movieId);
@@ -40,16 +52,43 @@ const reviewApi = {
     },
     //check tài khoản
     getcheckAccountBooking: async (accountId, movieId) => {
-        return axiosClient.get(url + `/get/check-account-booking?accountId=${accountId}&movieId=${movieId}`);
+        try {
+            const response = await axiosClient.get(url + `/get/check-account-booking?accountId=${accountId}&movieId=${movieId}`);
+            const canComment = response.data;
+    
+            return canComment;
+        } catch (error) {
+            console.error('Error checking account booking:', error);
+            return false; // Trả về false nếu có lỗi xảy ra
+        }
     },
+    
+    
     getMovieOrReview: async (page, limit) => {
         const params = {
             page: page,
             limit: limit,
         };
         return axiosClient.get(url + `/get/by-movie-review`, {params});
-    }
+    },
 
-}
+    getAllMovieAndReview: async (page, limit) => {
+        const params = {
+            page: page,
+            limit: limit,
+        };
+        return axiosClient.get(url + `/get/all-movie-by-review`, {params});
+    },
+    getMovieAndReviewId: async (movieId, page, limit, status) => {
+        const params = {
+            movieId,
+            page,
+            limit,
+            status
+        }
+        return axiosClient.get(url + '/get/review-by-movieId', {params});
+    },
+
+};
 
 export default reviewApi;

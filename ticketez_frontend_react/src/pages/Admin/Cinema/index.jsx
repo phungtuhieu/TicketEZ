@@ -225,7 +225,6 @@ const AdminCinema = ({cinemaComplexId}) => {
             title: 'Loại rạp',
             dataIndex: 'cinemaType',
             width: '15%',
-            ...getColumnSearchProps('name'),
             render: (cinemaType) => <span>{cinemaType.typeName}</span>,
         },
         // {
