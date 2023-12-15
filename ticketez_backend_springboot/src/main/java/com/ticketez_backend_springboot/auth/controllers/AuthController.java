@@ -96,7 +96,7 @@ public class AuthController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  //Đăng nhập
+  // Đăng nhập
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -104,8 +104,13 @@ public class AuthController {
         .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với id: " + loginRequest.getId()));
     if (!securityAccount.isVerified()) {
       return ResponseEntity
-          .status(HttpStatus.FORBIDDEN)
-          .body("Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.");
+          .badRequest()
+          .body(new MessageResponse("Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn!"));
+    }
+    if (securityAccount.getStatus() == 2) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Tài khoản bạn bị khóa vui lòng liên hệ quản trị viên!"));
     }
 
     Authentication authentication = authenticationManager.authenticate(
@@ -132,8 +137,8 @@ public class AuthController {
         roles));
   }
 
-  //Đăng ký
-    @PostMapping("/signup")
+  // Đăng ký
+  @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
     if (accountRepository.existsById(signUpRequest.getId())) {
       return ResponseEntity
@@ -238,7 +243,6 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("Người dùng đã đăng ký thành công!"));
   }
 
-
   @PutMapping("/change-password")
   public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
     SecurityAccount securityAccount = accountRepository.findById(changePasswordRequest.getId())
@@ -263,7 +267,6 @@ public class AuthController {
 
   }
 
-
   @PostMapping("/verify-account")
   public ResponseEntity<?> verifyOtp(@RequestBody LoginRequest loginRequest) {
     SecurityAccount securityAccount = accountRepository.findById(loginRequest.getId())
@@ -286,28 +289,31 @@ public class AuthController {
       }
     }
     if (isOtpValid) {
-      return ResponseEntity.ok().body("Tài khoản đã được xác thực thành công.");
-    } else {
-      return ResponseEntity.badRequest().body("Đăng nhập thất bại: OTP không chính xác hoặc đã hết hạn");
-    }
+    return ResponseEntity.ok().body(new MessageResponse("Tài khoản đã được xác thực thành công."));
+  } else {
+
+    return ResponseEntity.badRequest().body(new MessageResponse("Đăng nhập thất bại: OTP không chính xác hoặc đã hết hạn"));
+  }
   }
 
   @PutMapping("/regenerate-otp")
-  public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
+  public ResponseEntity<?> regenerateOtp(@RequestParam String email) {
     Optional<SecurityAccount> securityAccountOpt = accountRepository.findByEmail(email);
 
     if (!securityAccountOpt.isPresent()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng với email này: " + email);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Không tìm thấy người dùng với email này: " + email));
     }
+  
     SecurityAccount securityAccount = securityAccountOpt.get();
-
     String otp = otpUtil.generateOtp();
-
+  
     try {
       emailUtil.sendOtpEmail(email, otp);
     } catch (MessagingException e) {
-      return ResponseEntity.badRequest().body("Không thể gửi OTP qua email, vui lòng thử lại sau.");
+      return ResponseEntity.badRequest().body(new MessageResponse("Không thể gửi OTP qua email, vui lòng thử lại sau."));
     }
+  
+    // Cập nhật hoặc tạo mới Verification
     List<Verification> verifications = verificationDAO.findByAccountId(securityAccount.getId());
     if (!verifications.isEmpty()) {
       for (Verification verification : verifications) {
@@ -316,22 +322,34 @@ public class AuthController {
         verificationDAO.save(verification);
       }
     } else {
-
     }
-    return ResponseEntity.ok("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút.");
+
+    return ResponseEntity.ok(new MessageResponse("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút."));
   }
-
-//profile
-@PutMapping("/{id}")
-public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestBody UserDto userDto) {
-    Optional<SecurityAccount> existingAccountOpt = accountRepository.findById(id);
-    
-    if (!existingAccountOpt.isPresent()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tài khoản không được tìm thấy");
-    }
-    
-    SecurityAccount existingAccount = existingAccountOpt.get();
   
+
+  // profile
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestBody UserDto userDto) {
+    Optional<SecurityAccount> existingAccountOpt = accountRepository.findById(id);
+
+    if (!existingAccountOpt.isPresent()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tài khoản không được tìm thấy");
+    }
+
+    SecurityAccount existingAccount = existingAccountOpt.get();
+
+    if (!existingAccount.getPhone().equals(userDto.getPhone()) && accountRepository.existsByPhone(userDto.getPhone())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Số điện thoai đã được sử dụng!"));
+    }
+  
+    if (!existingAccount.getEmail().equals(userDto.getEmail()) && accountRepository.existsByEmail(userDto.getEmail())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Email đã được sử dụng!"));
+    }
     existingAccount.setPhone(userDto.getPhone());
     existingAccount.setFullname(userDto.getFullname());
     existingAccount.setEmail(userDto.getEmail());
@@ -339,9 +357,9 @@ public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestB
     existingAccount.setBirthday(userDto.getBirthday());
     existingAccount.setGender(userDto.getGender());
     existingAccount.setImage(userDto.getImage());
-    
+
     SecurityAccount updatedAccount = accountRepository.save(existingAccount);
-    
+
     UserDto responseDto = new UserDto(
         updatedAccount.getId(),
         updatedAccount.getPhone(),
@@ -350,17 +368,16 @@ public ResponseEntity<?> updateAccount(@PathVariable String id, @Valid @RequestB
         updatedAccount.getAddress(),
         updatedAccount.getBirthday(),
         updatedAccount.getGender(),
-        updatedAccount.getImage()
-    );
+        updatedAccount.getImage());
     return ResponseEntity.ok(responseDto);
-}
+  }
 
-//gửi email qmk
-@PutMapping("/forgot-password")
-public ResponseEntity<?> sendForgotPasswordEmail(@RequestBody NewOtp newOtp) {
+  // gửi email qmk
+  @PutMapping("/forgot-password")
+  public ResponseEntity<?> sendForgotPasswordEmail(@RequestBody NewOtp newOtp) {
     Optional<SecurityAccount> userOpt = accountRepository.findByEmail(newOtp.getEmail());
     if (!userOpt.isPresent()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email không tồn tại trong hệ thống");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email không tồn tại trong hệ thống");
     }
 
     SecurityAccount user = userOpt.get();
@@ -369,11 +386,11 @@ public ResponseEntity<?> sendForgotPasswordEmail(@RequestBody NewOtp newOtp) {
     List<Verification> verifications = verificationDAO.findByAccountId(user.getId());
     Verification verification;
     if (!verifications.isEmpty()) {
-        verification = verifications.get(0);
+      verification = verifications.get(0);
     } else {
-        verification = new Verification();
-        verification.setAccountId(user.getId());
-        verification.setActive(false);
+      verification = new Verification();
+      verification.setAccountId(user.getId());
+      verification.setActive(false);
     }
 
     verification.setCode(code);
@@ -381,29 +398,28 @@ public ResponseEntity<?> sendForgotPasswordEmail(@RequestBody NewOtp newOtp) {
     verificationDAO.save(verification);
 
     try {
-        emailUtil.sendOtpEmail(newOtp.getEmail(), code);
+      emailUtil.sendOtpEmail(newOtp.getEmail(), code);
     } catch (MessagingException e) {
-        return ResponseEntity.badRequest().body("Không thể gửi email. Vui lòng thử lại.");
+      return ResponseEntity.badRequest().body("Không thể gửi email. Vui lòng thử lại.");
     }
 
     return ResponseEntity.ok("Email xác nhận đã được gửi.");
-}
+  }
 
-
-//doi mk
-@PutMapping("/reset-password")
-public ResponseEntity<?> resetPassword(@RequestBody ForgotPassword forgotPassword) {
+  // doi mk
+  @PutMapping("/reset-password")
+  public ResponseEntity<?> resetPassword(@RequestBody ForgotPassword forgotPassword) {
     Verification verification = verificationDAO.findByCode(forgotPassword.getCode())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP không hợp lệ hoặc không tồn tại."));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP không hợp lệ hoặc không tồn tại."));
 
     if (Duration.between(verification.getCreatedAt(), LocalDateTime.now()).getSeconds() >= 1000) {
-        verification.setActive(false);
-        verificationDAO.save(verification);
-        return ResponseEntity.badRequest().body("OTP đã hết hạn.");
+      verification.setActive(false);
+      verificationDAO.save(verification);
+      return ResponseEntity.badRequest().body("OTP đã hết hạn.");
     }
 
     SecurityAccount user = accountRepository.findById(verification.getAccountId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản."));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản."));
 
     user.setPassword(encoder.encode(forgotPassword.getNewPassword()));
     accountRepository.save(user);
@@ -412,10 +428,7 @@ public ResponseEntity<?> resetPassword(@RequestBody ForgotPassword forgotPasswor
     verificationDAO.save(verification);
 
     return ResponseEntity.ok("Mật khẩu đã được cập nhật thành công.");
-}
-
-
-
+  }
 
   @GetMapping("/logout")
   public ResponseEntity<?> logoutUser(HttpServletRequest request) {

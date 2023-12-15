@@ -34,10 +34,6 @@ const OtpForm = () => {
 
 
     const onFinish = async (values) => {
-        if (otpExpired) {
-            funcUtils.notify('Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.', 'error');
-            return;
-        }
         setLoading(true);
         try {
             const response = await authApi.getVerifyAccount({

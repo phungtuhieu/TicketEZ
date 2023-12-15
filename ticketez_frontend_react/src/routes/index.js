@@ -13,6 +13,7 @@ const publicRoutes = [
     { path: '/otp', component: PageUser.OtpForm, layout: DefaultLayout },
     { path: '/changepassword', component: PageUser.PasswordChangeForm, layout: DefaultLayout },
     { path: '/forgotpassword', component: PageUser.ResetPasswordFrom, layout: DefaultLayout },
+    { path: '/chat', component: PageUser.Chat, layout: DefaultLayout },
     //sự kiện
     { path: '/su-kien/tin-tuc', component: PageUser.Event, layout: DefaultLayout },
     { path: '/su-kien/tin-tuc/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },

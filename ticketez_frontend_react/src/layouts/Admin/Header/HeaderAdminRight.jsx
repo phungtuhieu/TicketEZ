@@ -25,7 +25,6 @@ function HeaderAdminRight() {
             try {
                 const user = await authApi.getUser();
                 setUserData(user);
-                console.log(user);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -40,7 +39,7 @@ function HeaderAdminRight() {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
-            navigate('/');
+            navigate('/login');
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
         }

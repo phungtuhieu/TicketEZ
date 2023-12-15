@@ -71,7 +71,7 @@ const EditableProfile = () => {
           funcUtils.notify('Ngày sinh không được vượt quá thời gian hiện tại.', 'error');
           return;
         }
-        
+
       }
       const response = await profileApi.update(userData.id, updatedValues);
       setUserData(response);
@@ -80,9 +80,10 @@ const EditableProfile = () => {
       localStorage.setItem('user', JSON.stringify(response.data));
       funcUtils.notify("Cập nhật thành công", 'success');
       window.location.reload();
-      
+
     } catch (error) {
-      funcUtils.notify("Cập nhật Thất bại", 'error');
+      const errorMessage = error.response?.data?.message;
+      funcUtils.notify(errorMessage, 'error');
     }
   };
 
@@ -152,7 +153,7 @@ const EditableProfile = () => {
                 <Form.Item
                   label="Ảnh đại diện"
                   name="image"
-            
+
                 >
                   <Upload
                     action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
