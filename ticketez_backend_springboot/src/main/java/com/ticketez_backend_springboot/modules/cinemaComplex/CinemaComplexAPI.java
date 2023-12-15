@@ -29,6 +29,11 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.province.Province;
 import com.ticketez_backend_springboot.modules.province.ProvinceDao;
 import com.ticketez_backend_springboot.dto.CCXShowtimeByMovieDTO;
+import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
+import com.ticketez_backend_springboot.dto.CinemaComplexBookingDTO;
+import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.booking.BookingDAO;
+import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieDAO;
@@ -48,6 +53,9 @@ public class CinemaComplexAPI {
     MovieDAO movieDAO;
     @Autowired
     ShowtimeDAO showtimeDao;
+
+    @Autowired
+    private BookingDAO bookingDao;
 
     @GetMapping
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
@@ -221,7 +229,7 @@ public class CinemaComplexAPI {
 
                     List<Showtime> showtime = showtimeDao.getShowtimesByCCXAndMovieAndFormatAndDate(cinemaComplex,
                             movie, formatMovie.getFormat(), date.orElse(LocalDate.now()));
-                            
+
                     formatAndShowtimes.setShowtimes(showtime);
                     lisFormatAndShowtimes.add(formatAndShowtimes);
                 }
@@ -237,6 +245,24 @@ public class CinemaComplexAPI {
         } catch (Exception e) {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/cinemaComplexBookingDTO")
+    public ResponseEntity<List<CinemaComplexBookingDTO>> findAllCinemaComplexAndBookingDTO() {
+        List<CinemaComplex> cinemaComplexs = cinemaComplexDao.findAll();
+        List<CinemaComplexBookingDTO> rspList = new ArrayList<>();
+        for (CinemaComplex cinemaComplex : cinemaComplexs) {
+            CinemaComplexBookingDTO bookingDTO = new CinemaComplexBookingDTO();
+
+            List<Booking> bookings = bookingDao.findBookingsByCinemaChainId(cinemaComplex.getId());
+            bookingDTO.setCinemaComplex(cinemaComplex);
+            bookingDTO.setBookings(bookings);
+
+            rspList.add(bookingDTO);
+        }
+
+        return ResponseEntity.ok(rspList);
+
     }
 
 }

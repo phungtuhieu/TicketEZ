@@ -52,7 +52,7 @@ const MovieTopDetails = () => {
          />
      );
 
-
+        console.log(" dd", data);
     return (
         <div className="tw-min-h-[1000px]">
             {data?.map((value, index) => (
@@ -123,7 +123,7 @@ const MovieTopDetails = () => {
                                                 </svg>
                                             </div>
                                         </Col>
-                                        <Col lg={17} className="tw-min-h-[237px]" >
+                                        <Col lg={17} className="tw-min-h-[237px]">
                                             <div className="tw-text-left  tw-leading-loose">
                                                 <h1 id={`movie-${index}-${indexValue}`} className="tw-mt-[-12px]">
                                                     {movie.movie.title}
@@ -197,14 +197,13 @@ const MovieTopDetails = () => {
                             <Col lg={3}>
                                 {selectedMovie ? (
                                     <img
-                                     alt=''
+                                        alt=""
                                         width={80}
                                         height={130}
                                         className={cx('img-modal')}
                                         src={`http://localhost:8081/api/upload/${selectedMovie.movie.poster}`}
                                     />
-                                ) : 
-                                (
+                                ) : (
                                     ''
                                 )}
                             </Col>
@@ -236,9 +235,9 @@ const MovieTopDetails = () => {
                         <div className="tw-mt-[-20px]">
                             <Button
                                 href={`/movie-details/${selectedMovie?.movie.id}`}
-                                className="tw-bg-[var(--pink)] tw-border-[var(--pink)] tw-text-white tw-font-medium"
+                                className="tw-bg-[var(--primary--text-color)]  tw-border-[var(--primary--text-color))] tw-text-white tw-font-medium"
                             >
-                                Đặt vé
+                               Xem chi tiết
                             </Button>
                             <Button
                                 onClick={handleCancel}

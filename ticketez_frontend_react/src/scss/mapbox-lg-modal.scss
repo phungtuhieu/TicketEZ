@@ -1,17 +1,25 @@
+// color: var(--primary--text-color);
+//         border-color: var(--primary--text-color);
+// background-color: var(--primary-background-color);
+
 .modal-footer-btn-close {
     width: 86px;
     height: 36px;
     font-size: 14px;
     border-radius: 0.375rem;
-    color: var(--ViTri-color-footer-btn);
-    background-color: var(--ViTri-background-color-footer-btn);
+    color: white;
+    background-color: var(--primary-background-color);
+    // color: var(--ViTri-color-footer-btn);
+    // background-color: var(--ViTri-background-color-footer-btn);
     font-weight: 500;
-    border-color: #c0177c !important;
+    border-color: var(--primary--text-color);
 
     &:hover {
-        color: var(--ViTri-color-footer-btn) !important;
-        --tw-bg-opacity: 1;
-        background-color: rgb(165 0 100 / var(--tw-bg-opacity));
+        color: white !important;
+        border-color: var(--primany-text-hover-color) !important;
+        background-color: var(--primany-text-hover-color) !important;
+        // --tw-bg-opacity: 1;
+        // background-color: rgb(165 0 100 / var(--tw-bg-opacity));
     }
 }
 

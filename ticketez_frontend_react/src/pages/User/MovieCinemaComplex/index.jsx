@@ -97,10 +97,10 @@ function MovieCinemaComplex() {
                                             </div>
                                         </Modal>
                                     </div>
-                                    <div className=" tw-mt-1 tw-text-[#ff85c0] tw-text-[14px]">
+                                    {/* <div className=" tw-mt-1 tw-text-[#ff85c0] tw-text-[14px]">
                                         Ưu đãi 89K/vé 2D cả tuần không giới hạn; 69K/vé 2D, tối đa 1 vé/tháng khi thanh
                                         toán bằng Ví Trả Sau
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

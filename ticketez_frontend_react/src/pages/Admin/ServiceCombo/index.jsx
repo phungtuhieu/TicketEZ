@@ -44,7 +44,7 @@ const AdminService = () => {
             try {
                 const [res, cinemaComplex] = await Promise.all([
                     serviceApi.getByPage(currentPage, pageSize),
-                    cinemaComplexApi.getPage(),
+                    cinemaComplexApi.get(),
                 ]);
                 console.log(cinemaComplex.data);
                 console.log(res);
@@ -434,7 +434,7 @@ const AdminService = () => {
                             label="Tên dịch vụ"
                             rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ' }]}
                         >
-                            <Input placeholder="Họ và tên" />
+                            <Input placeholder="Tên dịch vụ" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}

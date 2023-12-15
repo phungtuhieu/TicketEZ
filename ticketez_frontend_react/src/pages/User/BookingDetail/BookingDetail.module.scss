@@ -15,7 +15,7 @@
     margin: 0px 0px;
 }
 .mpaa-movie {
-    width: 40px;
+    min-width: 40px;
     text-align: center;
     border-radius: 10px;
 }
@@ -33,7 +33,7 @@
     color: rgb(115 115 115 / var(--tw-text-opacity));
 }
 .info-inner {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
 }
 .address-cinema-complex {
     margin: 0px 0px;

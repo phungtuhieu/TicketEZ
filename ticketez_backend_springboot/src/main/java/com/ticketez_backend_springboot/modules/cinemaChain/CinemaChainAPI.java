@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.cinemaChain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
+import com.ticketez_backend_springboot.dto.PriceSeatTypeDTO;
+import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.booking.BookingDAO;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +30,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class CinemaChainAPI {
     @Autowired
     CinemaChainDao cinemaChainDao;
-
+    @Autowired
+    private BookingDAO bookingDao;
     // @GetMapping
     // public ResponseEntity<List<CinemaChain>> findAll() {
     // return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
@@ -81,6 +88,24 @@ public class CinemaChainAPI {
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Không thể xóa", HttpStatus.CONFLICT);
         }
+
+    }
+
+    @GetMapping("/cinemaChainBookingDTO")
+    public ResponseEntity<List<CinemaChainBookingDTO>> findAllCinemaChainAndBookingDTO() {
+        List<CinemaChain> cinemaChains = cinemaChainDao.findAll();
+        List<CinemaChainBookingDTO> rspList = new ArrayList<>();
+        for (CinemaChain cinemaChain : cinemaChains) {
+            CinemaChainBookingDTO bookingDTO = new CinemaChainBookingDTO();
+
+            List<Booking> bookings = bookingDao.findBookingsByCinemaChainId(cinemaChain.getId());
+            bookingDTO.setCinemaChain(cinemaChain);
+            bookingDTO.setBookings(bookings);
+
+            rspList.add(bookingDTO);
+        }
+
+        return ResponseEntity.ok(rspList);
 
     }
 

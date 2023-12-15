@@ -1,11 +1,15 @@
 package com.ticketez_backend_springboot.modules.booking;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,13 +35,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.auth.OTP.util.EmailUtil;
 import com.ticketez_backend_springboot.dto.BookingAnPaymentInfoAndSeatBookings;
+import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
 import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
+import com.ticketez_backend_springboot.dto.PriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
 import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.account.AccountDAO;
+import com.ticketez_backend_springboot.modules.actor.Actor;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieAPI;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
@@ -46,13 +54,23 @@ import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.price.PriceDAO;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatTypeDAO;
+import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChooseDao;
+import com.ticketez_backend_springboot.modules.service.Service;
+import com.ticketez_backend_springboot.modules.service.ServiceDAO;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBookingDAO;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBookingPK;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChooseDAO;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
+import com.ticketez_backend_springboot.service.ZXingQRCodeService;
 
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -72,6 +90,12 @@ public class BookingAPI {
 	@Autowired
 	private BookingDAO dao;
 	private static final Logger logger = LoggerFactory.getLogger(MovieAPI.class);
+
+	@GetMapping("/get/all")
+	public ResponseEntity<List<Booking>> findAll() {
+		List<Booking> bookings = dao.findAll();
+		return ResponseEntity.ok(bookings);
+	}
 
 	@GetMapping
 	public ResponseEntity<?> findByPage(
@@ -208,10 +232,22 @@ public class BookingAPI {
 	SeatChooseDao seatChooseDao;
 
 	@Autowired
+	ServiceBookingDAO serviceBookingDAO;
+
+	@Autowired
+	ServiceChooseDAO serviceChooseDAO;
+
+	@Autowired
+	ServiceDAO serviceDAO;
+
+	@Autowired
 	PriceDAO priceDAO;
 
 	@Autowired
 	PriceSeatTypeDAO priceSeatTypeDAO;
+
+	@Autowired
+	EmailUtil emailUtil;
 
 	@GetMapping("/vnpay-payment")
 	public ResponseEntity<?> payment(HttpServletRequest request) {
@@ -239,17 +275,34 @@ public class BookingAPI {
 			booking.setShowtime(showtime);
 
 			Booking bCreated = dao.save(booking);
+			// String accountId = booking.getAccount().getId();
 			List<Price> prices = priceDAO.findByShowtimesId(showtime.getId());
 			List<String> weekends = new ArrayList<>(Arrays.asList("Friday", "Saturday", "Sunday"));
-			List<SeatChoose> seatChooses = seatChooseDao.findByShowtimeId(showtime.getId());
+			List<SeatChoose> seatChooses = seatChooseDao.findByShowtimeIdAndAccountId(showtime.getId(), accountId);
 
 			// Kiểm tra cuối tuần
 			Date currentDate = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
 			String dayOfWeek = sdf.format(currentDate);
 			boolean isWeekend = weekends.contains(dayOfWeek);
-			List<SeatBooking> lBookings = new ArrayList<>();
+			List<SeatBooking> seatBookingForSave = new ArrayList<>();
+			List<ServiceBooking> listServiceBookings = new ArrayList<>();
 
+			List<ServiceChoose> serviceChooses = serviceChooseDAO.findByAccountId(accountId);
+
+			for (ServiceChoose svc : serviceChooses) {
+				ServiceBooking svbNew = new ServiceBooking();
+				ServiceBookingPK svbPK = new ServiceBookingPK();
+				svbPK.setBookingID(booking.getId());
+				svbPK.setServiceID(svc.getService().getId());
+
+				svbNew.setServiceBookingPK(svbPK);
+				svbNew.setBooking(booking);
+				svbNew.setPrice(svc.getPrice());
+				svbNew.setQuantity(svc.getQuantity());
+				svbNew.setService(svc.getService());
+				listServiceBookings.add(svbNew);
+			}
 			// Lặp qua các ghế mà người dùng đã chọn
 			for (SeatChoose seatChoose : seatChooses) {
 				SeatBooking seatBooking = new SeatBooking();
@@ -268,27 +321,34 @@ public class BookingAPI {
 								seatBooking.setPrice(pst.getWeekdayPrice());
 							}
 							seatBooking.setSeat(seatChoose.getSeat());
-							lBookings.add(seatBooking);
+							seatBookingForSave.add(seatBooking);
 						}
 					}
 				}
 			}
-			seatBookingDao.saveAll(lBookings);
+			List<ServiceBooking> serviceBookingsSaved = serviceBookingDAO.saveAll(listServiceBookings);
+			List<SeatBooking> seatsBookingsSaved = seatBookingDao.saveAll(seatBookingForSave);
 
 			String orderInfo = request.getParameter("vnp_OrderInfo");
 			String tmnCode = request.getParameter("vnp_TmnCode");
 			String paymentTime = request.getParameter("vnp_PayDate");
 			String transactionId = request.getParameter("vnp_TransactionNo");
 			String totalPrice = request.getParameter("vnp_Amount");
-			System.out.println("------------- totalPrice: " + totalPrice);
-			System.out.println("-------------Double totalPrice: " + Double.valueOf(totalPrice));
+			// System.out.println("------------- totalPrice: " + totalPrice);
+			// System.out.println("-------------Double totalPrice: " +
+			// Double.valueOf(totalPrice));
 			String bankCode = request.getParameter("vnp_BankCode");
 			String transactionStatus = request.getParameter("vnp_TransactionStatus");
 
 			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			PaymentInfo paymentInfo = new PaymentInfo();
+			List<Long> seatChooseIdsDel = seatChooses.stream().map(seat -> seat.getId())
+					.collect(Collectors.toList());
 
+			List<Long> serviceChooseIdsDel = serviceChooses.stream().map(svc -> svc.getId())
+					.collect(Collectors.toList());
+			PaymentInfo pInfoSaved = null;
 			try {
 				Date date = inputFormat.parse(paymentTime);
 				String outputDateString = dateFormat.format(date);
@@ -304,17 +364,84 @@ public class BookingAPI {
 				paymentInfo.setPayDate(payDate);
 				paymentInfo.setTransactionStatus(transactionStatus);
 				System.out.println();
-				List<Long> seatChooseIdsDel = seatChooses.stream().map(seat -> seat.getId())
+				List<Long> serviceIds = serviceChooses.stream().map(svc -> svc.getService().getId())
 						.collect(Collectors.toList());
-				seatChooseDao
-						.deleteAllById(seatChooseIdsDel);
+				List<Service> servicesDb = serviceDAO.findAllById(serviceIds);
+				List<Service> servicesUpdated = new ArrayList<>();
+				for (Service svDB : servicesDb) {
+					for (ServiceChoose svc : serviceChooses) {
+						if (svDB.getId() == svc.getService().getId()) {
+							svDB.setQuantity(svDB.getQuantity() - svc.getQuantity());
+							servicesUpdated.add(svDB);
+						}
+					}
+				}
+				pInfoSaved = pmIDao.save(paymentInfo);
+				serviceDAO.saveAll(servicesUpdated);
+				Map<String, Object> templateModel = new HashMap<>();
+				SimpleDateFormat formatDate = new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy");
+				String payDateInfo = formatDate.format(pInfoSaved.getPayDate());
+				String showtimeDateFm = formatDate.format(bCreated.getShowtime().getStartTime());
+				String seatsName = seatsBookingsSaved.stream()
+						.map(seatBooking -> seatBooking.getSeat().getName())
+						.collect(Collectors.joining(", "));
+				// String comboNameFm = "";
+				List<String> combos = new ArrayList<>();
+
+				for (ServiceBooking serviceBooking : serviceBookingsSaved) {
+					Integer quantity = serviceBooking.getQuantity();
+					String comboName = serviceBooking.getService().getName();
+					String comboNew = String.format("%d X %s", quantity, comboName);
+					combos.add(comboNew);
+
+				}
+				byte[] qrImage = null;
+				try {
+					qrImage = ZXingQRCodeService.generateQRCodeImage(bCreated.getId());
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+				Locale locale = new Locale("vi", "VN");
+				NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
+
+				// Định dạng số tiền
+				String formattedAmount = currencyFormat.format(pInfoSaved.getAmount());
+				templateModel.put("ticketCode", bCreated.getId());
+				templateModel.put("showtimeDate", showtimeDateFm);
+				templateModel.put("movieName", bCreated.getShowtime().getFormatMovie().getMovie().getTitle());
+				templateModel.put("cinemaCplxName", bCreated.getShowtime().getCinema().getCinemaComplex().getName());
+				templateModel.put("cinemaCplxAddress",
+						bCreated.getShowtime().getCinema().getCinemaComplex().getAddress());
+				templateModel.put("cinemaName", bCreated.getShowtime().getCinema().getName());
+				templateModel.put("quantityTicket", seatsBookingsSaved.size());
+				templateModel.put("nameSeats", seatsName);
+				templateModel.put("combosName", combos);
+				templateModel.put("qrImage", bCreated.getId());
+				templateModel.put("payDateInfo", payDateInfo);
+				// System.out.println("-----QRCode: " + qrImage);
+				templateModel.put("total", formattedAmount);
+				try {
+					// "hieuptpc03210@fpt.edu.vn"
+					emailUtil.sendMessageUsingThymeleafTemplateWithInlineImage(bCreated.getAccount().getEmail(),
+							"[TicketEZ] - THÔNG TIN THANH TOÁN",
+							templateModel, "invoice-ticket", bCreated.getId(), qrImage);
+				} catch (MessagingException e) {
+					e.printStackTrace();
+				} finally {
+					ZXingQRCodeService.deleteQRCodeImage(bCreated.getId());
+				}
+
 			} catch (ParseException e) {
 				e.printStackTrace();
 				return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 						HttpStatus.CONFLICT);
+			} finally {
+				seatChooseDao.deleteAllById(seatChooseIdsDel);
+				serviceChooseDAO.deleteAllById(serviceChooseIdsDel);
+
 			}
-			PaymentInfo pInfo = pmIDao.save(paymentInfo);
-			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
+			return ResponseEntity.status(HttpStatus.OK).body(pInfoSaved.getTransactionId());
 		} else if (paymentStatus == 0) {
 			return new ResponseEntity<>("Giao dịch thất bại",
 					HttpStatus.CONFLICT);
@@ -372,14 +499,13 @@ public class BookingAPI {
 
 	}
 
-
 	@GetMapping("/get/booking-payment-info-seat-booking/{bookingId}")
 	public ResponseEntity<?> getBookingPaymentInfoSeatBookings(@PathVariable("bookingId") String bookingId) {
 		try {
 
 			BookingAnPaymentInfoAndSeatBookings dto = new BookingAnPaymentInfoAndSeatBookings();
 
-			if(bookingId != null ){
+			if (bookingId != null) {
 				Booking book = dao.getBookingById(bookingId);
 				PaymentInfo paymentInfo = dao.getPaymentInfoById(bookingId);
 				List<SeatBooking> seatBookings = dao.getSeatsBookingById(bookingId);
@@ -388,7 +514,7 @@ public class BookingAPI {
 				dto.setPaymentInfo(paymentInfo);
 				dto.setSeatBookings(seatBookings);
 			}
-			
+
 			return ResponseEntity.ok(dto);
 
 		} catch (Exception e) {
@@ -396,6 +522,5 @@ public class BookingAPI {
 		}
 
 	}
-
 
 }
