@@ -521,7 +521,7 @@ const AdminShowtime = () => {
                 <BaseModal
                     style={{ marginTop: '-50px' }}
                     open={open}
-                    width={'95%'}
+                    width={'85%'}
                     title={editData ? 'Cập nhật' : 'Thêm mới'}
                     onOk={handleOk}
                     onCancel={handleCancel}
