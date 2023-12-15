@@ -95,7 +95,7 @@ const AdminAccount = () => {
             value: 'Người dùng đã viết những bình luận gây hấn, đe dọa, hoặc gây lo lắng đối với người dùng khác.',
         },
     ];
-    const onChangeReason = (ten) => {
+    const   onChangeReason = (ten) => {
         setReason(ten);
     };
     const onSelect = (value) => {
@@ -154,6 +154,7 @@ const AdminAccount = () => {
         setAccountLockHistory(res.data);
     };
 
+    const [duLieuNe, setDuLieuNe] = useState('');
     const columns = [
         {
             title: 'Ảnh đại diện',
@@ -194,6 +195,10 @@ const AdminAccount = () => {
             dataIndex: 'address',
         },
         {
+            title: 'Địa chỉ',
+            dataIndex: 'id',
+        },
+        {
             title: 'Hoạt động',
             dataIndex: 'status',
             render: (_, record) => {
@@ -208,35 +213,33 @@ const AdminAccount = () => {
             title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
-                    {record.status === 1 && (
-                        <FontAwesomeIcon
-                            icon={faPen}
-                            className={cx('icon-pen')}
-                            onClick={() => {
-                                handleEditData(record);
-                            }}
-                        />
-                    )}
-                    {/*  */}
-                    <Popconfirm
-                        title={record.status !== 1 && 'Mở khoá tài khoản'}
-                        description={record.status !== 1 && 'Chắn chắn mở?'}
-                        okText="Đồng ý"
-                        cancelText="Huỷ"
-                        onConfirm={() => handleStatus(record)}
-                    >
-                        {record.status !== 1 && <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />}
-                    </Popconfirm>
-                    {/*  */}
+                    <h1>{record.id}</h1>
                     {record.status === 1 && (
                         <>
-                            <FontAwesomeIcon icon={faLockOpen} className={cx('icon-trash')} onClick={showModalReason} />
+                            <FontAwesomeIcon
+                                icon={faPen}
+                                className={cx('icon-pen')}
+                                onClick={() => {
+                                    handleEditData(record);
+                                }}
+                            />
+                            {/* space */}
+                            <FontAwesomeIcon
+                                icon={faLockOpen}
+                                className={cx('icon-trash')}
+                                onClick={() => {
+                                    showModalReason();
+                                    alert(record.id);
+                                    setDuLieuNe(record);
+                                    setReason('');
+                                }}
+                            />
                             <Modal
                                 title="Lí do khoá tài khoản"
                                 open={isModalOpen}
                                 onOk={() => {
                                     if (reason.trim() !== '') {
-                                        handleStatus(record);
+                                        handleStatus(duLieuNe);
                                         handleCancelReason();
                                     } else {
                                         funcUtils.notify('Nhập hoặc chọn lí do khoá tài khoản', 'error');
@@ -255,8 +258,11 @@ const AdminAccount = () => {
                                     filterOption={(inputValue, option) =>
                                         option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
+
+                                    
                                 >
                                     <TextArea
+                                        value={reason}
                                         placeholder="Nhập lí do..."
                                         className="custom"
                                         style={{
@@ -267,6 +273,21 @@ const AdminAccount = () => {
                                 </AutoComplete>
                             </Modal>
                         </>
+                    )}
+                    {/*  */}
+
+                    {/*  */}
+
+                    {record.status !== 1 && (
+                        <Popconfirm
+                            title={record.status !== 1 && 'Mở khoá tài khoản'}
+                            description={record.status !== 1 && 'Chắn chắn mở?'}
+                            okText="Đồng ý"
+                            cancelText="Huỷ"
+                            onConfirm={() => handleStatus(record)}
+                        >
+                            <FontAwesomeIcon icon={faLock} className={cx('icon-trash')} />
+                        </Popconfirm>
                     )}
                     {/*  */}
                     {record.status !== 1 && (
@@ -302,7 +323,10 @@ const AdminAccount = () => {
     };
 
     const handleStatus = async (record) => {
+        setReason('');
+        setDuLieuNe('');
         try {
+            // alert(record.id);
             if (record.id) {
                 const status = record.status === 1 ? 2 : 1;
                 const res = await accountApi.patchStatus(record.id, status, reason);
@@ -316,6 +340,7 @@ const AdminAccount = () => {
             console.log(error);
             funcUtils.notify(error.response.data, 'error');
         }
+        
         setWorkSomeThing(!workSomeThing);
     };
 
