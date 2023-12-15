@@ -680,7 +680,7 @@ function AdminMovie() {
             if (resp.status === 200) {
                 setLoadingButton((prev) => ({ ...prev, movie: false }));
                 funcUtils.notify('Đã xoá phim thành công', 'success');
-                setWorkSomething(!workSomething.movie);
+                setWorkSomething((prev) => ({ ...prev, movie: !workSomething.movie }));
             }
         } catch (error) {
             if (error.hasOwnProperty('response')) {

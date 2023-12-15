@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.auth.OTP.util.EmailUtil;
-import com.ticketez_backend_springboot.dto.BookingAnPaymentInfoAndSeatBookings;
 import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
 import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
@@ -368,6 +367,8 @@ public class BookingAPI {
 						.collect(Collectors.toList());
 				List<Service> servicesDb = serviceDAO.findAllById(serviceIds);
 				List<Service> servicesUpdated = new ArrayList<>();
+				pInfoSaved = pmIDao.save(paymentInfo);
+				serviceDAO.saveAll(servicesUpdated);
 				for (Service svDB : servicesDb) {
 					for (ServiceChoose svc : serviceChooses) {
 						if (svDB.getId() == svc.getService().getId()) {
@@ -376,8 +377,7 @@ public class BookingAPI {
 						}
 					}
 				}
-				pInfoSaved = pmIDao.save(paymentInfo);
-				serviceDAO.saveAll(servicesUpdated);
+
 				Map<String, Object> templateModel = new HashMap<>();
 				SimpleDateFormat formatDate = new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy");
 				String payDateInfo = formatDate.format(pInfoSaved.getPayDate());
@@ -401,6 +401,15 @@ public class BookingAPI {
 				} catch (Exception e) {
 
 					e.printStackTrace();
+					bCreated.setStatus(BookingStatus.FAILED);
+
+					seatBookingDao.deleteAllById(
+							seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+					serviceBookingDAO.deleteAllById(
+							serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+									.collect(Collectors.toList()));
+					return new ResponseEntity<>("Có lỗi trong việc tạo qr",
+							HttpStatus.CONFLICT);
 				}
 				Locale locale = new Locale("vi", "VN");
 				NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
@@ -428,14 +437,33 @@ public class BookingAPI {
 							templateModel, "invoice-ticket", bCreated.getId(), qrImage);
 				} catch (MessagingException e) {
 					e.printStackTrace();
+					bCreated.setStatus(BookingStatus.FAILED);
+
+					seatBookingDao.deleteAllById(
+							seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+					serviceBookingDAO.deleteAllById(
+							serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+									.collect(Collectors.toList()));
+
+					return new ResponseEntity<>("Có lỗi trong việc gửi mail thông báo",
+							HttpStatus.CONFLICT);
 				} finally {
 					ZXingQRCodeService.deleteQRCodeImage(bCreated.getId());
 				}
 
 			} catch (ParseException e) {
 				e.printStackTrace();
+				bCreated.setStatus(BookingStatus.FAILED);
+
+				seatBookingDao.deleteAllById(
+						seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+
+				serviceBookingDAO.deleteAllById(
+						serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+								.collect(Collectors.toList()));
 				return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 						HttpStatus.CONFLICT);
+
 			} finally {
 				seatChooseDao.deleteAllById(seatChooseIdsDel);
 				serviceChooseDAO.deleteAllById(serviceChooseIdsDel);
@@ -463,6 +491,7 @@ public class BookingAPI {
 		pInfoDTO.setPaymentInfo(pInfoDb);
 		pInfoDTO.setBooking(bookingDb);
 		pInfoDTO.setSeatBookings(bookingDb.getSeatsBookings());
+		pInfoDTO.setServicesBooking(bookingDb.getServicesBookings());
 		return ResponseEntity.status(HttpStatus.OK).body(pInfoDTO);
 	}
 
@@ -503,7 +532,7 @@ public class BookingAPI {
 	public ResponseEntity<?> getBookingPaymentInfoSeatBookings(@PathVariable("bookingId") String bookingId) {
 		try {
 
-			BookingAnPaymentInfoAndSeatBookings dto = new BookingAnPaymentInfoAndSeatBookings();
+			PaymentInfoDTO dto = new PaymentInfoDTO();
 
 			if (bookingId != null) {
 				Booking book = dao.getBookingById(bookingId);
@@ -511,6 +540,7 @@ public class BookingAPI {
 				List<SeatBooking> seatBookings = dao.getSeatsBookingById(bookingId);
 
 				dto.setBooking(book);
+				dto.setServicesBooking(book.getServicesBookings());
 				dto.setPaymentInfo(paymentInfo);
 				dto.setSeatBookings(seatBookings);
 			}
