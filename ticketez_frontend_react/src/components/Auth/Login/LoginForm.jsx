@@ -69,10 +69,7 @@ const LoginForm = () => {
             funcUtils.notify(errorMessage, 'error');
             if (errorMessage === "Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn!") {
                 navigate('/otp');
-            }else{
-                window.location.reload();
             }
-
         } finally {
             setLoading(false);
         }
