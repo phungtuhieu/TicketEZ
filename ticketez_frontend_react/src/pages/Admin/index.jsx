@@ -30,5 +30,5 @@ export { default as AdminPriceService } from './PriceService';
 export { default as AdminPrice } from './Price';
 
 export { default as AdminWebcam } from './Webcam';
-
+export { default as AdminTicKetStatistics } from './TicketStatistics';
 

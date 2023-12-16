@@ -52,8 +52,6 @@ public interface BookingDAO extends JpaRepository<Booking, String> {
                         @Param("accId") String accId,
                         Pageable pageable);
 
-
-
         // web cam
 
         @Query("SELECT b FROM Booking b WHERE b.id = :bookingId")
@@ -64,5 +62,13 @@ public interface BookingDAO extends JpaRepository<Booking, String> {
 
         @Query("SELECT sb FROM SeatBooking sb WHERE sb.booking.id = :bookingId")
         List<SeatBooking> getSeatsBookingById(@Param("bookingId") String bookingId);
+
+        @Query("SELECT b FROM Booking b " +
+                        "JOIN Showtime s ON b.showtime = s " +
+                        "JOIN Cinema c ON s.cinema = c " +
+                        "JOIN CinemaComplex cc ON c.cinemaComplex = cc " +
+                        "JOIN CinemaChain ch ON cc.cinemaChain = ch " +
+                        "WHERE ch.id = :cinemaChainId")
+        List<Booking> findBookingsByCinemaChainId(@Param("cinemaChainId") Long cinemaChainId);
 
 }

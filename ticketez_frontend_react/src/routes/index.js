@@ -4,6 +4,35 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
+    //Admin
+    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout, roles: ['SUPER_ADMIN'] },
+    { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout },
+    { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout },
+    { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout },
+    { path: '/admin/cinema-type', component: PageAdmin.AdminCinemaType, layout: AdminLayout },
+    { path: '/admin/province', component: PageAdmin.AdminProvince, layout: AdminLayout },
+    { path: '/admin/showtime', component: PageAdmin.AdminShowtime, layout: AdminLayout },
+    { path: '/admin/seat', component: PageAdmin.AdminSeat, layout: AdminLayout },
+    { path: '/admin/seat-type', component: PageAdmin.AdminSeatType, layout: AdminLayout },
+    { path: '/admin/seat-chart', component: PageAdmin.AdminSeatChart, layout: AdminLayout },
+    { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
+    { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
+    { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
+    { path: '/admin/movie-studio', component: PageAdmin.AdminMovieStudio, layout: AdminLayout },
+    { path: '/admin/actor', component: PageAdmin.AdminActor, layout: AdminLayout },
+    { path: '/admin/director', component: PageAdmin.AdminDirector, layout: AdminLayout },
+    { path: '/admin/format', component: PageAdmin.AdminFormat, layout: AdminLayout },
+    { path: '/admin/account', component: PageAdmin.AdminAccount, layout: AdminLayout },
+    { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
+    { path: '/admin/service', component: PageAdmin.AdminService, layout: AdminLayout },
+    { path: '/admin/priceservice', component: PageAdmin.AdminPriceService, layout: AdminLayout },
+    { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout },
+    { path: '/admin/price', component: PageAdmin.AdminPrice, layout: AdminLayout },
+    { path: '/admin/article', component: PageAdmin.AdminArticle, layout: AdminLayout },
+    { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
+    { path: '/admin/accountStaff', component: PageAdmin.AdminAccountStaff, layout: AdminLayout },
+    { path: '/admin/webcam', component: PageAdmin.AdminWebcam, layout: AdminLayout },
+    { path: '/admin/ticket-statistics', component: PageAdmin.AdminTicKetStatistics, layout: AdminLayout },
     // User
     
     // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
