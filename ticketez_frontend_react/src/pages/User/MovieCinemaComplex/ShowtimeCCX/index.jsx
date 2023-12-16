@@ -6,8 +6,8 @@ import moment from 'moment-timezone';
 import { Link } from 'react-router-dom';
 import { movieUserApi } from '~/api/user/showtime';
 import { useParams } from 'react-router-dom';
-import {  LoadingOutlined } from '@ant-design/icons';
-
+import { LoadingOutlined } from '@ant-design/icons';
+import SeatChart from '~/pages/User/Booking/SeatChart';
 import classNames from 'classnames/bind';
 import style from './ShowtimeCCX.module.scss';
 import uploadApi from '~/api/service/uploadApi';
@@ -63,7 +63,9 @@ function Showtime() {
     //
     const [showtime, setShowtime] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-
+    const handleCancel = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút Hủy
+    };
     const handleOk = () => {
         setIsModalVisible(false); // Đóng modal khi ấn nút OK
     };
@@ -177,6 +179,18 @@ function Showtime() {
                     )}
                 </Col>
             </Row>
+            <Modal
+                title="Sơ đồ rạp phim"
+                visible={isModalVisible}
+                footer={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={800}
+                style={{ marginBottom: '20px' }}
+                destroyOnClose={true}
+            >
+                <SeatChart showtime={showtime}></SeatChart>
+            </Modal>
         </Col>
     );
 }

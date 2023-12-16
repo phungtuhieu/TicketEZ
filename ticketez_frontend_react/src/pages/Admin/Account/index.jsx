@@ -95,7 +95,7 @@ const AdminAccount = () => {
             value: 'Người dùng đã viết những bình luận gây hấn, đe dọa, hoặc gây lo lắng đối với người dùng khác.',
         },
     ];
-    const   onChangeReason = (ten) => {
+    const onChangeReason = (ten) => {
         setReason(ten);
     };
     const onSelect = (value) => {
@@ -195,8 +195,8 @@ const AdminAccount = () => {
             dataIndex: 'address',
         },
         {
-            title: 'Địa chỉ',
-            dataIndex: 'id',
+            title: 'Số điện thoại',
+            dataIndex: 'phone',
         },
         {
             title: 'Hoạt động',
@@ -213,7 +213,6 @@ const AdminAccount = () => {
             title: 'Thao tác',
             render: (_, record) => (
                 <Space size="middle">
-                    <h1>{record.id}</h1>
                     {record.status === 1 && (
                         <>
                             <FontAwesomeIcon
@@ -258,8 +257,6 @@ const AdminAccount = () => {
                                     filterOption={(inputValue, option) =>
                                         option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
-
-                                    
                                 >
                                     <TextArea
                                         value={reason}
@@ -340,7 +337,7 @@ const AdminAccount = () => {
             console.log(error);
             funcUtils.notify(error.response.data, 'error');
         }
-        
+
         setWorkSomeThing(!workSomeThing);
     };
 

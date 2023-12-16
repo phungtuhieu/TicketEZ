@@ -65,7 +65,7 @@ const MovieShowing = () => {
             // setLoadingStates({});
             const getSendEmail = async () => {
                 try {
-                   const res =  await accountApi.getSendEmail(valueMovieId);
+                    const res = await accountApi.getSendEmail(valueMovieId);
                     console.log(res, 'error');
                     funcUtils.notify('Gữi Email cho người dùng thành công', 'success');
                     setLoadingStates(res);
@@ -153,7 +153,7 @@ const MovieShowing = () => {
 
     return (
         <div className={cx('body', 'tw-mb-[130px]')}>
-            <h1 className="tw-text-[var(--primary--text-color)]">Danh sách phim sắp chiếu</h1>
+            <h1 className="tw-text-[var(--primary--text-color)]">Đề xuất phim sắp chiếu cho người dùng đã mua</h1>
 
             {isLoadingPage && (
                 <div style={{ height: '100px' }}>
@@ -257,7 +257,7 @@ const MovieShowing = () => {
                                     >
                                         {loadingStates[slide.movie.id] ? (
                                             <span>
-                                                <span className="tw-mr-2"> Đang gữi</span>
+                                                <span className="tw-mr-2"> Đang gửi</span>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     className="tw-mr-2 tw-inline-block tw-h-5 tw-w-[10px] tw-animate-bounce tw-fill-white hover:tw-fill-white"
@@ -269,7 +269,7 @@ const MovieShowing = () => {
                                             </span>
                                         ) : (
                                             <>
-                                                <span className="tw-mr-2"> Gữi Email</span>{' '}
+                                                <span className="tw-mr-2"> Gửi đề xuất</span>{' '}
                                                 <FontAwesomeIcon icon={faEnvelope} />
                                             </>
                                         )}

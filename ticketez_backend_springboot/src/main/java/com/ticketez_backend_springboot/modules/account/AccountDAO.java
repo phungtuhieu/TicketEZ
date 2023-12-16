@@ -54,7 +54,7 @@ public interface AccountDAO extends JpaRepository<Account, String> {
                         "        INNER JOIN dbo.Movies m ON m.id = fm.movie_id " +
                         "        INNER JOIN dbo.Genres_Movies gm ON gm.movie_id = m.id " +
                         "        INNER JOIN dbo.Genres g ON g.id = gm.genre_id " +
-                        "        WHERE b.ticket_status = 1 " +
+                        " WHERE b.ticket_status = 1 " +
                         "    GROUP BY " +
                         "        a.id, " +
                         "        g.name, " +

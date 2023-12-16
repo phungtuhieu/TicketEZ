@@ -76,7 +76,7 @@ GO
         edit_date DATETIME,
         account_id NVARCHAR(20) NOT NULL,
         movie_id BIGINT NOT NULL,
-        [status] INT NOT NULL 0  --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
+        [status] INT NOT NULL   --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
     )
 GO
     CREATE TABLE Genres (

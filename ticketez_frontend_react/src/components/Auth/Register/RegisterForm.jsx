@@ -10,7 +10,6 @@ import { validateEmail, validateId, validatePassword, validatePhone, validateFul
 
 const { Header, Content } = Layout;
 
-
 const RegisterForm = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -23,7 +22,7 @@ const RegisterForm = () => {
         const finalData = {
             ...registrationData,
             ...form.getFieldsValue(),
-            gender: form.getFieldValue('gender') === 'male'
+            gender: form.getFieldValue('gender') === 'male',
         };
         try {
             await authApi.signup(finalData);
@@ -37,21 +36,17 @@ const RegisterForm = () => {
         }
     };
 
-
-
     const onNext = async () => {
         try {
             const values = await form.validateFields(
-                currentStep === 1 ? ['id', 'fullname'] :
-                    currentStep === 2 ? ['phone', 'email'] :
-                        []);
-            setRegistrationData(prevData => ({ ...prevData, ...values }));
+                currentStep === 1 ? ['id', 'fullname'] : currentStep === 2 ? ['phone', 'email'] : [],
+            );
+            setRegistrationData((prevData) => ({ ...prevData, ...values }));
             setCurrentStep(currentStep + 1);
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
         }
     };
-
 
     const onPrevious = () => {
         setCurrentStep(currentStep - 1);
@@ -71,8 +66,16 @@ const RegisterForm = () => {
                         >
                             {currentStep === 1 && (
                                 <>
-                                    <span style={{ marginBottom: '20px', 
-                                    marginRight: "450px",fontWeight: 'bold', fontSize: '14px'}}>Tên Tài khoản:</span>
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '450px',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
+                                    >
+                                        Tên tài khoản:
+                                    </span>
                                     <Form.Item
                                         name="id"
                                         rules={[
@@ -81,15 +84,19 @@ const RegisterForm = () => {
                                             },
                                         ]}
                                     >
-
                                         <Input placeholder="Tên Tài khoản" />
                                     </Form.Item>
-                                    <span style={{ marginBottom: '20px', 
-                                    marginRight: "485px",fontWeight: 'bold', fontSize: '14px'}}>Họ và tên:</span>
-                                    <Form.Item
-                                        name="fullname"
-                                        rules={[{ validator: validateFullname }]}
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '485px',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
                                     >
+                                        Họ và tên:
+                                    </span>
+                                    <Form.Item name="fullname" rules={[{ validator: validateFullname }]}>
                                         <Input placeholder="Họ và tên" />
                                     </Form.Item>
                                     <Button type="primary" onClick={onNext}>
@@ -100,20 +107,30 @@ const RegisterForm = () => {
 
                             {currentStep === 2 && (
                                 <>
-                                       <span style={{ marginBottom: '20px', 
-                                    marginRight: "460px",fontWeight: 'bold', fontSize: '14px'}}>Số điện thoại:</span>
-                                    <Form.Item
-                                        name="phone"
-                                        rules={[{ validator: validatePhone }]}
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '460px',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
                                     >
+                                        Số điện thoại:
+                                    </span>
+                                    <Form.Item name="phone" rules={[{ validator: validatePhone }]}>
                                         <Input placeholder="Số điện thoại" />
                                     </Form.Item>
-                                    <span style={{ marginBottom: '20px', 
-                                    marginRight: "530px",fontWeight: 'bold', fontSize: '14px'}}>Email:</span>
-                                    <Form.Item
-                                        name="email"
-                                        rules={[{ validator: validateEmail }]}
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '530px',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
                                     >
+                                        Email:
+                                    </span>
+                                    <Form.Item name="email" rules={[{ validator: validateEmail }]}>
                                         <Input placeholder="Email" />
                                     </Form.Item>
                                     <div className="button-group">
@@ -125,13 +142,14 @@ const RegisterForm = () => {
                                             Tiếp theo
                                         </Button>
                                     </div>
-
                                 </>
                             )}
 
                             {currentStep === 3 && (
                                 <>
-                                      <span style={{ marginBottom: '20px',fontWeight: 'bold', fontSize: '14px'}}>Giới tính:</span>
+                                    <span style={{ marginBottom: '20px', fontWeight: 'bold', fontSize: '14px' }}>
+                                        Giới tính:
+                                    </span>
                                     <Form.Item
                                         name="gender"
                                         rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
@@ -142,17 +160,30 @@ const RegisterForm = () => {
                                         </Radio.Group>
                                     </Form.Item>
 
-                                    <span style={{ marginBottom: '20px', 
-                                    marginRight: "485px",fontWeight: 'bold', fontSize: '14px'}}>Mật khẩu:</span>
-                                    <Form.Item
-                                        name="password"
-                                        rules={[{ validator: validatePassword }]}
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '485px',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
                                     >
+                                        Mật khẩu:
+                                    </span>
+                                    <Form.Item name="password" rules={[{ validator: validatePassword }]}>
                                         <Input.Password placeholder="Mật khẩu" />
                                     </Form.Item>
 
-                                    <span style={{ marginBottom: '20px', 
-                                    marginRight: "390px ",fontWeight: 'bold', fontSize: '14px'}}>Xác nhận lại mật khẩu:</span>
+                                    <span
+                                        style={{
+                                            marginBottom: '20px',
+                                            marginRight: '390px ',
+                                            fontWeight: 'bold',
+                                            fontSize: '14px',
+                                        }}
+                                    >
+                                        Xác nhận lại mật khẩu:
+                                    </span>
                                     <Form.Item
                                         name="confirm"
                                         dependencies={['password']}
@@ -167,7 +198,9 @@ const RegisterForm = () => {
                                                     if (!value || getFieldValue('password') === value) {
                                                         return Promise.resolve();
                                                     }
-                                                    return Promise.reject(new Error('Hai mật khẩu bạn nhập không khớp!'));
+                                                    return Promise.reject(
+                                                        new Error('Hai mật khẩu bạn nhập không khớp!'),
+                                                    );
                                                 },
                                             }),
                                         ]}
