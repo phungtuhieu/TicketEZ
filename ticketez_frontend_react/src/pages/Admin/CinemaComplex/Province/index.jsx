@@ -252,10 +252,10 @@ const AdminProvince = () => {
         setLoading(true);
         try {
             let values = await form.validateFields();
-            
+
             // Kiểm tra xem tỉnh/thành phố đã tồn tại chưa
             const isDuplicate = province.some(item => item.name === values.name);
-            
+
             if (isDuplicate) {
                 funcUtils.notify('Tên tỉnh/thành phố đã tồn tại. Vui lòng chọn tên khác.', 'error');
             } else {
@@ -311,7 +311,7 @@ const AdminProvince = () => {
     ];
     return (
         <>
-            <Row style={{width: '300px'}}>
+            <Row style={{ width: '300px' }}>
                 <Col span={2}>
                     <Button type="primary" className={cx('button-title')} icon={<PlusOutlined />} onClick={showModal}>
                         Thêm
@@ -354,25 +354,26 @@ const AdminProvince = () => {
                             label="Tên tỉnh"
                             rules={[{ required: true, message: 'Vui lòng nhập tỉnh' }]}
                         >
-                            {/* <Input placeholder="Please input your name" /> */}
-                            <Select
-                                placeholder="Chọn tỉnh/thành phố"
-                                onChange={handleChange}
-                                value={selectedProvince}
-                                allowClear
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                // mode="multiple"
-                            >
-                                {vietnamProvinces.map((province) => (
-                                    <Option key={province} value={province}>
-                                        {province}
-                                    </Option>
-                                ))}
-                            </Select>
-
+                            {editData ? (
+                                <Input placeholder="Please input your province" />
+                            ) : (
+                                <Select
+                                    placeholder="Chọn tỉnh/thành phố"
+                                    onChange={handleChange}
+                                    value={selectedProvince}
+                                    allowClear
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                >
+                                    {vietnamProvinces.map((province) => (
+                                        <Option key={province} value={province}>
+                                            {province}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            )}
                         </Form.Item>
                     </Form>
                 </BaseModal>
