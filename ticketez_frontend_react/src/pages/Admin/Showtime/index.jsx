@@ -295,7 +295,7 @@ const AdminShowtime = () => {
                     console.log(error.response.data);
                 }
             };
-          
+            getPriceByMovieAndCinemaComplexAndDate();
         }
     }, [
         valueSelectCinemaComplex,
