@@ -49,20 +49,11 @@ const LoginForm = () => {
 
             if (hasSuperAdminRole()) {
                 navigate('/admin/index');
-                setTimeout(() => {
                     funcUtils.notify('Đăng nhập thành công!', 'success');
-                }, 500);
-
             } else {
-                setTimeout(() => {
                     funcUtils.notify('Đăng nhập thành công!', 'success');
-                }, 500);
-                navigate('/', { replace: true, state: { fromLogin: true } });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                navigate('/');
             }
-
             setIsModalVisible(true);
         } catch (error) {
             const errorMessage = error.response?.data?.message;
