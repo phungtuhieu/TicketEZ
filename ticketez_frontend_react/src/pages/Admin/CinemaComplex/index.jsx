@@ -232,7 +232,7 @@ const AdminCinemaComplex = () => {
         {
             title: 'Thuộc loại',
             dataIndex: 'cinemaChain',
-            
+
             render: (cinemaChains) => <span>{cinemaChains.name}</span>
         },
         {
@@ -261,7 +261,7 @@ const AdminCinemaComplex = () => {
             ),
         },
     ];
-     
+
     const cinemabyCinemaComplex = (record) => {
         setCinemaComplex(record);
         // console.log('123',record);
@@ -270,19 +270,19 @@ const AdminCinemaComplex = () => {
     const openCinemaModal = () => {
         setCinemaModalOpen(true);
         // console.log(record);
-      };
-    
+    };
+
     const openProvinceModal = () => {
         setProvinceModalOpen(true);
         // console.log(record);
-      };
-    
-      const closeProvinceModal = () => {
+    };
+
+    const closeProvinceModal = () => {
         setProvinceModalOpen(false);
-      };
-      const closeCinemaModal = () => {
+    };
+    const closeCinemaModal = () => {
         setCinemaModalOpen(false);
-      };
+    };
     const showModal = () => {
         form.resetFields();
         setEditData(null);
@@ -343,6 +343,18 @@ const AdminCinemaComplex = () => {
                 setLoading(false);
                 return;
             }
+            // const isDuplicateCoordinate = posts.some(
+            //     post =>
+            //         post.id !== editData?.id &&
+            //         post.longitude === popupInfoFromMapbox.longitude &&
+            //         post.latitude === popupInfoFromMapbox.latitude
+            // );
+
+            // if (isDuplicateCoordinate) {
+            //     message.error('Tọa độ đã tồn tại. Vui lòng chọn tọa độ khác.');
+            //     setLoading(false);
+            //     return;
+            // }
             if (editData) {
                 values = {
                     ...values,
@@ -370,6 +382,7 @@ const AdminCinemaComplex = () => {
                     console.log(values);
                     const resp = await cinemaComplexApi.post(values, values.province, values.cinemaChain);
                     // message.success('Thêm thành công');
+                    console.log(resp);
                     funcUtils.notify('Thêm thành công', 'success');
                 } catch (error) {
                     // console.log(error);
@@ -415,43 +428,43 @@ const AdminCinemaComplex = () => {
     const expandedRowRender = (record) => {
         return (
             <div className={cx('flex')}>
-            <div className={cx('flex-1 p-4 m-2')}>
-                <ul className={cx('wrapp-more-info')}>
-                    <li>
-                        <span>
-                            <b>Giờ mở cửa: </b> {record.openingTime}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Giờ đóng cửa: </b> {record.closingTime}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Kinh độ: </b> {record.longitude}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Vĩ độ: </b> {record.latitude}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Địa chỉ: </b> {record.address}
-                        </span>
-                    </li>
-                </ul>
+                <div className={cx('flex-1 p-4 m-2')}>
+                    <ul className={cx('wrapp-more-info')}>
+                        <li>
+                            <span>
+                                <b>Giờ mở cửa: </b> {record.openingTime}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Giờ đóng cửa: </b> {record.closingTime}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Kinh độ: </b> {record.longitude}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Vĩ độ: </b> {record.latitude}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Địa chỉ: </b> {record.address}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div className={cx('w-[300px] h-[400px] p-3')}>
+                    <Mapbox
+                        latitude={record.latitude}
+                        longitude={record.longitude}
+                        address={record.address}
+                    />
+                </div>
             </div>
-            <div className={cx('w-[300px] h-[400px] p-3')}>
-                <Mapbox
-                    latitude={record.latitude}
-                    longitude={record.longitude}
-                    address={record.address}
-                />
-            </div>
-        </div>
         );
     };
 
@@ -500,16 +513,19 @@ const AdminCinemaComplex = () => {
                             label="Cụm rạp"
                             rules={[{ required: true, message: 'Vui lòng nhập cụm rạp' }]}
                         >
-                            <Input placeholder="Please input your name" />
+                            <Input placeholder="Nhập cụm rạp" />
                         </Form.Item>
-                       
+
                         <Form.Item
                             {...formItemLayout}
                             name="phone"
                             label="Số điện thoại"
-                            rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập số điện thoại' },
+                                { pattern: /^[0-9]+$/, message: 'Số điện thoại chỉ được nhập số' },
+                              ]}
                         >
-                            <Input placeholder="Please input your name" />
+                            <Input placeholder="Nhập số điện thoại" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -521,11 +537,11 @@ const AdminCinemaComplex = () => {
                                     validator(_, value) {
                                         const startTime = value.format('HH:mm:ss');
                                         const endTime = form.getFieldValue('closingTime')?.format('HH:mm:ss');
-    
+
                                         if (endTime && startTime >= endTime) {
                                             return Promise.reject('Giờ kết thúc phải sau giờ bắt đầu');
                                         }
-    
+
                                         return Promise.resolve();
                                     },
                                 }),
@@ -544,11 +560,11 @@ const AdminCinemaComplex = () => {
                                     validator(_, value) {
                                         const startTime = form.getFieldValue('openingTime')?.format('HH:mm:ss');
                                         const endTime = value.format('HH:mm:ss');
-    
+
                                         if (startTime && startTime >= endTime) {
                                             return Promise.reject('Giờ kết thúc phải sau giờ bắt đầu');
                                         }
-    
+
                                         return Promise.resolve();
                                     },
                                 }),
@@ -558,38 +574,44 @@ const AdminCinemaComplex = () => {
                             <TimePicker value={closingTime} onChange={onChangeEndTime} defaultOpenValue={dayjs('00:00', 'HH:mm')} />
 
                         </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="province"
-                            label="Thuộc tỉnh"
-                            rules={[{ required: true, message: 'Vui lòng chọn tỉnh' }]}
-                        >
-                            <Select
-                                style={{ width: '100%' }}
-                                showSearch
-                                placeholder="Chọn loại"
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={[
-                                    {
-                                        value: editData?.province?.id, // Sử dụng cinemaType từ record khi có
-                                        label: editData?.province?.name,
-                                    },
-                                    ...province.map((namepr) => ({
-                                        value: namepr.id,
-                                        label: namepr.name,
-                                    })),
-                                ]}
-                                allowClear
-                            />
+                        <Row gutter={10} style={{ paddingLeft: 10 }}>
+                            <Col span={22}>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="province"
+                                    label="Thuộc tỉnh"
+                                    rules={[{ required: true, message: 'Vui lòng chọn tỉnh' }]}
+                                >
+                                    <Select
+                                        style={{ width: '100%' }}
+                                        showSearch
+                                        placeholder="Chọn loại"
+                                        optionFilterProp="children"
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
+                                        options={[
+                                            {
+                                                value: editData?.province?.id, // Sử dụng cinemaType từ record khi có
+                                                label: editData?.province?.name,
+                                            },
+                                            ...province.map((namepr) => ({
+                                                value: namepr.id,
+                                                label: namepr.name,
+                                            })),
+                                        ]}
+                                        allowClear
+                                    />
+
+                                </Form.Item>
+                            </Col>
                             <Col span={2}>
                             <Button onClick={() => { openProvinceModal(); 
                                 // cinemabyCinemaComplex(record); 
                                 }}>+</Button>
                         </Col>
-                        </Form.Item>
+                        </Row>
+
                         <Form.Item
                             {...formItemLayout}
                             name="cinemaChain"
@@ -651,22 +673,22 @@ const AdminCinemaComplex = () => {
                 />
             </div>
             <BaseModal
-        open={isCinemaModalOpen}
-        width={'80%'}
-        title={'QUẢN LÝ PHÒNG CỦA RẠP'}
-        onCancel={closeCinemaModal}
-        
-      >
-        <AdminCinema cinemaComplexId={cinemaComplex}/>
-      </BaseModal>
-      <Modal
-       open={isProvinceModalOpen}
-       width={'80%'}
-       title={'QUẢN LÝ CÁC TỈNH'}
-       onCancel={closeProvinceModal}
-      >
-        <AdminProvince></AdminProvince>
-      </Modal>
+                open={isCinemaModalOpen}
+                width={'80%'}
+                title={'QUẢN LÝ PHÒNG CỦA RẠP'}
+                onCancel={closeCinemaModal}
+
+            >
+                <AdminCinema cinemaComplexId={cinemaComplex} />
+            </BaseModal>
+            <Modal
+                open={isProvinceModalOpen}
+                width={'80%'}
+                title={'QUẢN LÝ CÁC TỈNH'}
+                onCancel={closeProvinceModal}
+            >
+                <AdminProvince></AdminProvince>
+            </Modal>
         </>
     );
 };

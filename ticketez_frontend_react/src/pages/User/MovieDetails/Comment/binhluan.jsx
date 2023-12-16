@@ -111,7 +111,8 @@ const Binhluan = () => {
         const profanityList = ['đụ má', 'con mẹ mày', 'vcl', 'vãi',
             'fuck', 'cmm', 'như cc', 'nứng cặc',
             'cdm', 'duma', 'dcm', 'nứng vl', 'chó đẻ',
-            'vãi cứt', 'xàm lồn', 'như lồn', 'cái lồn', 'như l', 'đỉ mẹ', 'loz', 'lol', 'nhu cac', 'đụ']; // Thêm các từ thô tục vào danh sách
+            'vãi cứt', 'xàm lồn', 'như lồn', 'cái lồn', 'như l', 'đỉ mẹ', 'loz', 'lol', 'nhu cac', 'đụ', 'vc', 'nhu con cac',
+        ]; // Thêm các từ thô tục vào danh sách
         let filteredText = text;
 
         profanityList.forEach((profanity) => {
@@ -417,8 +418,9 @@ const Binhluan = () => {
                                                 </Paragraph>
 
                                                 <Space>
-                                                    <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span>
-                                                    <LikeOutlined className={cx('col-icon')} /><span>250 Thấy hữu ích</span>
+                                                    {/* <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span> */}
+
+                                                    <LikeOutlined className={cx('col-icon')} /><span>like</span>
 
                                                     {item.account.id === user.id && (
                                                         <Dropdown

@@ -1,5 +1,6 @@
 package com.ticketez_backend_springboot.modules.accountRole;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketez_backend_springboot.dto.AccountDTO;
+import com.ticketez_backend_springboot.dto.AccountRolesDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.dto.TotalDashboardAdmin;
 import com.ticketez_backend_springboot.modules.account.Account;
@@ -31,6 +33,8 @@ import com.ticketez_backend_springboot.modules.account.AccountStatus;
 import com.ticketez_backend_springboot.modules.account.AccountUpdateRequest;
 import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistory;
 import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistoryDAO;
+import com.ticketez_backend_springboot.modules.movieStudio.MovieStudio;
+import com.ticketez_backend_springboot.modules.role.Role;
 
 @CrossOrigin("*")
 @RestController
@@ -67,14 +71,31 @@ public class AccountRoleAPI {
             Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10));
             Page<Account> page = accountRoleDAO.findByAccountRole(pageable, status.orElse(AccountStatusRole.ACTIVE),
                     search.orElse(""));
+            List<AccountRolesDTO> accountRolesDTOs = new ArrayList<>();
 
-            ResponseDTO<Account> responseDTO = new ResponseDTO<>();
-            responseDTO.setData(page.getContent());
+            for (Account account : page.getContent()) {
+                AccountRolesDTO accountRolesDTO = new AccountRolesDTO();
+                accountRolesDTO.setAccount(account);
+                List<Role> roles = new ArrayList<>();
+                for (AccountRole accountRole : account.getAccountRoles()) {
+                    roles.add(accountRole.getRole());
+                }
+                ;
+                accountRolesDTO.setRoles(roles);
+                accountRolesDTOs.add(accountRolesDTO);
+
+            }
+            System.out.println(accountRolesDTOs.get(0).getAccount().getId());
+            ResponseDTO<AccountRolesDTO> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(accountRolesDTOs);
             responseDTO.setTotalItems(page.getTotalElements());
             responseDTO.setTotalPages(page.getTotalPages());
             return ResponseEntity.ok(responseDTO);
+
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
     }
 

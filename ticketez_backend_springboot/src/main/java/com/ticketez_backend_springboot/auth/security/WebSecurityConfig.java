@@ -70,7 +70,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               "/api/priceService/**", "/api/province/**", "/api/review/**", "/api/seat/**", "/api/seatBooking/**",
               "/api/seatchart/**", "/api/seat-choose/**", "/api/seatType/**", "/api/servicecombo/**",
               "/api/servicebookings/**", "/api/showtime/**", "/api/verification/**", "/api/article/**",
-              "/api/articleMovie/**", "/api/price_seat_type/**", "/api/service-choose/**", "/api/upload/**")
+              "/api/articleMovie/**", "/api/price_seat_type/**", "/api/service-choose/**", "/api/upload/**",
+              "/api/accountRole/**")
               .permitAll();
           auth.requestMatchers("/test/test/**").permitAll();
           auth.anyRequest().authenticated();
