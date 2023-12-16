@@ -7,8 +7,9 @@ import { SyncOutlined } from '@ant-design/icons';
 import authApi from '~/api/user/Security/authApi';
 import { hasSuperAdminRole } from '~/utils/authUtils';
 import funcUtils from '~/utils/funcUtils';
-import {validateId, validatePassword } from '../Custom';
+import { validateId, validatePassword } from '../Custom';
 const { Content } = Layout;
+
 
 const generateCaptcha = () => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -33,18 +34,19 @@ const LoginForm = () => {
 
 
     const onFinish = async (values) => {
-        // if (!validateId(values.id) || !validatePassword(values.password))
-        //     return;
-        // if (!isCaptchaVerified) {
-        //     setIsModalVisible(true);
-        //     return;
-        // }
+
+        if (!isCaptchaVerified) {
+            setIsModalVisible(true);
+            return;
+        }
         setLoading(true);
         try {
+
             const response = await authApi.getLogin({
                 id: values.id,
                 password: values.password,
             });
+
             if (hasSuperAdminRole()) {
                 navigate('/admin/index');
                 setTimeout(() => {
@@ -55,19 +57,18 @@ const LoginForm = () => {
                 setTimeout(() => {
                     funcUtils.notify('Đăng nhập thành công!', 'success');
                 }, 500);
-                navigate('/');
+                navigate('/', { replace: true, state: { fromLogin: true } });
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
             }
-            setIsModalVisible(true);
 
+            setIsModalVisible(true);
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                funcUtils.notify('Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn.', 'info');
+            const errorMessage = error.response?.data?.message;
+            funcUtils.notify(errorMessage, 'error');
+            if (errorMessage === "Tài khoản chưa được xác thực. Vui lòng xác thực email của bạn!") {
                 navigate('/otp');
-            } else {
-                funcUtils.notify('Đăng nhập không thành công. Vui lòng kiểm tra lại Tài khoản mật khẩu.', 'error');
             }
         } finally {
             setLoading(false);
@@ -78,6 +79,7 @@ const LoginForm = () => {
         issetLoading(true);
         setTimeout(() => {
             issetLoading(false);
+
             if (userInput.trim().toLowerCase() === captcha.trim().toLowerCase()) {
                 setIsCaptchaVerified(true);
                 funcUtils.notify('Captcha xác thực thành công!', 'success');
@@ -148,8 +150,8 @@ const LoginForm = () => {
                             <Form.Item
                                 name="id"
                                 rules={[
-                                    { validator: validateId }, 
-                                  ]}
+                                    { validator: validateId },
+                                ]}
                                 className={styles.formItem}
                             >
                                 <Input placeholder="Tên Tài khoản" className={styles.input} />
@@ -158,19 +160,13 @@ const LoginForm = () => {
                             <Form.Item
                                 name="password"
                                 rules={[
-                                    { validator: validatePassword }, 
-                                  ]}
+                                    { validator: validatePassword },
+                                ]}
                                 className={styles.formItem}
                             >
                                 <Input.Password type="password" placeholder="Mật khẩu" className={styles.input} />
                             </Form.Item>
 
-                            <Form.Item className={styles.formItem}>
-                                <Checkbox className={styles.checkbox}>Nhớ tài khoản</Checkbox>
-                                <Link className={styles.forgot} to="/forgotpassword">
-                                    Quên mật khẩu
-                                </Link>
-                            </Form.Item>
 
                             <Form.Item className={styles.formItem}>
                                 <Button type="primary" htmlType="submit" block className={styles.loginButton} loading={loading}>
@@ -178,8 +174,14 @@ const LoginForm = () => {
                                 </Button>
                                 <p className={styles.signup}>
                                     Bạn chưa có tài khoản
-                                    <Link className={styles.forgot} to="/Register">
+                                    <Link className={styles.forgots} to="/Register">
                                         Đăng Ký
+                                    </Link>
+                                </p>
+                                <p className={styles.Qtk}>
+                                    Quên mật khẩu tại đây
+                                    <Link className={styles.forgot} to="/forgotpassword">
+                                        Quên mật khẩu
                                     </Link>
                                 </p>
                             </Form.Item>
