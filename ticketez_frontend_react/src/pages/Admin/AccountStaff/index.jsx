@@ -40,6 +40,7 @@ import { rule } from 'postcss';
 import { regex } from '~/utils/regex';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import accountRoleApi from '~/api/admin/managementGeneral/accountRoleApi';
+import roleApi from '~/api/admin/managementGeneral/roleApi';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -72,6 +73,7 @@ const AdminAccountStaff = () => {
     const valueSearchDelay = useDebounce(search, 500);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [role, setRole] = useState([]);
 
     const options = [
         {
@@ -118,14 +120,26 @@ const AdminAccountStaff = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const res = await accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
+                const [res, resRole] =  await Promise.all([
+                    accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status),
+                    roleApi.get(),
+                ]);
+                
+                
+            //     accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
+            //    const resRole = await roleApi.get();
+               setRole(resRole.data);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
                 console.log(res.data);
+                console.log(resRole);
             } catch (error) {
-                console.log(error);
-                // funcUtils.notify(error.response, 'error');
+                if (error.hasOwnProperty('response')) {
+                    funcUtils.notify(error.response.data, 'error');
+                } else {
+                    console.log(error);
+                }
             }
         };
         getList();
@@ -154,7 +168,7 @@ const AdminAccountStaff = () => {
             title: 'Họ và tên',
             dataIndex: 'fullname',
             // width: '30%',
-            // ...getColumnSearchProps('fullname'),
+            render: (_, record) => `${record.account.fullname}`,
         },
         // {
         //     title: 'Ngày sinh',
@@ -168,22 +182,23 @@ const AdminAccountStaff = () => {
         {
             title: 'email',
             dataIndex: 'email',
+            render: (_, record) => `${record.account.email}`,
         },
         // {
         //     title: 'Địa chỉ',
         //     dataIndex: 'address',
         // },
-        // {
-        //     title: 'Chức vụ',
-        //     dataIndex: 'accountRole',
-        //     render: (accountRole) => <span>{accountRole.role.name}</span>       
-        //  },
+        {
+            title: 'Chức vụ',
+            dataIndex: 'roles',
+            render: (_, record) => record.roles.length > 0 ? record.roles[0].name : 'Không có chức vụ',
+        },
         {
             title: 'Hoạt động',
             dataIndex: 'status',
             render: (_, record) => {
-                const statusText = record.status === 1 ? 'Hoạt động' : 'Khoá ';
-                const tagColor = record.status === 1 ? 'green' : 'red';
+                const statusText = record.account.status === 1 ? 'Hoạt động' : 'Khoá ';
+                const tagColor = record.account.status === 1 ? 'green' : 'red';
 
                 return <Tag color={tagColor}>{statusText}</Tag>;
             },
@@ -266,17 +281,22 @@ const AdminAccountStaff = () => {
                 <ul className={cx('wrapp-more-info')}>
                     <li>
                         <span>
-                            <b>Ngày sinh: </b> {record.birthday}
+                            <b>Ngày sinh: </b> {record.account.birthday}
                         </span>
                     </li>
                     <li>
                         <span>
-                            <b>Giới tính: </b> {record.gender ? 'Nam' : 'Nữ'}
+                            <b>Giới tính: </b> {record.account.gender ? 'Nam' : 'Nữ'}
                         </span>
                     </li>
                     <li>
                         <span>
-                            <b>Địa chỉ: </b> {record.address}
+                            <b>Địa chỉ: </b> {record.account.address}
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <b>Mật khẩu nhân viên: </b> {record.account.password}
                         </span>
                     </li>
                 </ul>
@@ -406,28 +426,12 @@ const AdminAccountStaff = () => {
             label: 'Nữ',
         },
     ];
-    const optionsWithDisabledRole = [
-        {
-            value: 3,
-            label: 'Quản lý Phim',
-        },
-        {
-            value: 4,
-            label: 'Quản lý Ghế',
-        },
-        {
-            value: 5,
-            label: 'Quản lý tài khoản',
-        },
-    ];
     const showModal = () => {
         form.resetFields();
         setEditData(null);
         setOpen(true);
         setResetForm(true);
     };
-
-
     return (
         <>
             <Row>
@@ -524,7 +528,6 @@ const AdminAccountStaff = () => {
                             {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
                             <Radio.Group options={optionsWithDisabled} optionType="button" buttonStyle="solid" />
                         </Form.Item>
-
                         <Form.Item
                             {...formItemLayout}
                             name="email"
@@ -537,7 +540,7 @@ const AdminAccountStaff = () => {
                                 },
                             ]}
                         >
-                            <Input placeholder="email..." />
+                            <Input type='email' placeholder="email..." />
                         </Form.Item>
 
                         <Form.Item
@@ -591,12 +594,36 @@ const AdminAccountStaff = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="role"
+                            name="roles"
                             label="Chức vụ"
                             rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
                         >
-                            {/* <Switch checkedChildren="Nam" unCheckedChildren="Nữ" defaultChecked /> */}
-                            <Radio.Group options={optionsWithDisabledRole} optionType="button" buttonStyle="solid" />
+                              <Select
+                                style={{ width: '100%' }}
+                                showSearch
+                                placeholder="Chọn chức vụ nhân viên"
+                                optionFilterProp="children"
+                                // filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                                    options={[
+                                        ...role.map((item) => ({
+                                            value: item.id,
+                                            label: item.name,
+                                        })),
+                                    ]}
+                                // onChange={(value) => handleSelectOption(value, 'genre')}
+                                // options={[
+                                //     {
+                                //         value: editData?.role?.id, // Sử dụng cinemaType từ record khi có
+                                //         label: editData?.role?.name,
+                                //     },
+                                //     ...role.map((namepr) => ({
+                                //         value: namepr.id,
+                                //         label: namepr.name,
+                                //     })),
+                                // ]}
+                                allowClear
+                                mode='multiple'
+                            />
                         </Form.Item>
                     </Form>
                 </BaseModal>
