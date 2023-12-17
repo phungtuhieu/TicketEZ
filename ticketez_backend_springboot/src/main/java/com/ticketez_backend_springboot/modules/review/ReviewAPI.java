@@ -191,8 +191,7 @@ public class ReviewAPI {
             }
 
             // Kiểm tra xem tài khoản đã thanh toán và có vé đã sử dụng hay không
-            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie,
-                    optionalAccount);
+            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
             List<Booking> bookings = bookingDAO.findPaidAndUsedBookingsByMovieAndAccount(optionalMovie,
                     optionalAccount);
 
@@ -205,7 +204,8 @@ public class ReviewAPI {
 
             return ResponseEntity.ok(canComment);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Log the exception details
+            // log.error("Error while checking account booking", e);
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }

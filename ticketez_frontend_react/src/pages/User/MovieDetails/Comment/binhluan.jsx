@@ -88,7 +88,9 @@ const Binhluan = () => {
         const checkPaymentStatus = async () => {
             try {
                 const user = authApi.getUser();
+                console.log(user);
                 const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
+
                 setIsPaid(isPaid);
                 console.log('isPaid', isPaid);
 
@@ -300,7 +302,7 @@ const Binhluan = () => {
                 )}
 
                 <Col span={16}>
-                    {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
+                 {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
                         <>
                             {showCommentInput && (
                                 <Space.Compact
