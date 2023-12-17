@@ -234,7 +234,12 @@ const privateRoutes = [
         layout: AdminLayout,
         allowedRoles: ['SUPER_ADMIN'],
     },
-
+    {
+        path: '/admin/ticket-statistics-price',
+        component: PageAdmin.AdminTicKetStatisticsPrice,
+        layout: AdminLayout,
+        allowedRoles: ['SUPER_ADMIN'],
+    },
     {
         path: '/admin/sendEmail',
         component: PageAdmin.AdminSendEmail,

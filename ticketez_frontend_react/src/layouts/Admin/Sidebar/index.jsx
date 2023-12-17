@@ -46,7 +46,8 @@ const items = [
     ]),
     // Thống kê
     getItem('Thống kê', 'grStatic', <FontAwesomeIcon icon={solidIcons.faChartSimple} />, [
-        getItem(<Link to="/admin/ticket-statistics">Thống kê vé theo chuỗi rạp</Link>, 'static', null),
+        getItem(<Link to="/admin/ticket-statistics">Thống kê vé</Link>, 'static', null),
+        getItem(<Link to="/admin/ticket-statistics-price">Thống kê giá</Link>, 'staticPrice', null),
     ]),
 
     // Quản lý dịch vụ, sự kiện

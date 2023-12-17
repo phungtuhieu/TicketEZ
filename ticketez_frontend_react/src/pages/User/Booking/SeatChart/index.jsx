@@ -670,7 +670,12 @@ function SeatChart(props) {
                     <Col span={24}>
                         <div className="tw-flex-1 tw-mt-3">
                             <span className="tw-block tw-text-gray-500 tw-text-2xl tw-mb-2 ">Tạm tính</span>
-                            <b className="tw-text-2xl tw-mt-5">{priceSeats}đ</b>
+                            <b className="tw-text-2xl tw-mt-5">
+                                {new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                }).format(priceSeats)}
+                            </b>
                         </div>
                     </Col>
                     <Col span={120}>
