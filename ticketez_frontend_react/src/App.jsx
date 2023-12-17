@@ -10,8 +10,7 @@ import ProtectedRoute from '~/api/user/Security/ProtectedRoute';
 function App() {
     const roles = getRolesFromLocalStorage();
     const isAuthenticated = !!localStorage.getItem('token');
-    console.log(isAuthenticated);
-    console.log(roles);
+
     
     return (
         <Router>

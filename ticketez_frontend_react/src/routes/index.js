@@ -4,37 +4,8 @@ import * as PageUser from '~/pages/User';
 import { AdminLayout, DefaultLayout } from '~/layouts';
 
 const publicRoutes = [
-    //Admin
-    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout, roles: ['SUPER_ADMIN'] },
-    { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout },
-    { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout },
-    { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout },
-    { path: '/admin/cinema-type', component: PageAdmin.AdminCinemaType, layout: AdminLayout },
-    { path: '/admin/province', component: PageAdmin.AdminProvince, layout: AdminLayout },
-    { path: '/admin/showtime', component: PageAdmin.AdminShowtime, layout: AdminLayout },
-    { path: '/admin/seat', component: PageAdmin.AdminSeat, layout: AdminLayout },
-    { path: '/admin/seat-type', component: PageAdmin.AdminSeatType, layout: AdminLayout },
-    { path: '/admin/seat-chart', component: PageAdmin.AdminSeatChart, layout: AdminLayout },
-    { path: '/admin/combo', component: PageAdmin.AdminCombo, layout: AdminLayout },
-    { path: '/admin/discount', component: PageAdmin.AdminDiscount, layout: AdminLayout },
-    { path: '/admin/event', component: PageAdmin.AdminEvent, layout: AdminLayout },
-    { path: '/admin/movie-studio', component: PageAdmin.AdminMovieStudio, layout: AdminLayout },
-    { path: '/admin/actor', component: PageAdmin.AdminActor, layout: AdminLayout },
-    { path: '/admin/director', component: PageAdmin.AdminDirector, layout: AdminLayout },
-    { path: '/admin/format', component: PageAdmin.AdminFormat, layout: AdminLayout },
-    { path: '/admin/account', component: PageAdmin.AdminAccount, layout: AdminLayout },
-    { path: '/admin/mpaaRating', component: PageAdmin.AdminMpaaRating, layout: AdminLayout },
-    { path: '/admin/service', component: PageAdmin.AdminService, layout: AdminLayout },
-    { path: '/admin/priceservice', component: PageAdmin.AdminPriceService, layout: AdminLayout },
-    { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout },
-    { path: '/admin/price', component: PageAdmin.AdminPrice, layout: AdminLayout },
-    { path: '/admin/article', component: PageAdmin.AdminArticle, layout: AdminLayout },
-    { path: '/admin/movie-producer', component: PageAdmin.AdminProducer, layout: AdminLayout },
-    { path: '/admin/accountStaff', component: PageAdmin.AdminAccountStaff, layout: AdminLayout },
-    { path: '/admin/webcam', component: PageAdmin.AdminWebcam, layout: AdminLayout },
-    { path: '/admin/ticket-statistics', component: PageAdmin.AdminTicKetStatistics, layout: AdminLayout },
     // User
-    
+
     // { path: '/movie/:id', component: PageUser.MovieDef, layout: DefaultLayout },
     { path: '/', component: PageUser.Home, layout: DefaultLayout },
     { path: '/login', component: PageUser.LoginForm, layout: DefaultLayout },
@@ -50,7 +21,7 @@ const publicRoutes = [
     { path: '/su-kien/khuyen-mai/:eventId', component: PageUser.EventDetails, layout: DefaultLayout },
     //liên hệ
     { path: '/contact', component: UserContact, layout: DefaultLayout },
-    { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout },
+
     { path: '/movie-details/:movieId', component: PageUser.MovieDetails, layout: DefaultLayout },
     { path: '/movie-search', component: PageUser.MovieSearch, layout: DefaultLayout },
     { path: '/connector-page', component: PageUser.ConnectorPage, layout: null },
@@ -67,14 +38,14 @@ const publicRoutes = [
 
 const privateRoutes = [
     //trang chủ
-    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout },
+    { path: '/admin/index', component: PageAdmin.AdminIndex, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'CINEMA_MANAGEMENT_ADMIN', 'USER_MANAGEMENT_ADMIN', 'SERVICE_EVENT_MANAGEMENT_ADMIN', 'SCHEDULING_PRICING_ADMIN', 'MOVIE_MANAGEMENT_ADMIN'] },
 
     //rap
     { path: '/admin/cinema-complex', component: PageAdmin.AdminCinemaComplex, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'CINEMA_MANAGEMENT_ADMIN'] },
     { path: '/admin/cinema', component: PageAdmin.AdminCinema, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'CINEMA_MANAGEMENT_ADMIN'] },
     { path: '/admin/cinema-type', component: PageAdmin.AdminCinemaType, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'CINEMA_MANAGEMENT_ADMIN'] },
     { path: '/admin/cinema-chains', component: PageAdmin.AdminCinemaChains, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'CINEMA_MANAGEMENT_ADMIN'] },
-   
+
     //phim
     { path: '/admin/movie', component: PageAdmin.AdminMovie, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'MOVIE_MANAGEMENT_ADMIN'] },
     { path: '/admin/movie-studio', component: PageAdmin.AdminMovieStudio, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'MOVIE_MANAGEMENT_ADMIN'] },
@@ -106,6 +77,9 @@ const privateRoutes = [
 
     //webcam
     { path: '/admin/webcam', component: PageAdmin.AdminWebcam, layout: AdminLayout },
+
+    { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout, allowedRoles: ['SUPER_ADMIN', 'USER'] },
+
 
 ];
 

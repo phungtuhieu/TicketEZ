@@ -45,7 +45,6 @@ const Header = () => {
     useEffect(() => {
         let fetchDataInterval;
         if (userData === null) {
-            console.log(userData);
             fetchDataInterval = setInterval(() => {
                 fetchData()
             }, 1000);
