@@ -256,6 +256,7 @@ public class MovieAPI {
             actorMovieDAO.saveAll(actorMovies);
             return ResponseEntity.ok(movieSaved);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("[POST] - Error: {}", e.toString());
             return new ResponseEntity<>("Không thể thêm, có lỗi trong việc lưu Movie",
                     HttpStatus.CONFLICT);

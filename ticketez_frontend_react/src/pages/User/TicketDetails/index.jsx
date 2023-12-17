@@ -9,11 +9,15 @@ import uploadApi from '~/api/service/uploadApi';
 import moment from 'moment';
 import 'moment/locale/vi';
 const cx = classNames.bind(style);
-
+const ticketStatus = {
+    UNUSED: 0,
+    USED: 1,
+    EXPIRES: 2,
+};
 function TicketDetails({ paymentInfoDTO }) {
     // const location = useLocation();
     const [infoTicket, setInfoTicket] = useState({});
-    const { booking, paymentInfo, seatBookings } = paymentInfoDTO;
+    const { booking, paymentInfo, seatBookings, servicesBooking } = paymentInfoDTO;
     // Lấy dữ liệu từ state
     // const paymentInfo = location.state?.paymentInfo;
     useEffect(() => {
@@ -42,6 +46,7 @@ function TicketDetails({ paymentInfoDTO }) {
                 endTime: moment(showtime.endTime).format('HH:mm'),
                 showDate: capitalizeFirstLetter(moment(showtime.startDate).format('dddd, DD/MM/YYYY')),
             },
+            ticketStatus: booking.ticketStatus,
             // seat,
             cinemaComplex: {
                 name: cinemaComplex.name,
@@ -51,6 +56,7 @@ function TicketDetails({ paymentInfoDTO }) {
             cinemaName: showtime.cinema.name,
             seatNumber: seatBookings.length.toString().padStart(2, '0'),
             seatNames: seatBookings.map((sb) => sb.seat.name).join(', '),
+            servicesBooking: servicesBooking.map((svb) => `${svb.quantity} X ${svb.service.name}`),
             paymentInfo: {
                 ticketId: booking.id,
                 amount: new Intl.NumberFormat('vi-VN', {
@@ -95,6 +101,12 @@ function TicketDetails({ paymentInfoDTO }) {
                                     </Col>
                                 </Row>
                             </div>
+                            {infoTicket.ticketStatus === ticketStatus.USED && (
+                                <div className={cx('status-ticket')}>Vé đã sử dụng</div>
+                            )}
+                            {infoTicket.ticketStatus === ticketStatus.EXPIRES && (
+                                <div className={cx('status-ticket')}>Vé đã hết hạn</div>
+                            )}
                             <div className={cx('ticket-body')}>
                                 <Row>
                                     <Col span={12} className={cx('wrapp-info-ticket')}>
@@ -162,6 +174,20 @@ function TicketDetails({ paymentInfoDTO }) {
                                                 <li className={cx('ticket-title')}>Số ghế</li>
                                                 <li className={cx('ticket-body-text')}>
                                                     <span className={cx('seats-name')}>{infoTicket.seatNames}</span>
+                                                </li>
+                                            </ul>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            <ul className={cx('info-ticket', 'tw-text-start')}>
+                                                <li className={cx('ticket-title')}>Thức ăn kèm</li>
+                                                <li className={cx('ticket-body-text')}>
+                                                    <ul>
+                                                        {infoTicket.servicesBooking.map((svb) => (
+                                                            <li className={cx('cinema-name')}>{svb}</li>
+                                                        ))}
+                                                    </ul>
                                                 </li>
                                             </ul>
                                         </Col>

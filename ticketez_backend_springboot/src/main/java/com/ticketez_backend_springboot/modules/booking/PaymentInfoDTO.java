@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
+import com.ticketez_backend_springboot.modules.serviceBooking.ServiceBooking;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class PaymentInfoDTO {
     private PaymentInfo paymentInfo;
     private Booking booking;
     private List<SeatBooking> seatBookings;
+    private List<ServiceBooking> servicesBooking;
     private Integer status;
 }

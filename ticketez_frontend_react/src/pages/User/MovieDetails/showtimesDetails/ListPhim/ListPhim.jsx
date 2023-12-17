@@ -8,6 +8,7 @@ import moment from 'moment-timezone';
 import NotFountShowtime from '~/pages/User/Home/showtimes/NotFountShowtime/NotFountShowtime';
 import uploadApi from '~/api/service/uploadApi';
 import { LoadingOutlined } from '@ant-design/icons';
+import SeatChart from '~/pages/User/Booking/SeatChart';
 
 import { useParams } from 'react-router-dom';
 import Mapbox from '~/components/Mapbox';
@@ -17,7 +18,15 @@ const cx = classNames.bind(style);
 function ListPhim({ propsValue }) {
     const [list, setList] = useState([]);
     const [showtime, setShowtime] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const handleOk = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút OK
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false); // Đóng modal khi ấn nút Hủy
+    };
     const [activeKey, setActiveKey] = useState(null);
     const handleCollapseChange = (key) => {
         setActiveKey(key);
@@ -40,7 +49,6 @@ function ListPhim({ propsValue }) {
                 );
                 setList(res);
                 setLoading(false);
-
             } catch (error) {
                 console.log(error);
                 setLoading(false);
@@ -51,6 +59,8 @@ function ListPhim({ propsValue }) {
 
     const handShowtime = (value) => {
         setShowtime(value);
+        console.log(showtime);
+        setIsModalVisible(true);
     };
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => {
@@ -184,6 +194,18 @@ function ListPhim({ propsValue }) {
                 />
             )}
             {newList === undefined && <NotFountShowtime />}
+            <Modal
+                title="Sơ đồ rạp phim"
+                visible={isModalVisible}
+                footer={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={800}
+                style={{ marginBottom: '20px' }}
+                destroyOnClose={true}
+            >
+                <SeatChart showtime={showtime}></SeatChart>
+            </Modal>
         </>
     );
 }
