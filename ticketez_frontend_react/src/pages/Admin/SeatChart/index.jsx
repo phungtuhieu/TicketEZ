@@ -68,12 +68,12 @@ const AdminSeatChart = () => {
     }, [workSomeThing]);
 
     const columns = [
-        {
-            title: 'Mã',
-            dataIndex: 'id',
-            width: '10%',
-            sorter: (a, b) => a.id - b.id,
-        },
+        // {
+        //     title: 'Mã',
+        //     dataIndex: 'id',
+        //     width: '10%',
+        //     sorter: (a, b) => a.id - b.id,
+        // },
         {
             title: 'Tên sơ đồ',
             dataIndex: 'name',

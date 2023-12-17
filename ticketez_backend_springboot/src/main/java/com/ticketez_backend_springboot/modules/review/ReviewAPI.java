@@ -3,6 +3,7 @@ package com.ticketez_backend_springboot.modules.review;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Map;
 
@@ -11,11 +12,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +32,8 @@ import com.ticketez_backend_springboot.dto.ResponseDTO;
 import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.account.AccountDAO;
 import com.ticketez_backend_springboot.modules.booking.Booking;
+import com.ticketez_backend_springboot.modules.booking.BookingDAO;
+import com.ticketez_backend_springboot.modules.cinema.Cinema;
 import com.ticketez_backend_springboot.modules.cinemaComplex.CinemaComplex;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieDAO;
@@ -49,6 +54,8 @@ public class ReviewAPI {
     // }
     @Autowired
     AccountDAO accountDAO;
+    @Autowired
+    BookingDAO bookingDAO;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
@@ -61,6 +68,26 @@ public class ReviewAPI {
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @GetMapping
+    public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+            }
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10));
+            Page<Review> page = reviewDAO.findAll(pageable);
+            ResponseDTO<Review> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(page.getContent());
+            responseDTO.setTotalItems(page.getTotalElements());
+            responseDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/get/all")
@@ -93,6 +120,22 @@ public class ReviewAPI {
         }
     }
 
+    @PatchMapping("/status/{id}")
+    public ResponseEntity<?> put(@PathVariable("id") Long id) {
+        try {
+            if (!reviewDAO.existsById(id)) {
+                return new ResponseEntity<>("không tồn tại", HttpStatus.NOT_FOUND);
+            }
+            Review review = reviewDAO.findById(id).get();
+            Review newReview = review;
+            newReview.setStatus(ReviewStatus.APPROVED);
+            reviewDAO.save(newReview);
+            return ResponseEntity.ok(newReview);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
@@ -105,15 +148,27 @@ public class ReviewAPI {
     }
 
     @GetMapping("/get/by-movie/{movieId}")
-    public ResponseEntity<?> getReviewsByMovieId(@PathVariable("movieId") Long movieId) {
+    public ResponseEntity<?> getReviewsByMovieId(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit,
+            @PathVariable("movieId") Long movieId) {
         try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+            }
+
             Optional<Movie> optionalMovie = movieDAO.findById(movieId);
             // Account account = accountDAO.findById("user6").get();
             // System.out.println("+++++++++++++" + !account.getBookings().isEmpty());
 
             if (optionalMovie.isPresent()) {
-                List<Review> reviews = reviewDAO.findAllByMovieId(movieId);
-                return ResponseEntity.ok(reviews);
+                Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10));
+                Page<Review> page = reviewDAO.findAllByMovieId(movieId, pageable);
+                ResponseDTO<Review> responseDTO = new ResponseDTO<>();
+                responseDTO.setData(page.getContent());
+                responseDTO.setTotalItems(page.getTotalElements());
+                responseDTO.setTotalPages(page.getTotalPages());
+                return ResponseEntity.ok(responseDTO);
+
             }
 
             return new ResponseEntity<>("Không tìm thấy phim có id " + movieId, HttpStatus.NOT_FOUND);
@@ -131,61 +186,54 @@ public class ReviewAPI {
             Movie optionalMovie = movieDAO.findById(movieId).orElse(null);
 
             if (optionalAccount == null || optionalMovie == null) {
-                return new ResponseEntity<>("Không tìm thấy tài khoản hoặc phim", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("Không tìm thấy tài khoản hoặc bộ phim",
+                        HttpStatus.NOT_FOUND);
             }
 
-            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
+            // Kiểm tra xem tài khoản đã thanh toán và có vé đã sử dụng hay không
+            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie,
+                    optionalAccount);
+            List<Booking> bookings = bookingDAO.findPaidAndUsedBookingsByMovieAndAccount(optionalMovie,
+                    optionalAccount);
 
+            boolean canComment = !bookings.isEmpty()
+                    && bookings.stream().anyMatch(booking -> booking.getTicketStatus() == 1);
             if (!reviews.isEmpty()) {
-                return ResponseEntity.ok("Tài khoản đã thanh toán");
-            } else {
-                return ResponseEntity.ok("Nếu bạn muốn bình luận, vui lòng thanh toán");
+                canComment = true;
+                return ResponseEntity.ok(canComment);
             }
 
+            return ResponseEntity.ok(canComment);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // @GetMapping("/get/check-account-booking")
-    // public ResponseEntity<?> getCheckAccountBooking(@RequestParam("accountId") String accountId,
-    //         @RequestParam("movieId") Long movieId,
-    //         @RequestParam("bookingStatus") boolean bookingStatus) {
-    //     try {
-    //         Account optionalAccount = accountDAO.findById(accountId).orElse(null);
-    //         Movie optionalMovie = movieDAO.findById(movieId).orElse(null);
+    // public ResponseEntity<?> getcheckAccountBooking(@RequestParam("accountId")
+    // String accountId,
+    // @RequestParam("movieId") Long movieId) {
+    // try {
+    // Account optionalAccount = accountDAO.findById(accountId).get();
+    // Movie optionalMovie = movieDAO.findById(movieId).get();
 
-    //         if (optionalAccount == null || optionalMovie == null) {
-    //             return new ResponseEntity<>("Không tìm thấy tài khoản hoặc phim", HttpStatus.NOT_FOUND);
-    //         }
+    // List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie,
+    // optionalAccount);
 
-    //         if (bookingStatus) {
+    // Boolean check = false;
+    // if (!reviews.isEmpty()) {
+    // check = true;
+    // return ResponseEntity.ok(check);
+    // }
 
-    //             return ResponseEntity.ok("Đã đặt vé thành công");
-    //         } else {
-    //             List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
-
-    //             if (!reviews.isEmpty()) {
-    //                 boolean check = true;
-    //                 Map<String, Object> response = new HashMap<>();
-    //                 response.put("check", check);
-    //                 response.put("message", "Tài khoản đã thanh toán");
-    //                 return ResponseEntity.ok(response);
-    //             } else {
-    //                 // Additional information for the response
-    //                 boolean check = false;
-    //                 Map<String, Object> response = new HashMap<>();
-    //                 response.put("check", check);
-    //                 response.put("message", "Nếu bạn muốn bình luận, vui lòng thanh toán");
-    //                 return ResponseEntity.ok(response);
-    //             }
-    //         }
-
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
+    // return ResponseEntity.ok(check);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // return new ResponseEntity<>("Server error, vui lòng thử lại sau!",
+    // HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
     // }
 
     // gọi movie đề lấy reivew của movie đó
@@ -218,6 +266,58 @@ public class ReviewAPI {
             e.printStackTrace(); // In lỗi để theo dõi tình trạng lỗi
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/get/all-movie-by-review")
+    public ResponseEntity<?> getOnMovieAndReview(@RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+            }
+
+            Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10));
+            Page<Movie> page = reviewDAO.findAllMovieAndReview(pageable);
+            ResponseDTO<Movie> responseDTO = new ResponseDTO<>();
+            responseDTO.setData(page.getContent());
+            responseDTO.setTotalItems(page.getTotalElements());
+            responseDTO.setTotalPages(page.getTotalPages());
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // In lỗi để theo dõi tình trạng lỗi
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get/review-by-movieId")
+    public ResponseEntity<?> getMovieAndReviewId(
+            @RequestParam("movieId") long movieId,
+            @RequestParam("page") Optional<Integer> pageNo,
+            @RequestParam("status") Optional<Integer> status,
+            @RequestParam("limit") Optional<Integer> limit) {
+        try {
+
+            if (pageNo.isPresent() && pageNo.get() == 0) {
+                return new ResponseEntity<>("Trang không tồn tại", HttpStatus.NOT_FOUND);
+            }
+            Movie movie = movieDAO.findById(movieId).get();
+            if (movie != null) {
+                Sort sort = Sort.by(Sort.Order.desc("id"));
+                Pageable pageable = PageRequest.of(pageNo.orElse(1) - 1, limit.orElse(10), sort);
+                Page<Review> page = reviewDAO.findByMovieAndStatus(pageable, movie, status.orElse(null));
+                ResponseDTO<Review> responseDTO = new ResponseDTO<>();
+                responseDTO.setData(page.getContent());
+                responseDTO.setTotalItems(page.getTotalElements());
+                responseDTO.setTotalPages(page.getTotalPages());
+                return ResponseEntity.ok(responseDTO);
+            }
+            return new ResponseEntity<>("Lỗi ", HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Lỗi kết nối server", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

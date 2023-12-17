@@ -14,7 +14,8 @@ import funcUtils from '~/utils/funcUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useReactToPrint } from 'react-to-print';
 const cx = classNames.bind(styles);
-function MovieTickets() {
+function MovieTickets(props) {
+    const { tab } = props;
     const componentPDF = useRef();
     const generatePDF = useReactToPrint({
         content: () => componentPDF.current,
@@ -31,6 +32,7 @@ function MovieTickets() {
         paymentInfo: {},
         booking: {},
         seatBookings: [],
+        servicesBooking: [],
     });
     const [bookings, setBookings] = useState([]);
     const [paymentId, setPaymentId] = useState('');
@@ -39,14 +41,12 @@ function MovieTickets() {
     useEffect(() => {
         const loadDataTicket = async () => {
             try {
-                console.log('sss1');
                 const resp = await bookingApi.getPaymentInfoById(paymentId);
-                console.log('resp', resp);
                 const booking = resp.data.booking;
                 const paymentInfo = resp.data.paymentInfo;
                 const seatBookings = resp.data.seatBookings;
-                console.log('booking', booking);
-                setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
+                const servicesBooking = resp.data.servicesBooking;
+                setPaymentInfoDTO({ booking, paymentInfo, seatBookings, servicesBooking });
             } catch (error) {
                 console.log('error', error);
             }
@@ -66,8 +66,7 @@ function MovieTickets() {
                     funcUtils.notify('Vui lòng đăng nhập');
                     return;
                 }
-                const resp = await bookingApi.getBookingByAcc(1, 10, account.id);
-                console.log('resp', resp);
+                const resp = await bookingApi.getBookingByAcc(1, 10, account.id, tab);
                 const dataFormat = resp.data.map((item) => ({
                     id: item.booking.id,
                     paymentId: item.paymentId,
@@ -113,7 +112,6 @@ function MovieTickets() {
                     <div className={cx('wrapp-btn-download')}>
                         <Button onClick={handleSavePdf} className={cx('btn-download-ticket')}>
                             <FontAwesomeIcon icon={solidIcons.faFileExport} />
-                            
                         </Button>
                     </div>
 

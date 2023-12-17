@@ -26,7 +26,7 @@ function SeatChart(props) {
         setIsModalOpenBooking(false);
     };
     const handleCancel = () => {
-        console.log(seatChoose);
+        console.log('seatChoose', seatChoose);
         deleteSeatChoose();
         setIsModalOpenBooking(false);
     };
@@ -174,11 +174,13 @@ function SeatChart(props) {
     };
     const [account, setAccount] = useState(null);
     const [isService, setIsService] = useState(false);
+    const [priceService, setPriceService] = useState([]);
     useEffect(() => {
         const loadServices = async () => {
             try {
-                const resp = await priceServiceApi.findByCplx(showtime.id);
+                const resp = await priceServiceApi.findByCplx(showtime.cinema.cinemaComplex.id);
                 console.log('priceService: 11 ', resp);
+                setPriceService(resp.data);
                 if (resp.data.length >= 0) {
                     setIsService(true);
                 } else {
@@ -422,6 +424,7 @@ function SeatChart(props) {
             currentTime.setMinutes(currentTime.getMinutes() + vietnamTimezoneOffset);
             const formattedTime = currentTime.toISOString();
             const data = duplicateSeat.map((s) => ({
+                account,
                 lastSelectedTime: formattedTime,
                 seat: s,
                 showtime: showtime,
@@ -762,12 +765,15 @@ function SeatChart(props) {
                         <Row>
                             <Col span={15}></Col>
                             <Col span={9}>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="tw-mt-6">
+                                <div
+                                    style={{ display: 'flex', justifyContent: 'flex-end' }}
+                                    className="tw-mt-6 tw-mb-6"
+                                >
                                     <Button
                                         style={{
                                             width: '150px',
                                             height: '70px',
-                                            backgroundColor: hasData ? '#EB2F96' : 'gray',
+                                            backgroundColor: hasData ? '#176b87' : 'gray',
                                             fontWeight: 'bolder',
                                         }}
                                         className={`btn ${
@@ -788,8 +794,9 @@ function SeatChart(props) {
             </Card>
             {account != null && isService && (
                 <BookingCombo
-                    showtime={showtime}
+                    priceServices={priceService}
                     seatBooking={seatBooking}
+                    showtime={showtime}
                     open={isModalOpenBooking}
                     onCancel={handleCancel}
                     destroyOnClose={true}

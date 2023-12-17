@@ -149,14 +149,14 @@ const Header = () => {
                                     <img width={56} src={img.logoAdmin} />
                                 </span>
                             </div>
-                            <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div>
-                            <img src={img.logoHome} />
-                            <div className="tw-hidden tw-leading-4 tw-text-[var(--primary--text-color)] lg:tw-block">
+                            {/* <div className="tw-w-[1px] tw-bg-pink-900 tw-h-10 tw-hidden lg:tw-block"></div> */}
+                            {/* <img src={img.logoHome} /> */}
+                            {/* <div className="tw-hidden tw-leading-4 tw-text-[var(--primary--text-color)] lg:tw-block">
                                 <div>
                                     <div>Đặt vé</div>
                                     <div className="tw-mt-[5px]">Xem phim</div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </a>
 

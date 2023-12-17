@@ -2,6 +2,7 @@ package com.ticketez_backend_springboot.modules.seatChoose;
 
 import java.time.LocalDateTime;
 
+import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 
@@ -30,5 +31,9 @@ public class SeatChoose {
 	@ManyToOne
 	@JoinColumn(name = "showtime_id")
 	private Showtime showtime;
+
+	@ManyToOne
+	@JoinColumn(name = "account_id")
+	private Account account;
 
 }
