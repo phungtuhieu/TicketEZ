@@ -11,6 +11,7 @@ const { RangePicker } = DatePicker;
 const AdminTicketStatisticsPrice = () => {
     const [bookingDataDTO, setBookingDataDTO] = useState([]);
     const [series, setSeries] = useState([]);
+    const [dates, setDates] = useState([]);
     const [labels, setLabels] = useState([]);
     const [options, setOptions] = useState({
         chart: {
@@ -25,6 +26,8 @@ const AdminTicketStatisticsPrice = () => {
         if (value === 2) {
             fetchDataBookingDataDTO('cinemaComplex');
         }
+        setDates(null)
+
         console.log(`selected ${value}`);
     };
     const onSearch = (value) => {
@@ -168,6 +171,7 @@ const AdminTicketStatisticsPrice = () => {
     const [selectedDate, setSelectedDate] = useState([]);
     const handleDateChange = (dates) => {
         setSelectedDate(dates);
+        setDates(dates)
 
         // Kiểm tra nếu có ngày bắt đầu và kết thúc
         if (dates && dates.length === 2) {
@@ -232,7 +236,7 @@ const AdminTicketStatisticsPrice = () => {
                             />
                         </Col>
                         <Col span={12}>
-                            <RangePicker onChange={handleDateChange} />
+                            <RangePicker value={dates} onChange={handleDateChange} />
                         </Col>
                     </Row>
                 </Col>

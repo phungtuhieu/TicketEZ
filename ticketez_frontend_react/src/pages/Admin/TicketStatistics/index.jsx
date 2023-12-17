@@ -25,6 +25,7 @@ const AdminTicketStatistics = () => {
         if (value === 2) {
             fetchDataBookingDataDTO('cinemaComplex');
         }
+        setSelectedDate(null);
         console.log(`selected ${value}`);
     };
     const onSearch = (value) => {
@@ -220,6 +221,7 @@ const AdminTicketStatistics = () => {
                     <Row>
                         <Col span={12}>
                             <Select
+
                                 showSearch
                                 defaultValue={1}
                                 placeholder="Select a person"
@@ -231,7 +233,7 @@ const AdminTicketStatistics = () => {
                             />
                         </Col>
                         <Col span={12}>
-                            <RangePicker onChange={handleDateChange} />
+                            <RangePicker value={selectedDate} onChange={handleDateChange} />
                         </Col>
                     </Row>
                 </Col>
