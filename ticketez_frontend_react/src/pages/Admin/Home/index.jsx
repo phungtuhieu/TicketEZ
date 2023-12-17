@@ -221,7 +221,7 @@ const AdminIndex = () => {
         <>
             {/* 4 card thống kê  */}
             <Row gutter={24} className={cx('body')}>
-                <Col xs={24} lg={6}>
+                <Col xs={24} lg={8}>
                     <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
@@ -250,7 +250,7 @@ const AdminIndex = () => {
                         </Row>
                     </Card>
                 </Col>
-                <Col xs={24} lg={6}>
+                <Col xs={24} lg={8}>
                     <Card bordered={false} className={cx('card-top')}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
@@ -279,7 +279,7 @@ const AdminIndex = () => {
                         </Row>
                     </Card>
                 </Col>
-                <Col xs={24} lg={6}>
+                <Col xs={24} lg={8}>
                     <Card bordered={false} className={cx('card-top')}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
@@ -308,7 +308,7 @@ const AdminIndex = () => {
                         </Row>
                     </Card>
                 </Col>
-                <Col xs={24} lg={6}>
+                {/* <Col xs={24} lg={6}>
                     <Card bordered={false} className={cx('card-top')}>
                         <Row gutter={24}>
                             <Col xs={12} lg={18}>
@@ -329,10 +329,10 @@ const AdminIndex = () => {
                             </Col>
                         </Row>
                     </Card>
-                </Col>
+                </Col> */}
             </Row>
             <Row gutter={24}>
-                <Col xs={24} lg={16}>
+                <Col xs={24} lg={24}>
                     <Card bordered={false} className={cx('card-top')} style={{ marginLeft: '-13px' }}>
                         <div id="chart">
                             <div>
@@ -342,7 +342,7 @@ const AdminIndex = () => {
                                 <span className={cx('char-card-top')}>
                                     {valueSelectYear} ·{' '}
                                     {totalRevenueForSelectedYear.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') +
-                                        ' VNĐ'}
+                                        'đ'}
                                 </span>
                                 <Select
                                     className="tw-float-right tw-mt-[-30px]  "
@@ -373,9 +373,8 @@ const AdminIndex = () => {
                         </div>
                     </Card>
                 </Col>
-                <Col xs={24} lg={8}>
+                {/* <Col xs={24} lg={8}>
                     <Card bordered={false} className={cx('card-chart-donut')}>
-                        {/*  */}
                         <div id="chart">
                             <span>
                                 <span className={cx('money-card-top')}>Biểu đồ thống kê số lượng vé</span>
@@ -393,9 +392,9 @@ const AdminIndex = () => {
                             </div>
                         </div>
                     </Card>
-                </Col>
+                </Col> */}
             </Row>
-            <Row gutter={24}>
+            {/* <Row gutter={24}>
                 <Col xs={24} lg={24}>
                     <Card bordered={false} className={cx('card-chart-donut')} style={{ marginLeft: '-13px' }}>
                         <div>
@@ -415,7 +414,7 @@ const AdminIndex = () => {
                         </div>
                     </Card>
                 </Col>
-            </Row>
+            </Row> */}
         </>
     );
 };
