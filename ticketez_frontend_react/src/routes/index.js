@@ -255,9 +255,9 @@ const privateRoutes = [
         allowedRoles: ['SUPER_ADMIN'],
     },
     //webcam
-    { path: '/admin/webcam', component: PageAdmin.AdminWebcam, layout: AdminLayout },
+    { path: '/admin/webcam', component: PageAdmin.AdminWebcam, layout: AdminLayout, allowedRoles: ['SUPER_ADMIN', 'MOVIE_MANAGEMENT_ADMIN'] },
 
-    { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout, allowedRoles: ['SUPER_ADMIN', 'USER'] },
+    { path: '/profile', component: PageUser.ProfilePage, layout: DefaultLayout, allowedRoles: ['SUPER_ADMIN', 'USER', 'CINEMA_MANAGEMENT_ADMIN', 'USER_MANAGEMENT_ADMIN', 'SERVICE_EVENT_MANAGEMENT_ADMIN', 'SCHEDULING_PRICING_ADMIN', 'MOVIE_MANAGEMENT_ADMIN'] },
 
 
 ];
