@@ -24,22 +24,38 @@ const Header = () => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
 
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const user = await authApi.getUser();
+            setUserData(user);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const user = await authApi.getUser();
-                setUserData(user);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+
         fetchData();
     }, [loading]);
 
-  
+
+    useEffect(() => {
+        let fetchDataInterval;
+        if (userData === null) {
+            fetchDataInterval = setInterval(() => {
+                fetchData()
+            }, 1000);
+        }
+        return () => {
+            clearInterval(fetchDataInterval);
+        };
+    }, []);
+
+
+
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -124,7 +140,7 @@ const Header = () => {
 
     return (
         <>
-            <nav  className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0 ">
+            <nav className="tw-z-[999] tw-bg-white tw-text-gray-500 tw-font-bold tw-shadow-2xl tw-sticky tw-top-0 ">
                 <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-border-b tw-container tw-mx-auto tw-px-[150px]">
                     <a href="/" className="tw-text-gray-700">
                         <div className="tw-flex tw-items-center tw-gap-2">

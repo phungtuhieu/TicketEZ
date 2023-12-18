@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Row, Col, Input } from 'antd';
+import { Button, Modal, Row, Col, Input, Tooltip } from 'antd';
 import { EnvironmentOutlined, AimOutlined } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -140,7 +140,9 @@ function ViTri() {
                 }}
             >
                 <div className={cx('khungne')}>
-                    <span className={cx('ten-phim')}>Lịch chiếu {dataMovieByID?.movie?.title}</span>
+                    <span className={cx('ten-phim')}>
+                        <Tooltip title={dataMovieByID?.movie?.title}>Lịch chiếu: {dataMovieByID?.movie?.title}</Tooltip>
+                    </span>
                     <div className={cx('wrapper-vitri')}>
                         <Button className={cx('btn-first')} onClick={showModal} icon={<EnvironmentOutlined />}>
                             {provinces.name}

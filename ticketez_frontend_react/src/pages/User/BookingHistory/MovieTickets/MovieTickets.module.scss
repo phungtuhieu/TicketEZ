@@ -96,10 +96,10 @@ $background-wrapp: #ececee;
     // position: relative;
     padding: 10px;
     background-color: $background-ticket;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    flex-direction: column;
+    // display: flex;
+    // justify-content: center;
+    // align-items: start;
+    // flex-direction: column;
     position: relative;
 
     .status-ticket {
@@ -111,22 +111,26 @@ $background-wrapp: #ececee;
         border: 5px double rgb(250, 81, 81);
         border-radius: 5px;
         padding: 2px;
-        transform: translate(45px, -5px) rotate(-16deg);
+        transform: translate(45px, 15px) rotate(-16deg);
         z-index: 1;
     }
     .movie-name {
-        line-height: 1.6rem;
+        line-height: 1.3rem;
+        // overflow: hidden;
+        // white-space: nowrap;
         text-transform: capitalize;
-        transform: translate(6px, 4px);
+        // text-overflow: ellipsis;
+
+        // transform: translate(6px, 4px);
     }
     .cinema-cplx-name {
         font-size: 12px;
-        transform: translate(6px, 4px);
+        // transform: translate(6px, 4px);
     }
     .datetime {
         font-weight: 500;
         font-size: 13px;
-        transform: translate(6px, 4px);
+        // transform: translate(6px, 4px);
     }
     .btn-view-ticket {
         height: 30px;
@@ -135,6 +139,9 @@ $background-wrapp: #ececee;
         border: none;
         color: #fff;
         border-radius: 0px;
-        transform: translate(90px, 0px);
+        // transform: translate(90px, 0px);
+    }
+    .info-list {
+        height: 100%;
     }
 }

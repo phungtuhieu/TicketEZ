@@ -16,6 +16,8 @@ import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
 import com.ticketez_backend_springboot.dto.PriceSeatTypeDTO;
 import com.ticketez_backend_springboot.modules.booking.Booking;
 import com.ticketez_backend_springboot.modules.booking.BookingDAO;
+import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
+import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfoDAO;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,8 @@ public class CinemaChainAPI {
     CinemaChainDao cinemaChainDao;
     @Autowired
     private BookingDAO bookingDao;
+    @Autowired
+    private PaymentInfoDAO dao;
     // @GetMapping
     // public ResponseEntity<List<CinemaChain>> findAll() {
     // return ResponseEntity.ok(cinemaChainDao.findAllByOrderByIdDesc());
@@ -96,11 +100,26 @@ public class CinemaChainAPI {
         List<CinemaChain> cinemaChains = cinemaChainDao.findAll();
         List<CinemaChainBookingDTO> rspList = new ArrayList<>();
         for (CinemaChain cinemaChain : cinemaChains) {
+            List<PaymentInfo> paymentss = new ArrayList<>();
             CinemaChainBookingDTO bookingDTO = new CinemaChainBookingDTO();
 
             List<Booking> bookings = bookingDao.findBookingsByCinemaChainId(cinemaChain.getId());
+            for (Booking booking : bookings) {
+                PaymentInfo payment = dao.findByBookingId(booking.getId());
+                if (payment != null) {
+                    paymentss.add(payment);
+                }
+
+            }
+            float totalPrice = (float) paymentss.stream()
+                    .filter(payment -> payment != null && payment.getAmount() != null)
+                    .mapToDouble(PaymentInfo::getAmount)
+                    .sum();
+
             bookingDTO.setCinemaChain(cinemaChain);
             bookingDTO.setBookings(bookings);
+            bookingDTO.setPayments(paymentss);
+            bookingDTO.setTotalPrice(totalPrice);
 
             rspList.add(bookingDTO);
         }

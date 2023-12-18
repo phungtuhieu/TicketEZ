@@ -35,3 +35,4 @@ export { default as AdminWebcam } from './Webcam';
 export { default as AdminSendEmail } from './SendEmail';
 export { default as AdminTicKetStatistics } from './TicketStatistics';
 
+export { default as AdminTicKetStatisticsPrice } from './TicketStatisticsPrice';

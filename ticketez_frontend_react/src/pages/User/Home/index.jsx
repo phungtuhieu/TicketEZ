@@ -7,20 +7,33 @@ import ShowTimes from './showtimes';
 import MovieShowing from './MovieShowing';
 import MovieUpcoming from './MovieUpcoming';
 import HomeIndex from './Home';
+import authApi from '~/api/user/Security/authApi';
 
 const Homes = () => {
     const [items, setItems] = useState(null);
+    const deleteSeatChooseByAccount = async () => {
+        try {
+            const acc = authApi.getUser();
+            if (acc != null) {
+                const respSeactChoose = await axiosClient.post('seat-choose/deleteSeatChoose-ServiceChooseByAcc', acc);
+                console.log('respSeactChoose', respSeactChoose);
+            }
+        } catch (error) {
+            console.log('respSeactChoose', error);
+        }
+    };
     const fetchDataMovie = async () => {
         try {
             const resp = await axiosClient.get(`movie/get/fivemovie`);
             const data = resp.data;
-            console.log(data);
+            // console.log(data);
             setItems(data);
         } catch (error) {
             console.error(error);
         }
     };
     useEffect(() => {
+        deleteSeatChooseByAccount();
         fetchDataMovie();
     }, []);
 
@@ -49,7 +62,7 @@ const Homes = () => {
                 <Col span={24}>
                     <h1 className="tw-text-[var(--primary--text-color)] tw-text-center">Lịch chiếu</h1>
                 </Col>
-               
+
                 <Col
                     span={24}
                     style={{
