@@ -177,7 +177,7 @@ function BookingCombo(props) {
                                                                     ? {
                                                                           rows: 4,
                                                                           expandable: true,
-                                                                          symbol: 'more',
+                                                                          symbol: 'Xem thêm',
                                                                       }
                                                                     : false
                                                             }
