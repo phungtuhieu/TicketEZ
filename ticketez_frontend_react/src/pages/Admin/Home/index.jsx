@@ -196,7 +196,7 @@ const AdminIndex = () => {
             y: {
                 formatter: function (val) {
                     // Chuyển đổi giá trị thành đơn vị VNĐ và sử dụng dấu chấm phẩy
-                    return val.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' VNĐ';
+                    return val.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' đ';
                 },
             },
         },
@@ -341,9 +341,9 @@ const AdminIndex = () => {
                                 <span className={cx('title-card-top')}>trong năm </span>
                                 <span className={cx('char-card-top')}>
                                     {valueSelectYear} ·{' '}
-                                    {totalRevenueForSelectedYear.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') +
-                                        'đ'}
+                                    {Math.floor(totalRevenueForSelectedYear).toLocaleString('en-US') + ' đ'}
                                 </span>
+
                                 <Select
                                     className="tw-float-right tw-mt-[-30px]  "
                                     showSearch

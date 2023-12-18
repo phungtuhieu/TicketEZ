@@ -5,7 +5,6 @@ import { listIcon } from '~/assets/img';
 
 import './mapbox.scss';
 
-
 function Mapbox({ latitude, longitude, address, title }) {
     const [showPopup, togglePopup] = React.useState(true);
     // console.log('123', latitude);
@@ -27,13 +26,13 @@ function Mapbox({ latitude, longitude, address, title }) {
             }}
             style={{
                 height: '71vh',
-                width: '99vh'
+                width: '90vh',
+                margin: '0px auto',
             }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
             mapboxAccessToken="pk.eyJ1Ijoibmd1eWVudmFuaHV1dGFpIiwiYSI6ImNsbnU0N29jazBiemwyaW9kbGZyZnAxZjkifQ.C0_aqS6mFyHpXwUBBSLzqA"
             className="mapbox"
         >
-          
             {showPopup && (
                 <Popup
                     latitude={latitude}

@@ -107,4 +107,11 @@ public class FormatMovieAPI {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
+
+    @GetMapping("/getMovieByGenres/{movieId}")
+    public ResponseEntity<?> getDistinctMovie(@PathVariable("movieId") long movieId) {
+        List<FormatMovie> distinctMovieIds = dao.getMoviesByGenre(movieId);
+        return ResponseEntity.ok(distinctMovieIds);
+    }
+
 }

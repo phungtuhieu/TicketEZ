@@ -32,7 +32,8 @@ import { movieApi } from '~/api/admin';
 import moment from 'moment';
 import classNames from 'classnames/bind';
 import style from './Article.module.scss';
-
+import genreApi from '~/api/admin/managementMovie/genreApi';
+import formatMovieApi from '~/api/admin/managementMovie/formatMovieApi';
 
 const cx = classNames.bind(style);
 const formItemLayout = {
@@ -49,10 +50,12 @@ const Article = () => {
     const [resetForm, setResetForm] = useState(false);
     const [editData, setEditData] = useState(null);
     const [dataMovie, setDataMovie] = useState([]);
+    const [dataGenre, setListDataGenre] = useState([]);
     const [fileList, setFileList] = useState([]);
     const [posts, setPosts] = useState([]);
     const [statusValue, setStatusValue] = useState(true);
     const [valueSelectMovie, setValueSelectMovie] = useState([]);
+    const [valueSelectGenre, setValueSelectGenre] = useState([]);
     //phân trang
     const [totalItems, setTotalItems] = useState(0); // Tổng số mục
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tạif
@@ -72,19 +75,33 @@ const Article = () => {
         };
         getList();
 
-        const getListMovie = async () => {
+       if(valueSelectGenre){
+         const getListMovie = async () => {
+             setLoading(true);
+             try {
+                 const res = await formatMovieApi.getMovieByGenre(valueSelectGenre);
+                 setDataMovie(res.data);
+                 setLoading(false);
+             } catch (error) {
+                 console.log(error);
+             }
+         };
+         getListMovie();
+       }
+
+        const getListGenre = async () => {
             setLoading(true);
             try {
-                const res = await movieApi.getAll();
-                setDataMovie(res.data);
+                const res = await genreApi.getAll();
+                setListDataGenre(res.data);
                 setLoading(false);
             } catch (error) {
                 console.log(error);
             }
         };
-        getListMovie();
-    }, [currentPage, pageSize, workSomeThing]);
-
+        getListGenre();
+    }, [currentPage, pageSize, valueSelectGenre, workSomeThing]);
+    console.log(dataMovie);
     const columns = [
         {
             title: '#',
@@ -202,10 +219,10 @@ const Article = () => {
 
     const handleDelete = async (record) => {
         try {
-            const res = await articleApi.delete(record.id);
+            const res = await articleApi.delete(record.article.id);
             if (res.status === 200) {
                 if (fileList.length > 0) {
-                    await uploadApi.delete(record.icon);
+                    await uploadApi.delete(record.article.icon);
                 }
                 funcUtils.notify(res.data, 'success');
             }
@@ -218,7 +235,8 @@ const Article = () => {
         setWorkSomeThing(!workSomeThing);
     };
 
-    const handleEditData = (record) => {
+    const handleEditData = async (record) => {
+        // const  a = await Promise.all([onChangSelectMovie(movieId)]);
         const formattedEndTime = dayjs(record.article.create_date, 'YYYY-MM-DD HH:mm:ss');
         const newUploadFile = {
             uid: record.article.id.toString(),
@@ -368,6 +386,10 @@ const Article = () => {
         });
         setValueSelectMovie(movies);
     };
+    const onChangSelectGenre = (values) => {
+
+        setValueSelectGenre(values);
+    };
 
     return (
         <div>
@@ -455,6 +477,35 @@ const Article = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
+                            name="genres"
+                            label="Chọn thể loại"
+                            rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn thể loại' }]}
+                        >
+                            <Select
+                                style={{ width: '100%' }}
+                                onChange={(value) => onChangSelectGenre(value)}
+                                // disabled={!selectedOption3}
+                                showSearch
+                                placeholder="Tìm kiếm hoặc chọn thể loại"
+                                optionFilterProp="children"
+                                optionLabelProp="label"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                            >
+                                {dataGenre && dataGenre.length > 0
+                                    ? dataGenre.map((genre) => (
+                                          <Option key={genre.id} value={genre.id} label={genre.name}>
+                                              <Space style={{ justifyContent: 'flex-start', display: 'flex' }}>
+                                                  <span>{genre.name}</span>
+                                              </Space>
+                                          </Option>
+                                      ))
+                                    : null}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
                             name="movie"
                             label="Chọn phim"
                             rules={[{ required: true, message: 'Vui lòng tìm kiếm hoặc chọn phân loại phim' }]}
@@ -474,18 +525,18 @@ const Article = () => {
                             >
                                 {dataMovie && dataMovie.length > 0
                                     ? dataMovie.map((formatMovie) => (
-                                          <Option key={formatMovie.id} value={formatMovie.id} label={formatMovie.title}>
+                                          <Option key={formatMovie.movie.id} value={formatMovie.movie.id} label={formatMovie.movie.title}>
                                               <Space style={{ justifyContent: 'flex-start', display: 'flex' }}>
                                                   <div>
                                                       <span role="img" aria-label="China">
                                                           <img
                                                               alt=""
                                                               className="tw-w-[40px] tw-h-[50px] tw-rounded-md"
-                                                              src={uploadApi.get(formatMovie.poster)}
+                                                              src={uploadApi.get(formatMovie.movie.poster)}
                                                           />
                                                       </span>
                                                   </div>
-                                                  <span>{formatMovie.title}</span>
+                                                  <span>{formatMovie.movie.title}</span>
                                               </Space>
                                           </Option>
                                       ))

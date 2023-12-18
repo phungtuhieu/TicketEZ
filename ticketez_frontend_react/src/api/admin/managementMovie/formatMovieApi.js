@@ -27,6 +27,9 @@ const formatMovieApi = {
     delete: async (formatId) => {
         return axiosClient.delete(url + '/' + formatId);
     },
+    getMovieByGenre: async (movieId) => {
+        return axiosClient.get(url + '/getMovieByGenres/' + movieId);
+    },
 };
 
 export default formatMovieApi;

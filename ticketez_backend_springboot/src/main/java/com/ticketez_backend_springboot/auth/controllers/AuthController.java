@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -102,6 +103,7 @@ public class AuthController {
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
     SecurityAccount securityAccount = accountRepository.findById(loginRequest.getId())
         .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với id: " + loginRequest.getId()));
+
     if (!securityAccount.isVerified()) {
       return ResponseEntity
           .badRequest()
@@ -112,6 +114,11 @@ public class AuthController {
           .badRequest()
           .body(new MessageResponse("Tài khoản bạn bị khóa vui lòng liên hệ quản trị viên!"));
     }
+    if (!encoder.matches(loginRequest.getPassword(), securityAccount.getPassword())) {
+      return ResponseEntity
+          .status(HttpStatus.UNAUTHORIZED)
+          .body(new MessageResponse("Sai mật khẩu, vui lòng kiểm tra lại!"));
+  }
 
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.getId(), loginRequest.getPassword()));
