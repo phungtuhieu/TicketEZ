@@ -14,6 +14,7 @@ import moment from 'moment-timezone';
 
 import authApi from './../../../../api/user/Security/authApi';
 import reviewStatus from '~/pages/Admin/CommentModeration/ModalReview/statusReview';
+import axios from 'axios';
 
 const cx = classNames.bind(style);
 const Binhluan = () => {
@@ -48,14 +49,14 @@ const Binhluan = () => {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
-    const user = authApi.getUser();
+    const user = !!authApi.getUser();
 
     useEffect(() => {
         const getList = async () => {
             setLoading(true);
             try {
                 const res = await reviewApi.getMovieAndReviewId(movieId, currentPage, pageSize, reviewStatus.APPROVED);
-                // console.log('tsst', res);
+                console.log('tsst', res);
                 setReview(res.data.data);
                 setInitLoading(false);
                 setTotalItems(res.data.totalItems);
@@ -88,18 +89,17 @@ const Binhluan = () => {
         const checkPaymentStatus = async () => {
             try {
                 const user = authApi.getUser();
-                console.log(user);
                 const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
 
                 setIsPaid(isPaid);
-                console.log('isPaid', isPaid);
 
-                // Nếu tài khoản đã thanh toán, hiển thị phần comment
+                // Thực hiện các hành động tương ứng khi trạng thái thanh toán thay đổi
                 if (isPaid) {
                     setCommentVisible(true);
+                    // Có thể thêm các tương tác hoặc thông báo khi tài khoản đã thanh toán
                 } else {
-                    // Nếu tài khoản chưa thanh toán, ẩn phần comment
                     setCommentVisible(false);
+                    // Có thể thêm các tương tác hoặc thông báo khi tài khoản chưa thanh toán
                 }
             } catch (error) {
                 console.error('Lỗi khi kiểm tra thanh toán:', error);
@@ -108,12 +108,19 @@ const Binhluan = () => {
         };
 
         checkPaymentStatus();
-    }, [user.id, movieId]);
+    }, [user.id, movieId, setIsPaid, setCommentVisible]);
+    const isUserComment = (comment) => {
+        const user = authApi.getUser();
+        return user && comment.account.id === user.id;
+    };
+
     const filterProfanity = (text) => {
         const profanityList = ['đụ má', 'con mẹ mày', 'vcl', 'vãi',
             'fuck', 'cmm', 'như cc', 'nứng cặc',
             'cdm', 'duma', 'dcm', 'nứng vl', 'chó đẻ',
             'vãi cứt', 'xàm lồn', 'như lồn', 'cái lồn', 'như l', 'đỉ mẹ', 'loz', 'lol', 'nhu cac', 'đụ', 'vc', 'nhu con cac',
+            'khùng', 'ngu vl', 'vcllll', 'địt mẹ', 'cức', 'đỉ mẹ', 'dâm dục', 'sex', 'phim sẽ', 'dụ đỉ mẹ mày', 'mày', 'tao',
+            
         ]; // Thêm các từ thô tục vào danh sách
         let filteredText = text;
 
@@ -140,16 +147,18 @@ const Binhluan = () => {
         }
         setLoading(true);
         try {
-            // const user = authApi.getUser();
-            // const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
-            // setIsPaid(isPaid);
+            const user = authApi.getUser();
+            const isPaid = await reviewApi.getcheckAccountBooking(user.id, movieId);
+            setIsPaid(isPaid);
             const censoredComment = filterProfanity(comment);
             const datareview = {
                 comment: censoredComment,
                 rating,
                 createDate: new Date(),
                 editData: null,
-                status: 1
+                status: 1,
+                likeComent: 0,
+
             }
             funcUtils.notify('Bình luận của bạn đang chờ kiểm duyệt. Cảm ơn!', 'info');
             reviewApi.post(datareview, user.id, movieId);
@@ -172,10 +181,10 @@ const Binhluan = () => {
         setRating(rating);
     }, [rating])
 
-    // Hàm xử lý sự kiện khi bấm vào biểu tượng bình luận
-    const handleCommentClick = () => {
-        setCommentVisible(!isCommentVisible);
-    };
+    // // Hàm xử lý sự kiện khi bấm vào biểu tượng bình luận
+    // const handleCommentClick = () => {
+    //     setCommentVisible(!isCommentVisible);
+    // };
     const handleEdit = (item, index) => {
         setIsEditing(true);
         setEditedComment(item.comment);
@@ -188,12 +197,29 @@ const Binhluan = () => {
 
     }, [editedComment])
 
+    // const handleSaveEdit = async (item) => {
+    //     try {
+
+    //         const dulieu = { ...editData, comment: editedComment, rating: rating, editDate: new Date() }
+    //         await reviewApi.put(dulieu);
+    //         funcUtils.notify('Chỉnh sửa bình luận thành công', 'success');
+    //         setWorkSomeThing(!workSomeThing);
+    //         setIsEditing(false);
+    //     } catch (error) {
+    //         console.error('Failed:', error);
+    //         funcUtils.notify('Đã xảy ra lỗi khi lưu chỉnh sửa bình luận', 'error');
+    //     }
+    // };
+    const [isPendingApproval, setIsPendingApproval] = useState(false);
+
     const handleSaveEdit = async (item) => {
         try {
-
-            const dulieu = { ...editData, comment: editedComment, rating: rating, editDate: new Date() }
-            await reviewApi.put(dulieu);
-            funcUtils.notify('Chỉnh sửa bình luận thành công', 'success');
+            const updatedData = { ...editData, comment: editedComment, rating, editDate: new Date(), status: 1};
+            // if (isPendingApproval) {
+            //     updatedData.status = reviewStatus.APPROVED;
+            // }
+            await reviewApi.put(updatedData);
+            funcUtils.notify('Chỉnh sửa bình luận thành công chờ kiểm duyệt', 'success');
             setWorkSomeThing(!workSomeThing);
             setIsEditing(false);
         } catch (error) {
@@ -235,7 +261,7 @@ const Binhluan = () => {
     const handleRatingChange = (value) => {
         const roundedValue = (value * 2);
         setRating(roundedValue);
-        setCommentError(false); 
+        setCommentError(false);
         setShowCommentInput(true);
 
     };
@@ -276,6 +302,46 @@ const Binhluan = () => {
     const handleToggle = () => {
         setExpanded(!expanded);
     };
+
+    const [likeStatus, setLikeStatus] = useState({});
+    const likeReview = async (reviewId) => {
+        try {
+            // Gọi API để thực hiện "like" bình luận
+            await reviewApi.likeReview(reviewId);
+
+            // Cập nhật state để đánh dấu là đã "like"
+            setLikeStatus((prevStatus) => ({
+                ...prevStatus,
+                [reviewId]: 'liked',
+            }));
+
+            setWorkSomeThing(!workSomeThing);
+        } catch (error) {
+            console.error('Failed to like review:', error);
+
+        }
+    };
+
+
+    const dislikeReview = async (reviewId) => {
+        try {
+
+            await reviewApi.dislikeReview(reviewId);
+
+            setLikeStatus((prevStatus) => ({
+                ...prevStatus,
+                [reviewId]: 'disliked',
+            }));
+
+            // Tải lại danh sách bình luận sau khi thực hiện "dislike"
+            setWorkSomeThing(!workSomeThing);
+        } catch (error) {
+            console.error('Failed to dislike review:', error);
+            // Xử lý lỗi theo ý của bạn
+        }
+    };
+    const getLikeButtonStatus = (reviewId) => likeStatus[reviewId] || 'default';
+
     return (
         <div>
             <Row style={{ width: '1080px' }}>
@@ -284,7 +350,13 @@ const Binhluan = () => {
                 </Col>
 
                 <Col span={24} style={{ color: 'black', height: '120px', textAlign: 'left' }}>
-                    <h2> <StarFilled style={{ color: 'yellow' }} />{moviedata?.rating}/10 <span>3.0k lượt đánh giá</span></h2>
+                    <h2> <StarFilled style={{ color: 'yellow' }} />{moviedata?.rating}/10 <span>{review.length != null
+                        ? review.length > 1000000
+                            ? (review.length / 1000000).toFixed(1) + 'M'
+                            : review.length > 1000
+                                ? (review.length / 1000).toFixed(1) + 'k'
+                                : review.length
+                        : null} lượt đánh giá</span></h2>
                 </Col>
 
                 {isPaid && ( // chỉ hiển thị rating khi isPaid là true
@@ -302,7 +374,7 @@ const Binhluan = () => {
                 )}
 
                 <Col span={16}>
-                 {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
+                    {isPaid ? ( // Nếu đã thanh toán, hiển thị nút bình luận và input
                         <>
                             {showCommentInput && (
                                 <Space.Compact
@@ -396,7 +468,6 @@ const Binhluan = () => {
                                             </div>
                                         ) : (
                                             <div>
-
                                                 <Paragraph
                                                     ellipsis={
                                                         expanded
@@ -421,10 +492,18 @@ const Binhluan = () => {
 
                                                 <Space>
                                                     {/* <CommentOutlined className={cx('col-icon')} onClick={handleCommentClick} /><span>50 Bình luận</span> */}
-
-                                                    <LikeOutlined className={cx('col-icon')} /><span>like</span>
-
-                                                    {item.account.id === user.id && (
+                                                    <LikeOutlined
+                                                        className={cx('col-icon', {
+                                                            'liked': getLikeButtonStatus(item.id) === 'liked',
+                                                        })}
+                                                        onClick={() => {
+                                                            getLikeButtonStatus(item.id) === 'liked'
+                                                                ? dislikeReview(item.id)
+                                                                : likeReview(item.id);
+                                                        }}
+                                                    />
+                                                    <span>{item.likeComent} lượt thích</span>
+                                                    {isUserComment(item) && (
                                                         <Dropdown
                                                             overlay={(
                                                                 <Menu>

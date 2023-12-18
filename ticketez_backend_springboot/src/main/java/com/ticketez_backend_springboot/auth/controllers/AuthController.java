@@ -289,11 +289,12 @@ public class AuthController {
       }
     }
     if (isOtpValid) {
-    return ResponseEntity.ok().body(new MessageResponse("Tài khoản đã được xác thực thành công."));
-  } else {
+      return ResponseEntity.ok().body(new MessageResponse("Tài khoản đã được xác thực thành công."));
+    } else {
 
-    return ResponseEntity.badRequest().body(new MessageResponse("Đăng nhập thất bại: OTP không chính xác hoặc đã hết hạn"));
-  }
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Đăng nhập thất bại: OTP không chính xác hoặc đã hết hạn"));
+    }
   }
 
   @PutMapping("/regenerate-otp")
@@ -301,18 +302,20 @@ public class AuthController {
     Optional<SecurityAccount> securityAccountOpt = accountRepository.findByEmail(email);
 
     if (!securityAccountOpt.isPresent()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Không tìm thấy người dùng với email này: " + email));
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(new MessageResponse("Không tìm thấy người dùng với email này: " + email));
     }
-  
+
     SecurityAccount securityAccount = securityAccountOpt.get();
     String otp = otpUtil.generateOtp();
-  
+
     try {
       emailUtil.sendOtpEmail(email, otp);
     } catch (MessagingException e) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Không thể gửi OTP qua email, vui lòng thử lại sau."));
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Không thể gửi OTP qua email, vui lòng thử lại sau."));
     }
-  
+
     // Cập nhật hoặc tạo mới Verification
     List<Verification> verifications = verificationDAO.findByAccountId(securityAccount.getId());
     if (!verifications.isEmpty()) {
@@ -324,9 +327,9 @@ public class AuthController {
     } else {
     }
 
-    return ResponseEntity.ok(new MessageResponse("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút."));
+    return ResponseEntity
+        .ok(new MessageResponse("Mã OTP đã được cập nhật. Vui lòng xác minh tài khoản trong vòng 1 phút."));
   }
-  
 
   // profile
   @PutMapping("/{id}")
@@ -344,7 +347,7 @@ public class AuthController {
           .badRequest()
           .body(new MessageResponse("Số điện thoai đã được sử dụng!"));
     }
-  
+
     if (!existingAccount.getEmail().equals(userDto.getEmail()) && accountRepository.existsByEmail(userDto.getEmail())) {
       return ResponseEntity
           .badRequest()

@@ -16,7 +16,7 @@ import {
     Pagination,
     Tag
 } from 'antd';
-import { SearchOutlined, PlusOutlined,  } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import BaseTable from '~/components/Admin/BaseTable/BaseTable';
 import BaseModal from '~/components/Admin/BaseModal/BaseModal';
@@ -37,7 +37,7 @@ const formItemLayout = {
     wrapperCol: { span: 20 },
 };
 
-const AdminCinema = ({cinemaComplexId}) => {
+const AdminCinema = ({ cinemaComplexId }) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -72,9 +72,9 @@ const AdminCinema = ({cinemaComplexId}) => {
                 // console.log(cinemaComplex);
                 // console.log(res);
                 //    console.log(resType);
-                console.log('text',res);
+                console.log('text', res);
                 setTotalItems(res.totalItems);
-               
+
                 setPosts(res.data.data);
                 setLoading(false);
             } catch (error) {
@@ -86,14 +86,14 @@ const AdminCinema = ({cinemaComplexId}) => {
             }
         };
         getList();
-    }, [cinemaComplexId,currentPage, pageSize, workSomeThing]);
+    }, [cinemaComplexId, currentPage, pageSize, workSomeThing]);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
- 
+
     const handleReset = (clearFilters) => {
         clearFilters();
         setSearchText('');
@@ -219,7 +219,7 @@ const AdminCinema = ({cinemaComplexId}) => {
                     {status ? 'Hoạt động' : 'Ngừng hoạt động'}
                 </Tag>
             ),
-        
+
         },
         {
             title: 'Loại rạp',
@@ -333,9 +333,12 @@ const AdminCinema = ({cinemaComplexId}) => {
         form.resetFields();
         console.log(form);
     };
+    const [switchChecked, setSwitchChecked] = useState(false);
+
     const onChange = (checked) => {
-        console.log(`switch to ${checked}`);
-    };
+        console.log(`Switch to ${checked}`);
+        setSwitchChecked(checked);
+      };
     const handlePageChange = (page, pageSize) => {
         setCurrentPage(page);
         setPageSize(pageSize);
@@ -385,10 +388,10 @@ const AdminCinema = ({cinemaComplexId}) => {
                         <Form.Item
                             {...formItemLayout}
                             name="name"
-                            label="Tên rạp"
-                            rules={[{ required: true, message: 'Vui lòng nhập rạp' }]}
+                            label="Tên phòng"
+                            rules={[{ required: true, message: 'Vui lòng nhập phòng' }]}
                         >
-                            <Input placeholder="Please input your name" />
+                            <Input placeholder="Nhập tên phòng chiếu" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -396,13 +399,17 @@ const AdminCinema = ({cinemaComplexId}) => {
                             label="Trạng thái"
                             rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
                         >
-                            <Switch defaultChecked onChange={onChange} />
+                            <Switch
+                                defaultChecked={switchChecked}
+                                onChange={onChange}
+                                
+                            />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="cinemaType"
                             label="Loại rạp"
-                            rules={[{ required: true, message: 'Vui lòng chọn loại rạp' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn loại phòng' }]}
                         >
                             <Select
                                 style={{ width: '100%' }}
