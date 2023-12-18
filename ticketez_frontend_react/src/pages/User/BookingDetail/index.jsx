@@ -428,7 +428,7 @@ function BookingDetail(props) {
                                     </Col> */}
                                         <div className={cx('wrapp-pay-area-inner')}>
                                             <Title level={4} className={cx('title')}>
-                                                Kiểm tra thông tin
+                                                Thông tin khách hàng
                                             </Title>
                                             <Divider style={{ backgroundColor: '#fff' }} />
                                             <ul style={{ color: 'black', textAlign: 'start', marginBottom: 20 }}>
@@ -443,7 +443,7 @@ function BookingDetail(props) {
                                                 </li>
                                             </ul>
                                             <Button type="primary" onClick={handlePurchase}>
-                                                Mua vé
+                                                Thanh toán
                                             </Button>
                                         </div>
                                     </Row>

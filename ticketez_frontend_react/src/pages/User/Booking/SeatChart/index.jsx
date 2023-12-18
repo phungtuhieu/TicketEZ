@@ -467,11 +467,18 @@ function SeatChart(props) {
             console.error('Lỗi khi lấy dữ liệu từ server', error);
         }
     };
-
+    // Xóa ghế chọn
     const deleteSeatChoose = async () => {
-        const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
+        try {
+            const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
+        } catch (error) {
+            console.log('error: ', error);
+        }
     };
 
+    // useEffect(() => {
+    //     deleteSeatChoose();
+    // },[]);
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
