@@ -204,7 +204,7 @@ function AdminMovieStudio() {
         setSearchValue(value);
         setIsSearchingTable(true);
     };
-    
+
     useSearchEffect(searchValue, studioApi, setList, isSearchingTable);
     useEffect(() => {
         const fetchData = async () => {
@@ -441,6 +441,25 @@ function AdminMovieStudio() {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
+    const validateBirthday = (rule, value) => {
+        return new Promise((resolve, reject) => {
+            if (value) {
+                // Tính tuổi dựa trên ngày sinh
+                const today = new Date();
+                const birthday = new Date(value);
+                const age = today.getFullYear() - birthday.getFullYear();
+
+                // Kiểm tra tuổi
+                if (age < 1) {
+                    reject('Ngày thành lập phải trước 1 năm');
+                } else {
+                    resolve();
+                }
+            } else {
+                resolve();
+            }
+        });
+    };
     const handleCancelPreview = () => setPreviewOpen(false);
     return (
         <>
@@ -546,7 +565,15 @@ function AdminMovieStudio() {
                             {fileList.length < 1 && '+ Tải lên'}
                         </Upload>
                     </Form.Item>
-                    <Form.Item name="foundedDate" label="Ngày thành lập" {...config}>
+                    <Form.Item
+                        name="foundedDate"
+                        label="Ngày thành lập"
+                        {...config}
+                        rules={[
+                            { required: true, message: 'Vui lòng chọn ngày thành lập' },
+                            { validator: validateBirthday },
+                        ]}
+                    >
                         <DatePicker style={{ width: 200 }} placeholder="Chọn ngày thành lập" format={formatDate} />
                     </Form.Item>
                     <Form.Item

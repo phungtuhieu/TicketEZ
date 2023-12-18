@@ -424,6 +424,26 @@ function AdminProducer() {
         setCurrentPage(page);
         setPageSize(pageSize);
     };
+
+    const validateBirthday = (rule, value) => {
+        return new Promise((resolve, reject) => {
+            if (value) {
+                // Tính tuổi dựa trên ngày sinh
+                const today = new Date();
+                const birthday = new Date(value);
+                const age = today.getFullYear() - birthday.getFullYear();
+
+                // Kiểm tra tuổi
+                if (age < 18) {
+                    reject('Ngày sinh đạo diễn phải lớn hơn 18 tuổi');
+                } else {
+                    resolve();
+                }
+            } else {
+                resolve();
+            }
+        });
+    };
     const handleCancelPreview = () => setPreviewOpen(false);
     return (
         <>
@@ -533,7 +553,15 @@ function AdminProducer() {
                             {fileList.length < 1 && '+ Tải lên'}
                         </Upload>
                     </Form.Item>
-                    <Form.Item name="birthday" label="Ngày sinh" {...config}>
+                    <Form.Item
+                        name="birthday"
+                        label="Ngày sinh"
+                        {...config}
+                        rules={[
+                            { required: true, message: 'Vui lòng chọn ngày sinh' },
+                            { validator: validateBirthday },
+                        ]}
+                    >
                         <DatePicker
                             style={{ fontFamily: 'inherit', fontSize: fontSize, width: 200 }}
                             placeholder="Chọn ngày sinh"
