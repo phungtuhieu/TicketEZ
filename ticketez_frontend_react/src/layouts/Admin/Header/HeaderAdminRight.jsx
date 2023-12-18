@@ -1,7 +1,7 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { faBell, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faGear, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Col, Row, Input, Dropdown } from 'antd';
+import { Col, Row, Input, Dropdown, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
 import style from './AdminHeader.module.scss';
 import classNames from 'classnames/bind';
@@ -12,13 +12,11 @@ import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(style);
 
-
-
 function HeaderAdminRight() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -81,43 +79,12 @@ function HeaderAdminRight() {
                 </a>
             ),
         },
-        {
-            key: '2',
-            label: (
-                <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                    cài đặt 2
-                </a>
-            ),
-        },
-        {
-            key: '3',
-            label: (
-                <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                    cài đặt 3
-                </a>
-            ),
-        },
     ];
-
-    const menuItemsBell = (
-        <Menu>
-            {itemsBell.map((item) => (
-                <Menu.Item key={item.key}>{item.label}</Menu.Item>
-            ))}
-        </Menu>
-    );
-    const menuItemsSetting = (
-        <Menu>
-            {itemSetting.map((item) => (
-                <Menu.Item key={item.key}>{item.label}</Menu.Item>
-            ))}
-        </Menu>
-    );
 
     return (
         <>
             <Row style={{ width: '100%' }} className="background">
-                <Col lg={15} xs={24} style={{ display: 'flex', alignItems: 'center', width: '100px' }}>
+                <Col span={22} style={{ display: 'flex', alignItems: 'center', width: '100px' }}>
                     {/* <div>
                         <span className={cx('title-left')}>Home /</span>
                         <span className={cx('name-left')}> Dashboard</span>
@@ -129,35 +96,23 @@ function HeaderAdminRight() {
                             : userData.fullname.split(' ').pop()}
                     </span>
                 </Col>
-                <Col lg={9} xs={24} className={cx('item-hearder-right')} flex={1}>
-                    <Input
-                        className={cx('search-item-hearder-right')}
-                        placeholder="Enter your username"
-                        type="search"
-                        prefix={<SearchOutlined className="site-form-item-icon" />}
-                    />
-                    <span className={cx('icon-item-hearder-right')}>
-                        <FontAwesomeIcon icon={faUser} />
-                    </span>
-                    <Dropdown
-                        overlay={menuItemsBell}
-                        placement="bottomRight"
-                        arrow={{
-                            pointAtCenter: true,
-                        }}
+                <Col
+                    span={2}
+                    className={cx('item-hearder-right')}
+                    style={{ display: 'flex', justifyContent: 'end', paddingRight: 35 }}
+                >
+                    <Popconfirm
+                        placement="leftBottom"
+                        title={'Đăng xuất'}
+                        description={'Bạn có chắc chắn muốn đăng xuất?'}
+                        okText="Có"
+                        onConfirm={handleLogout}
+                        cancelText="Không"
                     >
-                        <FontAwesomeIcon icon={faBell} className={cx('icon-item-hearder-right')} />
-                    </Dropdown>
-
-                    <Dropdown
-                        overlay={menuItemsSetting}
-                        placement="bottomRight"
-                        arrow={{
-                            pointAtCenter: true,
-                        }}
-                    >
-                        <FontAwesomeIcon icon={faGear} className={cx('icon-item-hearder-right')} />
-                    </Dropdown>
+                        <span className={cx('icon-item-hearder-right')}>
+                            <FontAwesomeIcon icon={faRightFromBracket} />
+                        </span>
+                    </Popconfirm>
                 </Col>
             </Row>
         </>

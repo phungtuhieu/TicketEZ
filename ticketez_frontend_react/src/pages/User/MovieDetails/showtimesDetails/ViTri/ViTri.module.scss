@@ -2,12 +2,18 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    line-height: 1.5;
 }
 
 .ten-phim {
     font-size: 20px;
     color: #000000;
     font-weight: 600;
+    line-height: 1.5;
+    width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     // margin-right: 30px;
 }
 
