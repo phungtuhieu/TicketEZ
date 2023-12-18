@@ -42,7 +42,7 @@ public interface AccountDAO extends JpaRepository<Account, String> {
                         "    SELECT " +
                         "        a.id 'userId', " +
                         "        g.name AS'theloai', " +
-                        " m.id AS 'phim', " +
+                        // " m.id AS 'phim', " +
                         "        COUNT(g.name) AS 'sl', " +
                         "        RANK() OVER (PARTITION BY a.id ORDER BY COUNT(g.name) DESC) AS rnk, " +
                         "  ROW_NUMBER() OVER (PARTITION BY a.id ORDER BY COUNT(g.name) DESC) AS row_num_within_user " +
@@ -57,11 +57,11 @@ public interface AccountDAO extends JpaRepository<Account, String> {
                         " WHERE b.ticket_status = 1 " +
                         "    GROUP BY " +
                         "        a.id, " +
-                        "        g.name, " +
-                        " m.id " +
+                        "        g.name " +
+                        // " m.id " +
                         ") " +
                         "SELECT * FROM dbo.Accounts accounts WHERE EXISTS ( " +
-                        "  SELECT gr.userId, gr.theloai, gr.sl, gr.phim " +
+                        "  SELECT gr.userId, gr.theloai, gr.sl " +
                         "  FROM GenreRank gr " +
                         "  WHERE accounts.id = gr.userId AND gr.rnk = 1 AND gr.row_num_within_user = 1 AND EXISTS ( " +
                         "  SELECT * FROM dbo.Genres g INNER JOIN dbo.Genres_Movies gm ON gm.genre_id = g.id " +

@@ -12,8 +12,6 @@ import {
     Upload,
     Image,
     Tag,
-    Select,
-    Switch,
     Radio,
     Modal,
     AutoComplete,
@@ -36,9 +34,10 @@ import PaginationCustom from '~/components/Admin/PaginationCustom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useDebounce } from '~/hooks';
-import { rule } from 'postcss';
 import { regex } from '~/utils/regex';
-import { ExportOutlined, SearchOutlined } from '@ant-design/icons';
+import { ExportOutlined, SearchOutlined,AndroidOutlined, AppleOutlined } from '@ant-design/icons';
+
+import { Tabs } from 'antd';
 dayjs.extend(customParseFormat);
 
 const cx = classNames.bind(style);
@@ -142,7 +141,7 @@ const AdminAccount = () => {
         getList();
     }, [currentPage, pageSize, workSomeThing, status, valueSearchDelay]);
 
-    const [reason, setReason] = useState('');
+    const [reason, setReason] = useState('asfjknasjnkfjknasfjknbaskbj');
     // console.log(reason);
 
     const [accountLockHistory, setAccountLockHistory] = useState('');
@@ -228,49 +227,52 @@ const AdminAccount = () => {
                                 className={cx('icon-trash')}
                                 onClick={() => {
                                     showModalReason();
-                                    alert(record.id);
+                                    // alert(record.id);
                                     setDuLieuNe(record);
                                     setReason('');
                                 }}
                             />
-                            <Modal
-                                title="Lí do khoá tài khoản"
-                                open={isModalOpen}
-                                onOk={() => {
-                                    if (reason.trim() !== '') {
-                                        handleStatus(duLieuNe);
-                                        handleCancelReason();
-                                    } else {
-                                        funcUtils.notify('Nhập hoặc chọn lí do khoá tài khoản', 'error');
-                                    }
-                                }}
-                                okText="Đồng ý"
-                                cancelText="Huỷ"
-                                onCancel={handleCancelReason}
-                            >
-                                <AutoComplete
-                                    options={options}
-                                    style={{
-                                        width: '100%',
-                                    }}
-                                    onSelect={onSelect}
-                                    filterOption={(inputValue, option) =>
-                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                                    }
-                                >
-                                    <TextArea
-                                        value={reason}
-                                        placeholder="Nhập lí do..."
-                                        className="custom"
-                                        style={{
-                                            height: 100,
-                                        }}
-                                        onChange={(e) => onChangeReason(e.target.value)}
-                                    />
-                                </AutoComplete>
-                            </Modal>
                         </>
                     )}
+                    <Modal
+                        title="Lí do khoá tài khoản"
+                        open={isModalOpen}
+                        onOk={() => {
+                            if (reason.trim() !== '') {
+                                handleStatus(duLieuNe);
+                                handleCancelReason();
+                            } else {
+                                funcUtils.notify('Nhập hoặc chọn lí do khoá tài khoản', 'error');
+                            }
+                        }}
+                        okText="Đồng ý"
+                        cancelText="Huỷ"
+                        onCancel={handleCancelReason}
+                    >
+                        <AutoComplete
+                            value={reason}
+                            defaultValue={reason}
+                            options={options}
+                            style={{
+                                width: '100%',
+                            }}
+                            onSelect={onSelect}
+                            filterOption={(inputValue, option) =>
+                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                            }
+                        >
+                            <TextArea
+                                value={reason}
+                                defaultValue={reason}
+                                placeholder="Nhập lí do..."
+                                className="custom"
+                                style={{
+                                    height: 100,
+                                }}
+                                onChange={(e) => onChangeReason(e.target.value)}
+                            />
+                        </AutoComplete>
+                    </Modal>
                     {/*  */}
 
                     {/*  */}
@@ -320,8 +322,8 @@ const AdminAccount = () => {
     };
 
     const handleStatus = async (record) => {
-        setReason('');
-        setDuLieuNe('');
+        // setReason('');
+        // setDuLieuNe('');
         try {
             // alert(record.id);
             if (record.id) {
@@ -449,8 +451,22 @@ const AdminAccount = () => {
                     <h1 className="tw-mt-[-7px]">Bảng dữ liệu</h1>
                 </Col>
 
-                <Col span={24} className=" tw-flex tw-items-center tw-justify-between tw-mb-10">
-                    <Select
+                <Col span={24} className=" tw-flex tw-items-center tw-justify-between tw-mb-5">
+                    <Tabs
+                        defaultActiveKey="1"
+                        onChange={handleChange}
+                        items={[AppleOutlined, AndroidOutlined].map((Icon, i) => {
+                            const id = String(i + 1);
+                            
+                            return {
+                                key: id,
+                                label: id === '1' ? 'Hoạt động' : 'Bị khoá',
+                                // children: `Tab ${id}`,
+                                icon: <Icon />,
+                            };
+                        })}
+                        />
+                    {/* <Select
                         defaultValue={1}
                         style={{
                             width: 170,
@@ -465,7 +481,7 @@ const AdminAccount = () => {
                                 ],
                             },
                         ]}
-                    />
+                    /> */}
                     <Input
                         className="tw-w-[200px]"
                         placeholder="Tìm tên người dùng..."
