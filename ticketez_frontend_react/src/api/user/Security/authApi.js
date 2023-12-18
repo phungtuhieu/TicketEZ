@@ -22,21 +22,21 @@ const authApi = {
 
             if (response.data.token) {
                 localStorage.setItem('token', JSON.stringify(response.data.token));
-                console.log('Token:', response.data.token);
+                // console.log('Token:', response.data.token);
             }
             else {
-                console.log('Không có dữ liệu user trong phản hồi');
+                // console.log('Không có dữ liệu user trong phản hồi');
             }
             if (response.data && response.data) {
                 localStorage.setItem('user', JSON.stringify(response.data));
             } else {
-                console.log('Không có dữ liệu user trong phản hồi');
+                // console.log('Không có dữ liệu user trong phản hồi');
             } if (response.data && response.data.roles) {
                 localStorage.setItem('roles', JSON.stringify(response.data.roles));
             } else {
-                console.log('Không có dữ liệu roles trong phản hồi');
+                // console.log('Không có dữ liệu roles trong phản hồi');
             }
-            console.log('Phản hồi từ server:', response);
+            // console.log('Phản hồi từ server:', response);
 
             return response;
         } catch (error) {

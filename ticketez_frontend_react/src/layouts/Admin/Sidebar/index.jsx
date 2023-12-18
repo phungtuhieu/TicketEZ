@@ -20,8 +20,8 @@ function getItem(label, key, icon, children, type) {
 function Sidebar() {
     const roles = getRolesFromLocalStorage();
     const isAuthenticated = !!localStorage.getItem('token');
-    console.log(roles);
-    let items = [];
+    // console.log(roles);
+    let items = []; 
 
 
 
