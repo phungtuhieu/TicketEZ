@@ -431,76 +431,20 @@ function BookingDetail(props) {
                                                 Kiểm tra thông tin
                                             </Title>
                                             <Divider style={{ backgroundColor: '#fff' }} />
-                                            <Form form={form} name="basic" layout="vertical" autoComplete="off">
-                                                <Form.Item
-                                                    className={cx('form-item')}
-                                                    label={<label className={cx('label')}>Tên người dùng</label>}
-                                                    name="fullname"
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            message: 'Vui lòng nhập tên phim!',
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input
-                                                        readOnly={account.fullname != null}
-                                                        placeholder="Nhập tên của bạn"
-                                                    />
-                                                </Form.Item>
-
-                                                <Form.Item
-                                                    className={cx('form-item')}
-                                                    label={<label className={cx('label')}>Số điện thoại</label>}
-                                                    name="phone"
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            message: 'Vui lòng nhập số điên thoại!',
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input
-                                                        readOnly={account.phone != null}
-                                                        placeholder="Nhập số điện thoại"
-                                                    />
-                                                </Form.Item>
-                                                {/* <Form.Item
-                                                    className={cx('form-item')}
-                                                    label={<label className={cx('label')}>Email</label>}
-                                                    name="email"
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            message: 'Vui lòng nhập tên phim!',
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input readOnly={account.email != null} placeholder="Nhập email" />
-                                                </Form.Item> */}
-                                                <Form.Item
-                                                    label="Email"
-                                                    name="email"
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            message: 'Vui lòng nhập email của hãng phim!',
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input
-                                                        readOnly={account.email != null}
-                                                        placeholder="Nhập email vào đây"
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item>
-                                                    <Space>
-                                                        <Button type="primary" key="submit" onClick={handlePurchase}>
-                                                            Mua vé
-                                                        </Button>
-                                                    </Space>
-                                                </Form.Item>
-                                            </Form>
+                                            <ul style={{ color: 'black', textAlign: 'start', marginBottom: 20 }}>
+                                                <li className="tw-mb-3">
+                                                    <span>Tên người dùng: </span> <b>{account.fullname}</b>
+                                                </li>
+                                                <li className="tw-mb-3">
+                                                    <span>Số điện thoại: </span> <b>{account.phone}</b>
+                                                </li>
+                                                <li>
+                                                    <span>Email: </span> <b>{account.email}</b>
+                                                </li>
+                                            </ul>
+                                            <Button type="primary" onClick={handlePurchase}>
+                                                Mua vé
+                                            </Button>
                                         </div>
                                     </Row>
                                 </Col>

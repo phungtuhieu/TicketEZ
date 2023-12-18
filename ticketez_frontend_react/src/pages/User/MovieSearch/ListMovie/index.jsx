@@ -132,7 +132,6 @@ function ListMovie() {
             } catch (error) {
                 console.log(error);
                 setLoading(false);
-
             }
         };
         res();
@@ -148,7 +147,10 @@ function ListMovie() {
             <Col span={24} className=" tw-h-[65px] tw-mb-[25px] ">
                 <Row className="tw-h-[100%] tw-flex tw-items-center tw-justify-center">
                     <Col span={12} className=" tw-flex tw-items-center  tw-h-[100%]">
-                        <h1 className="tw-text-[24px] tw-text-[var(--primary--text-color)]"> Tìm phim chiếu rạp trên MoMo</h1>
+                        <h1 className="tw-text-[24px] tw-text-[var(--primary--text-color)]">
+                            {' '}
+                            Tìm phim chiếu rạp trên TicketEZ
+                        </h1>
                     </Col>
                     <Col span={12} className=" tw-flex tw-items-center  tw-justify-center  tw-h-[100%]">
                         {/* select Thể loại */}
@@ -177,7 +179,7 @@ function ListMovie() {
                                             Tất cả
                                         </Button>
 
-                                        {dataGenres.map((item,index) => (
+                                        {dataGenres.map((item, index) => (
                                             <Button
                                                 key={index}
                                                 type="text"
@@ -259,7 +261,7 @@ function ListMovie() {
                                         >
                                             Tất cả
                                         </Button>
-                                        {listNam.map((value,index) => (
+                                        {listNam.map((value, index) => (
                                             <Button
                                                 key={index}
                                                 type="text"
