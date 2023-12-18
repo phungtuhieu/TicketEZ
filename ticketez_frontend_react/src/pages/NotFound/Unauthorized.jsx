@@ -12,8 +12,8 @@ const Unauthorized = () => (
           </>
         }
         extra={
-            <Link to={'/admin/index'} type="">
-                <Button>Về trang chủ</Button>
+            <Link to={'/login'} type="">
+                <Button>Về Đăng nhập</Button>
             </Link>
         }
     />

@@ -14,7 +14,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     userRoles.includes('SCHEDULING_PRICING_ADMIN') ||
     userRoles.includes('CINEMA_MANAGEMENT_ADMIN') ||
     userRoles.includes('SERVICE_EVENT_MANAGEMENT_ADMIN') ||
-    userRoles.includes('USER_MANAGEMENT_ADMIN');
+    userRoles.includes('USER_MANAGEMENT_ADMIN')||
+    userRoles.includes('USER');
 
   const userHasRequiredRole = allowedRoles ? allowedRoles.some(role => userRoles.includes(role)) : true;
 
@@ -27,8 +28,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (!hasRequiredRole) {
     return <Navigate to="/" />;
   }
-  
-
+  if (!allowedRoles) {
+      return <Navigate to="/login" />;
+  }
+  if (!userRoles) {
+    return <Navigate to="/login" />;
+  }
 
   if (!userHasRequiredRole) {
     return <Unauthorized />;

@@ -31,6 +31,22 @@ const LoginForm = () => {
     const [loading, setLoading] = useState(false);
     const [isCaptchaVerified, setIsCaptchaVerified] = useState(null);
     const [isloading, issetLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+
+
+    useEffect(() => {
+        const handleRightClick = (event) => {
+            event.preventDefault();
+        };
+        document.addEventListener('contextmenu', handleRightClick);
+
+        return () => {
+            document.removeEventListener('contextmenu', handleRightClick);
+        };
+    }, []);
+
+
 
 
     const onFinish = async (values) => {
@@ -49,20 +65,11 @@ const LoginForm = () => {
 
             if (hasSuperAdminRole()) {
                 navigate('/admin/index');
-                setTimeout(() => {
-                    funcUtils.notify('Đăng nhập thành công!', 'success');
-                }, 500);
-
+                funcUtils.notify('Đăng nhập thành công!', 'success');
             } else {
-                setTimeout(() => {
-                    funcUtils.notify('Đăng nhập thành công!', 'success');
-                }, 500);
-                navigate('/', { replace: true, state: { fromLogin: true } });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                funcUtils.notify('Đăng nhập thành công!', 'success');
+                navigate('/');
             }
-
             setIsModalVisible(true);
         } catch (error) {
             const errorMessage = error.response?.data?.message;
@@ -91,9 +98,6 @@ const LoginForm = () => {
             }
         }, 1000);
     };
-
-
-
 
     const onRefresh = () => {
         if (canRefresh) {
@@ -202,17 +206,17 @@ const LoginForm = () => {
                 style={{ textAlign: 'center' }}
             >
                 <Form form={form} onFinish={onFinishCaptcha} className="captcha-form">
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                        <div style={{ padding: '5px' }}>
-                            <div style={{ marginRight: '5px', fontSize: '24px', letterSpacing: '10px' }}>
-                                {captcha.slice(0, 6)}
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px', userSelect: 'none' }}>
+                        <div style={{ padding: '5px', userSelect: 'none' }}>
+                            <div style={{ marginRight: '5px', fontSize: '24px', letterSpacing: '10px', userSelect: 'none' }}>
+                                {captcha.substring(0, 6)}
                             </div>
                         </div>
 
-                        <div style={{ border: '1px solid gray', borderRadius: '5px', marginLeft: '10px' }}>
+                        <div style={{ border: '1px solid gray', borderRadius: '5px', marginLeft: '10px', userSelect: 'none' }}>
                             <Button
                                 icon={
-                                    <div style={{ position: 'relative' }}>
+                                    <div style={{ position: 'relative', userSelect: 'none' }}>
                                         <SyncOutlined spin={!canRefresh} />
                                         {!canRefresh && (
                                             <span style={{
@@ -222,7 +226,8 @@ const LoginForm = () => {
                                                 transform: 'translate(-50%, -50%)',
                                                 color: 'black',
                                                 fontSize: '12px',
-                                                lineHeight: '12px'
+                                                lineHeight: '12px',
+                                                userSelect: 'none'
                                             }}>
                                                 {timeLeft}
                                             </span>
@@ -231,10 +236,12 @@ const LoginForm = () => {
                                 }
                                 onClick={onRefresh}
                                 disabled={!canRefresh}
-                                style={{ border: 'none' }}
+                                style={{ border: 'none', userSelect: 'none' }}
                             />
                         </div>
                     </div>
+
+
                     <Form.Item
                         name="captcha"
                         rules={[
