@@ -596,13 +596,12 @@ function SeatChart(props) {
                                                                   })
                                                                   .filter(Boolean)
                                                                   .join(' ') || 'reserved';
-
                                                     const style = {
                                                         backgroundColor: seatClassName,
                                                         pointerEvents: seatClassName === '#404040' ? 'none' : 'auto',
                                                         visibility: seatClassName === '#121B2B' ? 'hidden' : 'visible',
                                                         textIndent: seatClassName === '#121B2B' ? '-9999px' : '0',
-                                                        transform: `scaleX(${width})`,
+                                                        transform: width >2 ? `scaleX(${width})` : seatState.coupleSeat.indexOf(seat_no) > -1 ? `scaleX(${2})` : null,
                                                         transformOrigin: 'top left',
                                                     };
                                                     return (
