@@ -74,7 +74,6 @@ export default function SeatGenerator(props) {
             const resp = await axiosClient.get(`cinema/by-cinema-complex/${idCInemacomplex}`);
             // Lấy giá trị hàng và cột từ dữ liệu trả về từ API
             const dataCinema = resp.data;
-            console.log(dataCinema);
             setCinemaDaTa(dataCinema);
             setSelectedCinemaComplex(true);
         } catch (error) {
@@ -112,9 +111,6 @@ export default function SeatGenerator(props) {
 
             seatState.seat.push(row);
         }
-
-        console.log(seatState.seat);
-
         // Thêm cột chú thích hàng ở bên trái
         seatState.seatHeader = rowHeader;
 
@@ -127,6 +123,7 @@ export default function SeatGenerator(props) {
 
     const postDataSeatChart = async () => {
         setIsTableLoaded(false);
+     
         try {
             const data = {
                 name: inputValue,
@@ -137,8 +134,6 @@ export default function SeatGenerator(props) {
                     id: record? iD: idCinema,
                 },
             };
-
-            console.log(data);
 
             const resp = await axiosClient.post(`seatchart`, data);
             setIdSeatChart(resp.data.id);
@@ -155,6 +150,9 @@ export default function SeatGenerator(props) {
         }
         if (showInfo === 'error') {
             funcUtils.notify('Thêm không thành công', 'error');
+        }
+        if (showInfo === 'errorInput') {
+            funcUtils.notify('Thêm không thành công vui lòng nhập tên', 'error');
         }
     }, [showInfo]);
 
@@ -179,11 +177,9 @@ export default function SeatGenerator(props) {
         setSelectedCinemaChain(false);
         setSelectedCinemaComplex(false);
         setSelectedOptionCinema(false);
-
-        console.log(`selected ${value}`);
     };
     const onSearchCinemaChain = (value) => {
-        console.log('search:', value);
+  
     };
     // Cụm rạp----------------------------------------------------------
 
@@ -202,7 +198,7 @@ export default function SeatGenerator(props) {
         setSelectedOptionCinema(false);
     };
     const onSearchCinemaComplex = (value) => {
-        console.log('search:', value);
+       
     };
 
     // Cinema
@@ -215,32 +211,35 @@ export default function SeatGenerator(props) {
     const onChangeCinema = (value) => {
         setSelectedOptionCinema(true);
         setIdCinema(value);
-        console.log(`selected ${value}`);
+     
     };
     const onSearchCinema = (value) => {
-        console.log('search:', value);
+ 
     };
 
     // input rows
     const onChangeRow = (value) => {
         setRow(value);
-        console.log('changed', value);
+    
     };
     // Input cols
 
     const onChangeCol = (value) => {
         setCol(value);
-        console.log('changed', value);
+       
     };
 
     // Input name sơ đồ
     const onChange = (e) => {
         setInputValue(e.target.value);
-        console.log('Change:', e.target.value);
     };
     // Thêm sơ đồ
 
     const handelCreate = () => {
+        if(inputValue === ''){
+            setShowInfo('errorInput')
+            return;
+        }
         setIsInputDisabled(true);
         postDataSeatChart();
     };
