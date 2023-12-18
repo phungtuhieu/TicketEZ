@@ -12,6 +12,7 @@ import priceServiceApi from '~/api/admin/ManageCombosAndEvents/priceServiceApi';
 import uploadApi from '~/api/service/uploadApi';
 import { BookingDetail } from '..';
 import authApi from '~/api/user/Security/authApi';
+import funcUtils from '~/utils/funcUtils';
 const cx = classNames.bind(styles);
 function BookingCombo(props) {
     const { priceServices, showtime, seatBooking } = props;
@@ -72,12 +73,25 @@ function BookingCombo(props) {
         setIsModalOpen(false);
     };
 
-    const handlePlus = (service, price) => {
-        setTotal((pr) => (pr += price));
-        setComboQuantities((prevQuantities) => ({
-            ...prevQuantities,
-            [service.id]: (prevQuantities[service.id] || 0) + 1,
-        }));
+    const handlePlus = async (service, price) => {
+        // let priceDb = priceServices.find((pr) => service.id === pr.service.id);
+        try {
+            const resp = await serviceApi.getById(service.id);
+            const serviceDb = resp.data;
+            if (serviceDb != null) {
+                if (serviceDb.quantity <= comboQuantities[serviceDb.id]) {
+                    funcUtils.notify(`Rất tiếc số lượng chỉ còn ${serviceDb.quantity} sản phẩm`, 'warning');
+                    return;
+                }
+            }
+            setTotal((pr) => (pr += price));
+            setComboQuantities((prevQuantities) => ({
+                ...prevQuantities,
+                [service.id]: (prevQuantities[service.id] || 0) + 1,
+            }));
+        } catch (error) {
+            console.log('error', error);
+        }
     };
 
     const handleMinus = (service, price) => {
