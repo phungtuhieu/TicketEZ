@@ -8,7 +8,7 @@ const roleApi= {
         return axiosClient.get(url + '/' + roleId);
     },
     get: async () => {
-        return axiosClient.get(url);
+        return axiosClient.get(url + '/get/all');
     },
     post: async (data) => {
         return axiosClient.post(url, data);

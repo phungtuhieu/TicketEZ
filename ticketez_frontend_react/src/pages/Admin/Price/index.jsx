@@ -43,7 +43,6 @@ const AdminPrice = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    
     //call api
     const getList = async () => {
         setLoading(true);
@@ -78,12 +77,12 @@ const AdminPrice = () => {
     }, [workSomeThing]);
 
     const columns = [
-        {
-            title: 'Mã',
-            render: (_, record) => record.price.id,
-            width: '10%',
-            sorter: (a, b) => a.id - b.id,
-        },
+        // {
+        //     title: 'Mã',
+        //     render: (_, record) => record.price.id,
+        //     width: '10%',
+        //     sorter: (a, b) => a.id - b.id,
+        // },
         {
             title: 'Ngày áp dụng',
             render: (_, record) =>
@@ -94,7 +93,7 @@ const AdminPrice = () => {
 
         {
             title: 'Tên phim',
-            render: (_, record) => `${record.price.formatMovie.movie.title } ${record.price.formatMovie.format.name }`,
+            render: (_, record) => `${record.price.formatMovie.movie.title} ${record.price.formatMovie.format.name}`,
         },
         {
             title: 'Cụm rạp và chuỗi rạp',
@@ -158,7 +157,7 @@ const AdminPrice = () => {
         try {
             const res = await axiosClient.delete(`price/${record.price.id}`);
             console.log(res);
-            setShowInfo('success')
+            setShowInfo('success');
         } catch (error) {
             // setShowInfo('errorEdit')
             console.log(error);

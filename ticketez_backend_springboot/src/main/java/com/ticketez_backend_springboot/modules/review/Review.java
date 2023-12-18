@@ -26,6 +26,7 @@ public class Review {
 	private float rating;
 	private Date createDate;
 	private Date editDate;
+	private Integer status;
 
 	@ManyToOne
 	@JoinColumn(name = "account_id")

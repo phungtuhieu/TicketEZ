@@ -30,7 +30,6 @@ const Header = () => {
             try {
                 const user = await authApi.getUser();
                 setUserData(user);
-                console.log(user);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -58,6 +57,7 @@ const Header = () => {
             authApi.logout();
             localStorage.clear();
             funcUtils.notify('Đăng Xuất thành công!', 'success');
+            window.location.reload();
             navigate('/');
         } catch (error) {
             funcUtils.notify('Đăng Xuất Thất Bại!', 'error');
@@ -99,7 +99,7 @@ const Header = () => {
         {
             key: '4',
             label: (
-                <a target="_self" onClick={handleLogout} rel="noopener noreferrer" href="">
+                <a target="_self" onClick={handleLogout} rel="noopener noreferrer">
                     Đăng xuất
                 </a>
             ),

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ticketez_backend_springboot.dto.RevenueStatisticsDTO;
+import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
@@ -70,5 +71,13 @@ public interface BookingDAO extends JpaRepository<Booking, String> {
                         "JOIN CinemaChain ch ON cc.cinemaChain = ch " +
                         "WHERE ch.id = :cinemaChainId")
         List<Booking> findBookingsByCinemaChainId(@Param("cinemaChainId") Long cinemaChainId);
+        // Tìm kiếm các Booking đã thanh toán và có vé sử dụng cho một bộ phim cụ thể và
+        // một tài khoản cụ thể
+        @Query("SELECT b FROM Booking b " +
+                        "JOIN b.showtime.formatMovie fm " +
+                        "WHERE b.status = 1 AND b.ticketStatus = 1 AND fm.movie = :movie AND b.account = :account")
+        List<Booking> findPaidAndUsedBookingsByMovieAndAccount(
+                        @Param("movie") Movie movie,
+                        @Param("account") Account account);
 
 }

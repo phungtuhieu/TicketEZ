@@ -21,7 +21,7 @@ function BookingInfo() {
         content: () => componentPDF.current,
         documentTitle: 'Ticket',
         bodyClass: cx('custom-print-body'),
-        onAfterPrint: () => alert('Done'),
+        // onAfterPrint: () => alert('Done'),
     });
     const [paymentStatus, setPaymentStatus] = useState('e');
     const paymentInfoId = location.state?.paymentInfoId;
@@ -30,6 +30,7 @@ function BookingInfo() {
         paymentInfo: {},
         booking: {},
         seatBookings: [],
+        servicesBooking: [],
     });
     const [currentStatusConfig, setCurrentStatusConfig] = useState({});
     const statusConfig = {
@@ -63,8 +64,9 @@ function BookingInfo() {
                 const booking = resp.data.booking;
                 const paymentInfo = resp.data.paymentInfo;
                 const seatBookings = resp.data.seatBookings;
+                const servicesBooking = resp.data.servicesBooking;
                 console.log('booking', booking);
-                setPaymentInfoDTO({ booking, paymentInfo, seatBookings });
+                setPaymentInfoDTO({ booking, paymentInfo, seatBookings, servicesBooking });
                 setPaymentStatus('success');
                 setCurrentStatusConfig(statusConfig['success']);
             } catch (error) {
@@ -81,8 +83,8 @@ function BookingInfo() {
     }, [paymentInfoId]);
     return (
         <>
-            <div className={cx('wrapper')}>
-                <Button onClick={generatePDF}>PDF</Button>
+            <div className={cx('wrapper', 'tw-pt-2')}>
+                {paymentStatus == 'success' && <Button onClick={generatePDF}>Tải vé về máy</Button>}
                 <div className={cx('container')}>
                     <div style={{ display: 'flex' }}>
                         <div className={cx('wrapper-box-status', 'light')}>
@@ -117,7 +119,7 @@ function BookingInfo() {
                                 </Button>
                             )}
                         </div>
-                        
+
                         {/* <TicketDetails></TicketDetails> */}
                         {paymentStatus === 'success' && (
                             <div className={cx('wrapper-ticket-details', 'light')}>

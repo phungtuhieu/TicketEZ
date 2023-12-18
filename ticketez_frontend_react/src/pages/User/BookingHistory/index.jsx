@@ -6,19 +6,23 @@ import styles from './BookingHistory.module.scss';
 import MovieTickets from './MovieTickets';
 
 const cx = classNames.bind(styles);
-
+const ticketStatus = {
+    UNUSED: 0,
+    USED: 1,
+    EXPIRES: 2,
+};
 function BookingHistory() {
     const [activityKey, setActivityKey] = useState('1');
     const items = [
         {
             key: '1',
-            label: 'Vé xem phim',
-            children: activityKey === '1' && <MovieTickets />,
+            label: 'Vé chưa sử dụng',
+            children: activityKey === '1' && <MovieTickets tab={ticketStatus.UNUSED} />,
         },
         {
             key: '2',
-            label: 'Vé bắp nước',
-            children: 'Content of Tab Pane 2',
+            label: 'Vé đã sử dụng',
+            children: activityKey === '2' && <MovieTickets tab={ticketStatus.USED} />,
         },
     ];
     const onChange = (key) => {

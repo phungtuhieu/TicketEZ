@@ -26,6 +26,9 @@ export { default as PasswordChangeForm } from '~/components/Auth/ChangePassword/
 export { default as ResetPasswordFrom } from '~/components/Auth/ResetPassword/ResetPasswordFrom';
 
 
+export { default as Chat } from '~/components/Auth/MiniChatAi/Chat';
+
+
 
 
 

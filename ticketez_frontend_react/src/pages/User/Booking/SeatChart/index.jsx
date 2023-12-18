@@ -765,12 +765,15 @@ function SeatChart(props) {
                         <Row>
                             <Col span={15}></Col>
                             <Col span={9}>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="tw-mt-6">
+                                <div
+                                    style={{ display: 'flex', justifyContent: 'flex-end' }}
+                                    className="tw-mt-6 tw-mb-6"
+                                >
                                     <Button
                                         style={{
                                             width: '150px',
                                             height: '70px',
-                                            backgroundColor: hasData ? '#EB2F96' : 'gray',
+                                            backgroundColor: hasData ? '#176b87' : 'gray',
                                             fontWeight: 'bolder',
                                         }}
                                         className={`btn ${

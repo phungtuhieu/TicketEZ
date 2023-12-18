@@ -1,11 +1,15 @@
 package com.ticketez_backend_springboot.modules.booking;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ticketez_backend_springboot.dto.BookingAnPaymentInfoAndSeatBookings;
+import com.ticketez_backend_springboot.auth.OTP.util.EmailUtil;
 import com.ticketez_backend_springboot.dto.CinemaChainBookingDTO;
 import com.ticketez_backend_springboot.dto.NewPriceSeatTypeDTO;
 import com.ticketez_backend_springboot.dto.PriceAndPriceSeatTypeDTO;
@@ -49,6 +53,7 @@ import com.ticketez_backend_springboot.modules.price.Price;
 import com.ticketez_backend_springboot.modules.price.PriceDAO;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatType;
 import com.ticketez_backend_springboot.modules.priceSeatType.PriceSeatTypeDAO;
+import com.ticketez_backend_springboot.modules.seat.Seat;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBooking;
 import com.ticketez_backend_springboot.modules.seatBooking.SeatBookingDao;
 import com.ticketez_backend_springboot.modules.seatChoose.SeatChoose;
@@ -62,7 +67,9 @@ import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
 import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChooseDAO;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
+import com.ticketez_backend_springboot.service.ZXingQRCodeService;
 
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -238,6 +245,9 @@ public class BookingAPI {
 	@Autowired
 	PriceSeatTypeDAO priceSeatTypeDAO;
 
+	@Autowired
+	EmailUtil emailUtil;
+
 	@GetMapping("/vnpay-payment")
 	public ResponseEntity<?> payment(HttpServletRequest request) {
 		Integer paymentStatus = vnPayService.orderReturn(request);
@@ -274,7 +284,7 @@ public class BookingAPI {
 			SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
 			String dayOfWeek = sdf.format(currentDate);
 			boolean isWeekend = weekends.contains(dayOfWeek);
-			List<SeatBooking> lBookings = new ArrayList<>();
+			List<SeatBooking> seatBookingForSave = new ArrayList<>();
 			List<ServiceBooking> listServiceBookings = new ArrayList<>();
 
 			List<ServiceChoose> serviceChooses = serviceChooseDAO.findByAccountId(accountId);
@@ -310,13 +320,13 @@ public class BookingAPI {
 								seatBooking.setPrice(pst.getWeekdayPrice());
 							}
 							seatBooking.setSeat(seatChoose.getSeat());
-							lBookings.add(seatBooking);
+							seatBookingForSave.add(seatBooking);
 						}
 					}
 				}
 			}
-			serviceBookingDAO.saveAll(listServiceBookings);
-			seatBookingDao.saveAll(lBookings);
+			List<ServiceBooking> serviceBookingsSaved = serviceBookingDAO.saveAll(listServiceBookings);
+			List<SeatBooking> seatsBookingsSaved = seatBookingDao.saveAll(seatBookingForSave);
 
 			String orderInfo = request.getParameter("vnp_OrderInfo");
 			String tmnCode = request.getParameter("vnp_TmnCode");
@@ -337,7 +347,7 @@ public class BookingAPI {
 
 			List<Long> serviceChooseIdsDel = serviceChooses.stream().map(svc -> svc.getId())
 					.collect(Collectors.toList());
-
+			PaymentInfo pInfoSaved = null;
 			try {
 				Date date = inputFormat.parse(paymentTime);
 				String outputDateString = dateFormat.format(date);
@@ -357,6 +367,8 @@ public class BookingAPI {
 						.collect(Collectors.toList());
 				List<Service> servicesDb = serviceDAO.findAllById(serviceIds);
 				List<Service> servicesUpdated = new ArrayList<>();
+				pInfoSaved = pmIDao.save(paymentInfo);
+				serviceDAO.saveAll(servicesUpdated);
 				for (Service svDB : servicesDb) {
 					for (ServiceChoose svc : serviceChooses) {
 						if (svDB.getId() == svc.getService().getId()) {
@@ -365,17 +377,99 @@ public class BookingAPI {
 						}
 					}
 				}
-				serviceDAO.saveAll(servicesUpdated);
+
+				Map<String, Object> templateModel = new HashMap<>();
+				SimpleDateFormat formatDate = new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy");
+				String payDateInfo = formatDate.format(pInfoSaved.getPayDate());
+				String showtimeDateFm = formatDate.format(bCreated.getShowtime().getStartTime());
+				String seatsName = seatsBookingsSaved.stream()
+						.map(seatBooking -> seatBooking.getSeat().getName())
+						.collect(Collectors.joining(", "));
+				// String comboNameFm = "";
+				List<String> combos = new ArrayList<>();
+
+				for (ServiceBooking serviceBooking : serviceBookingsSaved) {
+					Integer quantity = serviceBooking.getQuantity();
+					String comboName = serviceBooking.getService().getName();
+					String comboNew = String.format("%d X %s", quantity, comboName);
+					combos.add(comboNew);
+
+				}
+				byte[] qrImage = null;
+				try {
+					qrImage = ZXingQRCodeService.generateQRCodeImage(bCreated.getId());
+				} catch (Exception e) {
+
+					e.printStackTrace();
+					bCreated.setStatus(BookingStatus.FAILED);
+
+					seatBookingDao.deleteAllById(
+							seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+					serviceBookingDAO.deleteAllById(
+							serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+									.collect(Collectors.toList()));
+					return new ResponseEntity<>("Có lỗi trong việc tạo qr",
+							HttpStatus.CONFLICT);
+				}
+				Locale locale = new Locale("vi", "VN");
+				NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
+
+				// Định dạng số tiền
+				String formattedAmount = currencyFormat.format(pInfoSaved.getAmount());
+				templateModel.put("ticketCode", bCreated.getId());
+				templateModel.put("showtimeDate", showtimeDateFm);
+				templateModel.put("movieName", bCreated.getShowtime().getFormatMovie().getMovie().getTitle());
+				templateModel.put("cinemaCplxName", bCreated.getShowtime().getCinema().getCinemaComplex().getName());
+				templateModel.put("cinemaCplxAddress",
+						bCreated.getShowtime().getCinema().getCinemaComplex().getAddress());
+				templateModel.put("cinemaName", bCreated.getShowtime().getCinema().getName());
+				templateModel.put("quantityTicket", seatsBookingsSaved.size());
+				templateModel.put("nameSeats", seatsName);
+				templateModel.put("combosName", combos);
+				templateModel.put("qrImage", bCreated.getId());
+				templateModel.put("payDateInfo", payDateInfo);
+				// System.out.println("-----QRCode: " + qrImage);
+				templateModel.put("total", formattedAmount);
+				try {
+					// "hieuptpc03210@fpt.edu.vn"
+					emailUtil.sendMessageUsingThymeleafTemplateWithInlineImage(bCreated.getAccount().getEmail(),
+							"[TicketEZ] - THÔNG TIN THANH TOÁN",
+							templateModel, "invoice-ticket", bCreated.getId(), qrImage);
+				} catch (MessagingException e) {
+					e.printStackTrace();
+					bCreated.setStatus(BookingStatus.FAILED);
+
+					seatBookingDao.deleteAllById(
+							seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+					serviceBookingDAO.deleteAllById(
+							serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+									.collect(Collectors.toList()));
+
+					return new ResponseEntity<>("Có lỗi trong việc gửi mail thông báo",
+							HttpStatus.CONFLICT);
+				} finally {
+					ZXingQRCodeService.deleteQRCodeImage(bCreated.getId());
+				}
+
 			} catch (ParseException e) {
 				e.printStackTrace();
+				bCreated.setStatus(BookingStatus.FAILED);
+
+				seatBookingDao.deleteAllById(
+						seatsBookingsSaved.stream().map((sb) -> sb.getId()).collect(Collectors.toList()));
+
+				serviceBookingDAO.deleteAllById(
+						serviceBookingsSaved.stream().map((sv) -> sv.getServiceBookingPK())
+								.collect(Collectors.toList()));
 				return new ResponseEntity<>("Có lỗi trong việc định dạng ngày",
 						HttpStatus.CONFLICT);
+
 			} finally {
 				seatChooseDao.deleteAllById(seatChooseIdsDel);
 				serviceChooseDAO.deleteAllById(serviceChooseIdsDel);
+
 			}
-			PaymentInfo pInfo = pmIDao.save(paymentInfo);
-			return ResponseEntity.status(HttpStatus.OK).body(pInfo.getTransactionId());
+			return ResponseEntity.status(HttpStatus.OK).body(pInfoSaved.getTransactionId());
 		} else if (paymentStatus == 0) {
 			return new ResponseEntity<>("Giao dịch thất bại",
 					HttpStatus.CONFLICT);
@@ -397,6 +491,7 @@ public class BookingAPI {
 		pInfoDTO.setPaymentInfo(pInfoDb);
 		pInfoDTO.setBooking(bookingDb);
 		pInfoDTO.setSeatBookings(bookingDb.getSeatsBookings());
+		pInfoDTO.setServicesBooking(bookingDb.getServicesBookings());
 		return ResponseEntity.status(HttpStatus.OK).body(pInfoDTO);
 	}
 
@@ -437,7 +532,7 @@ public class BookingAPI {
 	public ResponseEntity<?> getBookingPaymentInfoSeatBookings(@PathVariable("bookingId") String bookingId) {
 		try {
 
-			BookingAnPaymentInfoAndSeatBookings dto = new BookingAnPaymentInfoAndSeatBookings();
+			PaymentInfoDTO dto = new PaymentInfoDTO();
 
 			if (bookingId != null) {
 				Booking book = dao.getBookingById(bookingId);
@@ -445,6 +540,7 @@ public class BookingAPI {
 				List<SeatBooking> seatBookings = dao.getSeatsBookingById(bookingId);
 
 				dto.setBooking(book);
+				dto.setServicesBooking(book.getServicesBookings());
 				dto.setPaymentInfo(paymentInfo);
 				dto.setSeatBookings(seatBookings);
 			}

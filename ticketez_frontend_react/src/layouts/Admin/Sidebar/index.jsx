@@ -74,7 +74,12 @@ const items = [
     getItem(
         <Link to="/admin/accountStaff">Quản lý nhân viên</Link>,
         'grAccountStaff',
-        <FontAwesomeIcon icon={solidIcons.faUsers} />,
+        <FontAwesomeIcon icon={solidIcons.faUserAlt} />,
+    ),
+    getItem(
+        <Link to="/admin/comentModeration">Kiểm duyệt bình luận</Link>,
+        'grComentModeration',
+        <FontAwesomeIcon icon={solidIcons.faComment} />,
     ),
     getItem(<Link to="/admin/webcam">Soát vé</Link>, 'webcam', <FontAwesomeIcon icon={solidIcons.faCamera} />),
     getItem(

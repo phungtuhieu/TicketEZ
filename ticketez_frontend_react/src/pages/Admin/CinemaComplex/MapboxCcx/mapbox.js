@@ -9,15 +9,17 @@ import { SearchOutlined } from '@ant-design/icons';
 // export const maps = {popupInfo}
 function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
   const [searchInput, setSearchInput] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const [popupInfo, setPopupInfo] = useState({
     latitude: 10.768928753876907,
-    longitude: 106.65765392148774, address: ""
+    longitude: 106.65765392148774,
+    address: ""
   });
 
   // console.log(latitude);
   // console.log(longitude);
-  
+
 
   useEffect(() => {
 
@@ -27,9 +29,9 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
       address: address
     })
 
-  }, [ latitude, longitude, address])
+  }, [latitude, longitude, address])
 
-  console.log(popupInfo);
+  // console.log(popupInfo);
 
   const mapboxAccessToken = "pk.eyJ1Ijoibmd1eWVudmFuaHV1dGFpIiwiYSI6ImNsbnU0N29jazBiemwyaW9kbGZyZnAxZjkifQ.C0_aqS6mFyHpXwUBBSLzqA";
   //  console.log(popupInfo);
@@ -51,7 +53,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
         const response = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${clickedLongitude},${clickedLatitude}.json?access_token=${mapboxAccessToken}`
         );
-        // console.log(response);
+        console.log(response);
 
         const placeInfo = response.data.features[0];
         // console.log(response.data.features[0].place_name);
@@ -73,24 +75,39 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
     } else {
       console.error('Invalid latitude or longitude.');
     }
+    setSearchInput('');
   };
+
+  const handleSearchInputChange = async (input) => {
+    setSearchInput(input);
+    try {
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${input}.json?access_token=${mapboxAccessToken}`
+      );
+
+      setSearchResults(response.data.features);
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+    }
+  };
+
 
   const handleSearch = async () => {
     try {
       const response = await axios.get(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchInput}.json?access_token=${mapboxAccessToken}`
       );
-  
+
       if (response.data.features.length > 0) {
         const firstResult = response.data.features[0];
         const { center, place_name } = firstResult;
-  
+
         setPopupInfo({
           latitude: center[1],
           longitude: center[0],
           address: place_name,
         });
-  
+
         onPopupInfoChange({
           latitude: center[1],
           longitude: center[0],
@@ -103,7 +120,25 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
       console.error('Lỗi khi tìm kiếm địa điểm:', error);
     }
   };
-  
+  const handleSearchSelection = (selectedPlace) => {
+    const { center, place_name } = selectedPlace;
+
+    setPopupInfo({
+      latitude: center[1],
+      longitude: center[0],
+      address: place_name,
+    });
+
+    onPopupInfoChange({
+      latitude: center[1],
+      longitude: center[0],
+      address: place_name,
+    });
+
+    setSearchInput('');
+    setSearchResults([]); // Clear search results after selection
+  };
+
   return (
     <Map
       onClick={handleMapClick}
@@ -135,15 +170,22 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
         />
       </Marker>
       <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>
-  <input
-    type="text"
-    placeholder="Tìm kiếm địa điểm..."
-    value={searchInput}
-    onChange={(e) => setSearchInput(e.target.value)}
-    className="tw-border-b tw-border-black focus:tw-border-transparent tw-outline-none"
-  />
-  <SearchOutlined onClick={handleSearch} style={{fontSize: '25px'}}/>
-</div>
+        <input
+          type="text"
+          placeholder="Tìm kiếm địa điểm..."
+          value={searchInput}
+          onChange={(e) => handleSearchInputChange(e.target.value)}
+          className="tw-border-b tw-border-black focus:tw-border-transparent tw-outline-none"
+        />
+        <SearchOutlined onClick={handleSearch} style={{ fontSize: '25px' }} />
+        <ul>
+          {searchResults.map(result => (
+            <li key={result.id} onClick={() => handleSearchSelection(result)}>
+              {result.place_name}
+            </li>
+          ))}
+        </ul>
+      </div>
 
     </Map>
   );

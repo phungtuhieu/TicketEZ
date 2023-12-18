@@ -3,6 +3,10 @@ package com.ticketez_backend_springboot.auth.OTP.util;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,6 +15,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.StreamUtils;
@@ -20,7 +26,8 @@ import com.ticketez_backend_springboot.modules.movie.Movie;
 
 @Component
 public class EmailUtil {
-
+  @Autowired
+  private SpringTemplateEngine thymeleafTemplateEngine;
   private final JavaMailSender javaMailSender;
 
   public EmailUtil(JavaMailSender javaMailSender) {
@@ -36,6 +43,47 @@ public class EmailUtil {
     helper.setText(htmlContent, true);
 
     javaMailSender.send(mimeMessage);
+  }
+
+  public void sendEmailWithInlineImage(String to, String subject, String htmlContent, String imageName,
+      byte[] imageBytes) throws MessagingException {
+    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+    helper.setTo(to);
+    helper.setSubject(subject);
+
+    // Thêm hình ảnh vào email với Content-ID
+    helper.setText(htmlContent, true);
+    helper.addInline(imageName, new ByteArrayResource(imageBytes), "image/png");
+
+    javaMailSender.send(mimeMessage);
+  }
+
+  public void sendMessageUsingThymeleafTemplate(
+      String to, String subject, Map<String, Object> templateModel, String nameTemplateHtml)
+      throws MessagingException {
+
+    Context thymeleafContext = new Context();
+    thymeleafContext.setVariables(templateModel);
+
+    String htmlBody = thymeleafTemplateEngine.process(nameTemplateHtml + ".html", thymeleafContext);
+
+    sendEmail(to, subject, htmlBody);
+  }
+
+  public void sendMessageUsingThymeleafTemplateWithInlineImage(
+      String to, String subject, Map<String, Object> templateModel, String nameTemplateHtml,
+      String imageName,
+      byte[] imageBytes)
+      throws MessagingException {
+
+    Context thymeleafContext = new Context();
+    thymeleafContext.setVariables(templateModel);
+
+    String htmlBody = thymeleafTemplateEngine.process(nameTemplateHtml + ".html", thymeleafContext);
+
+    // Gửi email với hình ảnh nhúng
+    sendEmailWithInlineImage(to, subject, htmlBody, imageName, imageBytes);
   }
 
   // Tạo nội dung email OTP và gửi
@@ -86,9 +134,14 @@ public class EmailUtil {
         + " <p>Xin chào,  <strong>" + account.getFullname() + "</strong></p>"
         + "<p>Chúng tôi muốn đề xuất cho bạn với bạn một bộ phim có thể bạn thích. Dưới đây là thông tin về phim:</p>"
         + "<div style='display: flex; align-items: center; margin-bottom: 20px; '>"
-        + "<img style='width: 165px; height: auto; margin-right: 20px;'"
+        + "<img style='width: 165px; height: 300px; margin-right: 20px;'"
         + "   src='cid:image' alt='Lỗi hình ảnh'>"
         + " <div style=' width: auto;  margin-bottom: 30px;'>"
+        + "   <p > " 
+        + "<span style='font-size: 14px; padding: 4px; margin: 0; min-width: 24px; border-radius: 3px; margin-top: 10px; color: white; background: "+movie.getMpaaRating().getColorCode()+" '>"
+        +  movie.getMpaaRating().getRatingCode() 
+        + " </span>" 
+        + "</p>"
         + "    <h3 style='font-size: 18px; font-weight: bold; margin: 0; '>" + movie.getTitle() + "</h3>"
         + "   <p style='font-size: 14px; margin: 0; margin-top: 10px;'>Khởi chiếu: "
         + movie.getReleaseDate() + "</p>"

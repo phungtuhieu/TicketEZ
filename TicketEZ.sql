@@ -75,7 +75,8 @@ GO
         create_date DATETIME NOT NULL,
         edit_date DATETIME,
         account_id NVARCHAR(20) NOT NULL,
-        movie_id BIGINT NOT NULL
+        movie_id BIGINT NOT NULL,
+        [status] INT NOT NULL   --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
     )
 GO
     CREATE TABLE Genres (
@@ -2436,6 +2437,145 @@ INSERT [dbo].[Payment_Info] ([transaction_id], [tmn_code], [booking_id], [amount
 INSERT [dbo].[Payment_Info] ([transaction_id], [tmn_code], [booking_id], [amount], [pay_date], [order_info], [bank_code], [transaction_status]) VALUES (N'14244842', N'TT7GVXVQ', N'7425531041', 430000, CAST(N'2023-12-15T21:05:02.000' AS DateTime), N'Thanh toan ve xem phim ', N'NCB', N'00')
 INSERT [dbo].[Payment_Info] ([transaction_id], [tmn_code], [booking_id], [amount], [pay_date], [order_info], [bank_code], [transaction_status]) VALUES (N'14244843', N'TT7GVXVQ', N'2659744188', 530000, CAST(N'2023-12-15T21:05:47.000' AS DateTime), N'Thanh toan ve xem phim ', N'NCB', N'00')
 GO
+
+--27 bảng dữ liệu reivew
+ SELECT *
+FROM [TicketEZ].[dbo].[Reviews]
+WHERE [movie_id] = 1;
+
+  INSERT INTO [TicketEZ].[dbo].[Reviews] ([comment], [rating], [create_date], [edit_date], [account_id], [movie_id], [status])
+VALUES 
+(N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
+Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 1, 0),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 1, 0),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user3', 1, 0),
+(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 1, 0),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user4', 1, 0),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user2', 1, 0),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user6', 1, 1),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user4', 1, 0),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user5', 1, 1),
+(N'Màu phim thì đánh giá cao đẹp, sắc nét, nhân vật nhập tâm. Vui có, hài có, sợ có, một chút hồi hộp.
+Tuy nhiên chưa toát vẻ cổ xưa phong kiến lắm, xuyên suốt phim tình tiết chưa logic khúc cần làm rõ thì làm khá nhanh, so với nhịp phim khúc đầu khá chậm. Mình bị tụt mood khúc Nhân bị bắt trong rừng, quá dễ dàng và từ đó đến hết phim mọi chuyện giải quyết khá nhanh chóng và không được thuyết trình phục. 
+Để coi thì cũng ok á, nhưng mà coi xong mình bị tụt mood :((( chả hỉu sao luô', 5, '2023-01-24 09:30:00', NULL, N'user2', 2, 0),
+(N'Nói thật trước khi đi xem tôi cũng nghe rất nhiều luồng ý kiến về bộ phim cả khen lẫn chê. Nhưng khi xem xong tôi cảm giác bộ phim rất có chiều sâu. Yếu tố văn hoá, thiên nhiên cảm giác rất đã mắt. Bộ phim khai thác về bối cảnh phong kiến rất hà khắc với phụ nữ. Phim có cảnh nóng được diễn khá thật nên nếu ai không thích không khuyến khích xem. Ngoài ra nó cũng gợi đến tình mẫu tử giữa mợ Ba và bé Đông Nhi. Thú thật thì tôi xem cũng ấm ức theo mẹ nào chẳng thương con mợ ba đã chịu đựng quá nhiều 6,7 năm trời nhưng khi bà Cả đem con mình ra quỳ nguyên đêm. Là tôi khéo tôi đào mả cả nhà quan còn được. Hành mình đã đành con mình một đứa bé 6 tuổi nó biết gì hành nó. Ngoài ra thì phim cũng cho tôi khá nhiều cảm xúc vì xem phim nhưng cảm giác như thật. Duy nhất có điểm trừ là giọng nữ chính hơi trẻ con thật. Một vài phân cảnh lặp lại khiến phim dễ bị nhàm. Còn lại thì phim này vẫn đáng trải nghiệm nó đọng lại khá nhiều giá trị. Nếu mọi người xem hãy nhìn và cảm nhận sâu đừng chỉ tập trung yếu tố ngoài lề', 5, '2023-02-14 09:30:00', NULL, N'user3', 2, 0),
+(N'Hình ảnh đã mắt , cũng có vài miếng hài khá hay=)), sự kết hợp của 3 cô gái là một sự hoàn hảo....', 5, '2023-03-04 09:30:00', NULL, N'user4', 2, 1),
+(N'lâu lắm k đi coi phim vì chọn mãi không thấy bộ nào thích. rồi thấy có phim này đi coi thử mà cười banh cả hàm luôn á kkkkk', 5, '2023-04-22 09:30:00', NULL, N'user5', 2, 1),
+(N'Em khóc nhiều khi xem phim này.em cảm thấy em rất may mắn khi có mẹ ở bên.khi quen người yêu.lúc trẻ con cãi nhau.mẹ là người khuyên rằng con phải thật bình tĩnh.thấu hiểu.em và người yêu đi xem.2 đứa nhìn nhau và nói với nhau rằng.thật cảm ơn vì 2 đứa đã kịp hiểu nhau thấu hiểu nhau.để vẫn còn hạnh phúc ở bên nhau', 5, '2023-05-28 09:30:00', NULL, N'user4', 2, 0),
+(N'phim đối với mình chưa đặc sắc lắm, ko xúc động như mng review. Nữ 9 diễn tạm ổn, mẹ n9 thì mặt diễn hơi đơ. Các vai diễn khác cũng tạm. Kịch bản chấp nhận được . Âm thanh hơi ồn. Tóm lại mình hài lòng so với mặt bằng phim việt nói chung.', 5, '2023-05-30 09:30:00', NULL, N'user6', 2, 1),
+(N'Hay đấy', 5, '2023-06-11 09:30:00', NULL, N'user2', 2, 0),
+(N'Trên cả tuyệt vời', 5, '2023-06-13 09:30:00', NULL, N'user3', 2, 0),
+(N'Tôi không thích bộ này cho lắm chắc gu phim của thôi không phải loại này', 5, '2023-06-14 09:30:00', NULL, N'user2', 2, 0);
+
+
+
+
+INSERT INTO Price_Seat_Types (weekday_price, weekend_price, seat_type_id,price_id)
+VALUES
+    (70000, 85000, 1, 1),
+    ( 90000, 100000, 2, 1),
+    (100000, 120000, 3, 1),
+	 (70000, 85000, 1, 2),
+    ( 90000, 100000, 2, 2),
+    (100000, 120000, 3, 2),
+	 (70000, 85000, 1, 3),
+    ( 90000, 100000, 2, 3),
+    (100000, 120000, 3, 4),
+	 (70000, 85000, 1, 4),
+    ( 90000, 100000, 2, 4),
+    (100000, 120000, 3, 4),
+	 (70000, 85000, 1, 5),
+    ( 90000, 100000, 2, 5),
+    (100000, 120000, 3, 5),
+	 (70000, 85000, 1, 6),
+    ( 90000, 100000, 2, 6),
+    (100000, 120000, 3, 6),
+	 (70000, 85000, 1, 7),
+    ( 90000, 100000, 2, 7),
+    (100000, 120000, 3, 7),
+	 (70000, 85000, 1, 8),
+    ( 90000, 100000, 2, 8),
+    (100000, 120000, 3, 8),
+	 (70000, 85000, 1, 9),
+    ( 90000, 100000, 2, 9),
+	 (70000, 85000, 1, 9),
+    ( 90000, 100000, 2, 10),
+    (100000, 120000, 3, 10),
+    (100000, 120000, 3, 10);
+  
+--thêm dữ liệu cho bảng booking
+INSERT INTO Booking (id, account_id, create_date, showtime_id, [status],[ticket_status])
+VALUES
+    ('1', 'user6', '2022-01-01 12:00:00', 1, 0, 0 ),
+    ('2', 'user6', '2022-03-02 14:30:00', 1, 1, 0),
+    ('3', 'user6', '2022-03-03 16:45:00', 1, 0, 0),
+    ('4', 'user6', '2024-01-04 19:15:00', 1, 1, 0),
+    ('5', 'user6', '2024-01-05 21:30:00', 1, 0, 1),
+    ('6', 'user6', '2024-01-06 10:00:00', 1, 1, 1),
+    ('7', 'user5', '2022-01-07 13:45:00', 2, 0, 1),
+    ('8', 'user6', '2023-01-08 15:30:00', 2, 1, 1),
+    ('9', 'user6', '2022-02-09 18:00:00', 2, 0, 1),
+    ('10', 'user6', '2022-02-10 20:15:00', 2, 1, 1),
+    ('11', 'user6', '2022-02-11 11:30:00', 3, 0, 2),
+    ('12', 'user6', '2022-02-12 14:00:00', 3, 1, 2),
+    ('13', 'user6', '2022-02-13 16:15:00', 3, 0, 2),
+    ('14', 'user6', '2022-01-14 19:45:00', 3, 1, 2),
+    ('15', 'user6', '2022-02-15 22:00:00', 3, 0, 2),
+    ('16', 'user6', '2023-01-16 09:15:00', 3, 1, 2),
+    ('17', 'user6', '2023-01-17 12:30:00', 3, 0, 1),
+    ('18', 'user6', '2023-01-18 14:45:00', 3, 1, 1),
+    ('19', 'user6', '2023-01-19 17:00:00', 3, 0, 1),
+    ('20', 'user6', '2023-01-20 20:30:00', 3, 1, 1);
+
+	/* 
+	   CREATE TABLE Booking (
+        id NVARCHAR(10) NOT NULL,
+        account_id NVARCHAR(20) NOT NULL,
+        create_date DATETIME NOT NULL,
+        showtime_id BIGINT NOT NULL,
+        [status] INT NOT NULL, -- 0: Thành công, 1: Thanh toán gặp lỗi,...
+        [ticket_status] INT NOT NULL, -- 0: Chưa sử dụng, 1: đã sử dụng, 2: Hết hạn
+    )*/
+
+--thêm dữ liệu cho bảng Seats_Booking
+INSERT INTO Seats_Booking ([seat_id], [booking_id], [price])
+VALUES
+    (1, 1, 20.5),
+    (2, 1, 15.75),
+    (3, 1, 30.0),
+    (4,1, 25.25),
+    (5, 1, 18.5),
+    (6, 2, 22.75),
+    (7, 3, 19.0),
+    (8, 3, 35.5),
+    (9, 4, 40.25),
+    (10, 5, 28.75),
+    (11, 6, 33.0),
+    (12, 7, 17.25),
+    (13,8, 21.5),
+    (14, 4, 26.75),
+    (15, 3,23.0),
+    (16, 2, 38.5),
+    (17,1, 43.25),
+    (18, 1, 31.75),
+    (19, 1, 36.0),
+    (20, 1, 29.25);
+
+	-- Chèn dữ liệu cho bảng Articles
+INSERT INTO Articles (title, banner, content, status, create_date)
+VALUES 
+(N'Tiêu đề 1', 'Banner 1', N'Nội dung 1', 1, '2023-01-01'),
+(N'Tiêu đề 2', 'Banner 2', N'Nội dung 2', 0, '2023-01-02'),
+(N'Tiêu đề 3', 'Banner 3', N'Nội dung 3', 1, '2023-01-03'),
+(N'Tiêu đề 4', 'Banner 4', N'Nội dung 4', 0, '2023-01-04'),
+(N'Tiêu đề 5', 'Banner 5', N'Nội dung 5', 1, '2023-01-05'),
+(N'Tiêu đề 6', 'Banner 6', N'Nội dung 6', 0, '2023-01-06'),
+(N'Tiêu đề 7', 'Banner 7', N'Nội dung 7', 1, '2023-01-07'),
+(N'Tiêu đề 8', 'Banner 8', N'Nội dung 8', 0, '2023-01-08'),
+(N'Tiêu đề 9', 'Banner 9', N'Nội dung 9', 1, '2023-01-09'),
+(N'Tiêu đề 10', 'Banner 10', N'Nội dung 10', 0, '2023-01-10');
+
 
 
 SELECT * FROM Accounts
