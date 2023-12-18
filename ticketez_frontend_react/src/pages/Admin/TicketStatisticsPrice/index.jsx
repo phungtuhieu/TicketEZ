@@ -8,9 +8,10 @@ import dayjs from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const { RangePicker } = DatePicker;
 
-const AdminTicketStatistics = () => {
+const AdminTicketStatisticsPrice = () => {
     const [bookingDataDTO, setBookingDataDTO] = useState([]);
     const [series, setSeries] = useState([]);
+    const [dates, setDates] = useState([]);
     const [labels, setLabels] = useState([]);
     const [options, setOptions] = useState({
         chart: {
@@ -25,7 +26,8 @@ const AdminTicketStatistics = () => {
         if (value === 2) {
             fetchDataBookingDataDTO('cinemaComplex');
         }
-        setSelectedDate(null);
+        setDates(null)
+
         console.log(`selected ${value}`);
     };
     const onSearch = (value) => {
@@ -169,6 +171,7 @@ const AdminTicketStatistics = () => {
     const [selectedDate, setSelectedDate] = useState([]);
     const handleDateChange = (dates) => {
         setSelectedDate(dates);
+        setDates(dates)
 
         // Kiểm tra nếu có ngày bắt đầu và kết thúc
         if (dates && dates.length === 2) {
@@ -210,7 +213,7 @@ const AdminTicketStatistics = () => {
     const [dataModal, setDataModal] = useState([]);
 
     const handleEditData = (record) => {
-        setDataModal(record.bookings);
+        setDataModal(record.payments);
         showModal();
     };
 
@@ -221,7 +224,7 @@ const AdminTicketStatistics = () => {
                     <Row>
                         <Col span={12}>
                             <Select
-
+                                className="tw-w-64"
                                 showSearch
                                 defaultValue={1}
                                 placeholder="Select a person"
@@ -233,7 +236,7 @@ const AdminTicketStatistics = () => {
                             />
                         </Col>
                         <Col span={12}>
-                            <RangePicker value={selectedDate} onChange={handleDateChange} />
+                            <RangePicker value={dates} onChange={handleDateChange} />
                         </Col>
                     </Row>
                 </Col>
@@ -246,15 +249,14 @@ const AdminTicketStatistics = () => {
                                     record.cinemaChain ? record.cinemaChain.name : record.cinemaComplex.name,
                             },
                             {
-                                title: 'Số lượng vé bán',
-                                render: (_, record) => (record.bookings ? record.bookings.length : 0),
-                            },
-                            {
-                                title: 'Phim có số vé cao nhất',
+                                title: 'Total Price',
                                 render: (_, record) =>
-                                    record.cinemaChain
-                                        ? getBestMovieCinemaChain(record.cinemaChain.id)
-                                        : getBestMovieCinemaComplex(record.cinemaComplex.id),
+                                    record.totalPrice
+                                        ? new Intl.NumberFormat('vi-VN', {
+                                              style: 'currency',
+                                              currency: 'VND',
+                                          }).format(record.totalPrice)
+                                        : 'N/A',
                             },
                             {
                                 title: 'Thao tác',
@@ -292,29 +294,28 @@ const AdminTicketStatistics = () => {
                 onCancel={handleCancel}
                 width={1000}
                 footer={null}
+                destroyOnClose={true}
             >
                 {dataModal && (
                     <BaseTable
                         columns={[
                             {
                                 title: 'Phim',
-                                render: (_, record) => record.showtime.formatMovie.movie.title,
+                                render: (_, record) => record.booking?.showtime?.formatMovie?.movie?.title || 'N/A',
                             },
                             {
-                                title: 'Người mua',
-                                render: (_, record) => record.account.fullname,
-                            },
-                            {
-                                title: 'Thuộc suất chiếu',
+                                title: 'Total Price',
                                 render: (_, record) =>
-                                    new Date(record.showtime.startTime).toLocaleDateString() +
-                                    ' - ' +
-                                    new Date(record.showtime.endTime).toLocaleDateString(),
+                                    record.amount
+                                        ? new Intl.NumberFormat('vi-VN', {
+                                              style: 'currency',
+                                              currency: 'VND',
+                                          }).format(record.amount)
+                                        : 'N/A',
                             },
                         ]}
                         dataSource={dataModal.map((post) => ({
-                            ...post,
-                            key: post.id,
+                            ...(post ? { ...post, key: post.transactionId || null } : {}),
                         }))}
                     />
                 )}
@@ -323,4 +324,4 @@ const AdminTicketStatistics = () => {
     );
 };
 
-export default AdminTicketStatistics;
+export default AdminTicketStatisticsPrice;

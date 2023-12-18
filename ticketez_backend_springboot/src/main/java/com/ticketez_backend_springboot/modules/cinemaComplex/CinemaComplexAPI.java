@@ -37,6 +37,8 @@ import com.ticketez_backend_springboot.modules.cinemaChain.CinemaChain;
 import com.ticketez_backend_springboot.modules.formatMovie.FormatMovie;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 import com.ticketez_backend_springboot.modules.movie.MovieDAO;
+import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfo;
+import com.ticketez_backend_springboot.modules.paymentInfo.PaymentInfoDAO;
 import com.ticketez_backend_springboot.modules.showtime.Showtime;
 import com.ticketez_backend_springboot.modules.showtime.ShowtimeDAO;
 
@@ -48,6 +50,9 @@ public class CinemaComplexAPI {
     CinemaComplexDao cinemaComplexDao;
     @Autowired
     ProvinceDao provinceDao;
+
+    @Autowired
+    private PaymentInfoDAO dao;
 
     @Autowired
     MovieDAO movieDAO;
@@ -252,17 +257,30 @@ public class CinemaComplexAPI {
         List<CinemaComplex> cinemaComplexs = cinemaComplexDao.findAll();
         List<CinemaComplexBookingDTO> rspList = new ArrayList<>();
         for (CinemaComplex cinemaComplex : cinemaComplexs) {
+            List<PaymentInfo> paymentss = new ArrayList<>();
             CinemaComplexBookingDTO bookingDTO = new CinemaComplexBookingDTO();
 
             List<Booking> bookings = bookingDao.findBookingsByCinemaChainId(cinemaComplex.getId());
+            for (Booking booking : bookings) {
+                PaymentInfo payment = dao.findByBookingId(booking.getId());
+                if (payment != null) {
+                    paymentss.add(payment);
+                }
+            }
+            float totalPrice = (float) paymentss.stream()
+                    .filter(payment -> payment != null && payment.getAmount() != null)
+                    .mapToDouble(PaymentInfo::getAmount)
+                    .sum();
+
             bookingDTO.setCinemaComplex(cinemaComplex);
             bookingDTO.setBookings(bookings);
+            bookingDTO.setPayments(paymentss);
+            bookingDTO.setTotalPrice(totalPrice);
 
             rspList.add(bookingDTO);
         }
 
         return ResponseEntity.ok(rspList);
-
     }
 
 }

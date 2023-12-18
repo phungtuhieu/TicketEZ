@@ -24,6 +24,11 @@ function BookingHistory() {
             label: 'Vé đã sử dụng',
             children: activityKey === '2' && <MovieTickets tab={ticketStatus.USED} />,
         },
+        {
+            key: '3',
+            label: 'Vé hết hạn',
+            children: activityKey === '3' && <MovieTickets tab={ticketStatus.EXPIRES} />,
+        },
     ];
     const onChange = (key) => {
         setActivityKey(key);

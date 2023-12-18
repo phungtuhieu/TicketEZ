@@ -13,6 +13,8 @@ import uploadApi from '~/api/service/uploadApi';
 import authApi from '~/api/user/Security/authApi';
 import priceSeatApi from '~/api/admin/managementSeat/priceApi';
 import priceServiceApi from '~/api/admin/ManageCombosAndEvents/priceServiceApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(style);
 function SeatChart(props) {
@@ -308,8 +310,17 @@ function SeatChart(props) {
 
         return finalRS;
     };
-    const onClickData = async (seat) => {
+    const onClickData = async (seat, rowIndex) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
+
+        var firstArray = seatState.seat[rowIndex].slice(0, 1);
+        var stringFirstArray = firstArray[0];
+        var lastArray = seatState.seat[rowIndex].slice(-1);
+        var stringLastArray = lastArray[0];
+        var nextToFirstElement = seatState.seat[rowIndex][1];
+        var stringNextToFirstElement = nextToFirstElement[0];
+        var nextToLastElement = seatState.seat[rowIndex][seatState.seat[rowIndex].length - 2];
+        var stringNextToLastElement = nextToLastElement[0];
 
         // }
         const objectsWithData = Object.keys(seatState).reduce((result, key) => {
@@ -330,7 +341,7 @@ function SeatChart(props) {
             seatType.forEach((value) => {
                 if (value.nickName === name) {
                     const priceResult = findPriceBySeatType(data, seat, value.id);
-                    console.log(priceResult);
+
                     if (priceResult !== null) {
                         Object.assign(rs, {
                             seatType: value,
@@ -341,7 +352,6 @@ function SeatChart(props) {
                 }
             });
         });
-        console.log(rs);
         const seatPrices = getSeatPrice(rs);
         if (seatReserved.indexOf(seat) > -1) {
             setPriceSeats(priceSeats - seatPrices);
@@ -352,6 +362,22 @@ function SeatChart(props) {
             });
             removeDataFromDuplicateSeatByName(seat);
         } else {
+            if (seatState.seatReserved.length > 7) {
+                funcUtils.notify('Chỉ được chọn tối đa 8 ghế', 'warning');
+                return;
+            }
+            if (seatState.seatReserved.indexOf(stringFirstArray) === -1) {
+                if (seat === nextToFirstElement) {
+                    funcUtils.notify('Không được bỏ trống ghế ngoài cùng bên trái', 'warning');
+                    return;
+                }
+            }
+            if (seatState.seatReserved.indexOf(stringLastArray) === -1) {
+                if (seat === nextToLastElement) {
+                    funcUtils.notify('Không được bỏ trống ghế ngoài cùng bên phải', 'warning');
+                    return;
+                }
+            }
             Object.keys(seatState).forEach((key) => {
                 seatType.forEach((seatType) => {
                     if (seatType.nickName === key) {
@@ -441,11 +467,18 @@ function SeatChart(props) {
             console.error('Lỗi khi lấy dữ liệu từ server', error);
         }
     };
-
+    // Xóa ghế chọn
     const deleteSeatChoose = async () => {
-        const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
+        try {
+            const resp = await axiosClient.post(`seat-choose/deleteMultiple`, seatChoose);
+        } catch (error) {
+            console.log('error: ', error);
+        }
     };
 
+    // useEffect(() => {
+    //     deleteSeatChoose();
+    // },[]);
     useEffect(() => {
         fetchDataSeat();
     }, [reload]);
@@ -529,13 +562,10 @@ function SeatChart(props) {
                             </Col>
                             <Col span={7}></Col>
                         </Row>
-                        <Row>
-                            {' '}
-                            <Col span={11}></Col>
-                            <Col span={2}>
+                        <Row className="tw-text-center">
+                            <Col span={24}>
                                 <h6 className={cx('screen-title')}>Màn hình</h6>
                             </Col>
-                            <Col span={11}></Col>
                         </Row>
                     </Col>
                     <Col span={24}>
@@ -587,7 +617,7 @@ function SeatChart(props) {
                                                             className={`protected-element`}
                                                             style={style}
                                                             key={seat_no}
-                                                            onClick={() => onClickData(seat_no)}
+                                                            onClick={() => onClickData(seat_no, rowIndex)}
                                                         >
                                                             {seat_no}
                                                         </td>
@@ -609,31 +639,121 @@ function SeatChart(props) {
                         )}
                     </Col>
                 </Row>
+            </Card>
 
-                <Row gutter={50} className="tw-bg-white">
-                    <Col span={24}>
-                        <div className="tw-mt-6">
-                            <b className="tw-text-3xl tw-line-clamp-1 tw-md:line-clamp-none">
-                                {showtime.formatMovie.movie.title}
-                            </b>
-                        </div>
-                        <div className="tw-mb-4">
-                            <span className="tw-block tw-text-tiny tw-text-orange-500 tw-lg:text-sm">
-                                {formattedStartTime} ~ {formattedEndTime} {isToday ? 'Hôm nay' : null}, {dayOfMonth}/
-                                {month} · {showtime.formatMovie.movie.title} · {showtime.formatMovie.format.name}
-                            </span>
-                        </div>
-                        <hr />
-                        <div className="tw-opacity-90"></div>
-                    </Col>
-                    <Col span={24}>
-                        <div className="tw-mt-3 tw-mb-3">
-                            <div className="tw-flex tw-items-center tw-justify-between tw-space-x-3 tw-py-1.5">
-                                <span className="tw-shrink-0 tw-text-gray-500">Chỗ ngồi</span>
-                                {seatState && seatState.seatReserved && (
+            <Row className="tw-bg-white">
+                <Col span={24}>
+                    <div className="tw-pt-5 ">
+                        <Space size={[0, 200]} wrap>
+                            <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '600px' }}>
+                                {seatTypeBySeatChart &&
+                                    seatTypeBySeatChart.map((value) => {
+                                        if (value.id === 7) {
+                                            return null;
+                                        }
+                                        return (
+                                            <Tag className={cx('')} key={value.id} color={value.color}>
+                                                {value.name}
+                                            </Tag>
+                                        );
+                                    })}
+                                {seatType &&
+                                    seatType.map((value) => {
+                                        if (value.id === 7) {
+                                            return null;
+                                        }
+                                        if (value.id === 9 || value.id === 8) {
+                                            return (
+                                                <Tag className={cx('')} key={value.id} color={value.color}>
+                                                    {value.name}
+                                                </Tag>
+                                            );
+                                        }
+                                    })}
+                            </div>
+                        </Space>
+                    </div>
+                </Col>
+                <Col span={24}>
+                    <div onClick={showModalSeatType} class="tw-pt-5  hover:tw-cursor-pointer hover:tw-opacity-60">
+                        <span class="tw-border-b-2 tw-mr-4 tw-underline">Xem chi tiết</span>
+                        <span>hình ảnh và thông tin ghế</span>
+                    </div>
+                    <Modal
+                        title="Chi tiết loại ghế"
+                        open={isModalOpenSeatType}
+                        onOk={handleOkSeatType}
+                        onCancel={handleCancelSeatType}
+                        footer={false}
+                    >
+                        {seatTypeBySeatChart &&
+                            seatTypeBySeatChart.map((value) => {
+                                if (value.id === 7) {
+                                    return null;
+                                }
+                                if (value.id === 8) {
+                                    return null;
+                                }
+                                if (value.id === 8) {
+                                    return null;
+                                }
+                                return (
+                                    <div className={cx('tagg')} key={value.id}>
+                                        <div class="tw-overflow-x-hidden tw-rounded-lg tw-shadow-xl">
+                                            <div className="tw-relative tw-aspect-2">
+                                                <img
+                                                    src={uploadApi.get(value.image)}
+                                                    alt="image"
+                                                    style={{ height: '200px', objectFit: 'cover' }}
+                                                />
+                                            </div>
+                                            <ul className="tw-px-4 tw-py-3">
+                                                <li>
+                                                    <b>{value.name}</b>
+                                                </li>
+                                                <li>
+                                                    <ul>
+                                                        <li>{value.description}&nbsp;</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                    </Modal>
+                </Col>
+                <Col span={24}>
+                    <div className="tw-mt-6">
+                        <b className="tw-text-3xl tw-line-clamp-1 tw-md:line-clamp-none">
+                            {showtime.formatMovie.movie.title}
+                        </b>
+                    </div>
+                    <div className="tw-mb-4">
+                        <span className="tw-block tw-text-tiny tw-text-orange-500 tw-lg:text-sm">
+                            {formattedStartTime} ~ {formattedEndTime} {isToday ? 'Hôm nay' : null}, {dayOfMonth}/{month}{' '}
+                            · {showtime.formatMovie.movie.title} · {showtime.formatMovie.format.name}
+                        </span>
+                    </div>
+                    {/* <hr /> */}
+                    <div className="tw-opacity-90"></div>
+                </Col>
+
+                <Col span={24} style={{ borderTop: '1px solid gainsboro', borderBottom: '1px solid gainsboro' }}>
+                    <div className="tw-mt-3 tw-mb-3">
+                        <div
+                            style={{ height: 37 }}
+                            className="tw-flex tw-items-center tw-justify-between tw-space-x-3 tw-py-1.5"
+                        >
+                            <span className="tw-shrink-0 tw-text-gray-500">Chỗ ngồi</span>
+                            {seatState &&
+                                seatState.seatReserved &&
+                                // {seatState.seatReserved.length > 0 && (
+
+                                seatState.seatReserved?.length > 0 && (
                                     <div
                                         style={{ border: '1px solid' }}
-                                        className="tw-flex tw-flex-wrap tw-flex tw-items-center tw-space-x-2 tw-rounded-lg tw-border tw-border-gray-200 tw-px-3 tw-py-1"
+                                        className=" tw-flex-wrap tw-flex tw-items-center tw-space-x-2 tw-rounded-lg tw-border tw-border-gray-200 tw-px-3 tw-py-1"
                                     >
                                         {seatState.seatReserved.map((isReserved, index, array) => (
                                             <React.Fragment key={index}>
@@ -663,135 +783,66 @@ function SeatChart(props) {
                                         )}
                                     </div>
                                 )}
-                            </div>
                         </div>
-                        <hr />
-                    </Col>
-                    <Col span={24}>
-                        <div className="tw-flex-1 tw-mt-3">
-                            <span className="tw-block tw-text-gray-500 tw-text-2xl tw-mb-2 ">Tạm tính</span>
-                            <b className="tw-text-2xl tw-mt-5">{priceSeats}đ</b>
-                        </div>
-                    </Col>
-                    <Col span={120}>
-                        <div className="tw-mt-12 tw-mb-6">
-                            <Space size={[0, 200]} wrap>
-                                <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '600px' }}>
-                                    {seatTypeBySeatChart &&
-                                        seatTypeBySeatChart.map((value) => {
-                                            if (value.id === 7) {
-                                                return null;
-                                            }
-                                            return (
-                                                <Tag className={cx('')} key={value.id} color={value.color}>
-                                                    {value.name}
-                                                </Tag>
-                                            );
-                                        })}
-                                    {seatType &&
-                                        seatType.map((value) => {
-                                            if (value.id === 7) {
-                                                return null;
-                                            }
-                                            if (value.id === 9 || value.id === 8) {
-                                                return (
-                                                    <Tag className={cx('')} key={value.id} color={value.color}>
-                                                        {value.name}
-                                                    </Tag>
-                                                );
-                                            }
-                                        })}
-                                </div>
-                            </Space>
-                        </div>
-                    </Col>
-                    <Col span={24}>
-                        <div
-                            onClick={showModalSeatType}
-                            class="tw-flex tw-items-center tw-border-b tw-border-gray-500 transition duration-300 ease-in-out transform hover:tw-font-semibold hover:tw-cursor-pointer"
-                        >
-                            <div class="tw-ml-4 tw-flex ">
-                                <p class="tw-border-b-2 tw-mr-4 tw-underline">xem chi tiết</p>
-                                <p>hình ảnh và thông tin ghế</p>
-                            </div>
-                        </div>
-                        <Modal
-                            title="Chi tiết loại ghế"
-                            open={isModalOpenSeatType}
-                            onOk={handleOkSeatType}
-                            onCancel={handleCancelSeatType}
-                            footer={false}
-                        >
-                            {seatTypeBySeatChart &&
-                                seatTypeBySeatChart.map((value) => {
-                                    if (value.id === 7) {
-                                        return null;
-                                    }
-                                    if (value.id === 8) {
-                                        return null;
-                                    }
-                                    if (value.id === 8) {
-                                        return null;
-                                    }
-                                    return (
-                                        <div className={cx('tagg')} key={value.id}>
-                                            <div class="tw-overflow-x-hidden tw-rounded-lg tw-shadow-xl">
-                                                <div className="tw-relative tw-aspect-2">
-                                                    <img
-                                                        src={uploadApi.get(value.image)}
-                                                        alt="image"
-                                                        style={{ height: '200px', objectFit: 'cover' }}
-                                                    />
-                                                </div>
-                                                <ul className="tw-px-4 tw-py-3">
-                                                    <li>
-                                                        <b>{value.name}</b>
-                                                    </li>
-                                                    <li>
-                                                        <ul>
-                                                            <li>{value.description}&nbsp;</li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                        </Modal>
-                    </Col>
+                    </div>
+                </Col>
 
-                    <Col span={24}>
-                        <hr></hr>
-                        <Row>
-                            <Col span={15}></Col>
-                            <Col span={9}>
-                                <div
-                                    style={{ display: 'flex', justifyContent: 'flex-end' }}
-                                    className="tw-mt-6 tw-mb-6"
-                                >
-                                    <Button
-                                        style={{
-                                            width: '150px',
-                                            height: '70px',
-                                            backgroundColor: hasData ? '#176b87' : 'gray',
-                                            fontWeight: 'bolder',
-                                        }}
-                                        className={`btn ${
-                                            hasData === false ? 'bg-gray-500' : ''
-                                        } tw-text-white tw-hover:bg-gray-600 tw-focus:outline-none`}
-                                        type="primary"
-                                        onClick={handleButtonClick}
-                                        icon={<ShoppingOutlined style={{ fontSize: '32px' }} />}
-                                        disabled={hasData === false}
-                                    >
-                                        Mua vé
-                                    </Button>
-                                </div>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </Card>
+                <Col
+                    span={12}
+                    style={{ display: 'flex', justifyContent: 'start', alignItems: 'center', padding: '5px 0px' }}
+                >
+                    <ul className="" style={{ height: '100%' }}>
+                        <li>
+                            <span className="tw-block tw-text-gray-500 tw-text-2xl "> Tạm tính</span>
+                        </li>
+                        <li>
+                            <b className="tw-text-2xl">
+                                {new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                }).format(priceSeats)}
+                            </b>
+                        </li>
+                    </ul>
+                </Col>
+                <Col span={12}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            height: '100%',
+                            padding: '5px 0px',
+                        }}
+                    >
+                        <Button
+                            style={{
+                                width: '150px',
+                                height: '44px',
+                                backgroundColor: hasData ? '#176b87' : 'gray',
+                                fontWeight: 'bolder',
+                            }}
+                            className={`btn ${
+                                hasData === false ? 'bg-gray-500' : ''
+                            } tw-text-white tw-hover:bg-gray-600 tw-focus:outline-none`}
+                            type="primary"
+                            onClick={handleButtonClick}
+                            // icon={<ShoppingOutlined style={{ fontSize: '20px' }} />}
+                            disabled={hasData === false}
+                        >
+                            <FontAwesomeIcon icon={faCartShopping} className="tw-mr-2" />
+                            Mua vé
+                        </Button>
+                    </div>
+                </Col>
+
+                {/* <Col span={24}>
+                    <Row>
+                        <Col span={15}></Col>
+                        <Col span={9}></Col>
+                    </Row>
+                </Col> */}
+            </Row>
             {account != null && isService && (
                 <BookingCombo
                     priceServices={priceService}

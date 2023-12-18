@@ -84,7 +84,7 @@ const ModalPrice = (props) => {
             seatTypeByCinemaComplexData.every((seatType) => seatType.id !== seatTypeOnModal)
         ) {
             console.log(seatTypeByCinemaComplexData);
-          setShowInfo('errorNoLikeSeatType')
+            setShowInfo('errorNoLikeSeatType');
             showModal(true);
             return;
         }
@@ -92,7 +92,7 @@ const ModalPrice = (props) => {
         // Bắt lỗi ghế đã có rồi mà chọn thêm nữa some là ít nhất
         const seatTypes = newPriceSeatTypeDTOs ? newPriceSeatTypeDTOs.map((item) => item.seatType) : null;
         if (seatTypes && seatTypes.some((seatType) => seatTypeOnModal === seatType.id)) {
-            setShowInfo('errorSeatTypeAlreadyExists')
+            setShowInfo('errorSeatTypeAlreadyExists');
             showModal(true);
             return;
         }
@@ -519,7 +519,8 @@ const ModalPrice = (props) => {
                     <Col span={24}>
                         <p className="tw-font-medium tw-mb-3">Chọn chuỗi rạp :</p>
                         <Select
-                            className="tw-width-100"
+                        
+                            className="tw-w-96"
                             showSearch
                             defaultValue={record ? record.price.cinemaComplex.cinemaChain.id : null}
                             placeholder="Chọn chuỗi rạp"
@@ -536,7 +537,7 @@ const ModalPrice = (props) => {
                     <Col span={24}>
                         <p className="tw-font-medium tw-mb-2">Chọn cụm rạp :</p>
                         <Select
-                            className="tw-width-100"
+                           className="tw-w-96"
                             showSearch
                             placeholder="Chọn cụm rạp"
                             optionFilterProp="children"
@@ -554,7 +555,7 @@ const ModalPrice = (props) => {
                         <p className="tw-font-medium tw-mb-3">Phân loại phim :</p>
                         <Select
                             defaultValue={record ? record.price.formatMovie.format.id : null}
-                            className="tw-width-100"
+                            className="tw-w-96"
                             showSearch
                             placeholder="Chọn phân loại phim"
                             optionFilterProp="children"
@@ -570,7 +571,7 @@ const ModalPrice = (props) => {
                     <Col span={24}>
                         <p className="tw-font-medium tw-mb-2">Chọn loại phim :</p>
                         <Select
-                            className="tw-width-100"
+                         className="tw-w-96"
                             showSearch
                             placeholder="Chọn loại phim"
                             optionFilterProp="children"
@@ -671,13 +672,19 @@ const ModalPrice = (props) => {
                                                                 paddingRight: '8px',
                                                             }}
                                                         >
-                                                            {moment.weekdayPrice}
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(moment.weekdayPrice)}
                                                         </td>
                                                         <td
                                                             className="tw-pl-20 tw-py-2 tw-px-4"
                                                             style={{ paddingRight: '8px' }}
                                                         >
-                                                            {moment.weekendPrice}
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(moment.weekendPrice)}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -725,7 +732,14 @@ const ModalPrice = (props) => {
                                                                 onChange={(value) =>
                                                                     onchangeDay(moment.seatType.id, value)
                                                                 }
-                                                                value={moment.weekdayPrice}
+                                                                value={moment.weekdayPrice} // Assuming moment.weekendPrice is a numeric value
+                                                                formatter={(value) =>
+                                                                    new Intl.NumberFormat('vi-VN', {
+                                                                        style: 'currency',
+                                                                        currency: 'VND',
+                                                                    }).format(value)
+                                                                }
+                                                                parser={(value) => Number(value.replace(/[^\d.]/g, ''))} // Optional: Parse the formatted value back to a number
                                                             />
                                                         </td>
                                                         <td
@@ -739,6 +753,13 @@ const ModalPrice = (props) => {
                                                                     onchangeWeek(moment.seatType.id, value)
                                                                 }
                                                                 value={moment.weekendPrice}
+                                                                formatter={(value) =>
+                                                                    new Intl.NumberFormat('vi-VN', {
+                                                                        style: 'currency',
+                                                                        currency: 'VND',
+                                                                    }).format(value)
+                                                                }
+                                                                parser={(value) => Number(value.replace(/[^\d.]/g, ''))}
                                                             />
                                                         </td>
                                                     </tr>

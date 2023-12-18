@@ -60,11 +60,17 @@ function Webcam({ paymentInfoDTO }) {
                         });
                         funcUtils.notify('Thông tin chính xác', 'success');
                         setPrint(true);
-                    } else {
+                    } else if (res.data.booking.ticketStatus === ticketStatus.USED) {
                         setDataDTO({
                             ...res.data,
                         });
                         funcUtils.notify('Vé đã được xác nhận trước đó', 'warning');
+                        setPrint(false);
+                    } else {
+                        setDataDTO({
+                            ...res.data,
+                        });
+                        funcUtils.notify('Vé đã được hết hạn', 'warning');
                         setPrint(false);
                     }
                     // if (dataDTO.booking.ticketStatus === 1) {

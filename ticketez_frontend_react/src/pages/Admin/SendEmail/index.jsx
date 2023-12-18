@@ -66,8 +66,8 @@ const MovieShowing = () => {
             const getSendEmail = async () => {
                 try {
                     const res = await accountApi.getSendEmail(valueMovieId);
-                    console.log(res, 'error');
-                    funcUtils.notify('Gữi Email cho người dùng thành công', 'success');
+                    console.log(res, 'user');
+                    funcUtils.notify(`Gửi Email cho ${res.data.length} người dùng thành công`, 'success');
                     setLoadingStates(res);
                 } catch (error) {
                     funcUtils.notify(error.response.data, 'error');
