@@ -93,7 +93,6 @@ function SeatChart(props) {
             const row = seat.charCodeAt(0) - 'A'.charCodeAt(0);
             const column = seatState.seat[row].indexOf(seat);
 
-            // console.log(`Ghế đã chọn: Hàng ${row}, Cột ${column}`);
 
             if (seatState.seat[row] && seatState.seat[row][column]) {
                 let currentSeatName = seat;
@@ -116,10 +115,7 @@ function SeatChart(props) {
                     }
                     currentSeatName = temp;
                 }
-                console.log(seatState.seat);
             }
-            console.log(seatState.way);
-            console.log(seatState.normalSeat);
         }
     };
 
@@ -141,8 +137,7 @@ function SeatChart(props) {
         );
         const flattenedArray = [].concat(...dataArray);
 
-        console.log(dataArray);
-        console.log(flattenedArray);
+   
 
         await new Promise((resolve) => {
             resolve();
@@ -150,7 +145,7 @@ function SeatChart(props) {
         try {
             const resp = await axiosClient.post(`seat`, flattenedArray);
         } catch (error) {
-            console.log(error);
+           
         }
         setIsTableLoaded(true);
         // handelUpdate(flattenedArray);
@@ -171,11 +166,10 @@ function SeatChart(props) {
         let data = dataSeat;
 
         const respVip = await axiosClient.put(`seat/update`, data);
-        console.log(respVip);
+  
     };
 
     const onChange = (e) => {
-        console.log('radio checked', e.target.value);
         setSelectedSeatType(e.target.value);
     };
     return (

@@ -310,8 +310,17 @@ function SeatChart(props) {
 
         return finalRS;
     };
-    const onClickData = async (seat) => {
+    const onClickData = async (seat, rowIndex) => {
         const { seatReserved, seatAvailable, vipSeat, normalSeat, seatUnavailable } = seatState;
+
+        var firstArray = seatState.seat[rowIndex].slice(0, 1);
+        var stringFirstArray = firstArray[0];
+        var lastArray = seatState.seat[rowIndex].slice(-1);
+        var stringLastArray = lastArray[0];
+        var nextToFirstElement = seatState.seat[rowIndex][1];
+        var stringNextToFirstElement = nextToFirstElement[0];
+        var nextToLastElement = seatState.seat[rowIndex][seatState.seat[rowIndex].length - 2];
+        var stringNextToLastElement = nextToLastElement[0];
 
         // }
         const objectsWithData = Object.keys(seatState).reduce((result, key) => {
@@ -332,7 +341,7 @@ function SeatChart(props) {
             seatType.forEach((value) => {
                 if (value.nickName === name) {
                     const priceResult = findPriceBySeatType(data, seat, value.id);
-                    console.log(priceResult);
+
                     if (priceResult !== null) {
                         Object.assign(rs, {
                             seatType: value,
@@ -343,7 +352,6 @@ function SeatChart(props) {
                 }
             });
         });
-        console.log(rs);
         const seatPrices = getSeatPrice(rs);
         if (seatReserved.indexOf(seat) > -1) {
             setPriceSeats(priceSeats - seatPrices);
@@ -354,6 +362,22 @@ function SeatChart(props) {
             });
             removeDataFromDuplicateSeatByName(seat);
         } else {
+            if (seatState.seatReserved.length > 7) {
+                funcUtils.notify('Chỉ được chọn tối đa 8 ghế', 'warning');
+                return;
+            }
+            if (seatState.seatReserved.indexOf(stringFirstArray) === -1) {
+                if (seat === nextToFirstElement) {
+                    funcUtils.notify('Không được bỏ trống ghế ngoài cùng bên trái', 'warning');
+                    return;
+                }
+            }
+            if (seatState.seatReserved.indexOf(stringLastArray) === -1) {
+                if (seat === nextToLastElement) {
+                    funcUtils.notify('Không được bỏ trống ghế ngoài cùng bên phải', 'warning');
+                    return;
+                }
+            }
             Object.keys(seatState).forEach((key) => {
                 seatType.forEach((seatType) => {
                     if (seatType.nickName === key) {
@@ -586,7 +610,7 @@ function SeatChart(props) {
                                                             className={`protected-element`}
                                                             style={style}
                                                             key={seat_no}
-                                                            onClick={() => onClickData(seat_no)}
+                                                            onClick={() => onClickData(seat_no, rowIndex)}
                                                         >
                                                             {seat_no}
                                                         </td>
