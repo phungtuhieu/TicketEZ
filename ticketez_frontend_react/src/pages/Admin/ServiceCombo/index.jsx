@@ -440,6 +440,7 @@ const AdminService = () => {
                             {...formItemLayout}
                             name="quantity"
                             label="Số lượng"
+                            
                             rules={[{ required: true, message: 'Vui lòng nhập số lượng' }]}
                         >
                             <Input placeholder="Số lượng" />
