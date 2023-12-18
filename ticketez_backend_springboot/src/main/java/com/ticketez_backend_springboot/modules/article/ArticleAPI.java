@@ -186,8 +186,28 @@ public class ArticleAPI {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable("id") Long id) {
         try {
-            dao.deleteById(id);
-            return ResponseEntity.ok().body("Xoá danh sách phim thành công");
+            // Lấy thông tin của bài viết cần xóa
+            Optional<Article> articleOptional = dao.findById(id);
+
+            if (articleOptional.isPresent()) {
+                Article article = articleOptional.get();
+
+                // Xóa tất cả các bản ghi trong bảng ArticleMovies liên quan đến bài viết này
+                List<ArticleMovie> articleMovies = article.getArticleMovies();
+                if (articleMovies != null && !articleMovies.isEmpty()) {
+                    for (ArticleMovie articleMovie : articleMovies) {
+                        // Thực hiện xóa từ bảng ArticleMovies
+                        articleMovieDAO.delete(articleMovie);
+                    }
+                }
+
+                // Xóa bài viết từ bảng Articles
+                dao.deleteById(id);
+
+                return ResponseEntity.ok().body("Xoá danh sách phim thành công");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy bài viết");
+            }
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Không thể xóa sự kiện do tài liệu tham khảo hiện có");
