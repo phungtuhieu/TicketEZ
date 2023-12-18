@@ -621,6 +621,7 @@ function SeatChart(props) {
                                 )}
                             </table>
                         )}
+                        {/* ghế  */}
                         {!isTableLoaded && (
                             <div
                                 className="tw-text-white tw-text-2xl"
