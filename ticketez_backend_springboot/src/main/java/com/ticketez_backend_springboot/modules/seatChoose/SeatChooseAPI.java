@@ -2,10 +2,13 @@ package com.ticketez_backend_springboot.modules.seatChoose;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.modules.account.Account;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChoose;
+import com.ticketez_backend_springboot.modules.serviceChoose.ServiceChooseDAO;
+
 @CrossOrigin("*")
 @RestController
 @Configuration
@@ -25,6 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class SeatChooseAPI {
     @Autowired
     SeatChooseDao dao;
+
+    @Autowired
+    ServiceChooseDAO serviceChooseDAO;
 
     @GetMapping
     public ResponseEntity<List<SeatChoose>> findAll() {
@@ -46,13 +56,28 @@ public class SeatChooseAPI {
 
     @PostMapping("/deleteMultiple")
     public ResponseEntity<Void> deleteMultiple(@RequestBody List<SeatChoose> seatChooseList) {
-        // for (SeatChoose seatChoose : seatChooseList) {
-        // if (!dao.existsById(seatChoose.getId())) {
-        // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        // }
-        // }
         dao.deleteAllByIdIn(seatChooseList);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/deleteSeatChoose-ServiceChooseByAcc")
+    public ResponseEntity<?> deleteMultiple(@RequestBody Account account) {
+        List<SeatChoose> seatChoose = dao.findByAccount(account);
+        List<ServiceChoose> serviceChooses = serviceChooseDAO.findByAccountId(account.getId());
+
+        try {
+            if (seatChoose != null) {
+                dao.deleteAllById(seatChoose.stream().map(sc -> sc.getId()).collect(Collectors.toList()));
+
+            }
+            if (serviceChooses != null) {
+                serviceChooseDAO
+                        .deleteAllById(serviceChooses.stream().map(svc -> svc.getId()).collect(Collectors.toList()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.noContent().build();
     }
 

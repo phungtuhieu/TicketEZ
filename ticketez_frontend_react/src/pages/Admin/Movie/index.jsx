@@ -772,6 +772,7 @@ function AdminMovie() {
         clearFilters();
         setSearchText('');
     };
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div
@@ -980,6 +981,23 @@ function AdminMovie() {
                 message: 'Vui lòng chọn thời gian!',
             },
         ],
+    };
+    const validateReleaseDate = (rule, value) => {
+        return new Promise((resolve, reject) => {
+            if (value) {
+                const today = new Date();
+                const releaseDate = new Date(value);
+
+                // Kiểm tra xem ngày phát hành có lớn hơn ngày hiện tại hay không
+                if (releaseDate <= today) {
+                    reject('Ngày phát hành phải sau ngày hiện tại');
+                } else {
+                    resolve();
+                }
+            } else {
+                resolve(); // Nếu ngày phát hành không được chỉ định, coi như là hợp lệ
+            }
+        });
     };
 
     const expandedRowRender = (record) => {
@@ -1293,7 +1311,12 @@ function AdminMovie() {
                         <Input readOnly defaultValue={0.0} />
                     </Form.Item>
 
-                    <Form.Item name="releaseDate" label="Ngày phát hành" {...config}>
+                    <Form.Item
+                        name="releaseDate"
+                        label="Ngày phát hành"
+                        {...config}
+                        rules={[{ validator: validateReleaseDate }]}
+                    >
                         <DatePicker placeholder="Chọn ngày phát hành" format={formatDate} />
                     </Form.Item>
                     <Form.Item

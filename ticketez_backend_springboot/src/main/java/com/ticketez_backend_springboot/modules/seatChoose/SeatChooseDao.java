@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ticketez_backend_springboot.modules.account.Account;
+
 import jakarta.transaction.Transactional;
 
 @Repository
@@ -21,6 +23,8 @@ public interface SeatChooseDao extends JpaRepository<SeatChoose, Long> {
     @Modifying
     @Query("DELETE FROM SeatChoose s WHERE s IN :seatChooseList")
     void deleteAllByIdIn(@Param("seatChooseList") List<SeatChoose> seatChooseList);
+
+    List<SeatChoose> findByAccount(Account account);
 
     List<SeatChoose> findByShowtimeIdAndAccountId(Long showtimeId, String accountId);
 }

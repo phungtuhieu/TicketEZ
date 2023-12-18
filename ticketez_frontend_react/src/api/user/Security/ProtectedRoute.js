@@ -6,7 +6,7 @@ import { getRolesFromLocalStorage } from '~/utils/authUtils';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const isAuthenticated = !!localStorage.getItem('token');
-  console.log(isAuthenticated);
+  // console.log(isAuthenticated);
   const userRoles = getRolesFromLocalStorage();
 
   const hasRequiredRole = userRoles.includes('SUPER_ADMIN') ||

@@ -56,7 +56,10 @@ function TicketDetails({ paymentInfoDTO }) {
             cinemaName: showtime.cinema.name,
             seatNumber: seatBookings.length.toString().padStart(2, '0'),
             seatNames: seatBookings.map((sb) => sb.seat.name).join(', '),
-            servicesBooking: servicesBooking.map((svb) => `${svb.quantity} X ${svb.service.name}`),
+            servicesBooking:
+                servicesBooking.length > 0
+                    ? servicesBooking.map((svb) => `${svb.quantity} X ${svb.service.name}`)
+                    : 'Không',
             paymentInfo: {
                 ticketId: booking.id,
                 amount: new Intl.NumberFormat('vi-VN', {
@@ -184,9 +187,15 @@ function TicketDetails({ paymentInfoDTO }) {
                                                 <li className={cx('ticket-title')}>Thức ăn kèm</li>
                                                 <li className={cx('ticket-body-text')}>
                                                     <ul>
-                                                        {infoTicket.servicesBooking.map((svb) => (
-                                                            <li className={cx('cinema-name')}>{svb}</li>
-                                                        ))}
+                                                        {Array.isArray(infoTicket.servicesBooking) ? (
+                                                            infoTicket.servicesBooking.map((svb) => (
+                                                                <li className={cx('cinema-name')}> {svb}</li>
+                                                            ))
+                                                        ) : (
+                                                            <li className={cx('cinema-name')}>
+                                                                {infoTicket.servicesBooking}
+                                                            </li>
+                                                        )}
                                                     </ul>
                                                 </li>
                                             </ul>

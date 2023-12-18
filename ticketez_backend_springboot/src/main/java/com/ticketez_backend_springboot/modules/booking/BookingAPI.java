@@ -3,6 +3,8 @@ package com.ticketez_backend_springboot.modules.booking;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -169,6 +171,14 @@ public class BookingAPI {
 			boolean check = false;
 			for (Booking booking : page.getContent()) {
 				BookingHistoryDTO bh = new BookingHistoryDTO();
+				Date currentDate = new Date();
+
+				// Vé chưa xác nhận và qua thời gian suất chiếu sẽ chuyển trạng thái Hết Hạn
+				if (currentDate.compareTo(booking.getShowtime().getEndTime()) > 0
+						&& booking.getTicketStatus() == TicketStatus.UNUSED) {
+					booking.setTicketStatus(TicketStatus.EXPIRED);
+					dao.save(booking);
+				}
 				bh.setBooking(booking);
 				PaymentInfo paymentInfo = pmIDao.findByBookingId(booking.getId());
 				if (paymentInfo != null) {
