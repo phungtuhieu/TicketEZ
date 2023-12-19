@@ -120,15 +120,15 @@ const AdminAccountStaff = () => {
         const getList = async () => {
             setLoading(true);
             try {
-                const [res, resRole] =  await Promise.all([
+                const [res, resRole] = await Promise.all([
                     accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status),
                     roleApi.get(),
                 ]);
-                
-                
-            //     accountRoleApi.getByPage(currentPage, pageSize, valueSearchDelay, status);
-            //    const resRole = await roleApi.get();
-               setRole(resRole.data);
+
+
+                //     accountRoleApi.getByPage(curreposttPage, pageSize, valueSearchDelay, status);
+                //    const resRole = await roleApi.get();
+                setRole(resRole.data);
                 setTotalItems(res.totalItems);
                 setPosts(res.data);
                 setLoading(false);
@@ -237,13 +237,13 @@ const AdminAccountStaff = () => {
                                 open={isModalOpen}
                                 onOk={() => {
                                     if (reason.trim() !== '') {
-                                      handleStatus(record);
-                                      handleCancelReason();
+                                        handleStatus(record);
+                                        handleCancelReason();
                                     } else {
-                                      funcUtils.notify("Nhập hoặc chọn lí do khoá tài khoản","error")
+                                        funcUtils.notify("Nhập hoặc chọn lí do khoá tài khoản", "error")
                                     }
-                                  }}
-                            
+                                }}
+
                                 okText="Đồng ý"
                                 cancelText="Huỷ"
                                 onCancel={handleCancelReason}
@@ -277,31 +277,31 @@ const AdminAccountStaff = () => {
     const expandedRowRender = (record) => {
         return (
             <div className={cx('flex')}>
-            <div className={cx('flex-1 p-4 m-2')}>
-                <ul className={cx('wrapp-more-info')}>
-                    <li>
-                        <span>
-                            <b>Ngày sinh: </b> {record.account.birthday}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Giới tính: </b> {record.account.gender ? 'Nam' : 'Nữ'}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Địa chỉ: </b> {record.account.address}
-                        </span>
-                    </li>
-                    <li>
-                        <span>
-                            <b>Mật khẩu nhân viên: </b> {record.account.password}
-                        </span>
-                    </li>
-                </ul>
+                <div className={cx('flex-1 p-4 m-2')}>
+                    <ul className={cx('wrapp-more-info')}>
+                        <li>
+                            <span>
+                                <b>Ngày sinh: </b> {record.account.birthday}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Giới tính: </b> {record.account.gender ? 'Nam' : 'Nữ'}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Địa chỉ: </b> {record.account.address}
+                            </span>
+                        </li>
+                        <li>
+                            <span>
+                                <b>Mật khẩu nhân viên: </b> {record.account.password}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
         );
     };
     const onChangeUpload = async ({ fileList: newFileList }) => {
@@ -363,8 +363,28 @@ const AdminAccountStaff = () => {
                             image: image,
                         };
                     }
-                    await accountApi.patchInfoUser(values.id, upl);
+                    await accountRoleApi.patchInfoUser(values.id, upl);
                     funcUtils.notify('Cập nhật tài khoản thành công', 'success');
+                }
+                if (!editData) {
+                    try {
+                        const file = values.avatar.fileList[0].originFileObj;
+                        const images = await uploadApi.post(file);
+                        const postData = {
+                            ...values,
+                            image: images,
+                        };
+                        const res = await accountRoleApi.post(postData);
+                        if (res.status === 200) {
+                            funcUtils.notify('Thêm diễn viên thành công', 'success');
+                        }
+                    } catch (error) {
+                        if (error.hasOwnProperty('response')) {
+                            message.error(error.response.data);
+                        } else {
+                            console.log(error);
+                        }
+                    }
                 }
                 setOpen(false);
                 form.resetFields();
@@ -435,7 +455,7 @@ const AdminAccountStaff = () => {
     return (
         <>
             <Row>
-            <Col span={22}>
+                <Col span={22}>
                     <h1 className="tw-mt-[-7px]">Bảng dữ liệu nhân viên</h1>
                 </Col>
                 <Col span={2}>
@@ -484,7 +504,7 @@ const AdminAccountStaff = () => {
                             <Button key="reset" onClick={handleResetForm}>
                                 Làm mới
                             </Button>
-                        ), 
+                        ),
                         // onClick={handleOk}
                         <Button key="submit" type="primary" loading={loading} onClick={() => form.submit()}>
                             {editData ? 'Cập nhật' : 'Thêm mới'}
@@ -493,6 +513,14 @@ const AdminAccountStaff = () => {
                 >
                     <Form form={form} name="dynamic_rule" onFinish={handleOk} style={{ maxWidth: 1000 }}>
                         <Form.Item name="id" style={{ display: 'none' }}></Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="id"
+                            label="Tài khoản"
+                            rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+                        >
+                            <Input placeholder="Nhập tên tài khoản" />
+                        </Form.Item>
                         <Form.Item
                             {...formItemLayout}
                             name="fullname"
@@ -594,22 +622,22 @@ const AdminAccountStaff = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                            name="roles"
+                            name="role"
                             label="Chức vụ"
                             rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
                         >
-                              <Select
+                            <Select
                                 style={{ width: '100%' }}
                                 showSearch
                                 placeholder="Chọn chức vụ nhân viên"
                                 optionFilterProp="children"
                                 // filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                                    options={[
-                                        ...role.map((item) => ({
-                                            value: item.id,
-                                            label: item.name,
-                                        })),
-                                    ]}
+                                options={[
+                                    ...role.map((item) => ({
+                                        value: item.name,
+                                        label: item.name,
+                                    })),
+                                ]}
                                 // onChange={(value) => handleSelectOption(value, 'genre')}
                                 // options={[
                                 //     {

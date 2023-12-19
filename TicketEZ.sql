@@ -76,7 +76,8 @@ GO
         edit_date DATETIME,
         account_id NVARCHAR(20) NOT NULL,
         movie_id BIGINT NOT NULL,
-        [status] INT NOT NULL   --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
+        [status] INT NOT NULL,  --0 là duyệt, 1 là chưa duyệt, 2 là ẩn, 
+        [like_coment] INT NOT NULL -- like bình luận
     )
 GO
     CREATE TABLE Genres (
@@ -1161,6 +1162,7 @@ SELECT * FROM Services_Booking
 
 -- DELETE Services_Booking
 -- DBCC CHECKIDENT ('Services_Booking', RESEED, 0);
+
 
 
 SELECT * FROM Accounts

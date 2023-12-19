@@ -467,9 +467,9 @@ const AdminCinemaChains = () =>  {
                             {...formItemLayout}
                             name="name"
                             label="Tên loại rạp"
-                            rules={[{ required: true, message: 'Vui lòng nhập rạp' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập loại rạp' }]}
                         >
-                            <Input placeholder="Please input your name" />
+                            <Input placeholder="Nhập tên loại rạp" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -513,7 +513,7 @@ const AdminCinemaChains = () =>  {
                             {...formItemLayout}
                             name="description"
                             label="Mô tả chi tiết"
-                            rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn mô tả' }]}
                         >
                            <TextArea
                             showCount
@@ -523,7 +523,7 @@ const AdminCinemaChains = () =>  {
                                 marginBottom: 24,
                             }}
                             onChange={onChange}
-                            placeholder="can resize"
+                            placeholder="Nhập mô tả "
                             />
                         </Form.Item>
     

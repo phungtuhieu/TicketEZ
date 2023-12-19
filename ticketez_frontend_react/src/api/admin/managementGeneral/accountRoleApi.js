@@ -22,6 +22,9 @@ class AccountRoleApi extends BaseApi {
     async patchInfoUser(id, data) {
         return axiosClient.patch(url + '/infoUser/' + id, data);
     }
+    async post(value){
+        return axiosClient.post(url + '/signupNV', value);
+    }
 
 }
 const accountRoleApi = new AccountRoleApi();

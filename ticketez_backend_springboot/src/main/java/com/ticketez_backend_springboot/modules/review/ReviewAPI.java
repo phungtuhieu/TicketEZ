@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Map;
 
@@ -136,6 +137,44 @@ public class ReviewAPI {
         }
     }
 
+    @PatchMapping("/{id}/like")
+    public ResponseEntity<?> addLikeToReview(@PathVariable("id") Long id) {
+        try {
+            if (!reviewDAO.existsById(id)) {
+                return new ResponseEntity<>("Không tìm thấy review", HttpStatus.NOT_FOUND);
+            }
+
+            Review review = reviewDAO.findById(id).get();
+            review.setLikeComent(review.getLikeComent() + 1);
+            reviewDAO.save(review);
+
+            return ResponseEntity.ok(review);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Thêm dislike
+    @PatchMapping("/{id}/dislike")
+    public ResponseEntity<?> addDislikeToReview(@PathVariable("id") Long id) {
+        try {
+            if (!reviewDAO.existsById(id)) {
+                return new ResponseEntity<>("Không tìm thấy review", HttpStatus.NOT_FOUND);
+            }
+
+            Review review = reviewDAO.findById(id).get();
+            // Giảm số lượng dislike đi 1 (hoặc thực hiện hành động dislike cụ thể của bạn)
+            review.setLikeComent(Math.max(0, review.getLikeComent() - 1));
+            reviewDAO.save(review);
+
+            return ResponseEntity.ok(review);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Không tìm thấy review", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error, vui lòng thử lại sau!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
@@ -179,7 +218,7 @@ public class ReviewAPI {
     }
 
     @GetMapping("/get/check-account-booking")
-    public ResponseEntity<?> getcheckAccountBooking(@RequestParam("accountId") String accountId,
+    public ResponseEntity<?> getCheckAccountBooking(@RequestParam("accountId") String accountId,
             @RequestParam("movieId") Long movieId) {
         try {
             Account optionalAccount = accountDAO.findById(accountId).orElse(null);
@@ -191,21 +230,17 @@ public class ReviewAPI {
             }
 
             // Kiểm tra xem tài khoản đã thanh toán và có vé đã sử dụng hay không
-            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie,
-                    optionalAccount);
+            List<Review> reviews = reviewDAO.findByCheckAccBooking(optionalMovie, optionalAccount);
             List<Booking> bookings = bookingDAO.findPaidAndUsedBookingsByMovieAndAccount(optionalMovie,
                     optionalAccount);
 
-            boolean canComment = !bookings.isEmpty()
+            boolean isPaid = !bookings.isEmpty()
                     && bookings.stream().anyMatch(booking -> booking.getTicketStatus() == 1);
-            if (!reviews.isEmpty()) {
-                canComment = true;
-                return ResponseEntity.ok(canComment);
-            }
 
-            return ResponseEntity.ok(canComment);
+            return ResponseEntity.ok(isPaid);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Log the exception details
+            // log.error("Error while checking account booking", e);
             return new ResponseEntity<>("Server error, vui lòng thử lại sau!",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
