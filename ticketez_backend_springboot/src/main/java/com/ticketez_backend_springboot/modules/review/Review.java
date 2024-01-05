@@ -5,6 +5,7 @@ import java.util.Date;
 import com.ticketez_backend_springboot.modules.account.Account;
 import com.ticketez_backend_springboot.modules.movie.Movie;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +28,7 @@ public class Review {
 	private Date createDate;
 	private Date editDate;
 	private Integer status;
+	private Integer likeComent;
 
 	@ManyToOne
 	@JoinColumn(name = "account_id")

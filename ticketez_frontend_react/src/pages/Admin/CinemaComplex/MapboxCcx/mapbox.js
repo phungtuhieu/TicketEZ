@@ -7,7 +7,7 @@ import Search from "antd/es/input/Search";
 import { SearchOutlined } from '@ant-design/icons';
 
 // export const maps = {popupInfo}
-function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
+function MapboxCcx({ onPopupInfoChange, latitude, longitude, address , province}) {
   const [searchInput, setSearchInput] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -16,10 +16,15 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
     longitude: 106.65765392148774,
     address: ""
   });
+  const [workSomeThing, setWorkSomeThing] = useState(false);
 
   // console.log(latitude);
   // console.log(longitude);
 
+  useEffect(() => {
+    console.log('tỉnh', province);
+    setSearchInput(province);
+  }, [province])
 
   useEffect(() => {
 
@@ -37,8 +42,8 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
   //  console.log(popupInfo);
 
   useEffect(() => {
-    setPopupInfo({ latitude: latitude, longitude: longitude, address: address })
-  }, [latitude, longitude, address]);
+    setPopupInfo({ latitude: latitude, longitude: longitude, address: address });
+  }, [latitude, longitude, address, province]);
   const handleMapClick = async (event) => {
     const clickedLongitude = event.lngLat.lng;
     const clickedLatitude = event.lngLat.lat;
@@ -92,7 +97,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
   };
 
 
-  const handleSearch = async () => {
+   const handleSearch = async () => {
     try {
       const response = await axios.get(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchInput}.json?access_token=${mapboxAccessToken}`
@@ -113,6 +118,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
           longitude: center[0],
           address: place_name,
         });
+       
       } else {
         console.log('Không tìm thấy kết quả.');
       }
@@ -136,10 +142,29 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
     });
 
     setSearchInput('');
+
     setSearchResults([]); // Clear search results after selection
   };
 
   return (
+    <div className=" tw-ml-[140px]" >
+ <div style={{ top: 10, left: 10, zIndex: 1, marginBottom : '20px' }}>
+        <input
+          type="text"
+          placeholder="Tìm kiếm địa điểm..."
+          value={searchInput}
+          onChange={(e) => handleSearchInputChange(e.target.value)}
+          className="tw-border-[0.5px] tw-border-solid tw-border-gray-500  tw-outline-none tw-mr-2"
+        />
+        <SearchOutlined onClick={handleSearch} style={{ fontSize: '15px' }} />
+        <ul>
+          {searchResults.map(result => (
+            <li key={result.id} onClick={() => handleSearchSelection(result)}>
+              {result.place_name}
+            </li>
+          ))}
+        </ul>
+      </div>
     <Map
       onClick={handleMapClick}
       latitude={popupInfo.latitude}
@@ -152,7 +177,7 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
       style={{
         width: "40vw",
         height: "40vh",
-        position: 'relative'
+        
       }}
       mapStyle="mapbox://styles/mapbox/streets-v11"
       mapboxAccessToken={mapboxAccessToken}
@@ -169,25 +194,11 @@ function MapboxCcx({ onPopupInfoChange, latitude, longitude, address }) {
           alt=""
         />
       </Marker>
-      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>
-        <input
-          type="text"
-          placeholder="Tìm kiếm địa điểm..."
-          value={searchInput}
-          onChange={(e) => handleSearchInputChange(e.target.value)}
-          className="tw-border-b tw-border-black focus:tw-border-transparent tw-outline-none"
-        />
-        <SearchOutlined onClick={handleSearch} style={{ fontSize: '25px' }} />
-        <ul>
-          {searchResults.map(result => (
-            <li key={result.id} onClick={() => handleSearchSelection(result)}>
-              {result.place_name}
-            </li>
-          ))}
-        </ul>
-      </div>
+      
 
     </Map>
+    </div>
+   
   );
 }
 

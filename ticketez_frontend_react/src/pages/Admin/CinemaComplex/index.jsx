@@ -58,7 +58,6 @@ const AdminCinemaComplex = () => {
     const [popupInfoFromMapbox, setPopupInfoFromMapbox] = useState({ latitude: 0, longitude: 0, address: "" });
 
     const handlePopupInfoChange = (newPopupInfo) => {
-        // Update the state in App.js
         setPopupInfoFromMapbox(newPopupInfo);
     };
 
@@ -468,6 +467,9 @@ const AdminCinemaComplex = () => {
         );
     };
 
+    const [selectedProvince, setSelectedProvince] = useState("");
+    console.log("213123", selectedProvince);
+
     return (
         <>
             <Row>
@@ -523,7 +525,7 @@ const AdminCinemaComplex = () => {
                             rules={[
                                 { required: true, message: 'Vui lòng nhập số điện thoại' },
                                 { pattern: /^[0-9]+$/, message: 'Số điện thoại chỉ được nhập số' },
-                              ]}
+                            ]}
                         >
                             <Input placeholder="Nhập số điện thoại" />
                         </Form.Item>
@@ -585,31 +587,37 @@ const AdminCinemaComplex = () => {
                                     <Select
                                         style={{ width: '100%' }}
                                         showSearch
-                                        placeholder="Chọn loại"
+                                        placeholder="Chọn tỉnh"
                                         optionFilterProp="children"
                                         filterOption={(input, option) =>
                                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                         }
                                         options={[
                                             {
-                                                value: editData?.province?.id, // Sử dụng cinemaType từ record khi có
+                                                value: editData?.province?.id,
                                                 label: editData?.province?.name,
                                             },
                                             ...province.map((namepr) => ({
                                                 value: namepr.id,
                                                 label: namepr.name,
+                                                name: namepr.name, // Thêm thuộc tính name vào option
                                             })),
                                         ]}
                                         allowClear
+                                        onChange={(value, option) => {
+                                            setSelectedProvince(option?.label || ''); // Lấy giá trị của thuộc tính name
+                                            // Có thể thêm logic hiển thị vị trí trên MapboxCcx ở đây
+                                        }}
                                     />
 
                                 </Form.Item>
                             </Col>
                             <Col span={2}>
-                            <Button onClick={() => { openProvinceModal(); 
-                                // cinemabyCinemaComplex(record); 
+                                <Button onClick={() => {
+                                    openProvinceModal();
+                                    // cinemabyCinemaComplex(record); 
                                 }}>+</Button>
-                        </Col>
+                            </Col>
                         </Row>
 
                         <Form.Item
@@ -641,12 +649,15 @@ const AdminCinemaComplex = () => {
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
-                        // name="address"
-                        // label="Địa chỉ"
-                        // rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                            // name="address"
+                            // label="Địa chỉ"
+                            rules={[{ required: true, message: 'Vui lòng nhập tỉnh' }]}
                         >
                             {/* <Input placeholder="Please input your name" /> */}
-                            <MapboxCcx onPopupInfoChange={handlePopupInfoChange} latitude={mapCinema.latitude} longitude={mapCinema.longitude} address={mapCinema.address} />
+                            <MapboxCcx onPopupInfoChange={handlePopupInfoChange}
+                                latitude={mapCinema.latitude} longitude={mapCinema.longitude}
+                                province={selectedProvince}
+                                />
                         </Form.Item>
                     </Form>
                 </BaseModal>

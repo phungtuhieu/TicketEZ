@@ -1,9 +1,12 @@
 package com.ticketez_backend_springboot.modules.accountRole;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticketez_backend_springboot.auth.models.SecurityAccount;
+import com.ticketez_backend_springboot.auth.models.SecurityERole;
+import com.ticketez_backend_springboot.auth.models.SecurityRole;
+import com.ticketez_backend_springboot.auth.payload.request.SignupRequest;
+import com.ticketez_backend_springboot.auth.payload.response.MessageResponse;
+import com.ticketez_backend_springboot.auth.repository.AccountRepository;
+import com.ticketez_backend_springboot.auth.repository.RoleRepository;
 import com.ticketez_backend_springboot.dto.AccountDTO;
 import com.ticketez_backend_springboot.dto.AccountRolesDTO;
 import com.ticketez_backend_springboot.dto.ResponseDTO;
@@ -35,6 +45,10 @@ import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHis
 import com.ticketez_backend_springboot.modules.accountLockHistory.AccountLockHistoryDAO;
 import com.ticketez_backend_springboot.modules.movieStudio.MovieStudio;
 import com.ticketez_backend_springboot.modules.role.Role;
+import com.ticketez_backend_springboot.modules.verification.Verification;
+
+import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
@@ -48,9 +62,13 @@ public class AccountRoleAPI {
 
     @Autowired
     AccountLockHistoryDAO accountLockHistoryDAO;
+    @Autowired
+    AccountRepository accountRepository;
 
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    RoleRepository roleRepository;
 
     @GetMapping("/getAll")
     public ResponseEntity<List<Account>> findAll() {
@@ -113,24 +131,62 @@ public class AccountRoleAPI {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<?> createAccount(@PathVariable("id") String id,
-            @RequestBody Account account) {
+    @PostMapping("/signupNV")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody DTONV signUpRequest) {
         try {
+            if (accountRepository.existsById(signUpRequest.getId())) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Tên người dùng đã tồn tại!"));
+            }
 
-            Account newAccount = account;
+            if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Email đã được sử dụng!"));
+            }
 
-            encoder.encode(account.getPassword());
-            newAccount.setStatus(1);
-            newAccount.setVerified(true);
-            newAccount.setPoints(0);
-            newAccount.setCreatedDate(new Date());
+            if (accountRepository.existsByFullname(signUpRequest.getFullname())) {
+                // Handle duplicate fullname if needed
+            }
 
-            accountDAO.save(newAccount);
+            if (accountRepository.existsByPhone(signUpRequest.getPhone())) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Số điện thoại đã được sử dụng!"));
+            }
 
-            return ResponseEntity.ok("Thêm thành công");
+            SecurityAccount account = new SecurityAccount(
+                    signUpRequest.getId(),
+                    signUpRequest.getPhone(),
+                    signUpRequest.getFullname(),
+                    signUpRequest.getEmail(),
+                    encoder.encode(signUpRequest.getPassword()));
+
+            account.setGender(signUpRequest.getGender());
+            account.setAddress(signUpRequest.getAddress());
+            account.setImage(signUpRequest.getImage());
+
+            Set<String> strRoles = signUpRequest.getRole();
+            Set<SecurityRole> roles = new HashSet<>();
+
+            if (strRoles != null) {
+                strRoles.forEach(role -> {
+                    SecurityERole securityERole = SecurityERole.fromString(role);
+                    System.out.println("Role from JSON: " + securityERole);
+                    SecurityRole securityRole = roleRepository.findByName(securityERole)
+                            .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy vai trò"));
+                    System.out.println("SecurityRole found: " + securityRole.getName());
+                    roles.add(securityRole);
+                });
+            }
+
+            // ngày tạo
+            account.setStatus(1);
+            account.setCreatedDate(new Date());
+
+            account.setRoles(roles);
+
+            accountRepository.save(account);
+
+            return ResponseEntity.ok(new MessageResponse("Người dùng đã đăng ký thành công!"));
         } catch (Exception e) {
-            return new ResponseEntity<>("Server error, please try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Lỗi server: " + e.getMessage()));
         }
     }
 

@@ -88,6 +88,15 @@ const reviewApi = {
         }
         return axiosClient.get(url + '/get/review-by-movieId', {params});
     },
+    // Thêm phương thức like
+    likeReview: async (reviewId) => {
+        return axiosClient.patch(url + '/' + reviewId + '/like');
+    },
+
+    // Thêm phương thức dislike
+    dislikeReview: async (reviewId) => {
+        return axiosClient.patch(url + '/' + reviewId + '/dislike');
+    },
 
 };
 
